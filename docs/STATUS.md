@@ -15,7 +15,8 @@ Regeln stehen in `HUB.md`, Begründungen in
   Zielzuordnung, Steuerkonsole als `static/steuerkonsole/relihub-steuerkonsole.js` (MIT), Logo,
   `hub.env.example`, Compose (Port 8081), Pipelines `.woodpecker/build-deploy.yaml` und
   `upstream-sync.yaml`. Hub-Tests: 27 in 11 Dateien grün (`pnpm vitest run src/lib/hub src/routes/__tests__`),
-  `pnpm run check` 0 Fehler. Sichtprüfung lokal mit `pnpm dev` bestanden.
+  `pnpm run check` 0 Fehler. Sichtprüfung lokal mit `pnpm dev` bestanden. Upstream-Tests lokal: 3 rote
+  Dateien, davon `LandingPage.test.js` gewollt (ersetzte Startseite, in der Pipeline ausgeschlossen).
 - Offen (Jörg/Ludger, Spec „Voraussetzungen“): Repo im Woodpecker aktivieren, Secrets
   `deploy_ssh_user`, `deploy_ssh_key`, `forgejo_token`; DNS `hub.rpi-virtuell.net` vom CNAME auf den
   Container-Host `46.225.82.96`; Apache-vHost auf Port 8081 mit Zertifikat; Server-Repo unter der

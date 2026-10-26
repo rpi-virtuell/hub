@@ -37,4 +37,10 @@ describe('Erklaerbox', () => {
     await fireEvent.click(getByText(/Termin eintragen/));
     expect(goto).toHaveBeenCalledWith('/calendar/manage');
   });
+
+  it('führt bei hub.home zum Ökosystem-Abschnitt statt nach /', () => {
+    const { getByText } = render(Erklaerbox, { props: { aktion: 'hub.home' } });
+    const link = getByText(/Zum Ökosystem/).closest('a');
+    expect(link?.getAttribute('href')).toBe('#partner');
+  });
 });

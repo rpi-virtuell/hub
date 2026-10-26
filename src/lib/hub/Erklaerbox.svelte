@@ -1,6 +1,7 @@
 <script>
   // Erklärkarte unter der großen Steuerkonsole (Prototyp 5, #explain). Texte aus erklaerungen.js,
-  // Ziele aus konsole-ziele.js. hub.profil öffnet den edufeed-Login statt zu navigieren.
+  // Ziele aus konsole-ziele.js. hub.profil öffnet den edufeed-Login statt zu navigieren,
+  // hub.home springt auf der Startseite zum Ökosystem-Abschnitt (#partner) wie im Prototyp.
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { modalStore } from '$lib/stores/modal.svelte.js';
@@ -68,7 +69,11 @@
             >
           {/each}
         {:else if eintrag.weiter && ziel}
-          {#if aktion === 'hub.profil' || ziel.art === 'intern'}
+          {#if aktion === 'hub.home'}
+            <a class="hub-btn" style="background: {farbe}; color: #fff" href="#partner"
+              >{eintrag.weiter} ›</a
+            >
+          {:else if aktion === 'hub.profil' || ziel.art === 'intern'}
             <button
               type="button"
               class="hub-btn"

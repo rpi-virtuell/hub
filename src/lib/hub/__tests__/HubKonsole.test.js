@@ -54,4 +54,11 @@ describe('HubKonsole', () => {
     expect(container.querySelector('relihub-steuerkonsole')).toBeNull();
     expect(registerContext).not.toHaveBeenCalled();
   });
+
+  it('liegt unter Modals (z-index 50 statt 9999 aus dem Skript)', async () => {
+    const { container } = render(HubKonsole);
+    await tick();
+    const el = /** @type {HTMLElement} */ (container.querySelector('relihub-steuerkonsole'));
+    expect(el.style.zIndex).toBe('50');
+  });
 });

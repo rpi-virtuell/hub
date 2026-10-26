@@ -67,10 +67,12 @@ Quelle der Zuordnung im Code: `src/lib/hub/konsole-ziele.js`.
   (`genese.js` ist das Modul, `Genese.svelte` die Komponente, Tests heißen `genese.test.js` und
   `Genese.svelte.test.js`).
 
-- Hub-Tests: `pnpm vitest run src/lib/hub`. Mocks für `$app/navigation`, `$app/state`,
+- Hub-Tests: `pnpm vitest run src/lib/hub src/routes/__tests__`. Mocks für `$app/navigation`, `$app/state`,
   `$lib/helpers/toast.js` im Stil von `src/lib/components/__tests__/AMBResourceCard.test.js`.
-- Upstream-Prüfungen (`pnpm run check`, `lint`, `test`) laufen in der Pipeline als Information,
-  nicht blockierend; Vergleichswert in `STATUS.md`.
+- Upstream-Prüfungen (`pnpm run check`, `lint`, vitest) laufen in der Pipeline nach dem Deploy als
+  Information, nicht blockierend; Vergleichswert in `STATUS.md`. Bekannte, gewollte Abweichung:
+  `src/lib/components/__tests__/LandingPage.test.js` erwartet die edufeed-Startseite und ist in der
+  Pipeline ausgeschlossen; Ersatz ist `src/routes/__tests__/hub-startseite.test.js`.
 - Hub-Texte nur Deutsch, direkt im Code; kein Import aus `$lib/paraglide` in Hub-Dateien.
 - Formatierung nach `.prettierrc`; vor jedem Commit `pnpm prettier --write <Hub-Dateien>`.
 - **Sandbox-Falle auf Jörgs Mac:** Node-Programme beenden sich in der Claude-Shell nicht. Aufrufe so

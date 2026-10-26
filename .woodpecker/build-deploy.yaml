@@ -21,17 +21,6 @@ steps:
       - pnpm paraglide:compile
       - pnpm vitest run src/lib/hub src/routes/__tests__
 
-  # Steffens main führt check/lint/test selbst nicht aus; ein roter Upstream-Stand darf den Hub
-  # nicht ohne Deploy lassen. Ergebnis nur als Information.
-  - name: upstream-checks
-    image: node:22-alpine
-    failure: ignore
-    commands:
-      - corepack enable
-      - pnpm run check
-      - pnpm run lint
-      - pnpm run test
-
   - name: deploy
     image: appleboy/drone-ssh:1.7.3
     settings:
@@ -42,3 +31,16 @@ steps:
         from_secret: deploy_ssh_key
       script:
         - ~/ServerSetup/scripts/deploy-app.sh hub
+
+  # Steffens main führt check/lint/test selbst nicht aus; ein roter Upstream-Stand darf den Hub
+  # nicht ohne Deploy lassen. Deshalb NACH dem Deploy (ein Timeout hier träfe sonst den Deploy)
+  # und nur als Information. LandingPage.test.js erwartet die edufeed-Startseite, die der Hub
+  # ersetzt; er ist ausgeschlossen, Ersatz ist src/routes/__tests__/hub-startseite.test.js.
+  - name: upstream-checks
+    image: node:22-alpine
+    failure: ignore
+    commands:
+      - corepack enable
+      - pnpm run check
+      - pnpm run lint
+      - pnpm vitest run --exclude src/lib/components/__tests__/LandingPage.test.js

@@ -12,6 +12,7 @@
   let { versteckt = false } = $props();
 
   // Auf der Startseite steht die große Konsole; Seiten mit eigener Bodenleiste (Chat, DM) bleiben frei.
+  // z-index 50 (Inline-Stil schlägt das :host-9999 des Skripts): unter DaisyUI-Modals (999), über Inhalt.
   const sichtbar = $derived(!versteckt && page.url.pathname !== '/');
 
   /** @param {{ action: string }} detail */
@@ -44,6 +45,6 @@
     size="58"
     popover-size="210"
     base-url="https://hub.rpi-virtuell.net"
-    style="--relihub-float-y: 88px"
+    style="--relihub-float-y: 88px; z-index: 50"
   ></relihub-steuerkonsole>
 {/if}
