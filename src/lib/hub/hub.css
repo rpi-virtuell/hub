@@ -300,3 +300,83 @@
     animation: none;
   }
 }
+
+/* Werkstatt: Versionsliste und Einstiegs-Überblendfenster */
+.hub .hub-werkstatt p {
+  max-width: 70ch;
+}
+.hub .hub-versionen {
+  list-style: none;
+  margin: 18px 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+.hub .hub-versionen li {
+  border: 1px solid var(--hub-line);
+  border-radius: 18px;
+  background: var(--hub-card);
+  padding: 16px 18px;
+}
+.hub .hub-versionen .kopf {
+  font-size: 17px;
+}
+.hub .hub-versionen .neu {
+  margin: 6px 0 12px;
+  font-size: 14px;
+  color: var(--hub-muted);
+}
+.hub .hub-versionen .acts,
+.hub .hub-overlay-card .acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.hub .hub-btn-primär {
+  background: var(--c-hub);
+  color: #fff;
+}
+.hub .hub-btn-start {
+  background: var(--hub-ink);
+  color: #fff;
+}
+.hub .hub-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 980; /* über der Navbar, unter DaisyUI-Modals (999) */
+  background: rgba(29, 29, 27, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+.hub .hub-overlay-card {
+  max-width: 560px;
+  width: 100%;
+  background: var(--hub-card);
+  border-radius: 22px;
+  padding: 26px 28px;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.25);
+}
+.hub .hub-overlay-card .fn {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--c-hub);
+  margin: 0 0 4px;
+}
+.hub .hub-overlay-card h2 {
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 1.15;
+  margin: 0 0 10px;
+}
+.hub .hub-overlay-card p {
+  margin: 0 0 16px;
+  color: #3d3d3a;
+}
+.hub .hub-overlay-card .hint {
+  font-size: 14px;
+  color: var(--hub-muted);
+}
