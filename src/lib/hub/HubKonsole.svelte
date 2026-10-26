@@ -8,7 +8,11 @@
   import { steuerkonsoleBereit } from './steuerkonsole-laden.js';
   import { zielFuer } from './konsole-ziele.js';
 
-  const aufStartseite = $derived(page.url.pathname === '/');
+  /** @type {{ versteckt?: boolean }} */
+  let { versteckt = false } = $props();
+
+  // Auf der Startseite steht die große Konsole; Seiten mit eigener Bodenleiste (Chat, DM) bleiben frei.
+  const sichtbar = $derived(!versteckt && page.url.pathname !== '/');
 
   /** @param {{ action: string }} detail */
   function handler(detail) {
@@ -20,7 +24,7 @@
   }
 
   $effect(() => {
-    if (aufStartseite) return;
+    if (!sichtbar) return;
     let aktiv = true;
     steuerkonsoleBereit()
       .then((K) => {
@@ -33,7 +37,7 @@
   });
 </script>
 
-{#if !aufStartseite}
+{#if sichtbar}
   <relihub-steuerkonsole
     floating
     context="hub"

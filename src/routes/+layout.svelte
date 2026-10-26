@@ -602,9 +602,9 @@
   </div>
 </div>
 <PublishStatusToast />
+<HubKonsole versteckt={hasOwnBottomUI} />
 {#if !hasOwnBottomUI && getActiveUser()}
   <GlobalFAB hideButton={pageHasOwnCreateAction} />
-  <HubKonsole />
 {/if}
 {#if !hasOwnBottomUI && getActiveUser() && curatedReady}
   {@const TermiAssistant = lazyTermiAssistant.Component}

@@ -10,8 +10,6 @@
 
   /** @type {string | null} */
   let aktion = $state(null);
-  /** @type {HTMLElement | undefined} */
-  let konsole = $state();
   let groesse = $state(320);
 
   $effect(() => {
@@ -23,23 +21,23 @@
     return () => window.removeEventListener('resize', passe);
   });
 
+  // Das Skript ruft den Kontext-Handler vor dem DOM-Ereignis und unterdrückt das Ereignis bei
+  // false. Die Erklärkarte wechselt deshalb aus dem Handler heraus (wie im Prototyp: explain()).
   $effect(() => {
-    const el = konsole;
-    if (!el) return;
-    /** @param {Event} e */
-    const anAktion = (e) => {
-      aktion = /** @type {CustomEvent<{ action: string }>} */ (e).detail.action;
-    };
-    el.addEventListener('relihub-action', anAktion);
     let aktiv = true;
     steuerkonsoleBereit()
       .then((K) => {
-        if (aktiv) K.registerContext('hub-start', { handler: () => false });
+        if (!aktiv) return;
+        K.registerContext('hub-start', {
+          handler: (d) => {
+            aktion = d.action;
+            return false;
+          }
+        });
       })
       .catch(() => {});
     return () => {
       aktiv = false;
-      el.removeEventListener('relihub-action', anAktion);
     };
   });
 </script>
@@ -62,7 +60,6 @@
     <h1>Dein Startplatz in die digitale Welt der Religionspädagogik</h1>
     <div class="hub-flower">
       <relihub-steuerkonsole
-        bind:this={konsole}
         size={groesse}
         context="hub-start"
         variant="knospen"

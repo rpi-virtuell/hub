@@ -47,4 +47,11 @@ describe('HubKonsole', () => {
     expect(goto).toHaveBeenCalledTimes(1);
     expect(showToast).toHaveBeenCalledTimes(1);
   });
+
+  it('rendert nichts, wenn die Seite eine eigene Bodenleiste hat (versteckt)', async () => {
+    const { container } = render(HubKonsole, { props: { versteckt: true } });
+    await tick();
+    expect(container.querySelector('relihub-steuerkonsole')).toBeNull();
+    expect(registerContext).not.toHaveBeenCalled();
+  });
 });
