@@ -1,11 +1,12 @@
 <script>
+  // Hub-Fassung der Startseite (Comenius-Institut/hub): abgemeldet die reli_hub-Startseite,
+  // angemeldet Weiterleitung nach /c/ wie upstream. Einzige ersetzte Upstream-Datei (docs/HUB.md).
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
-  import * as m from '$lib/paraglide/messages';
   import { runtimeConfig } from '$lib/stores/config.svelte.js';
   import { useActiveUser } from '$lib/stores/accounts.svelte';
-  import LandingContent from '$lib/components/landing/LandingContent.svelte';
+  import HubLanding from '$lib/hub/HubLanding.svelte';
 
   const activeUser = useActiveUser();
 
@@ -17,10 +18,15 @@
 </script>
 
 <svelte:head>
-  <title>{m.landing_meta_title({ appName: runtimeConfig.appName })}</title>
-  <meta name="description" content={m.landing_meta_description()} />
+  <title
+    >{runtimeConfig.appName} · Dein Startplatz in die digitale Welt der Religionspädagogik</title
+  >
+  <meta
+    name="description"
+    content="reli_hub verbindet bestehende Angebote der Religionspädagogik: finden, erstellen, kooperieren, veröffentlichen – mit einem Profil überall."
+  />
 </svelte:head>
 
 {#if !activeUser()}
-  <LandingContent />
+  <HubLanding />
 {/if}
