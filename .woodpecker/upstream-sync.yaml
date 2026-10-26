@@ -1,0 +1,22 @@
+# Holt Steffens main (edufeed-App) in den Hub. Auslöser: Cron (in der Woodpecker-Oberfläche
+# täglich auf main anlegen) oder manuell. Ein Konflikt lässt den Schritt scheitern, nichts wird
+# gepusht; die Lösung passiert lokal (docs/HUB.md). Der Push löst build-deploy.yaml aus.
+when:
+  - event: [cron, manual]
+    branch: main
+
+steps:
+  - name: merge-upstream
+    image: alpine/git:2.47.2
+    environment:
+      FORGEJO_TOKEN:
+        from_secret: forgejo_token
+    commands:
+      - git config user.name "woodpecker-bot"
+      - git config user.email "woodpecker-bot@git.rpi-virtuell.de"
+      - git fetch --unshallow origin main || git fetch origin main
+      - git checkout -B main origin/main
+      - git remote add upstream https://relay.ngit.dev/npub1r30l8j4vmppvq8w23umcyvd3vct4zmfpfkn4c7h2h057rmlfcrmq9xt9ma/edufeed-app.git
+      - git fetch upstream main --tags
+      - git merge --no-edit upstream/main
+      - git push "https://oauth2:$${FORGEJO_TOKEN}@git.rpi-virtuell.de/Comenius-Institut/hub.git" main --tags

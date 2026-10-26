@@ -1,0 +1,44 @@
+# Build und Deploy des reli_hub (Comenius-Institut/hub) nach dem Muster von Materialpool und
+# oer-community: Hub-Tests blockieren, Upstream-Prüfungen informieren, das Image baut
+# Ludgers deploy-app.sh auf dem Server (docs/HUB.md, docs/superpowers/specs/2026-10-26-hub-repo-design.md).
+when:
+  - branch: main
+    event: push
+
+steps:
+  - name: install
+    image: node:22-alpine
+    environment:
+      HUSKY: '0'
+    commands:
+      - corepack enable
+      - pnpm install --frozen-lockfile
+
+  - name: hub-tests
+    image: node:22-alpine
+    commands:
+      - corepack enable
+      - pnpm paraglide:compile
+      - pnpm vitest run src/lib/hub src/routes/__tests__
+
+  # Steffens main führt check/lint/test selbst nicht aus; ein roter Upstream-Stand darf den Hub
+  # nicht ohne Deploy lassen. Ergebnis nur als Information.
+  - name: upstream-checks
+    image: node:22-alpine
+    failure: ignore
+    commands:
+      - corepack enable
+      - pnpm run check
+      - pnpm run lint
+      - pnpm run test
+
+  - name: deploy
+    image: appleboy/drone-ssh:1.7.3
+    settings:
+      host: hub.rpi-virtuell.net
+      username:
+        from_secret: deploy_ssh_user
+      key:
+        from_secret: deploy_ssh_key
+      script:
+        - ~/ServerSetup/scripts/deploy-app.sh hub
