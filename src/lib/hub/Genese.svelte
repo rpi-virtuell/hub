@@ -21,11 +21,11 @@
 </script>
 
 <section class="hub-werkstatt" id="werkstatt">
-  <h2>Werkstatt</h2>
+  <h2>Werkstatt: Prototypen und Konstruktionsbeschreibung</h2>
   <p>
     Der reli_hub entsteht zweigleisig: als Klick-Prototyp, in dem Ideen zuerst ausprobiert werden,
     und als diese App, die davon umsetzt, was sich bewährt. Was hier noch fehlt, ist oft im Prototyp
-    schon zu sehen.
+    schon zu sehen. Jede Version bleibt erreichbar.
   </p>
   {#if genese && genese.prototypen.length}
     <ul class="hub-versionen">
