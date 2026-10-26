@@ -1,0 +1,302 @@
+/* Gestaltung der Hub-Startseite nach Jens' Prototyp 5, auf .hub gescopt. Schriften kommen vom
+   DaisyUI-Theme (rpi); die fünf Funktionsfarben und Tönungen sind die des Prototyps. */
+.hub {
+  --c-hub: #233e99;
+  --c-finden: #008c86;
+  --c-erstellen: #f39200;
+  --c-koop: #d6336c;
+  --c-ver: #7b4fb8;
+  --t-hub: #e6eaf5;
+  --t-finden: #ddf1f0;
+  --t-erstellen: #feefd9;
+  --t-koop: #fae1ea;
+  --t-ver: #eee7f7;
+  --hub-ink: #1d1d1b;
+  --hub-muted: #5f5e5a;
+  --hub-line: #e7e4dc;
+  --hub-card: #ffffff;
+  color: var(--hub-ink);
+}
+.hub .hub-stage {
+  position: relative;
+  text-align: center;
+  padding: 10px 16px 40px;
+  overflow: hidden;
+}
+.hub .hub-deco {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.1;
+  pointer-events: none;
+}
+.hub .hub-eyebrow {
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 15px;
+  margin: 18px 0 6px;
+  color: var(--hub-muted);
+}
+.hub .hub-eyebrow b {
+  color: var(--c-hub);
+}
+.hub .hub-eyebrow i {
+  font-style: normal;
+  color: var(--c-finden);
+}
+.hub .hub-eyebrow u {
+  text-decoration: none;
+  color: var(--c-koop);
+}
+.hub .hub-stage h1 {
+  font-weight: 600;
+  font-size: clamp(32px, 4.6vw, 52px);
+  line-height: 1.05;
+  margin: 0 auto;
+  max-width: 20ch;
+}
+.hub .hub-flower {
+  display: flex;
+  justify-content: center;
+  padding: 92px 0 70px;
+}
+.hub .hub-explain {
+  max-width: 620px;
+  margin: 0 auto;
+  text-align: left;
+  background: var(--hub-card);
+  border: 1px solid var(--hub-line);
+  border-radius: 22px;
+  padding: 22px 24px;
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  min-height: 132px;
+  transition: border-color 0.25s;
+}
+.hub .hub-explain .ic {
+  flex: 0 0 auto;
+  width: 58px;
+  height: 58px;
+}
+.hub .hub-explain .fn {
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin: 0;
+}
+.hub .hub-explain h2 {
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 1.1;
+  margin: 2px 0 6px;
+}
+.hub .hub-explain p {
+  margin: 0 0 14px;
+  color: #3d3d3a;
+}
+.hub .hub-explain .acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.hub .hub-explain .hint {
+  font-size: 14px;
+  color: var(--hub-muted);
+}
+.hub .hub-explain.anim {
+  animation: hub-pop 0.28s cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+@keyframes hub-pop {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.hub .hub-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 16px;
+}
+.hub .hub-btn-ghost {
+  background: transparent;
+  border: 1.5px solid var(--hub-line);
+  color: var(--hub-ink);
+}
+.hub .hub-btn:focus-visible,
+.hub a:focus-visible {
+  outline: 3px solid var(--hub-ink);
+  outline-offset: 2px;
+}
+.hub .hub-badge-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-hub);
+  background: var(--t-hub);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+.hub .hub-partners {
+  padding: 56px clamp(16px, 4vw, 40px) 64px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.hub .hub-partners h2 {
+  font-weight: 600;
+  font-size: 36px;
+  margin: 0 0 6px;
+}
+.hub .hub-partners > p {
+  color: var(--hub-muted);
+  margin: 0 0 26px;
+  max-width: 62ch;
+}
+.hub .hub-partners h3 {
+  font-weight: 600;
+  font-size: 24px;
+  margin: 34px 0 14px;
+}
+.hub .hub-pgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 14px;
+}
+.hub .hub-pcard {
+  position: relative;
+  display: block;
+  height: 132px;
+  perspective: 900px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  outline: 0;
+}
+.hub .hub-pcard .pin {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.55s cubic-bezier(0.3, 0.9, 0.4, 1);
+  transform-style: preserve-3d;
+}
+.hub .hub-pcard:hover .pin,
+.hub .hub-pcard:focus-visible .pin,
+.hub .hub-pcard.flip .pin {
+  transform: rotateY(180deg);
+}
+.hub .hub-pcard .pface {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 18px;
+  border: 1px solid var(--hub-line);
+  background: var(--hub-card);
+  padding: 16px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.hub .hub-pcard .pback {
+  transform: rotateY(180deg);
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 12px 16px 10px;
+  background: var(--bk);
+  border-color: transparent;
+  color: var(--bt);
+}
+.hub .hub-pcard .pback p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.38;
+}
+.hub .hub-pcard .pback em {
+  align-self: flex-end;
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+.hub .hub-pcard .cc {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: 18px;
+}
+.hub .hub-pcard b {
+  display: block;
+  font-size: 17px;
+  line-height: 1.2;
+  hyphens: auto;
+  overflow-wrap: anywhere;
+}
+.hub .hub-pcard small {
+  display: block;
+  font-size: 14px;
+  color: var(--hub-muted);
+  margin-top: 2px;
+}
+.hub .hub-pcard .tag {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border-radius: 999px;
+  padding: 1px 8px;
+  background: var(--t-erstellen);
+  color: #7a4a00;
+}
+.hub .hub-werkstatt {
+  padding: 0 clamp(16px, 4vw, 40px) 48px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.hub .hub-werkstatt h2 {
+  font-weight: 600;
+  font-size: 28px;
+  margin: 0 0 6px;
+}
+.hub .hub-werkstatt ul {
+  margin: 0;
+  padding-left: 20px;
+}
+.hub .hub-foot {
+  border-top: 1px solid var(--hub-line);
+  padding: 22px clamp(16px, 4vw, 40px);
+  color: var(--hub-muted);
+  font-size: 14px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hub .hub-pcard .pin {
+    transition: none;
+  }
+  .hub .hub-explain.anim {
+    animation: none;
+  }
+}
