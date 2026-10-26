@@ -24,6 +24,10 @@ Regeln stehen in `HUB.md`, Begründungen in
   Stand 26.10., 18 Uhr: DNS zeigt noch auf `rpi-virtuell.de`, kein Deploy.
 - Nächster Schritt: Voraussetzungen schaffen, erster Deploy, `upstream-sync` einmal manuell starten
   (Plan Task 7). Danach Stufe 2: Startplatz, eigene Spezifikation.
+- Zurückgestellte Review-Punkte als Issues #1–#9 angelegt (26.10.): Toast-Timing (#1), Skriptkopf (#2),
+  Farben einmal definieren (#3), aria-live/Fokus der Erklärkarte (#4), Werkstatt-Validierung (#5),
+  Hub-SHA im Build (#6), base-url (#7), Meta-Beschreibung (#8), Betriebs-Checkliste vor dem ersten
+  Deploy (#9, gehört zu den Voraussetzungen oben).
 
 ## 2026-10-26 — Repo angelegt (ADR-0001)
 
