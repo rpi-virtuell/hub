@@ -22,7 +22,9 @@ Stand in `STATUS.md`.
 | Compose-Datei nach Materialpool-Muster                                       | `env_file: .env`, Port 8080 auf 3000, kein Traefik. Ob sie `docker-compose.yml` heißen muss (dann ersetzt sie Steffens Traefik-Datei und ist eine Upstream-Berührung mehr) oder `compose.hub.yml` heißen darf, hängt davon ab, was `deploy-app.sh` erwartet; mit Ludger klären | neu oder ersetzt   |
 | `CLAUDE.md`                                                                  | Anhang „Hub“ am Dateiende                                                                                                                                                                                                                                                      | Anhang             |
 
-Die Layout-Berührung sind ein Import und eine Zeile `<HubKonsole />` nach `<GlobalFAB />`.
+Die Layout-Berührung sind ein Import und eine Zeile `<HubKonsole versteckt={hasOwnBottomUI} />` direkt
+nach `<PublishStatusToast />` (außerhalb des Angemeldet-Blocks, damit die Konsole auch abgemeldet
+erscheint). Dazu `.gitignore` (vier Ausnahmen für `docs/` am Ende) und `docker-compose.yml` (ersetzt).
 Alles andere bleibt upstream-identisch. Ein Hub-Feature, das eine weitere Upstream-Datei ändern
 müsste, ist ein Anlass für eine ADR oder einen Vorschlag an Steffen.
 
@@ -54,6 +56,16 @@ Quelle der Zuordnung im Code: `src/lib/hub/konsole-ziele.js`.
 6. **Eine Persona trägt die Kohärenz.** Interessen, Mitgliedschaften und laufende Arbeit einer Person erscheinen konsistent auf allen Seiten und erklären, warum Vorauswahlen und Empfehlungen so sind, wie sie sind.
 
 ## Arbeiten und Testen
+
+- **Hooks:** Der Pre-Commit-Hook (husky, lint-staged) formatiert und lintet die Stage; der Pre-Push-Hook
+  führt `pnpm run check` aus (svelte-check, `strict`, `checkJs`) und blockt bei Fehlern. Hub-Dateien
+  brauchen deshalb JSDoc-Typen; Typen des Skripts stehen in `src/lib/hub/steuerkonsole.d.ts`. Jens'
+  Skript ist mit `// @ts-nocheck` und `eslint-disable` von beiden Prüfungen ausgenommen.
+- **Wichtig:** Das Skript ruft den Kontext-Handler vor dem DOM-Ereignis `relihub-action` und
+  unterdrückt das Ereignis, wenn der Handler `false` liefert. Hub-Komponenten reagieren im Handler.
+- Dateinamen, die sich nur in Groß-/Kleinschreibung unterscheiden, kollidieren auf macOS
+  (`genese.js` ist das Modul, `Genese.svelte` die Komponente, Tests heißen `genese.test.js` und
+  `Genese.svelte.test.js`).
 
 - Hub-Tests: `pnpm vitest run src/lib/hub`. Mocks für `$app/navigation`, `$app/state`,
   `$lib/helpers/toast.js` im Stil von `src/lib/components/__tests__/AMBResourceCard.test.js`.
