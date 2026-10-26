@@ -53,6 +53,7 @@
   import { showToast } from '$lib/helpers/toast.js';
   import { getAppUpdateState } from '$lib/stores/app-update.svelte.js';
   import { shouldPromptUpdate } from '$lib/helpers/app-update.js';
+  import HubKonsole from '$lib/hub/HubKonsole.svelte';
 
   // Flag emojis on Windows (letters instead of flags) — lazy, browser-only;
   // see $lib/helpers/flag-emoji-polyfill.js
@@ -603,6 +604,7 @@
 <PublishStatusToast />
 {#if !hasOwnBottomUI && getActiveUser()}
   <GlobalFAB hideButton={pageHasOwnCreateAction} />
+  <HubKonsole />
 {/if}
 {#if !hasOwnBottomUI && getActiveUser() && curatedReady}
   {@const TermiAssistant = lazyTermiAssistant.Component}
