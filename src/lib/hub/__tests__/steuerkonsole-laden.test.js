@@ -11,7 +11,7 @@ describe('steuerkonsoleBereit', () => {
       'script[src="/steuerkonsole/relihub-steuerkonsole.js"]'
     );
     expect(skripte.length).toBe(1);
-    window.RelihubSteuerkonsole = { version: 'test' };
+    window.RelihubSteuerkonsole = /** @type {any} */ ({ version: 'test' });
     skripte[0].dispatchEvent(new Event('load'));
     expect((await p1).version).toBe('test');
   });

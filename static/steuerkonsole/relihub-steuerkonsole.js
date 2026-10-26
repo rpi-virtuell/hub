@@ -5,6 +5,7 @@
  * Quelle: docs/relihub-prototyp_5.html im Repo Comenius-Institut/FOERBICO_und_rpi-virtuell
  */
 /* eslint-disable no-unused-vars -- Fremdcode von Jens Dechow, unverändert übernommen; Regeln des Hub-Repos gelten hier nicht */
+// @ts-nocheck
 /*!
  * reli_hub-Steuerkonsole – Steuerelement (Prototyp)
  * FOERBICO · nach dem Projektlogo (fünf überlagerte Kreise)

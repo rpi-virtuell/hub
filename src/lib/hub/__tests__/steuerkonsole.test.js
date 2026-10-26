@@ -4,12 +4,15 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 
 beforeAll(async () => {
+  // @ts-ignore Skript ohne Exporte, wirkt nur über window
   await import('../../../../static/steuerkonsole/relihub-steuerkonsole.js');
 });
 
 describe('relihub-steuerkonsole', () => {
   it('registriert fünf Funktionen mit elf Unteraktionen', () => {
-    const f = window.RelihubSteuerkonsole.functions;
+    const f = /** @type {NonNullable<typeof window.RelihubSteuerkonsole>} */ (
+      window.RelihubSteuerkonsole
+    ).functions;
     expect(f.map((x) => x.id)).toEqual([
       'hub',
       'finden',
@@ -21,13 +24,15 @@ describe('relihub-steuerkonsole', () => {
   });
 
   it('löst Routen gegen die Basis-URL auf', () => {
-    expect(window.RelihubSteuerkonsole.resolve('finden.material', 'standard')).toBe(
-      'https://relihub.example/finden/materialpool'
-    );
+    expect(
+      /** @type {NonNullable<typeof window.RelihubSteuerkonsole>} */ (
+        window.RelihubSteuerkonsole
+      ).resolve('finden.material', 'standard')
+    ).toBe('https://relihub.example/finden/materialpool');
   });
 
   it('trifft nur Punkte in genau einem Kreis', () => {
-    const el = document.createElement('relihub-steuerkonsole');
+    const el = /** @type {any} */ (document.createElement('relihub-steuerkonsole'));
     expect(el.exclusive({ x: 0, y: 0 })).toBeNull(); // Mitte: alle fünf Kreise
     expect(el.exclusive({ x: 0, y: -190 }).id).toBe('hub'); // oberes Blütenblatt
     expect(el.exclusive({ x: 0, y: -60 })).toBeNull(); // Linse hub/finden/veroeffentlichen
