@@ -1,3 +1,35 @@
+# reli_hub – Dein Startplatz in die digitale Welt der Religionspädagogik
+
+Der **reli_hub** verbindet bestehende Angebote der Religionspädagogik: Materialpool, relilab,
+relidesk, relimentar, narrt, reliGlobal, Konfi-Arbeit, Friedensarbeit EKD, Comenius-Institut und
+edufeed. Er ist keine weitere Plattform, sondern eine Steuerkonsole, die auf jeder angeschlossenen
+Seite gleich aussieht und je nach Ort anderes tut; ein Profil (ein Nostr-Schlüssel) gilt überall.
+Ein Vorhaben von [FOERBICO](https://oer.community) am Comenius-Institut.
+
+- **Live (geplant):** https://hub.rpi-virtuell.net
+- **Regeln für dieses Repo:** [`docs/HUB.md`](docs/HUB.md) · **Stand:** [`docs/STATUS.md`](docs/STATUS.md) ·
+  **Entscheidungen:** [`docs/entscheidungen/`](docs/entscheidungen/) ·
+  **Spezifikation:** [`docs/superpowers/specs/2026-10-26-hub-repo-design.md`](docs/superpowers/specs/2026-10-26-hub-repo-design.md)
+- **Klick-Prototypen und Konstruktionsbeschreibung** (die Entwurfsseite der Entwicklung):
+  https://rpi-virtuell.github.io/FOERBICO_und_rpi-virtuell/relihub-prototyp_5.html und
+  https://rpi-virtuell.github.io/FOERBICO_und_rpi-virtuell/relihub-prototyp_5.md
+  (Verzeichnis aller Versionen: `relihub-prototypen.json` im selben Ordner)
+- **Steuerkonsole zum Einbinden:** `static/steuerkonsole/relihub-steuerkonsole.js` (MIT)
+
+## Unterbau: Fork der edufeed-App
+
+Dieses Repo ist ein Fork der [edufeed-App](https://relay.ngit.dev/npub1r30l8j4vmppvq8w23umcyvd3vct4zmfpfkn4c7h2h057rmlfcrmq9xt9ma/edufeed-app.git)
+(AGPL-3.0). Login, Communities, Kalender, Editoren, Profile und Kommentare kommen von dort und werden dort
+weiterentwickelt; ein täglicher Pipeline-Lauf holt den Upstream-Stand herein (ADR-0001). Hub-Code liegt
+ausschließlich in `src/lib/hub/`, `static/steuerkonsole/`, `.woodpecker/` und `docs/`.
+
+Lokal starten: `.env` nach `hub.env.example` anlegen, dann `pnpm install` und `pnpm dev`.
+Hub-Tests: `pnpm vitest run src/lib/hub src/routes/__tests__`.
+
+---
+
+_Es folgt die unveränderte README der edufeed-App (Upstream)._
+
 # Edufeed - Decentralized Community App with a Calendar and other stuff
 
 [![Node.js](https://img.shields.io/badge/Node.js-v22.16.0-green)](https://nodejs.org/) [![SvelteKit](https://img.shields.io/badge/SvelteKit-2.1.2-orange)](https://kit.svelte.dev/) [![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)

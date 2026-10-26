@@ -28,23 +28,37 @@
     schon zu sehen.
   </p>
   {#if genese && genese.prototypen.length}
-    <ul>
+    <ul class="hub-versionen">
       {#each [...genese.prototypen].sort((a, b) => b.nummer - a.nummer) as p (p.nummer)}
         {@const links = prototypLinks(genese.basis, p)}
         <li>
-          <a href={links.html} target="_blank" rel="noopener">{p.titel ?? `Prototyp ${p.nummer}`}</a
-          >
-          {#if p.datum}<span> · {p.datum}</span>{/if}
-          {#if p.autor}<span> · {p.autor}</span>{/if}
-          {#if links.beschreibung}
-            · <a href={links.beschreibung} target="_blank" rel="noopener"
-              >Konstruktionsbeschreibung</a
+          <div class="kopf">
+            <b>{p.titel ?? `Prototyp ${p.nummer}`}</b>
+            {#if p.datum}<span> · {p.datum}</span>{/if}
+            {#if p.autor}<span> · {p.autor}</span>{/if}
+          </div>
+          {#if p.neu}<p class="neu">Neu: {p.neu}</p>{/if}
+          <div class="acts">
+            <a class="hub-btn hub-btn-primär" href={links.html} target="_blank" rel="noopener"
+              >Prototyp {p.nummer} öffnen ›</a
             >
-          {/if}
-          {#if p.neu}<br /><small>Neu: {p.neu}</small>{/if}
+            {#if links.beschreibung}
+              <a
+                class="hub-btn hub-btn-ghost"
+                href={links.beschreibung}
+                target="_blank"
+                rel="noopener">Konstruktionsbeschreibung {p.nummer} ›</a
+              >
+            {/if}
+          </div>
         </li>
       {/each}
     </ul>
+    <p class="hint">
+      Verzeichnis aller Versionen: <a href={GENESE_ORDNER} target="_blank" rel="noopener"
+        >Ordner der Prototypen ›</a
+      >
+    </p>
   {:else}
     <p>
       {#if geladen}Das Verzeichnis der Prototypen ist gerade nicht erreichbar.{:else}Prototypen

@@ -29,8 +29,8 @@ describe('Genese', () => {
 
   it('listet Prototypen aus dem Verzeichnis', async () => {
     vi.mocked(ladeGenese).mockResolvedValue(daten);
-    const { findByText, container } = render(Genese);
-    expect(await findByText(/Prototyp 5/)).toBeTruthy();
+    const { findAllByText, container } = render(Genese);
+    expect((await findAllByText(/Prototyp 5/)).length).toBeGreaterThan(0);
     expect(container.querySelector('a[href$="relihub-prototyp_5.html"]')).not.toBeNull();
   });
 
@@ -41,5 +41,15 @@ describe('Genese', () => {
       expect(container.querySelector(`a[href="${GENESE_ORDNER}"]`)).not.toBeNull()
     );
     expect(queryByText(/Prototyp 5/)).toBeNull();
+  });
+
+  it('bietet je Version deutliche Knöpfe für Prototyp und Konstruktionsbeschreibung', async () => {
+    vi.mocked(ladeGenese).mockResolvedValue(daten);
+    const { findByRole, getByRole } = render(Genese);
+    const proto = await findByRole('link', { name: /Prototyp 5 öffnen/ });
+    expect(proto.getAttribute('href')).toMatch(/relihub-prototyp_5\.html$/);
+    expect(getByRole('link', { name: /Konstruktionsbeschreibung 5/ }).getAttribute('href')).toMatch(
+      /relihub-prototyp_5\.md$/
+    );
   });
 });

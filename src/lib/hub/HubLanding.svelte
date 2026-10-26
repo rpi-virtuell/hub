@@ -5,6 +5,7 @@
   import Erklaerbox from './Erklaerbox.svelte';
   import Oekosystem from './Oekosystem.svelte';
   import Genese from './Genese.svelte';
+  import WerkstattOverlay from './WerkstattOverlay.svelte';
   import Logo from './Logo.svelte';
   import './hub.css';
 
@@ -43,6 +44,7 @@
 </script>
 
 <div class="hub">
+  <WerkstattOverlay />
   <section class="hub-stage">
     <span
       class="hub-deco"
