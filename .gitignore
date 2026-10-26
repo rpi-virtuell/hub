@@ -66,3 +66,9 @@ screenshots/
 docs/*
 !docs/nips/
 !docs/guides/
+
+# Hub (Fork-Zusatz): Hub-Doku unter docs/ ist Teil des Repos
+!docs/HUB.md
+!docs/STATUS.md
+!docs/entscheidungen/
+!docs/superpowers/

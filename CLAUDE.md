@@ -697,3 +697,11 @@ Icons live under `src/lib/components/icons/` (subfolders: `calendar/`, `ui/`, `a
 ## Skills
 
 - `/communikey` - Communikey protocol (kinds 10222, 30000, 30222) for community management
+
+---
+
+## Hub (Fork-Zusatz, Comenius-Institut)
+
+Dieses Repo ist der Fork `Comenius-Institut/hub` der edufeed-App. Alles oberhalb dieser Linie ist
+Steffens Datei und bleibt unverändert. Die Regeln für den Hub-Teil stehen in `docs/HUB.md`:
+wo Hub-Code liegen darf, welche Upstream-Dateien berührt sind, wie getestet wird.
