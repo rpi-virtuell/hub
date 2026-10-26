@@ -64,7 +64,6 @@
           style="--bk: {f.bk}; --bt: {f.bt}"
           aria-label="{p.name}: {p.text}"
           role="note"
-          onclick={tipp}
         >
           <span class="pin">
             <span class="pface"
