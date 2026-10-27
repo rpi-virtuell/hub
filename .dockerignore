@@ -59,8 +59,13 @@ docker-compose.yml
 eslint.config.js
 .editorconfig
 
+#### triviales Beispiel für "Sync von Fork"
 # Hub (Fork-Zusatz): paraglide-Ausgabe und -Cache nie ins Image. Beides ist git-ignoriert und wird im
 # Container vom Vite-Plugin frisch erzeugt; eine mitgeschleppte Teilkopie lässt den Build mit
 # "Could not resolve ./messages/_index.js" scheitern (Issue #10).
 src/lib/paraglide
 project.inlang/cache
+#### triviales Beispiel für "Sync von Fork":
+# an dieser Stelle laufen wir "unbemerkt" auseinander
+# edufeed weiß nicht von dieser Änderung
+# edufeed könnte künftig diese Ergänzung wieder "überschreiben"
