@@ -56,7 +56,7 @@ Deno.test('Bereichsfarben nur in :root', () => {
 
 Deno.test('Konsole liest Custom Properties und behält Fallback', () => {
   assert(consoleScript().includes('--relihub-c-'), '--relihub-c- fehlt');
-  assert(/#203A8F/i.test(consoleScript()) || /#233E99/i.test(consoleScript()), 'Fallback-Farbe fehlt');
+  assert(/#203A8F/i.test(consoleScript()) && /#007A75/i.test(consoleScript()) && /#FFA500/i.test(consoleScript()) && !/#233E99/i.test(consoleScript()), 'Fallback-Farben sind nicht die beschlossene Palette');
   // Pillen-Beschriftung (Bereichsname auf hellem Grund) nutzt eine Textfarbe, nicht die Flächenfarbe
   assert(consoleScript().includes('--relihub-x-'), '--relihub-x- fehlt');
   assert(/this\.text\(pill,[^;]*f\.ink/.test(consoleScript()), 'Pille nutzt f.ink nicht');
@@ -116,4 +116,13 @@ Deno.test('ADRs und README-Abschnitt', async () => {
     alle.push(t);
   }
   assert(!/Arbeitspaket|Meilenstein|Förderkennzeichen|01PO23012/.test(alle.join('\n') + readme), 'Projektdoku-Begriffe in ADRs/README');
+});
+
+Deno.test('Review-Fixes: Picker-Bindung, Escaping, Raum-Kontext, Mitgliedschaft, Platzhalter', () => {
+  const s = appScript();
+  assert((s.match(/picker\.bind\(\)/g) || []).length >= 2, 'picker.bind() nicht in beiden Editoren');
+  assert(/tags:\s*tags\.map\(esc\)/.test(s) && /tags:\s*st\.tags\.map\(esc\)/.test(s), 'Hashtags werden nicht escaped');
+  assert(/openBlog\(c\.n,\s*\{\s*room:\s*true\s*\}\)/.test(s) && /opts\.room/.test(s), 'Raum-Kontext nicht explizit');
+  assert(/function isMember\(c\)\s*\{[^}]*crMember\[c\.id\]/.test(s), 'isMember liest crMember nicht');
+  assert(!/#8A8378/i.test(html), 'Platzhalterfarbe #8A8378 unter 4,5:1');
 });

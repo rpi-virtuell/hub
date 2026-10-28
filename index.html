@@ -460,7 +460,7 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .ef-steps u{width:30px;height:4px;border-radius:2px;background:#D6CEC1;text-decoration:none}
 .ef-steps u.done{background:#3F7B78}
 .ef-big{font-size:17px;padding:14px 16px;border:2px solid #1F1D1A;border-radius:10px;background:#FCFAF6}
-.ef-or{display:flex;align-items:center;gap:14px;color:#8A8378;font-size:13px;margin:22px 0}
+.ef-or{display:flex;align-items:center;gap:14px;color:#6A645A;font-size:13px;margin:22px 0}
 .ef-or::before,.ef-or::after{content:"";flex:1;height:1px;background:#D6CEC1}
 .ef-card{display:block;width:100%;text-align:left;border:1px solid #D6CEC1;background:#EFEAE0;border-radius:10px;padding:18px 20px;font:inherit;cursor:pointer;color:#1F1D1A}
 .ef-card:hover{background:#F4F0E8}
@@ -1197,11 +1197,11 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
   const CLOSE_DELAY = 280;
 
   const FUNCS = [
-    { id: 'hub', label: 'reli_hub', color: '#233E99', text: '#FFFFFF', self: true,
+    { id: 'hub', label: 'reli_hub', color: '#203A8F', text: '#FFFFFF', self: true,
       subs: [{ id: 'hub.profil', label: 'mein Profil' }, { id: 'hub.home', label: 'Home' }] },
-    { id: 'finden', label: 'finden', color: '#008C86', text: '#FFFFFF',
+    { id: 'finden', label: 'finden', color: '#007A75', text: '#FFFFFF',
       subs: [{ id: 'finden.material', label: 'Material' }, { id: 'finden.fortbildungen', label: 'Fortbildungen' }, { id: 'finden.beitraege', label: 'Beiträge' }] },
-    { id: 'erstellen', label: 'erstellen', color: '#F39200', text: '#2B1A00',
+    { id: 'erstellen', label: 'erstellen', color: '#FFA500', text: '#2B1A00',
       subs: [{ id: 'erstellen.schreibtisch', label: 'Schreibtisch' }, { id: 'erstellen.labor', label: 'Labor' }] },
     { id: 'kooperieren', label: 'kooperieren', color: '#D6336C', text: '#FFFFFF',
       subs: [{ id: 'kooperieren.communities', label: 'Communities' }, { id: 'kooperieren.personen', label: 'Personen' }] },
@@ -1798,7 +1798,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 
   // ---------- Mit Communities teilen (Issue ef87ccaa): Muster der edufeed-App ----------
   // Angeboten werden Communities, denen die Persona folgt oder in denen sie Mitglied ist; teilen dürfen nur Mitglieder.
-  function isMember(c) { return c.mine === 'Mitglied'; }
+  function isMember(c) { return crMember[c.id] !== undefined ? !!crMember[c.id] : c.mine === 'Mitglied'; }
   function communityPicker(ctx) {
     const list = CY.filter(c => cyFollow.has(c.id));
     const pre = CY.find(x => x.n === ctx) || CY.find(x => x.inst && x.inst[0] === (CTX_NAME[ctx] || ctx));
@@ -1887,6 +1887,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       <div class="ef-foot"><button type="button" class="ef-btn ghost" data-efx>Abbrechen</button><button type="button" class="ef-btn" data-efpub>Veranstaltung veröffentlichen</button></div>
     </div>`);
     const dlg = EF.querySelector('.ef-dlg');
+    picker.bind();
     const chips = (id, arr, fmt, empty) => { document.getElementById(id).innerHTML = arr.length ? `<div class="ef-chips">${arr.map((x, i) => `<span class="ef-chip">${fmt(x)}<button type="button" data-rm="${id}:${i}" aria-label="Entfernen">✕</button></span>`).join('')}</div>` : `<p class="ef-hint i">${empty}</p>`; };
     const draw = () => { chips('efLinks', st.links, x => esc(x), 'Noch keine Links hinzugefügt'); chips('efTags', st.tags, x => '#' + esc(x), 'Noch keine Hashtags hinzugefügt'); chips('efPeople', st.people, x => `${esc(x[0])} · ${esc(x[1])}`, 'Noch keine Mitwirkenden hinzugefügt'); };
     draw();
@@ -1906,7 +1907,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         if (!t.value.trim()) { err.classList.add('on'); t.focus(); return; }
         const dv = (dlg.querySelector('input[type=date]') || {}).value || '', dt = dv ? new Date(dv + 'T12:00:00') : null;
         const MON = ['JAN', 'FEB', 'MÄR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DEZ'];
-        const names = shareTo(picker.selected(), T_('Termin', esc(t.value.trim()), { who: 'Luca Beispiel', ago: 'jetzt', d: dt ? [String(dt.getDate()), MON[dt.getMonth()], String(dt.getFullYear())] : ['–', '', 'Datum offen'], tags: st.tags.slice() }));
+        const names = shareTo(picker.selected(), T_('Termin', esc(t.value.trim()), { who: 'Luca Beispiel', ago: 'jetzt', d: dt ? [String(dt.getDate()), MON[dt.getMonth()], String(dt.getFullYear())] : ['–', '', 'Datum offen'], tags: st.tags.map(esc) }));
         efClose();
         toast(`Termin <b>„${esc(t.value.trim())}“</b> würde jetzt als Nostr-Kalenderereignis veröffentlicht (NIP-52, kind ${st.type === 'ganz' ? 31922 : 31923})${shareNote(names)} – signiert mit deinem Schlüssel und sichtbar im gemeinsamen Kalender.`);
       }
@@ -2021,9 +2022,9 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       if (l.trim()) out += `<p>${inl(l)}</p>`;
     });
     if (list) out += '</ul>';
-    return out || '<p style="color:#8A8378">Noch nichts geschrieben.</p>';
+    return out || '<p style="color:#6A645A">Noch nichts geschrieben.</p>';
   }
-  function openBlog(ctx) {
+  function openBlog(ctx, opts = {}) {
     const tags = ctx === 'relilab' ? ['relilab'] : [];
     const picker = communityPicker(ctx);
     efOpen(`<div class="ef-page ef-blog" role="dialog" aria-modal="true" aria-label="Blog-Artikel schreiben">
@@ -2065,8 +2066,8 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       const r = e.target.closest('[data-bgrm]'); if (r) { tags.splice(+r.dataset.bgrm, 1); drawTags(); return; }
       if (e.target.closest('[data-bgpub]')) {
         const ti = document.getElementById('bgT'); if (!ti.value.trim()) { document.getElementById('bgTerr').classList.add('on'); ti.focus(); return; }
-        const titel = ti.value.trim(), room = CY.find(x => x.n === ctx);
-        const names = shareTo(picker.selected(), T_('Artikel', esc(titel), { who: 'Luca Beispiel', ago: 'jetzt', x: esc(document.getElementById('bgSum').value.trim()), tags: tags.slice() }));
+        const titel = ti.value.trim(), roomC = opts.room ? CY.find(x => x.n === ctx) : null, room = roomC && isMember(roomC) ? roomC : null;
+        const names = shareTo(picker.selected(), T_('Artikel', esc(titel), { who: 'Luca Beispiel', ago: 'jetzt', x: esc(document.getElementById('bgSum').value.trim()), tags: tags.map(esc) }));
         efClose(); toast(`Artikel <b>„${esc(titel)}“</b> würde jetzt als Nostr-Langform-Artikel veröffentlicht (NIP-23, kind 30023)${room ? `, mit h-Tag der Community <b>${esc(room.n)}</b>` : ''}${shareNote(names)}. Er erscheint in deinem Profil${names.length ? ' und in den gewählten Communities' : ''}.`);
       }
     });
@@ -2300,7 +2301,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     if (k === 'code') { const box = document.getElementById('crCode'); box.hidden = !box.hidden; if (!box.hidden) box.querySelector('input').focus(); }
     if (k === 'redeem') { const v = document.querySelector('#crCode input').value.trim(); if (!v) { document.querySelector('#crCode input').focus(); return; } crMember[crId] = true; cyFollow.add(crId); cyRender(); crRender(); toast(`Willkommen! Du bist jetzt Mitglied in <b>${c.n}</b>.`); }
     if (k === 'leave') { crMember[crId] = false; crTab = 'home'; crRender(); toast(`Du hast <b>${c.n}</b> verlassen.`); }
-    if (k === 'blog') openBlog(c.n);
+    if (k === 'blog') openBlog(c.n, { room: true });
     if (k === 'learn') openChooser(c.n);
     if (k === 'event') openEvent(c.n);
   }
