@@ -103,3 +103,17 @@ Deno.test('Newsletter je Community', () => {
   assert(/function nlBox\(/.test(s) && s.includes('Newsletter der Communities') && s.includes('39701'), 'nlBox fehlt');
   assert(/cy-nl/.test(s) && /Newsletter:/.test(s), 'Kachel-Pille oder Raum-Kopf fehlt');
 });
+
+const ADRS = ['0001-farbsystem', '0002-instanzen-als-nachbau', '0003-teilen-in-communities', '0004-newsletter-als-nip-b0', '0005-artikel-im-finden'];
+Deno.test('ADRs und README-Abschnitt', async () => {
+  const readme = await Deno.readTextFile(new URL('../README.md', import.meta.url));
+  assert(readme.includes('## Grundentscheidungen'), 'README-Abschnitt fehlt');
+  const alle: string[] = [];
+  for (const f of ADRS) {
+    const t = await Deno.readTextFile(new URL(`../docs/adr/${f}.md`, import.meta.url));
+    for (const h of ['Status', 'Kontext', 'Entscheidung', 'Folgen']) assert(t.includes(`## ${h}`), `${f}: ${h} fehlt`);
+    assert(readme.includes(f), `README verlinkt ${f} nicht`);
+    alle.push(t);
+  }
+  assert(!/Arbeitspaket|Meilenstein|Förderkennzeichen|01PO23012/.test(alle.join('\n') + readme), 'Projektdoku-Begriffe in ADRs/README');
+});
