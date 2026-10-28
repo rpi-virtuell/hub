@@ -79,3 +79,12 @@ Deno.test('Schaufenster OER-Community ist verdrahtet', () => {
   assert((s.match(/const OC_POSTS[\s\S]*?\n  \];/)![0].match(/\bt:/g) || []).length === 5, 'OC_POSTS hat nicht 5 Beiträge');
   assert(/onerror=/.test(s.match(/function ocRender[\s\S]*?\n  \}/)![0]), 'kein Bild-Fallback');
 });
+
+Deno.test('Teilen in Communities im Beitrags- und Termin-Editor', () => {
+  const s = appScript();
+  assert(s.includes('Mit Communities teilen (optional)') && s.includes('Communities auswählen'), 'Abschnitt fehlt');
+  assert(s.includes('Alle auswählen') && s.includes('Alle abwählen') && s.includes('Nur Mitglieder'), 'Buttons/Sperre fehlen');
+  assert((s.match(/communityPicker\(/g) || []).length >= 3, 'communityPicker nicht in beiden Editoren');
+  assert(/function shareTo\(/.test(s) && /kind 16/.test(s) && /h-Tag/.test(s), 'shareTo oder Toast-Text fehlt');
+  assert(/function isMember\(/.test(s), 'isMember fehlt');
+});

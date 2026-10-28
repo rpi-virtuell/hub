@@ -405,6 +405,20 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .ef-btn.berry{background:#9B3D57}
 .ef-btn.ghost{background:transparent;color:#1F1D1A;border:1.5px solid #1F1D1A}
 .ef-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+/* Mit Communities teilen (Muster der edufeed-App: Liste mit Checkboxen, Alle auswählen/abwählen, Sperre für Nicht-Mitglieder) */
+.ef-cp{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;background:var(--card)}
+.ef-cp-tools{display:flex;gap:8px;margin-bottom:8px}
+.ef-btn.ef-sm{padding:5px 10px;font-size:13px}
+.ef-cp-list{max-height:160px;overflow:auto;display:flex;flex-direction:column;gap:4px}
+.ef-cp-row{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer}
+.ef-cp-row:hover{background:var(--paper)}
+.ef-cp-row.off{cursor:not-allowed;color:var(--muted)}
+.ef-cp-row input{width:18px;height:18px;accent-color:var(--c-ver);margin:0}
+.ef-cp-av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;flex:0 0 auto}
+.ef-cp-row.off .ef-cp-av{opacity:.5}
+.ef-cp-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ef-cp-st{font-size:12.5px;color:var(--muted);visibility:hidden}
+.ef-cp-row.off .ef-cp-st,.ef-cp-row input:checked~.ef-cp-st{visibility:visible}
 .ef-chip{display:inline-flex;align-items:center;gap:6px;background:#E3EEED;color:#234A48;border-radius:999px;font-size:13px;padding:3px 6px 3px 11px}
 .ef-chip button{border:0;background:transparent;cursor:pointer;color:inherit;font-size:14px;line-height:1}
 .ef-err{color:#B5394E;font-size:12.5px;margin-top:5px;display:none}
@@ -1768,6 +1782,34 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   const CTX_NAME = { hub: 'reli_hub', relilab: 'relilab', materialpool: 'rpi-virtuell Materialpool', relidesk: 'relidesk' };
   function efOpen(html) { EF.innerHTML = html; EF.hidden = false; document.body.style.overflow = 'hidden'; const f = EF.querySelector('[autofocus]'); if (f) setTimeout(() => f.focus(), 30); }
   function efClose() { EF.hidden = true; EF.innerHTML = ''; document.body.style.overflow = ''; }
+
+  // ---------- Mit Communities teilen (Issue ef87ccaa): Muster der edufeed-App ----------
+  // Angeboten werden Communities, denen die Persona folgt oder in denen sie Mitglied ist; teilen dürfen nur Mitglieder.
+  function isMember(c) { return c.mine === 'Mitglied'; }
+  function communityPicker(ctx) {
+    const list = CY.filter(c => cyFollow.has(c.id));
+    const pre = CY.find(x => x.n === ctx) || CY.find(x => x.inst && x.inst[0] === (CTX_NAME[ctx] || ctx));
+    const uid = 'cp' + Math.random().toString(36).slice(2, 7);
+    const html = `<label class="ef-l soft">Mit Communities teilen (optional)</label>
+      <p class="ef-desc">Communities auswählen. Geteilt wird als Repost (kind 16) mit einem h-Tag je Community.</p>
+      <div class="ef-cp" id="${uid}">
+        <div class="ef-cp-tools"><button type="button" class="ef-btn ef-sm" data-cpall="1">Alle auswählen</button><button type="button" class="ef-btn ef-sm" data-cpall="0">Alle abwählen</button></div>
+        <div class="ef-cp-list">${list.map(c => { const ok = isMember(c); return `<label class="ef-cp-row${ok ? '' : ' off'}"><input type="checkbox" value="${c.id}"${ok ? '' : ' disabled'}${ok && pre && pre.id === c.id ? ' checked' : ''}><span class="ef-cp-av" style="background:${c.col}">${c.ab}</span><span class="ef-cp-n">${c.n}</span><small class="ef-cp-st">${ok ? '(wird geteilt)' : '🔒 Nur Mitglieder'}</small></label>`; }).join('')}</div>
+      </div>`;
+    return {
+      html,
+      selected: () => [...document.querySelectorAll(`#${uid} input:checked`)].map(i => i.value),
+      bind: () => { const box = document.getElementById(uid); if (box) box.addEventListener('click', e => { const b = e.target.closest('[data-cpall]'); if (b) box.querySelectorAll('input:not(:disabled)').forEach(i => { i.checked = b.dataset.cpall === '1'; }); }); }
+    };
+  }
+  // Beitrag/Termin in die gewählten Räume stellen (im Prototyp: vorn in die Aktivitätsliste); gibt die Namen zurück
+  function shareTo(ids, item) {
+    const names = [];
+    ids.forEach(id => { const c = CY.find(x => x.id === id); if (!c) return; const d = crData(c); if (!CR[id]) CR[id] = d; d.act.unshift(item); names.push(c.n); });
+    if (crId && ids.includes(crId) && crRootEl) crRender();
+    return names;
+  }
+  const shareNote = names => names.length ? ` und mit einem Repost (kind 16) mit h-Tags an ${names.length} ${names.length === 1 ? 'Community' : 'Communities'} geteilt: <b>${names.map(esc).join(', ')}</b>` : '';
   EF.addEventListener('mousedown', e => { if (e.target === EF) efClose(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !EF.hidden) efClose(); });
   const ctxBadge = ctx => `<div class="ef-ctx"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true">${ORDER.map((k, i) => { const a = (-90 + 72 * i) * Math.PI / 180; return `<circle cx="${(98*Math.cos(a)).toFixed(1)}" cy="${(98*Math.sin(a)).toFixed(1)}" r="100" fill="${C[k]}" opacity=".66"/>`; }).join('')}</svg>geöffnet über die Steuerkonsole · ${CTX_NAME[ctx] || ctx}</div>`;
@@ -1777,6 +1819,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   function openEvent(ctx) {
     const st = { type: 'ganz', links: [], tags: ctx === 'relilab' ? ['relilab'] : [], people: ctx === 'relilab' ? [['relilab', 'Organisation']] : [['Luca Beispiel', 'Organisator:in']] };
     const sel = (opts) => `<select class="ef-sel">${opts.map(o => `<option>${o}</option>`).join('')}</select>`;
+    const picker = communityPicker(ctx);
     efOpen(`<div class="ef-dlg" role="dialog" aria-modal="true" aria-label="Neue Veranstaltung erstellen">
       <button class="ef-x" type="button" data-efx aria-label="Schließen">✕</button>
       <h2>Neue Veranstaltung erstellen</h2>
@@ -1812,6 +1855,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       <p class="ef-desc">Hilft anderen, die Veranstaltung zu finden, z. B. nach Thema oder Zielgruppe.</p>
       <div class="ef-row"><input class="ef-in" id="efTin" placeholder="z. B. fortbildung"><button type="button" class="ef-btn" data-add="tags">Hinzufügen</button></div>
       <div id="efTags"></div>
+      ${picker.html}
       <label class="ef-l soft">Mitwirkende</label>
       <div class="ef-row wrap"><input class="ef-in" id="efPin" placeholder="Name suchen oder npub einfügen…"><select class="ef-sel" id="efProle" style="max-width:200px"><option>Teilnehmer:in</option><option>Vortragende:r</option><option>Organisator:in</option><option>Organisation</option></select><button type="button" class="ef-btn" data-add="people">+</button></div>
       <p class="ef-hint">Nach Name suchen oder npub eingeben. Hier hinzugefügte Personen werden öffentlich am Termin angezeigt (z. B. Vortragende, Organisation).</p>
@@ -1836,8 +1880,11 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       if (e.target.closest('[data-efpub]')) {
         const t = document.getElementById('efT'), err = document.getElementById('efTerr');
         if (!t.value.trim()) { err.classList.add('on'); t.focus(); return; }
+        const dv = (dlg.querySelector('input[type=date]') || {}).value || '', dt = dv ? new Date(dv + 'T12:00:00') : null;
+        const MON = ['JAN', 'FEB', 'MÄR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DEZ'];
+        const names = shareTo(picker.selected(), T_('Termin', esc(t.value.trim()), { who: 'Luca Beispiel', ago: 'jetzt', d: dt ? [String(dt.getDate()), MON[dt.getMonth()], String(dt.getFullYear())] : ['–', '', 'Datum offen'], tags: st.tags.slice() }));
         efClose();
-        toast(`Termin <b>„${esc(t.value.trim())}“</b> würde jetzt als Nostr-Kalenderereignis veröffentlicht (NIP-52, kind ${st.type === 'ganz' ? 31922 : 31923}) – signiert mit deinem Schlüssel und sichtbar im gemeinsamen Kalender.`);
+        toast(`Termin <b>„${esc(t.value.trim())}“</b> würde jetzt als Nostr-Kalenderereignis veröffentlicht (NIP-52, kind ${st.type === 'ganz' ? 31922 : 31923})${shareNote(names)} – signiert mit deinem Schlüssel und sichtbar im gemeinsamen Kalender.`);
       }
     });
     document.getElementById('efT').addEventListener('input', () => document.getElementById('efTerr').classList.remove('on'));
@@ -1954,6 +2001,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   }
   function openBlog(ctx) {
     const tags = ctx === 'relilab' ? ['relilab'] : [];
+    const picker = communityPicker(ctx);
     efOpen(`<div class="ef-page ef-blog" role="dialog" aria-modal="true" aria-label="Blog-Artikel schreiben">
       <div class="ef-body" style="padding-top:18px">
         <div class="ef-tt" style="margin:4px 0 18px"><button type="button" data-efx aria-label="Zurück">‹</button><h2>Blog-Artikel schreiben</h2><button class="ef-x" type="button" data-efx aria-label="Schließen" style="margin-left:auto;position:static">✕</button></div>
@@ -1961,7 +2009,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         <input class="ef-in ef-title" id="bgT" placeholder="Artikeltitel" aria-label="Artikeltitel" autofocus><div class="ef-err" id="bgTerr">Gib dem Artikel einen Titel.</div>
         <label class="ef-l soft">Titelbild</label>
         <div class="ef-row"><input class="ef-in" placeholder="https://… oder Bild hochladen"><button type="button" class="ef-btn berry" data-efnote="Bildauswahl">Bild auswählen…</button></div>
-        <textarea class="ef-ta" style="margin-top:16px" placeholder="Kurze Zusammenfassung (optional)" aria-label="Kurze Zusammenfassung"></textarea>
+        <textarea class="ef-ta" id="bgSum" style="margin-top:16px" placeholder="Kurze Zusammenfassung (optional)" aria-label="Kurze Zusammenfassung"></textarea>
         <div class="ef-md" id="bgMd">
           <div class="ef-tb"><button type="button" class="seg on" data-mode="w">Schreiben</button><button type="button" class="seg" data-mode="p">Vorschau</button><i></i>
             <button type="button" class="tb" data-md="b" title="Fett">B</button><button type="button" class="tb it" data-md="i" title="Kursiv">I</button><button type="button" class="tb" data-md="h" title="Überschrift">H</button>
@@ -1972,9 +2020,11 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         <label class="ef-l soft">Hashtags</label>
         <div class="ef-row"><input class="ef-in" id="bgTag" placeholder="Hashtag hinzufügen"><button type="button" class="ef-btn ef-sq" data-bgtag aria-label="Hashtag hinzufügen">+</button></div>
         <div id="bgTags"></div>
+        ${picker.html}
         <button type="button" class="ef-btn ef-wide" data-bgpub>Artikel veröffentlichen</button>
       </div></div>`);
     const pg = EF.querySelector('.ef-blog'), ta = document.getElementById('bgTx');
+    picker.bind();
     const drawTags = () => { document.getElementById('bgTags').innerHTML = tags.length ? `<div class="ef-chips">${tags.map((t, i) => `<span class="ef-chip">#${esc(t)}<button type="button" data-bgrm="${i}" aria-label="Entfernen">✕</button></span>`).join('')}</div>` : '<p class="ef-hint i">Noch keine Hashtags hinzugefügt</p>'; };
     drawTags();
     function wrap(a, b, ph) { const s = ta.selectionStart, e = ta.selectionEnd, sel = ta.value.slice(s, e) || ph; ta.setRangeText(a + sel + b, s, e, 'end'); ta.focus(); }
@@ -1991,7 +2041,9 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       const r = e.target.closest('[data-bgrm]'); if (r) { tags.splice(+r.dataset.bgrm, 1); drawTags(); return; }
       if (e.target.closest('[data-bgpub]')) {
         const ti = document.getElementById('bgT'); if (!ti.value.trim()) { document.getElementById('bgTerr').classList.add('on'); ti.focus(); return; }
-        efClose(); toast(`Artikel <b>„${esc(ti.value.trim())}“</b> würde jetzt als Nostr-Langform-Artikel veröffentlicht (NIP-23, kind 30023) und erscheint in deinem Profil und in den passenden Communities.`);
+        const titel = ti.value.trim(), room = CY.find(x => x.n === ctx);
+        const names = shareTo(picker.selected(), T_('Artikel', esc(titel), { who: 'Luca Beispiel', ago: 'jetzt', x: esc(document.getElementById('bgSum').value.trim()), tags: tags.slice() }));
+        efClose(); toast(`Artikel <b>„${esc(titel)}“</b> würde jetzt als Nostr-Langform-Artikel veröffentlicht (NIP-23, kind 30023)${room ? `, mit h-Tag der Community <b>${esc(room.n)}</b>` : ''}${shareNote(names)}. Er erscheint in deinem Profil${names.length ? ' und in den gewählten Communities' : ''}.`);
       }
     });
     document.getElementById('bgT').addEventListener('input', () => document.getElementById('bgTerr').classList.remove('on'));
