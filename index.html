@@ -5,13 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>reli_hub · Prototyp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@400;500;600&family=Oswald:wght@500;600&family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@400;500;600&family=Oswald:wght@500;600&family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --c-hub:#233E99;--c-finden:#008C86;--c-erstellen:#F39200;--c-koop:#D6336C;--c-ver:#7B4FB8;--c-profil:#233E99;
+  --c-hub:#203A8F;--c-finden:#007A75;--c-erstellen:#FFA500;--c-koop:#D6336C;--c-ver:#7B4FB8;--c-profil:#203A8F;
+  /* Textfarben je Bereich: mindestens 4,5:1 auf paper, card und eigenem Tint */
+  --x-hub:#203A8F;--x-finden:#00605C;--x-erstellen:#8A4C00;--x-koop:#7A1A3E;--x-ver:#5A3590;
   --t-hub:#E6EAF5;--t-finden:#DDF1F0;--t-erstellen:#FEEFD9;--t-koop:#FAE1EA;--t-ver:#EEE7F7;--t-profil:#E6EAF5;
   --ink:#1D1D1B;--muted:#5F5E5A;--line:#E7E4DC;--paper:#FBFAF7;--card:#FFFFFF;
   --mp:#00726D;--mp-dark:#004E4A;--mp-l1:#8FD3CE;--mp-l2:#3FA9A2;--mp-soft:#E3F2F1;
+  /* FOERBICO-Palette (Styleguide oer.community) für das Schaufenster */
+  --fo-blau:#203A8F;--fo-orange:#FFA500;--fo-titel:#002366;--fo-text:#333333;--fo-hell:#F0F8FF;--fo-kopf:#E6F2FF;--fo-rahmen:#D3D3D3;
+  /* Steuerkonsole liest diese Werte; ohne sie gelten ihre eingebauten Standardfarben */
+  --relihub-c-hub:var(--c-hub);--relihub-c-finden:var(--c-finden);--relihub-c-erstellen:var(--c-erstellen);--relihub-c-kooperieren:var(--c-koop);--relihub-c-veroeffentlichen:var(--c-ver);
+  --relihub-x-hub:var(--x-hub);--relihub-x-finden:var(--x-finden);--relihub-x-erstellen:var(--x-erstellen);--relihub-x-kooperieren:var(--x-koop);--relihub-x-veroeffentlichen:var(--x-ver);
+  --relihub-text-hub:#FFFFFF;--relihub-text-finden:#FFFFFF;--relihub-text-erstellen:#2B1A00;--relihub-text-kooperieren:#FFFFFF;--relihub-text-veroeffentlichen:#FFFFFF;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -36,12 +44,59 @@ button{font:inherit}
 .btn-profil{background:var(--c-profil);color:#fff}
 .btn-ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
 .btn:focus-visible,a:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+/* ---------- Ansicht 8: OER-Community (Nachbau oer.community, Hugo/PaperMod; Farben aus dem FOERBICO-Styleguide) ---------- */
+#v-oercommunity{font-family:"Roboto Condensed",sans-serif;background:#fff;color:var(--fo-text);min-height:100vh}
+.oc-head{background:var(--fo-kopf);border-bottom:2px solid var(--fo-orange)}
+.oc-in{max-width:960px;margin:0 auto;padding:0 20px}
+.oc-head .oc-in{display:flex;align-items:center;gap:18px;min-height:60px;flex-wrap:wrap}
+.oc-brand{font-weight:700;font-size:22px;color:var(--fo-titel);text-decoration:none}
+.oc-nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.oc-nav button{border:0;background:transparent;font:inherit;font-size:16px;color:var(--fo-titel);padding:8px 10px;cursor:pointer;border-radius:5px}
+.oc-nav button:hover{background:#fff}
+.oc-main{padding:28px 0 40px}
+.oc-sec{padding:28px 0;border-top:1px solid var(--fo-rahmen)}
+.oc-sec:first-child{border-top:0}
+.oc-sec h2{color:var(--fo-titel);font-size:28px;margin:0 0 16px}
+.oc-start{text-align:center}
+.oc-start img{width:140px;height:140px}
+.oc-start h1{color:var(--fo-titel);font-size:44px;margin:10px 0 4px;letter-spacing:1px}
+.oc-start h2{font-size:22px;font-weight:400;color:var(--fo-blau);margin:0 auto 18px;max-width:720px}
+.oc-start p{max-width:720px;margin:0 auto 12px;line-height:1.6;font-size:17px}
+.oc-btn{display:inline-block;background:var(--fo-blau);color:#fff;text-decoration:none;padding:9px 16px;border-radius:5px;font-weight:600;margin:6px 4px;border:0;font:inherit;cursor:pointer}
+.oc-btn.alt{background:#fff;color:var(--fo-titel);border:1.5px solid var(--fo-orange)}
+.oc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.oc-card{border:1px solid var(--fo-orange);border-radius:5px;background:#fff;overflow:hidden;display:flex;flex-direction:column}
+.oc-card .img{position:relative;aspect-ratio:16/9;background:var(--fo-hell);display:grid;place-items:center;color:var(--fo-titel);font-weight:600;text-align:center;padding:8px}
+.oc-card .img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.oc-lic{position:absolute;right:8px;bottom:8px;background:rgba(255,255,255,.94);color:var(--fo-text);font-size:12px;border-radius:999px;padding:3px 9px;border:1px solid var(--fo-rahmen)}
+.oc-card .tx{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px}
+.oc-card h3{margin:0;font-size:19px;line-height:1.3}
+.oc-card h3 a{color:var(--fo-titel);text-decoration:none}
+.oc-card h3 a:hover{text-decoration:underline}
+.oc-date{font-size:14px;color:#555555}
+.oc-tags{display:flex;flex-wrap:wrap;gap:6px}
+.oc-tags span{font-size:13px;background:var(--fo-hell);color:var(--fo-titel);border-radius:999px;padding:3px 9px}
+.oc-card p{margin:0;line-height:1.5;font-size:15.5px}
+.oc-card p a{color:var(--fo-blau)}
+.oc-team{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.oc-g{margin:18px 0 10px;font-size:20px;color:var(--fo-blau)}
+.oc-g a{color:inherit}
+.oc-person{display:flex;gap:12px;align-items:center;border:1px solid var(--fo-rahmen);border-radius:5px;padding:10px 12px;background:#fff}
+.oc-av{flex:0 0 auto;width:46px;height:46px;border-radius:50%;background:var(--fo-blau);color:#fff;display:grid;place-items:center;font-weight:700}
+.oc-person b{display:block;color:var(--fo-titel)}
+.oc-person small{font-size:13.5px;color:var(--fo-text);line-height:1.35}
+.oc-foot{border-top:2px solid var(--fo-orange);background:var(--fo-kopf);padding:18px 0;font-size:14px;color:var(--fo-text);line-height:1.6}
+.oc-foot a{color:var(--fo-titel)}
+.oc-foot .hub{display:flex;align-items:center;gap:8px;margin-top:8px;color:var(--fo-titel);font-weight:600}
+@media (max-width:640px){.oc-start h1{font-size:34px}.oc-nav{margin-left:0}}
 
 /* ---------- Ansicht 1: Start ---------- */
 .stage{position:relative;text-align:center;padding:10px 16px 40px;overflow:hidden}
 .deco{position:absolute;border-radius:50%;opacity:.10;pointer-events:none}
 .eyebrow{font-family:"Barlow Condensed",sans-serif;font-weight:600;letter-spacing:2px;text-transform:uppercase;font-size:15px;margin:18px 0 6px;color:var(--muted)}
-.eyebrow b{color:var(--c-hub)}.eyebrow i{font-style:normal;color:var(--c-finden)}.eyebrow u{text-decoration:none;color:var(--c-koop)}
+.eyebrow b{color:var(--x-hub)}.eyebrow i{font-style:normal;color:var(--x-finden)}.eyebrow u{text-decoration:none;color:var(--x-koop)}
 .stage h1{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:clamp(32px,4.6vw,52px);line-height:1.05;margin:0 auto;max-width:20ch}
 .flower-wrap{display:flex;justify-content:center;padding:92px 0 70px}
 .explain{max-width:620px;margin:0 auto;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px 24px 22px 24px;display:flex;gap:18px;align-items:flex-start;min-height:132px;transition:border-color .25s}
@@ -93,13 +148,13 @@ button{font:inherit}
 .panel h2 .more:hover{color:var(--ink)}
 .mat{display:flex;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
 .mat:first-of-type{border-top:0}
-.mat .th{flex:0 0 auto;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--t-finden);color:var(--c-finden)}
+.mat .th{flex:0 0 auto;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--t-finden);color:var(--x-finden)}
 .mat .th svg{width:26px;height:26px}
 .mat b{display:block;font-size:17px;line-height:1.3}
 .mat .meta{font-size:14px;color:var(--muted);margin:2px 0 6px}
 .why{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:#1B2F73;background:var(--t-profil);border-radius:999px;padding:2px 10px}
 .why i{width:8px;height:8px;border-radius:50%;background:var(--c-profil)}
-.src{font-size:13px;color:var(--c-finden);font-weight:600;margin-left:8px;text-decoration:none}
+.src{font-size:13px;color:var(--x-finden);font-weight:600;margin-left:8px;text-decoration:none}
 .news{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
 .news:first-of-type{border-top:0}
 .news .who{flex:0 0 auto;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;font-size:14px}
@@ -113,7 +168,7 @@ button{font:inherit}
 .cm span{font-size:12.5px;color:var(--muted)}
 .ev{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line);align-items:center}
 .ev:first-of-type{border-top:0}
-.ev .date{flex:0 0 auto;width:54px;height:54px;border-radius:50%;background:var(--t-finden);color:var(--c-finden);display:grid;place-items:center;text-align:center;line-height:1;font-family:"Barlow Condensed",sans-serif;font-weight:600}
+.ev .date{flex:0 0 auto;width:54px;height:54px;border-radius:50%;background:var(--t-finden);color:var(--x-finden);display:grid;place-items:center;text-align:center;line-height:1;font-family:"Barlow Condensed",sans-serif;font-weight:600}
 .ev .date b{display:block;font-size:22px}.ev .date small{font-size:12px;letter-spacing:1px}
 .ev .tx b{display:block;font-size:16px;line-height:1.25}
 .ev .tx span{font-size:13.5px;color:var(--muted)}
@@ -162,7 +217,7 @@ button{font:inherit}
 .ages a:nth-child(3){background:var(--mp);color:#fff}
 .ages a:nth-child(4){background:var(--mp-dark);color:#fff}
 .reco{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);border:1px solid #D8E6E4;border-left:6px solid var(--mp);border-radius:12px;overflow:hidden}
-.reco .img{background:var(--mp-soft);display:grid;place-items:center;min-height:240px;color:#4E928C}
+.reco .img{background:var(--mp-soft);display:grid;place-items:center;min-height:240px;color:#2F6F6A}
 .reco .img svg{width:64px;height:64px}
 .reco .tx{padding:28px 32px}
 .reco .ey{color:var(--mp);font-weight:600;margin:0 0 6px}
@@ -236,7 +291,7 @@ button{font:inherit}
 @media (max-width:560px){.rl-cards{grid-template-columns:1fr}.rl-cal .wd{font-size:0}.rl-cal .wd::first-letter{font-size:11px}}
 
 /* ---------- Ansicht 5: relidesk (Nachbau des ReliDesk-Prototyps, in der Farbe von „erstellen“) ---------- */
-#v-relidesk{--rd-deep:#8A4C00;--rd-head:#A65B00;--rd:#B86500;--rd-acc:#F39200;--rd-mid:#FBD49A;--rd-soft:#FDE6C2;--rd-light:#FFF6EA;--rd-ink:#2B1A00;
+#v-relidesk{--rd-deep:#8A4C00;--rd-head:#A65B00;--rd:#AD5F00;--rd-acc:#F39200;--rd-mid:#FBD49A;--rd-soft:#FDE6C2;--rd-light:#FFF6EA;--rd-ink:#2B1A00;
   background:#FBFAF8;color:#2E2A25;font-family:Inter,system-ui,sans-serif;font-size:15px;min-height:100vh}
 .rd-note{background:var(--rd-mid);color:#5A3300;font-size:12.5px;font-weight:600;padding:5px 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rd-head{display:flex;align-items:center;gap:16px;padding:12px 26px;background:var(--rd-head);color:#fff}
@@ -244,7 +299,7 @@ button{font:inherit}
 .rd-brand svg{width:22px;height:22px;color:var(--rd-mid)}
 .rd-proto{font-size:11px;font-weight:600;letter-spacing:0;background:rgba(255,255,255,.22);border-radius:999px;padding:2px 9px}
 .rd-toggle{display:flex;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:3px;margin-left:12px}
-.rd-toggle button{border:0;background:transparent;color:#FDE6C2;font-size:10.5px;font-weight:700;letter-spacing:1px;padding:6px 16px;border-radius:6px;cursor:pointer}
+.rd-toggle button{border:0;background:transparent;color:#FFF6EA;font-size:10.5px;font-weight:700;letter-spacing:1px;padding:6px 16px;border-radius:6px;cursor:pointer}
 .rd-toggle button.on{background:var(--rd-mid);color:var(--rd-ink)}
 .rd-nav{margin-left:auto;display:flex;gap:6px;align-items:center}
 .rd-nav a{display:flex;align-items:center;gap:7px;color:#fff;text-decoration:none;font-size:14px;letter-spacing:2.4px;text-transform:uppercase;padding:10px 10px;border-bottom:2px solid transparent}
@@ -253,15 +308,15 @@ button{font:inherit}
 .rd-user{width:34px;height:34px;border-radius:50%;background:var(--rd-mid);color:var(--rd-ink);display:grid;place-items:center;font-weight:700;font-size:13px;margin-left:10px;text-decoration:none}
 .rd-tab{display:none}.rd-tab.on{display:block}
 .rd-hero{background:var(--rd);color:#fff;padding:64px clamp(16px,11vw,156px) 56px}
-.rd-hero .rd-ey,.rd-ey{font-size:11px;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;color:var(--rd-mid);margin:0 0 14px}
+.rd-hero .rd-ey,.rd-ey{font-size:11px;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;color:#FFF6EA;margin:0 0 14px}
 .rd-hero h1{font-weight:300;font-size:clamp(34px,5vw,56px);letter-spacing:clamp(3px,.6vw,8px);text-transform:uppercase;margin:0 0 20px;line-height:1.1}
-.rd-hero p{font-size:17.5px;line-height:1.75;max-width:640px;margin:0 0 30px;color:#FFF3E2}
+.rd-hero p{font-size:17.5px;line-height:1.75;max-width:640px;margin:0 0 30px;color:#FFFFFF}
 .rd-ask{display:flex;align-items:center;gap:14px;background:#fff;padding:14px 14px 14px 28px;box-shadow:0 14px 34px rgba(60,30,0,.22)}
 .rd-ask svg{width:22px;height:22px;color:var(--rd);flex:0 0 auto}
 .rd-ask input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:18px;color:var(--rd-ink)}
 .rd-btn{background:var(--rd);color:#fff;border:0;font:inherit;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:15px 34px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px}
 .rd-btn.dark{background:var(--rd-deep)}
-.rd-hero .rd-src{font-size:12.5px;line-height:1.5;color:#FFE3BC;margin:22px 0 0}
+.rd-hero .rd-src{font-size:12.5px;line-height:1.5;color:#FFF6EA;margin:22px 0 0}
 .rd-sec{padding:54px clamp(16px,11vw,156px)}
 .rd-sec .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:1px solid #E7E1D8;padding-bottom:20px;margin-bottom:40px}
 .rd-sec h2{font-weight:300;font-size:42px;margin:0;color:#2E2A25}
@@ -350,6 +405,20 @@ button{font:inherit}
 .ef-btn.berry{background:#9B3D57}
 .ef-btn.ghost{background:transparent;color:#1F1D1A;border:1.5px solid #1F1D1A}
 .ef-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+/* Mit Communities teilen (Muster der edufeed-App: Liste mit Checkboxen, Alle auswählen/abwählen, Sperre für Nicht-Mitglieder) */
+.ef-cp{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;background:var(--card)}
+.ef-cp-tools{display:flex;gap:8px;margin-bottom:8px}
+.ef-btn.ef-sm{padding:5px 10px;font-size:13px}
+.ef-cp-list{max-height:160px;overflow:auto;display:flex;flex-direction:column;gap:4px}
+.ef-cp-row{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer}
+.ef-cp-row:hover{background:var(--paper)}
+.ef-cp-row.off{cursor:not-allowed;color:var(--muted)}
+.ef-cp-row input{width:18px;height:18px;accent-color:var(--c-ver);margin:0}
+.ef-cp-av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;flex:0 0 auto}
+.ef-cp-row.off .ef-cp-av{opacity:.5}
+.ef-cp-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ef-cp-st{font-size:12.5px;color:var(--muted);visibility:hidden}
+.ef-cp-row.off .ef-cp-st,.ef-cp-row input:checked~.ef-cp-st{visibility:visible}
 .ef-chip{display:inline-flex;align-items:center;gap:6px;background:#E3EEED;color:#234A48;border-radius:999px;font-size:13px;padding:3px 6px 3px 11px}
 .ef-chip button{border:0;background:transparent;cursor:pointer;color:inherit;font-size:14px;line-height:1}
 .ef-err{color:#B5394E;font-size:12.5px;margin-top:5px;display:none}
@@ -385,13 +454,13 @@ button{font:inherit}
 .ef-sh b{font-weight:500;font-size:17px;color:#3C3832}
 .ef-sh button{border:0;background:transparent;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
 .ef-steps{display:flex;align-items:center;justify-content:center;gap:10px;margin:0 0 30px}
-.ef-steps i{font-style:normal;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:600;color:#8A8378}
+.ef-steps i{font-style:normal;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:600;color:#6F665A}
 .ef-steps i.done,.ef-steps i.cur{background:#3F7B78;color:#fff}
 .ef-steps i.cur{box-shadow:0 0 0 3px #ECE6DA,0 0 0 4px rgba(63,123,120,.35)}
 .ef-steps u{width:30px;height:4px;border-radius:2px;background:#D6CEC1;text-decoration:none}
 .ef-steps u.done{background:#3F7B78}
 .ef-big{font-size:17px;padding:14px 16px;border:2px solid #1F1D1A;border-radius:10px;background:#FCFAF6}
-.ef-or{display:flex;align-items:center;gap:14px;color:#8A8378;font-size:13px;margin:22px 0}
+.ef-or{display:flex;align-items:center;gap:14px;color:#6A645A;font-size:13px;margin:22px 0}
 .ef-or::before,.ef-or::after{content:"";flex:1;height:1px;background:#D6CEC1}
 .ef-card{display:block;width:100%;text-align:left;border:1px solid #D6CEC1;background:#EFEAE0;border-radius:10px;padding:18px 20px;font:inherit;cursor:pointer;color:#1F1D1A}
 .ef-card:hover{background:#F4F0E8}
@@ -463,12 +532,17 @@ button{font:inherit}
 .cy-f h3 svg{flex:0 0 auto;width:16px;height:16px}
 .cy-bio{font-size:15px;line-height:1.45;color:var(--muted);margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .cy-ser{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-top:10px}
-.cy-ser span{font-size:12.5px;font-weight:600;color:#6B3F00;background:var(--t-erstellen);border-radius:999px;padding:2px 9px}
+.cy-ser span{font-size:12.5px;font-weight:600;color:var(--x-erstellen);background:var(--t-erstellen);border-radius:999px;padding:2px 9px}
+/* Newsletter je Community (Issue da392383): Pille auf der Kachel, Zeile im Raum-Kopf, Liste bei den relilab-Terminen */
+.cy-nl{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-top:6px}
+.cy-nl span{font-size:12.5px;font-weight:600;color:var(--x-finden);background:var(--t-finden);border-radius:999px;padding:2px 9px}
+.cr-nl{margin-top:8px;font-size:14px;color:var(--x-finden)}.cr-nl a{color:inherit;font-weight:600}
+.rt-nl li{flex-direction:column;align-items:flex-start;gap:2px}.rt-nl li a{color:#1F1F25;font-weight:600}.rt-nl small{display:block;margin-top:6px;color:#5F6670}
 .cy-rel{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#7A1A3E;background:#fff;border:1px solid #F0C7D6;border-radius:999px;padding:2px 10px;margin-top:10px;text-decoration:none}
 .cy-follow{margin-top:8px;align-self:center;border:0;border-radius:999px;background:var(--c-koop);color:#fff;font:inherit;font-size:15px;font-weight:600;padding:9px 24px;cursor:pointer}
-.cy-follow.on{background:transparent;color:var(--c-koop);box-shadow:inset 0 0 0 1.5px var(--c-koop)}
+.cy-follow.on{background:transparent;color:var(--x-koop);box-shadow:inset 0 0 0 1.5px var(--c-koop)}
 .cy-back .cy-follow.on{background:#fff}
-.cy-back small{font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--c-koop)}
+.cy-back small{font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--x-koop)}
 .cy-back h3{justify-content:flex-start;margin:2px 0 8px}
 .cy-back p{margin:0 0 6px;font-size:15px;line-height:1.45;color:#4A1530}
 .cy-back .meta{font-size:13.5px;color:#7A1A3E}
@@ -481,7 +555,7 @@ button{font:inherit}
 
 /* ---------- relilab: Termine via Nostr ---------- */
 .rt{max-width:1180px;margin:0 auto;padding:22px 20px 80px}
-.rt-crumb{font-size:13px;color:#7A808A;margin:0 0 10px}.rt-crumb a{color:#B23BD8;text-decoration:none;font-weight:500}
+.rt-crumb{font-size:13px;color:#5F6670;margin:0 0 10px}.rt-crumb a{color:#B23BD8;text-decoration:none;font-weight:500}
 .rt h1{font-family:Oswald,"Roboto Condensed",sans-serif;font-weight:500;font-size:36px;color:#1F1F25;margin:0 0 8px;letter-spacing:-.3px}
 .rt h1 .nz{display:inline-block;vertical-align:middle;margin-left:10px;font-family:Roboto,sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;color:#fff;background:#8E44D9;border-radius:999px;padding:3px 10px}
 .rt-intro{max-width:74ch;color:#3A3F47;margin:0 0 16px;line-height:1.6}
@@ -523,9 +597,9 @@ button{font:inherit}
 .rt-side ul{list-style:none;margin:0 0 10px;padding:0}
 .rt-side li{display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid #F1F2F4}
 .rt-side li i{flex:0 0 auto;width:10px;height:10px;border-radius:50%}
-.rt-side li code{margin-left:auto;font-size:11.5px;color:#7A808A}
+.rt-side li code{margin-left:auto;font-size:11.5px;color:#5F6670}
 .rt-side .rt-act{margin-top:8px}
-.rt-side small{display:block;color:#7A808A;font-size:12.5px;margin-top:6px}
+.rt-side small{display:block;color:#5F6670;font-size:12.5px;margin-top:6px}
 .rt-cal-h{display:flex;align-items:center;gap:10px;margin:0 0 12px}
 .rt-cal-h b{font-family:Oswald,"Roboto Condensed",sans-serif;font-weight:500;font-size:22px;color:#1F1F25;flex:1}
 .rt-cal-h button{font:inherit;border:1px solid #D5D8DD;background:#fff;border-radius:6px;width:36px;height:34px;cursor:pointer}
@@ -563,7 +637,7 @@ button{font:inherit}
 .cr-name{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .cr-name h1{font-family:"Barlow Condensed",sans-serif;font-size:40px;font-weight:600;line-height:1;margin:0}
 .cr-fol{border:0;border-radius:999px;background:var(--c-koop);color:#fff;font:inherit;font-size:14px;font-weight:600;padding:5px 14px;cursor:pointer}
-.cr-fol.off{background:transparent;color:var(--c-koop);box-shadow:inset 0 0 0 1.5px var(--c-koop)}
+.cr-fol.off{background:transparent;color:var(--x-koop);box-shadow:inset 0 0 0 1.5px var(--c-koop)}
 .cr-mem{display:flex;align-items:center;gap:10px;border:0;background:transparent;font:inherit;color:var(--muted);cursor:pointer;padding:0}
 .cr-mem .st{display:flex}
 .cr-mem .st span{width:30px;height:30px;border-radius:50%;border:2px solid #fff;margin-left:-8px;display:grid;place-items:center;font-size:12px;color:#fff;font-weight:600}
@@ -573,7 +647,7 @@ button{font:inherit}
 .cr-code{display:flex;gap:6px}
 .cr-code[hidden]{display:none}
 .cr-code input{font:inherit;font-size:15px;border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;background:var(--card);width:150px}
-.cr-badge{display:inline-flex;align-items:center;gap:6px;color:var(--c-koop);border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--c-koop);font-size:15px;font-weight:600;padding:8px 16px;background:#fff}
+.cr-badge{display:inline-flex;align-items:center;gap:6px;color:var(--x-koop);border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--c-koop);font-size:15px;font-weight:600;padding:8px 16px;background:#fff}
 .cr-cols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:22px}
 .cr-cols.one{grid-template-columns:minmax(0,1fr);max-width:820px}
 .cr-h{display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:"Barlow Condensed",sans-serif;font-size:26px;font-weight:600;margin:0 0 12px}
@@ -583,10 +657,10 @@ button{font:inherit}
 .cr-item .who small{color:var(--muted);font-size:13.5px}
 .cr-item h4{font-size:18px;font-weight:600;line-height:1.3;margin:0 0 10px}
 .cr-item p{margin:0 0 10px;color:#3D3D3A;font-size:15px;line-height:1.5}
-.cr-type{margin-left:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:5px;background:var(--t-finden);color:#00605C;border-radius:999px;font-size:13px;font-weight:600;padding:2px 10px;white-space:nowrap}
+.cr-type{margin-left:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:5px;background:var(--t-finden);color:var(--x-finden);border-radius:999px;font-size:13px;font-weight:600;padding:2px 10px;white-space:nowrap}
 .cr-type.art{background:var(--t-ver);color:#4B2E78}.cr-type.lern{background:var(--t-erstellen);color:#6B3F00}
 .cr-date{display:flex;align-items:center;gap:14px;margin:0 0 10px}
-.cr-date>div{flex:0 0 auto;width:58px;height:58px;border-radius:50%;background:var(--t-finden);color:var(--c-finden);display:grid;place-items:center;align-content:center;line-height:1;font-family:"Barlow Condensed",sans-serif;font-weight:600}
+.cr-date>div{flex:0 0 auto;width:58px;height:58px;border-radius:50%;background:var(--t-finden);color:var(--x-finden);display:grid;place-items:center;align-content:center;line-height:1;font-family:"Barlow Condensed",sans-serif;font-weight:600}
 .cr-date b{display:block;font-size:24px;text-align:center}
 .cr-date small{display:block;font-size:12px;letter-spacing:1px;text-align:center}
 .cr-date span{font-size:16px;font-weight:500;color:#3D3D3A}
@@ -594,7 +668,7 @@ button{font:inherit}
 .cr-tags span{background:var(--paper);border:1px solid var(--line);border-radius:999px;font-size:13.5px;padding:2px 11px}
 .cr-ev{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:10px;cursor:pointer;color:var(--ink)}
 .cr-ev:before{content:"";flex:0 0 auto;width:12px;height:12px;border-radius:50%;background:var(--c-finden);opacity:.7}
-.cr-ev small{display:block;color:var(--c-finden);font-size:13.5px;font-weight:600;margin-bottom:2px}
+.cr-ev small{display:block;color:var(--x-finden);font-size:13.5px;font-weight:600;margin-bottom:2px}
 .cr-ev b{font-weight:600;font-size:16px;line-height:1.3}
 .cr-lock{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;text-align:center;color:#3D3D3A}
 .cr-lock b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:24px;color:var(--ink);margin-bottom:6px}
@@ -740,6 +814,11 @@ button{font:inherit}
         <section class="panel">
           <h2><svg viewBox="-205 -205 410 410" data-c="finden"></svg>Neue Materialien für dich<a class="more" href="#materialpool?thema=Sch%C3%B6pfung&thema=Friedensp%C3%A4dagogik">Alle im Materialpool ›</a></h2>
           <div id="mats"></div>
+        </section>
+        <section class="panel">
+          <h2><svg viewBox="-205 -205 410 410" data-c="finden"></svg>Artikel aus deinen Communities<a class="more" href="#communities">Alle Communities ›</a></h2>
+          <p style="margin:-6px 0 10px;color:var(--muted);font-size:14px">aus Communities, denen du folgst oder in denen du Mitglied bist · Nachrichten aus dem Netz stehen unter „News“</p>
+          <div id="artikel"></div>
         </section>
         <section class="panel">
           <h2><svg viewBox="-205 -205 410 410" data-c="hub"></svg>News aus deinem Netz</h2>
@@ -943,6 +1022,7 @@ button{font:inherit}
           <small id="rtStand"></small>
         </div>
         <div><h4>Im reli_hub weiterverfolgen</h4>Termine, die du dir merkst, erscheinen in deinem reli_hub-Profil unter „Meine Termine“ – über die Steuerkonsole kommst du jederzeit hierher zurück.</div>
+        <div id="rtNl"></div>
       </aside>
     </div>
   </div></section>
@@ -1027,8 +1107,24 @@ button{font:inherit}
   <relihub-steuerkonsole id="rdFlower" floating size="58" popover-size="210" context="relidesk"></relihub-steuerkonsole>
 </div>
 
+<!-- ========== Ansicht 8: OER-Community – Nachbau von oer.community (Hugo/PaperMod), Schaufenster des Projekts FOERBICO ========== -->
+<div class="view" id="v-oercommunity">
+  <header class="oc-head"><div class="oc-in">
+    <a class="oc-brand" href="#oercommunity">oer.community</a>
+    <nav class="oc-nav" aria-label="oer.community">
+      <button type="button" data-ocs="oc-tagungen">Tagungen</button><button type="button" data-ocs="oc-oer">Was ist OER?</button><button type="button" data-ocs="oc-qualitaet">Qualität</button><button type="button" data-ocs="oc-team">Team</button><button type="button" data-ocs="oc-blog">Blog</button>
+    </nav>
+  </div></header>
+  <main class="oc-main"><div class="oc-in" id="ocRoot"></div></main>
+  <footer class="oc-foot"><div class="oc-in">
+    <div>CC BY 2024–2026 FOERBICO – soweit nicht anders angegeben · <a href="https://oer.community/impressum/" target="_blank" rel="noopener">Impressum</a> &amp; <a href="https://oer.community/datenschutz/" target="_blank" rel="noopener">Datenschutz</a></div>
+    <div class="hub"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> Teil des reli_hub · Datenstand 29.09.2026</div>
+  </div></footer>
+  <relihub-steuerkonsole id="ocFlower" floating size="58" popover-size="210" context="oer-community"></relihub-steuerkonsole>
+</div>
+
 <nav class="proto" aria-label="Prototyp-Ansichten"><span class="plbl">Prototyp</span>
-  <a href="#start" data-v="start">Start</a><a href="#profil" data-v="profil">Profil</a><a href="#materialpool" data-v="materialpool"><span class="lg">Materialpool</span><span class="sh">Pool</span></a><a href="#relilab" data-v="relilab">relilab</a><a href="#relidesk" data-v="relidesk">relidesk</a>
+  <a href="#start" data-v="start">Start</a><a href="#profil" data-v="profil">Profil</a><a href="#materialpool" data-v="materialpool"><span class="lg">Materialpool</span><span class="sh">Pool</span></a><a href="#relilab" data-v="relilab">relilab</a><a href="#relidesk" data-v="relidesk">relidesk</a><a href="#oercommunity" data-v="oercommunity">FOERBICO</a>
 </nav>
 <div class="ef-overlay" id="efOverlay" hidden></div>
 <div class="toast" id="toast" role="status"></div>
@@ -1072,7 +1168,7 @@ button{font:inherit}
  *   });
  *
  * AKTIONEN
- *   hub · hub.profil · hub.home · finden · finden.material · finden.fortbildungen ·
+ *   hub · hub.profil · hub.home · finden · finden.material · finden.fortbildungen · finden.beitraege ·
  *   erstellen · erstellen.schreibtisch · erstellen.labor · kooperieren ·
  *   kooperieren.communities · kooperieren.personen · veroeffentlichen ·
  *   veroeffentlichen.lerninhalte · veroeffentlichen.termin · veroeffentlichen.beitrag
@@ -1101,11 +1197,11 @@ button{font:inherit}
   const CLOSE_DELAY = 280;
 
   const FUNCS = [
-    { id: 'hub', label: 'reli_hub', color: '#233E99', text: '#FFFFFF', self: true,
+    { id: 'hub', label: 'reli_hub', color: '#203A8F', text: '#FFFFFF', self: true,
       subs: [{ id: 'hub.profil', label: 'mein Profil' }, { id: 'hub.home', label: 'Home' }] },
-    { id: 'finden', label: 'finden', color: '#008C86', text: '#FFFFFF',
-      subs: [{ id: 'finden.material', label: 'Material' }, { id: 'finden.fortbildungen', label: 'Fortbildungen' }] },
-    { id: 'erstellen', label: 'erstellen', color: '#F39200', text: '#2B1A00',
+    { id: 'finden', label: 'finden', color: '#007A75', text: '#FFFFFF',
+      subs: [{ id: 'finden.material', label: 'Material' }, { id: 'finden.fortbildungen', label: 'Fortbildungen' }, { id: 'finden.beitraege', label: 'Beiträge' }] },
+    { id: 'erstellen', label: 'erstellen', color: '#FFA500', text: '#2B1A00',
       subs: [{ id: 'erstellen.schreibtisch', label: 'Schreibtisch' }, { id: 'erstellen.labor', label: 'Labor' }] },
     { id: 'kooperieren', label: 'kooperieren', color: '#D6336C', text: '#FFFFFF',
       subs: [{ id: 'kooperieren.communities', label: 'Communities' }, { id: 'kooperieren.personen', label: 'Personen' }] },
@@ -1117,6 +1213,7 @@ button{font:inherit}
     f.ux = Math.cos(a); f.uy = Math.sin(a);
     f.cx = D * f.ux; f.cy = D * f.uy;
     f.light = mix(f.color, '#FFFFFF', 0.22);
+    f.ink = mix(f.color, '#000000', 0.4);
   });
 
   const ROUTES = {
@@ -1125,6 +1222,7 @@ button{font:inherit}
     'hub.home': '/',
     'finden.material': '/finden/materialpool',
     'finden.fortbildungen': '/finden/fortbildungen',
+    'finden.beitraege': '/finden/beitraege',
     'erstellen.schreibtisch': '/erstellen/schreibtisch',
     'erstellen.labor': '/erstellen/labor',
     'kooperieren.communities': '/kooperieren/communities',
@@ -1220,7 +1318,20 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       this._closeT = null;
       this._touchAct = false;
     }
+    /* Farben aus dem Dokument übernehmen (--relihub-c-<id>, --relihub-text-<id>); fehlen sie, bleiben die eingebauten Werte */
+    applyTheme() {
+      const cs = getComputedStyle(this);
+      FUNCS.forEach(f => {
+        const c = cs.getPropertyValue('--relihub-c-' + f.id).trim(), t = cs.getPropertyValue('--relihub-text-' + f.id).trim(), x = cs.getPropertyValue('--relihub-x-' + f.id).trim();
+        if (/^#[0-9a-fA-F]{6}$/.test(c)) f.color = c.toUpperCase();
+        if (/^#[0-9a-fA-F]{6}$/.test(t)) f.text = t.toUpperCase();
+        f.light = mix(f.color, '#FFFFFF', 0.22);
+        // Textfarbe auf hellem Grund (Pille): aus dem Dokument oder abgedunkelte Flächenfarbe
+        f.ink = /^#[0-9a-fA-F]{6}$/.test(x) ? x.toUpperCase() : mix(f.color, '#000000', 0.4);
+      });
+    }
     connectedCallback() {
+      this.applyTheme();
       this.render();
       this._outside = e => { if (this.hasAttribute('open') && !e.composedPath().includes(this)) this.closePop(0); };
       this._esc = e => { if (e.key === 'Escape' && this.hasAttribute('open')) { this.closePop(0); if (this.miniBtn) this.miniBtn.focus(); } };
@@ -1379,7 +1490,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         const pill = el('g', { class: 'pill act', 'data-action': f.id }, pop);
         const w = Math.max(96, f.label.length * 12 + 34);
         el('rect', { x: -w / 2, y: -18, width: w, height: 36, rx: 18 }, pill);
-        this.text(pill, f.label, 0, 1, 21, f.color, 'lbl');
+        this.text(pill, f.label, 0, 1, 21, f.ink, 'lbl');
       } else {
         el('circle', { class: 'act main', 'data-action': f.id, r: R, fill: f.color, 'fill-opacity': 0.96 }, pop);
         this.text(pop, f.label, 0, 2, f.label.length > 12 ? 22 : f.label.length > 9 ? 26 : 30, f.text, 'lbl');
@@ -1487,8 +1598,11 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 </script>
 <script>
 (() => {
-  const C = { hub:'#233E99', finden:'#008C86', erstellen:'#F39200', kooperieren:'#D6336C', koop:'#D6336C', veroeffentlichen:'#7B4FB8' };
-  const T = { hub:'#FFFFFF', finden:'#FFFFFF', erstellen:'#2B1A00', kooperieren:'#FFFFFF', veroeffentlichen:'#FFFFFF' };
+  // Alle Bereichsfarben kommen aus :root (Issue fd31ec90): ein Theme-Wechsel ist ein Austausch der Variablen.
+  const cssVar = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const C = { hub:cssVar('--c-hub'), finden:cssVar('--c-finden'), erstellen:cssVar('--c-erstellen'), kooperieren:cssVar('--c-koop'), koop:cssVar('--c-koop'), veroeffentlichen:cssVar('--c-ver') };
+  const T = { hub:cssVar('--relihub-text-hub'), finden:cssVar('--relihub-text-finden'), erstellen:cssVar('--relihub-text-erstellen'), kooperieren:cssVar('--relihub-text-kooperieren'), veroeffentlichen:cssVar('--relihub-text-veroeffentlichen') };
+  const X = { hub:cssVar('--x-hub'), finden:cssVar('--x-finden'), erstellen:cssVar('--x-erstellen'), kooperieren:cssVar('--x-koop'), koop:cssVar('--x-koop'), veroeffentlichen:cssVar('--x-ver') };
 
   // ---------- kleine Symbole der Steuerkonsole (Logo, Abschnittssymbole) ----------
   const ORDER = ['hub','finden','erstellen','kooperieren','veroeffentlichen'];
@@ -1507,8 +1621,9 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     'hub': { fn:'reli_hub', t:'Deine Steuerkonsole', p:'Der reli_hub ist deine Steuerkonsole in der vernetzten Welt der digitalen Religionspädagogik. Überall, wo du dieses Symbol findest, bist du im Netzwerk unterwegs. Dein Profil nimmst du überall hin mit.', subs:['hub.profil','hub.home'] },
     'hub.profil': { fn:'reli_hub › mein Profil', t:'Mein Profil', p:'Mit deinem Profil wird der reli_hub zu deinem persönlichen Startplatz: deine Communities, neue Materialien zu deinen Themen und passende Veranstaltungen. Ein Schlüssel öffnet alle angeschlossenen Seiten.', go:['Mit Nostr-Schlüssel anmelden','#profil'] },
     'hub.home': { fn:'reli_hub › Home', t:'Home', p:'Die Startseite des reli_hub – ohne Anmeldung. Hier erfährst du, was der Hub ist und welche Seiten zu ihm gehören.', go:['Zum Ökosystem','#partner'] },
-    'finden': { fn:'finden', t:'Material und Fortbildungen', p:'Geprüftes, offen lizenziertes Material und digitale Fortbildungen aus ganz Deutschland – an einem Ort auffindbar.', subs:['finden.material','finden.fortbildungen'] },
+    'finden': { fn:'finden', t:'Material, Fortbildungen und Beiträge', p:'Geprüftes, offen lizenziertes Material, digitale Fortbildungen und Artikel aus deinen Communities – an einem Ort auffindbar. Lehr- und Lerninhalte liegen im Materialpool, Beiträge kommen aus Communities und Instanzen.', subs:['finden.material','finden.fortbildungen','finden.beitraege'] },
     'finden.material': { fn:'finden › Material', t:'Material', p:'Finde aktuelles, redaktionell geprüftes Material zu deinen Themen und deiner Zielgruppe.', go:['Zum Materialpool','#materialpool'] },
+    'finden.beitraege': { fn:'finden › Beiträge', t:'Artikel und Nachrichten', p:'Artikel und Nachrichten aus deinen Communities und Instanzen. Lehr- und Lerninhalte findest du im Materialpool.', go:['Zu den Artikeln','#profil?zu=artikel'] },
     'finden.fortbildungen': { fn:'finden › Fortbildungen', t:'Fortbildungen', p:'Entdecke digitale Fortbildungen religionspädagogischer Institute und Communities – deutschlandweit, meist online, in einem gemeinsamen Kalender.', go:['Zum Fortbildungskalender',null] },
     'erstellen': { fn:'erstellen', t:'Unterricht vorbereiten, Material entwickeln', p:'Allein am eigenen Schreibtisch oder gemeinsam im Labor: Hier wird aus Material Unterricht – und aus Ideen neues Material.', lock:true, subs:['erstellen.schreibtisch','erstellen.labor'] },
     'erstellen.schreibtisch': { fn:'erstellen › Schreibtisch', t:'Mein Schreibtisch', p:'Sammle Materialien auf deinem digitalen Schreibtisch, ordne sie, passe sie an und plane daraus deine nächste Lernsequenz.', lock:true, go:['Zum relidesk','#relidesk?tab=schreibtisch'] },
@@ -1538,7 +1653,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     const key = action.split('.')[0], col = C[key];
     exEl.style.borderColor = col;
     const btnStyle = `background:${col};color:${T[key]}`;
-    const SUBL = { 'hub.profil':'mein Profil', 'hub.home':'Home', 'veroeffentlichen.lerninhalte':'Lerninhalte', 'veroeffentlichen.termin':'Termin', 'veroeffentlichen.beitrag':'Beitrag', 'finden.material':'Material', 'finden.fortbildungen':'Fortbildungen', 'erstellen.schreibtisch':'Schreibtisch', 'erstellen.labor':'Labor', 'kooperieren.communities':'Communities', 'kooperieren.personen':'Personen' };
+    const SUBL = { 'hub.profil':'mein Profil', 'hub.home':'Home', 'veroeffentlichen.lerninhalte':'Lerninhalte', 'veroeffentlichen.termin':'Termin', 'veroeffentlichen.beitrag':'Beitrag', 'finden.material':'Material', 'finden.fortbildungen':'Fortbildungen', 'finden.beitraege':'Beiträge', 'erstellen.schreibtisch':'Schreibtisch', 'erstellen.labor':'Labor', 'kooperieren.communities':'Communities', 'kooperieren.personen':'Personen' };
     const go = e.subs ? `<span class="hint">Weiter zu:</span>` + e.subs.map(x => `<button type="button" class="btn btn-ghost" data-ex="${x}" style="border-color:${col};color:${col}">${SUBL[x]} ›</button>`).join('') : e.go[1] && e.go[1][0] === '@' ? `<button type="button" class="btn" style="${btnStyle}" data-open="${e.go[1].slice(1)}">${e.go[0]} ›</button>` : e.go[1] ? `<a class="btn" style="${btnStyle}" href="${e.go[1]}">${e.go[0]} ›</a>` : `<a class="btn" style="${btnStyle}" href="#" data-todo="${e.go[0]}">${e.go[0]} ›</a>`;
     exEl.innerHTML = `${icon(action)}<div><p class="fn" style="color:${col}">${e.fn}</p><h2>${e.t}</h2><p>${e.p}</p><div class="acts">${go}${e.lock ? '<span class="badge-lock">● mit Profil</span>' : ''}</div></div>`;
     exEl.classList.remove('anim'); void exEl.offsetWidth; exEl.classList.add('anim');
@@ -1563,10 +1678,11 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     ['Friedensarbeit EKD', 'Evangelische Friedensarbeit', 'kooperieren', 'FA', null, 'Dachmarke der Friedensarbeit im Raum der EKD: Nachrichten, Termine, Projekte und Friedensbildung.'],
     ['InkRV', 'Inklusive Religionspädagogik der Vielfalt', 'kooperieren', 'iV', null, 'Inklusive Religionspädagogik der Vielfalt. Die Plattform wird gerade überarbeitet und kommt bald wieder ins Ökosystem.', 'in Überarbeitung'],
     ['Comenius-Institut', 'Evangelische Bildungsforschung', 'hub', 'CI', null, 'Evangelische Arbeitsstätte für Erziehungswissenschaft in Münster – Forschung, Netzwerke und Projekte wie FOERBICO, aus dem der reli_hub entsteht.'],
-    ['edufeed', 'offene Bildungsdaten im Nostr-Netz', 'hub', 'ef', null, 'Offene Infrastruktur für Bildungsdaten: Relays und Editoren, über die Materialien, Termine und Beiträge im ganzen Ökosystem geteilt werden.']
+    ['edufeed', 'offene Bildungsdaten im Nostr-Netz', 'hub', 'ef', null, 'Offene Infrastruktur für Bildungsdaten: Relays und Editoren, über die Materialien, Termine und Beiträge im ganzen Ökosystem geteilt werden.'],
+    ['OER-Community', 'Schaufenster des Projekts FOERBICO', 'hub', 'OC', '#oercommunity', 'Community of Communities: Blog, Tagungen, Wissensgrundlagen zu OER und Qualität und das Team des Projekts, aus dem der reli_hub hervorgeht.']
   ];
-  const TINT = { finden:'#DDF1F0', erstellen:'#FEEFD9', kooperieren:'#FAE1EA', hub:'#E6EAF5' };
-  const TINK = { finden:'#004E4A', erstellen:'#6B3F00', kooperieren:'#7A1A3E', hub:'#1B2F73' };
+  const TINT = { finden:cssVar('--t-finden'), erstellen:cssVar('--t-erstellen'), kooperieren:cssVar('--t-koop'), hub:cssVar('--t-hub') };
+  const TINK = { finden:X.finden, erstellen:X.erstellen, kooperieren:X.kooperieren, hub:X.hub };
   document.getElementById('pgrid').innerHTML = PARTNERS.map(([n, d, k, ab, href, back, tag]) =>
     `<a class="pcard" href="${href || '#'}" ${href ? '' : `data-todo="${n}"`} style="--bk:${TINT[k]};--bt:${TINK[k]}" aria-label="${n}: ${back}"><span class="pin">`
     + `<span class="pface"><span class="cc" style="background:${C[k]};color:${T[k]}">${ab}</span><span><b>${n}</b><small>${d}</small>${tag ? `<span class="tag">${tag}</span>` : ''}</span></span>`
@@ -1600,7 +1716,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   const COMM = [['relilab', 'Mitglied', 'rl', 3, 'relilab'], ['relimentar', 'folge ich', 're', 0, 'relimentar'], ['narrt', 'Mitglied', 'na', 1, 'narrt'], ['efabinet', 'folge ich', 'ef', 0, null], ['Friedens­pädagogik', 'Mitglied', 'FP', 5, 'frieden']];
   document.getElementById('comm').innerHTML = COMM.map(([n, s, ab, c, cid], i) =>
     `<div class="cm" ${cid ? `data-go="community?c=${cid}" role="link" tabindex="0" style="cursor:pointer"` : `data-todo="Community ${n.replace('­','')}"`}><div class="cir" style="opacity:${s === 'Mitglied' ? 1 : .72}">${ab}${c ? `<em>${c}</em>` : ''}</div><b>${n}</b><span>${s}</span></div>`).join('');
-  const EVENTS = [['12', 'NOV', 'Bibliolog digital – Einführung', 'Religionspädagogisches Institut · online · 16–18 Uhr'], ['19', 'NOV', 'KI im RU: Werkstattabend', 'relilab · online · 19 Uhr'], ['03', 'DEZ', 'Frieden lernen – Fachtag Sek I', 'Comenius-Institut · online']];
+  const EVENTS = [['12', 'NOV', 'Bibliolog digital – Einführung', 'Religionspädagogisches Institut · online · 16–18 Uhr'], ['19', 'NOV', 'KI im RU: Werkstattabend', 'relilab · online · 19 Uhr'], ['03', 'DEZ', 'Frieden lernen – Fachtag Sek I', 'Comenius-Institut · online'], ['02', 'FEB', 'Offen. Vernetzt. Zukunft – Abschlusstagung', 'OER-Community · Goethe-Universität Frankfurt · 2./3. Feb. 2027']];
   document.getElementById('events').innerHTML = EVENTS.map(([d, m, t, s]) =>
     `<div class="ev" ${s.startsWith('relilab') ? 'data-go="relilab" style="cursor:pointer"' : ''}><span class="date"><span><b>${d}</b><small>${m}</small></span></span><div class="tx"><b>${t}</b><span>${s}</span></div></div>`).join('');
 
@@ -1679,6 +1795,45 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   const CTX_NAME = { hub: 'reli_hub', relilab: 'relilab', materialpool: 'rpi-virtuell Materialpool', relidesk: 'relidesk' };
   function efOpen(html) { EF.innerHTML = html; EF.hidden = false; document.body.style.overflow = 'hidden'; const f = EF.querySelector('[autofocus]'); if (f) setTimeout(() => f.focus(), 30); }
   function efClose() { EF.hidden = true; EF.innerHTML = ''; document.body.style.overflow = ''; }
+
+  // ---------- Mit Communities teilen (Issue ef87ccaa): Muster der edufeed-App ----------
+  // Angeboten werden Communities, denen die Persona folgt oder in denen sie Mitglied ist; teilen dürfen nur Mitglieder.
+  function isMember(c) { return crMember[c.id] !== undefined ? !!crMember[c.id] : c.mine === 'Mitglied'; }
+  function communityPicker(ctx) {
+    const list = CY.filter(c => cyFollow.has(c.id));
+    const pre = CY.find(x => x.n === ctx) || CY.find(x => x.inst && x.inst[0] === (CTX_NAME[ctx] || ctx));
+    const uid = 'cp' + Math.random().toString(36).slice(2, 7);
+    const html = `<label class="ef-l soft">Mit Communities teilen (optional)</label>
+      <p class="ef-desc">Communities auswählen. Geteilt wird als Repost (kind 16) mit einem h-Tag je Community.</p>
+      <div class="ef-cp" id="${uid}">
+        <div class="ef-cp-tools"><button type="button" class="ef-btn ef-sm" data-cpall="1">Alle auswählen</button><button type="button" class="ef-btn ef-sm" data-cpall="0">Alle abwählen</button></div>
+        <div class="ef-cp-list">${list.map(c => { const ok = isMember(c); return `<label class="ef-cp-row${ok ? '' : ' off'}"><input type="checkbox" value="${c.id}"${ok ? '' : ' disabled'}${ok && pre && pre.id === c.id ? ' checked' : ''}><span class="ef-cp-av" style="background:${c.col}">${c.ab}</span><span class="ef-cp-n">${c.n}</span><small class="ef-cp-st">${ok ? '(wird geteilt)' : '🔒 Nur Mitglieder'}</small></label>`; }).join('')}</div>
+      </div>`;
+    return {
+      html,
+      selected: () => [...document.querySelectorAll(`#${uid} input:checked`)].map(i => i.value),
+      bind: () => { const box = document.getElementById(uid); if (box) box.addEventListener('click', e => { const b = e.target.closest('[data-cpall]'); if (b) box.querySelectorAll('input:not(:disabled)').forEach(i => { i.checked = b.dataset.cpall === '1'; }); }); }
+    };
+  }
+  // Beitrag/Termin in die gewählten Räume stellen (im Prototyp: vorn in die Aktivitätsliste); gibt die Namen zurück
+  function shareTo(ids, item) {
+    const names = [];
+    ids.forEach(id => { const c = CY.find(x => x.id === id); if (!c) return; const d = crData(c); if (!CR[id]) CR[id] = d; d.act.unshift(item); names.push(c.n); });
+    if (crId && ids.includes(crId) && crRootEl) crRender();
+    renderArtikel();
+    return names;
+  }
+  // Profil-Panel „Artikel aus deinen Communities“ (Issue 390d2fa0): sammelt Artikel aus allen Communities der Persona
+  function renderArtikel() {
+    const box = document.getElementById('artikel'); if (!box) return;
+    const items = [];
+    CY.filter(c => cyFollow.has(c.id)).forEach(c => crData(c).act.filter(i => i.type === 'Artikel').forEach(i => items.push([i, c])));
+    items.sort((a, b) => (b[0].ago === 'jetzt') - (a[0].ago === 'jetzt'));
+    box.innerHTML = items.length
+      ? items.slice(0, 8).map(([i, c]) => `<div data-go="community?c=${c.id}&tab=art" role="link" tabindex="0" style="cursor:pointer">${crItem(Object.assign({}, i, { tags: [c.n].concat(i.tags || []) }), c)}</div>`).join('')
+      : '<p class="ef-hint i">Folge Communities, um hier Artikel zu sehen.</p>';
+  }
+  const shareNote = names => names.length ? ` und mit einem Repost (kind 16) mit h-Tags an ${names.length} ${names.length === 1 ? 'Community' : 'Communities'} geteilt: <b>${names.map(esc).join(', ')}</b>` : '';
   EF.addEventListener('mousedown', e => { if (e.target === EF) efClose(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !EF.hidden) efClose(); });
   const ctxBadge = ctx => `<div class="ef-ctx"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true">${ORDER.map((k, i) => { const a = (-90 + 72 * i) * Math.PI / 180; return `<circle cx="${(98*Math.cos(a)).toFixed(1)}" cy="${(98*Math.sin(a)).toFixed(1)}" r="100" fill="${C[k]}" opacity=".66"/>`; }).join('')}</svg>geöffnet über die Steuerkonsole · ${CTX_NAME[ctx] || ctx}</div>`;
@@ -1688,6 +1843,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   function openEvent(ctx) {
     const st = { type: 'ganz', links: [], tags: ctx === 'relilab' ? ['relilab'] : [], people: ctx === 'relilab' ? [['relilab', 'Organisation']] : [['Luca Beispiel', 'Organisator:in']] };
     const sel = (opts) => `<select class="ef-sel">${opts.map(o => `<option>${o}</option>`).join('')}</select>`;
+    const picker = communityPicker(ctx);
     efOpen(`<div class="ef-dlg" role="dialog" aria-modal="true" aria-label="Neue Veranstaltung erstellen">
       <button class="ef-x" type="button" data-efx aria-label="Schließen">✕</button>
       <h2>Neue Veranstaltung erstellen</h2>
@@ -1723,6 +1879,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       <p class="ef-desc">Hilft anderen, die Veranstaltung zu finden, z. B. nach Thema oder Zielgruppe.</p>
       <div class="ef-row"><input class="ef-in" id="efTin" placeholder="z. B. fortbildung"><button type="button" class="ef-btn" data-add="tags">Hinzufügen</button></div>
       <div id="efTags"></div>
+      ${picker.html}
       <label class="ef-l soft">Mitwirkende</label>
       <div class="ef-row wrap"><input class="ef-in" id="efPin" placeholder="Name suchen oder npub einfügen…"><select class="ef-sel" id="efProle" style="max-width:200px"><option>Teilnehmer:in</option><option>Vortragende:r</option><option>Organisator:in</option><option>Organisation</option></select><button type="button" class="ef-btn" data-add="people">+</button></div>
       <p class="ef-hint">Nach Name suchen oder npub eingeben. Hier hinzugefügte Personen werden öffentlich am Termin angezeigt (z. B. Vortragende, Organisation).</p>
@@ -1730,6 +1887,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       <div class="ef-foot"><button type="button" class="ef-btn ghost" data-efx>Abbrechen</button><button type="button" class="ef-btn" data-efpub>Veranstaltung veröffentlichen</button></div>
     </div>`);
     const dlg = EF.querySelector('.ef-dlg');
+    picker.bind();
     const chips = (id, arr, fmt, empty) => { document.getElementById(id).innerHTML = arr.length ? `<div class="ef-chips">${arr.map((x, i) => `<span class="ef-chip">${fmt(x)}<button type="button" data-rm="${id}:${i}" aria-label="Entfernen">✕</button></span>`).join('')}</div>` : `<p class="ef-hint i">${empty}</p>`; };
     const draw = () => { chips('efLinks', st.links, x => esc(x), 'Noch keine Links hinzugefügt'); chips('efTags', st.tags, x => '#' + esc(x), 'Noch keine Hashtags hinzugefügt'); chips('efPeople', st.people, x => `${esc(x[0])} · ${esc(x[1])}`, 'Noch keine Mitwirkenden hinzugefügt'); };
     draw();
@@ -1747,8 +1905,11 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       if (e.target.closest('[data-efpub]')) {
         const t = document.getElementById('efT'), err = document.getElementById('efTerr');
         if (!t.value.trim()) { err.classList.add('on'); t.focus(); return; }
+        const dv = (dlg.querySelector('input[type=date]') || {}).value || '', dt = dv ? new Date(dv + 'T12:00:00') : null;
+        const MON = ['JAN', 'FEB', 'MÄR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DEZ'];
+        const names = shareTo(picker.selected(), T_('Termin', esc(t.value.trim()), { who: 'Luca Beispiel', ago: 'jetzt', d: dt ? [String(dt.getDate()), MON[dt.getMonth()], String(dt.getFullYear())] : ['–', '', 'Datum offen'], tags: st.tags.map(esc) }));
         efClose();
-        toast(`Termin <b>„${esc(t.value.trim())}“</b> würde jetzt als Nostr-Kalenderereignis veröffentlicht (NIP-52, kind ${st.type === 'ganz' ? 31922 : 31923}) – signiert mit deinem Schlüssel und sichtbar im gemeinsamen Kalender.`);
+        toast(`Termin <b>„${esc(t.value.trim())}“</b> würde jetzt als Nostr-Kalenderereignis veröffentlicht (NIP-52, kind ${st.type === 'ganz' ? 31922 : 31923})${shareNote(names)} – signiert mit deinem Schlüssel und sichtbar im gemeinsamen Kalender.`);
       }
     });
     document.getElementById('efT').addEventListener('input', () => document.getElementById('efTerr').classList.remove('on'));
@@ -1861,10 +2022,11 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       if (l.trim()) out += `<p>${inl(l)}</p>`;
     });
     if (list) out += '</ul>';
-    return out || '<p style="color:#8A8378">Noch nichts geschrieben.</p>';
+    return out || '<p style="color:#6A645A">Noch nichts geschrieben.</p>';
   }
-  function openBlog(ctx) {
+  function openBlog(ctx, opts = {}) {
     const tags = ctx === 'relilab' ? ['relilab'] : [];
+    const picker = communityPicker(ctx);
     efOpen(`<div class="ef-page ef-blog" role="dialog" aria-modal="true" aria-label="Blog-Artikel schreiben">
       <div class="ef-body" style="padding-top:18px">
         <div class="ef-tt" style="margin:4px 0 18px"><button type="button" data-efx aria-label="Zurück">‹</button><h2>Blog-Artikel schreiben</h2><button class="ef-x" type="button" data-efx aria-label="Schließen" style="margin-left:auto;position:static">✕</button></div>
@@ -1872,7 +2034,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         <input class="ef-in ef-title" id="bgT" placeholder="Artikeltitel" aria-label="Artikeltitel" autofocus><div class="ef-err" id="bgTerr">Gib dem Artikel einen Titel.</div>
         <label class="ef-l soft">Titelbild</label>
         <div class="ef-row"><input class="ef-in" placeholder="https://… oder Bild hochladen"><button type="button" class="ef-btn berry" data-efnote="Bildauswahl">Bild auswählen…</button></div>
-        <textarea class="ef-ta" style="margin-top:16px" placeholder="Kurze Zusammenfassung (optional)" aria-label="Kurze Zusammenfassung"></textarea>
+        <textarea class="ef-ta" id="bgSum" style="margin-top:16px" placeholder="Kurze Zusammenfassung (optional)" aria-label="Kurze Zusammenfassung"></textarea>
         <div class="ef-md" id="bgMd">
           <div class="ef-tb"><button type="button" class="seg on" data-mode="w">Schreiben</button><button type="button" class="seg" data-mode="p">Vorschau</button><i></i>
             <button type="button" class="tb" data-md="b" title="Fett">B</button><button type="button" class="tb it" data-md="i" title="Kursiv">I</button><button type="button" class="tb" data-md="h" title="Überschrift">H</button>
@@ -1883,9 +2045,11 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         <label class="ef-l soft">Hashtags</label>
         <div class="ef-row"><input class="ef-in" id="bgTag" placeholder="Hashtag hinzufügen"><button type="button" class="ef-btn ef-sq" data-bgtag aria-label="Hashtag hinzufügen">+</button></div>
         <div id="bgTags"></div>
+        ${picker.html}
         <button type="button" class="ef-btn ef-wide" data-bgpub>Artikel veröffentlichen</button>
       </div></div>`);
     const pg = EF.querySelector('.ef-blog'), ta = document.getElementById('bgTx');
+    picker.bind();
     const drawTags = () => { document.getElementById('bgTags').innerHTML = tags.length ? `<div class="ef-chips">${tags.map((t, i) => `<span class="ef-chip">#${esc(t)}<button type="button" data-bgrm="${i}" aria-label="Entfernen">✕</button></span>`).join('')}</div>` : '<p class="ef-hint i">Noch keine Hashtags hinzugefügt</p>'; };
     drawTags();
     function wrap(a, b, ph) { const s = ta.selectionStart, e = ta.selectionEnd, sel = ta.value.slice(s, e) || ph; ta.setRangeText(a + sel + b, s, e, 'end'); ta.focus(); }
@@ -1902,7 +2066,9 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       const r = e.target.closest('[data-bgrm]'); if (r) { tags.splice(+r.dataset.bgrm, 1); drawTags(); return; }
       if (e.target.closest('[data-bgpub]')) {
         const ti = document.getElementById('bgT'); if (!ti.value.trim()) { document.getElementById('bgTerr').classList.add('on'); ti.focus(); return; }
-        efClose(); toast(`Artikel <b>„${esc(ti.value.trim())}“</b> würde jetzt als Nostr-Langform-Artikel veröffentlicht (NIP-23, kind 30023) und erscheint in deinem Profil und in den passenden Communities.`);
+        const titel = ti.value.trim(), roomC = opts.room ? CY.find(x => x.n === ctx) : null, room = roomC && isMember(roomC) ? roomC : null;
+        const names = shareTo(picker.selected(), T_('Artikel', esc(titel), { who: 'Luca Beispiel', ago: 'jetzt', x: esc(document.getElementById('bgSum').value.trim()), tags: tags.map(esc) }));
+        efClose(); toast(`Artikel <b>„${esc(titel)}“</b> würde jetzt als Nostr-Langform-Artikel veröffentlicht (NIP-23, kind 30023)${room ? `, mit h-Tag der Community <b>${esc(room.n)}</b>` : ''}${shareNote(names)}. Er erscheint in deinem Profil${names.length ? ' und in den gewählten Communities' : ''}.`);
       }
     });
     document.getElementById('bgT').addEventListener('input', () => document.getElementById('bgTerr').classList.remove('on'));
@@ -1913,34 +2079,43 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   // ---------- Communities (Beispieldaten; Texte teils von edufeed.org übernommen) ----------
   const SHIELD = '<svg viewBox="0 0 24 24" aria-label="verifiziert"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z" fill="#4E8FE0"/><path d="M12 4.2 6 6.5V11c0 3.9 2.5 7.4 6 8.8z" fill="#7FB1EE"/></svg>';
   const CY = [
-    { id: 'relilab', n: 'relilab', ab: 'rl', col: C.erstellen, tx: '#2B1A00', ty: 'netz', mine: 'Mitglied', bio: 'Die Menschen hinter dem relilab.', back: 'Die relilab-Community steuert und entwickelt das relilab gemeinsam weiter: Lernbausteine, Live-Anlässe und Serien. Wer mitgestalten möchte, ist eingeladen.', inst: ['relilab', 'relilab'], m: 214, rl: 1, series: [['Live-Anlässe im relilab', 'laufend']] },
+    { id: 'relilab', n: 'relilab', ab: 'rl', nl: [['relilab-Newsletter', 'monatlich', null]], col: C.erstellen, tx: '#2B1A00', ty: 'netz', mine: 'Mitglied', bio: 'Die Menschen hinter dem relilab.', back: 'Die relilab-Community steuert und entwickelt das relilab gemeinsam weiter: Lernbausteine, Live-Anlässe und Serien. Wer mitgestalten möchte, ist eingeladen.', inst: ['relilab', 'relilab'], m: 214, rl: 1, series: [['Live-Anlässe im relilab', 'laufend']] },
     { id: 'religlobal', n: 'reliGlobal', ab: 'rG', col: C.kooperieren, ty: 'thema', bio: 'Globales Lernen im Religionsunterricht fördern.', back: 'Die Hauptamtlichen, die für reliGlobal arbeiten, und verbundene Personen, die gemeinsam mit dem Team Globales Lernen im Religionsunterricht fördern möchten.', inst: ['reliGlobal', null], m: 63, rl: 1, series: [['reliGlobal.Werkstatt', 'mehrmals im Jahr']] },
     { id: 'konfi', n: 'Konfiarbeit EKD', ab: 'KA', col: C.kooperieren, ty: 'ziel', ver: true, bio: 'Hier vernetzt sich die ALPIKA-AG Konfiarbeit und erprobt den nostr-Datenraum und die edufeed-Logik für die EKD-weite Konfiarbeit.', back: 'Die ALPIKA-AG Konfiarbeit vernetzt sich hier und erprobt den nostr-Datenraum und die edufeed-Logik für die Konfiarbeit in der ganzen EKD.', inst: ['Konfi-Arbeit bundesweit', null], m: 41 },
     { id: 'narrt', n: 'narrt', ab: 'na', col: C.kooperieren, ty: 'thema', mine: 'Mitglied', bio: 'Antisemitismus- und rassismuskritische Religionspädagogik und Theologie.', back: 'Menschen, die kritisch reflektieren, wie Religionspädagogik und Theologie in antisemitische und rassistische Verhältnisse verstrickt sind – und gemeinsam nach Alternativen für Denken, Handeln und Material suchen.', inst: ['narrt', null], m: 102 },
     { id: 'relimentar', n: 'relimentar', ab: 're', col: C.kooperieren, ty: 'ziel', mine: 'folge ich', bio: 'Religionspädagogik in der Kita.', back: 'Fachkräfte aus Krippe, Kindergarten und Hort teilen religionspädagogisches Material, Fortbildungen und Erfahrungen aus der Praxis.', inst: ['relimentar', null], m: 87, rl: 1, series: [['Bilderbuchstunde', 'im relilab'], ['Café relimentar', 'im relilab']] },
-    { id: 'campuscom', n: 'CampusCom – die Hochschul-Community', ab: 'CC', col: '#7B4FB8', ty: 'ziel', bio: 'Die Community CampusCom macht Personen, Materialien, Artikel, Projekte, Termine und Veranstaltungen zur Hochschullehre sichtbar.', back: 'CampusCom macht Personen, Materialien, Artikel, Projekte, Termine und Veranstaltungen zur Hochschullehre sichtbar – für Lehrende in Religionspädagogik und Theologie.', m: 56 },
+    { id: 'campuscom', n: 'CampusCom – die Hochschul-Community', ab: 'CC', col: C.veroeffentlichen, ty: 'ziel', bio: 'Die Community CampusCom macht Personen, Materialien, Artikel, Projekte, Termine und Veranstaltungen zur Hochschullehre sichtbar.', back: 'CampusCom macht Personen, Materialien, Artikel, Projekte, Termine und Veranstaltungen zur Hochschullehre sichtbar – für Lehrende in Religionspädagogik und Theologie.', m: 56 },
     { id: 'kuru', n: 'KuRU & Schuldek.de', ab: 'KS', col: C.hub, ty: 'ziel', bio: 'Kirche-und-Religionsunterricht.de & schuldek.de – die Community der Büros der Schuldekaninnen und Schuldekane.', back: 'Kirche-und-Religionsunterricht.de und schuldek.de: die Community der Büros der Schuldekaninnen und Schuldekane – Austausch, Material und Termine rund um den Religionsunterricht.', m: 38 },
     { id: 'agdm', n: 'AG Didaktische Metadaten', ab: 'DM', col: C.finden, ty: 'thema', ver: true, bio: 'Keine Biografie verfügbar', back: 'Arbeitsgruppe rund um didaktische Metadaten für offene Bildungsmaterialien: Wie lassen sich Materialien so beschreiben, dass sie nach Lernzielen und Einsatz gefunden werden?', m: 19 },
     { id: 'kph', n: 'KPH Wien/NÖ Zentrum Fortbildung Religion', ab: 'PH', col: C.finden, ty: 'netz', ver: true, bio: 'Keine Biografie verfügbar', back: 'Zentrum Fortbildung Religion der Kirchlichen Pädagogischen Hochschule Wien/Niederösterreich – Fortbildungen für Religionslehrkräfte.', m: 24 },
     { id: 'rpi', n: 'Religionspädagogisches Institut von EKKW und EKHN', ab: 'RPI', col: C.hub, ty: 'netz', bio: 'Keine Biografie verfügbar', back: 'Religionspädagogisches Institut der Evangelischen Kirche von Kurhessen-Waldeck und der Evangelischen Kirche in Hessen und Nassau – Fortbildung, Beratung und Material.', m: 73 },
     { id: 'schulseelsorge', n: 'relilab.Schulseelsorge', ab: 'SS', col: C.hub, ty: 'ziel', rl: 1, bio: 'voneinander lernen. miteinander entwickeln.', back: 'Schulseelsorgende aus Deutschland und Österreich reflektieren in kurzen Online-Fortbildungen ihre Praxis und entwickeln Schulseelsorge gemeinsam weiter.', inst: ['relilab', 'relilab'], m: 58, series: [['Relilab.Schulseelsorge – Learningsnacks', 'monatlich, donnerstags 16–17 Uhr']] },
-    { id: 'muenchen', n: 'Münchner Reli Room', ab: 'MR', col: C.finden, ty: 'ziel', rl: 1, bio: 'Updates zur digitalen Religionspädagogik für katholische Religionslehrkräfte.', back: 'Die Fachstelle Medien und Digitalität und die Religionspädagogische Materialstelle Bayern (RPZ) bieten mit weiteren Fachleuten regelmäßige Online-Updates für katholische Religionslehrkräfte im Erzbistum München und Freising.', inst: ['relilab', 'relilab'], m: 77, series: [['Münchner Reli Room-Snack', 'ca. 90 Minuten online'], ['Münchner Reli Room-Newsletter', '4–6 Mal im Jahr']] },
+    { id: 'muenchen', n: 'Münchner Reli Room', ab: 'MR', nl: [['Münchner Reli Room-Newsletter', '4–6 Mal im Jahr', null]], col: C.finden, ty: 'ziel', rl: 1, bio: 'Updates zur digitalen Religionspädagogik für katholische Religionslehrkräfte.', back: 'Die Fachstelle Medien und Digitalität und die Religionspädagogische Materialstelle Bayern (RPZ) bieten mit weiteren Fachleuten regelmäßige Online-Updates für katholische Religionslehrkräfte im Erzbistum München und Freising.', inst: ['relilab', 'relilab'], m: 77, series: [['Münchner Reli Room-Snack', 'ca. 90 Minuten online'], ['Münchner Reli Room-Newsletter', '4–6 Mal im Jahr']] },
     { id: 'nrw', n: 'relilab NRW', ab: 'NRW', col: C.erstellen, tx: '#2B1A00', ty: 'netz', rl: 1, bio: 'Kurzer Input, Austausch, Praxisphase – in der reli.werkstatt.', back: 'Das relilab NRW verantwortet die reli.werkstatt: ein kurzer thematischer Input zu Digitalität, Heterogenität, Methodik oder Theologie, danach Austausch und eine Praxisphase.', inst: ['relilab', 'relilab'], m: 64, series: [['reli.werkstatt', 'meist alle zwei Wochen, dienstags 16:30–17:30']] },
     { id: 'impulse', n: '#relilab Impulse', ab: '#I', col: C.veroeffentlichen, ty: 'thema', rl: 1, bio: 'Neue Perspektiven auf Jesus Christus – theologische Tiefe und multikulturelle Weite.', back: 'RPZ Zweibrücken und RPI Baden laden gemeinsam zu Workshops mit Fachleuten ein – zu neuer theologischer Forschung über Jesus und zu ihrer Umsetzung im Unterricht der Sekundarstufen.', inst: ['relilab', 'relilab'], m: 45, series: [['Spotlight Jesus', 'freitags 16–17 Uhr, Herbst'], ['Jesus Christus im Unterricht (Sek I+II)', 'freitags 16–17 Uhr, Frühjahr']] },
     { id: 'bru', n: 'relilab|BRU', ab: 'BRU', col: C.hub, ty: 'ziel', rl: 1, bio: 'Religionsunterricht an beruflichen Schulen.', back: 'Kirchliche Institute und das ZSL Baden-Württemberg teilen Angebote und Ideen für Religionslehrkräfte an beruflichen Schulen.', inst: ['relilab', 'relilab'], m: 39, series: [['relilab|BRU', 'meist 1. und 2. Donnerstag im Monat, 15:30–17 Uhr']] },
     { id: 'junior', n: 'relilab|Junior', ab: 'Jr', col: C.finden, ty: 'ziel', rl: 1, bio: 'Digitale Unterrichtsideen für die Klassen 1–6.', back: 'ZSL, ptz Stuttgart-Birkach und Fachberatungen geben einfache, praxisnahe digitale Ideen und Materialien für den Religionsunterricht der Klassen 1 bis 6 weiter.', inst: ['relilab', 'relilab'], m: 52, series: [['relilab|Junior', '1. Donnerstag im Monat (Schulwochen BW und Bayern)']] },
     { id: 'interrel', n: 'relilab|interreligiös', ab: 'ir', col: C.kooperieren, ty: 'thema', rl: 1, bio: 'Christentum und Islam im Klassenzimmer.', back: 'ptz und ZSL Baden-Württemberg entwickeln kreative digitale Ideen zu Themen, die Christentum und Islam gleichermaßen betreffen – für Klassen mit Schüler:innen verschiedener Religionen.', inst: ['relilab', 'relilab'], m: 33, series: [['relilab|interreligiös', 'mit Anmeldung, im geschützten Moodle-Raum']] },
     { id: 'makerspace', n: 'Makerspace asynchrone Lernressourcen', ab: 'MS', col: C.erstellen, tx: '#2B1A00', ty: 'thema', rl: 1, bio: 'Wie lassen sich asynchrone Lernressourcen didaktisch gestalten?', back: 'Im Makerspace geht es um die Frage, wie asynchrone Lernressourcen didaktisch gestaltet werden können – einmal im Monat, praktisch und gemeinsam.', inst: ['relilab', 'relilab'], m: 27, series: [['Makerspace „asynchrone Lernressourcen“', 'einmal im Monat']] },
-    { id: 'frieden', n: 'Friedenspädagogik', ab: 'FP', col: C.kooperieren, ty: 'thema', mine: 'Mitglied', bio: 'Frieden lernen – in Schule und Gemeinde.', back: 'Lehrkräfte, Gemeindepädagog:innen und Engagierte aus der Friedensarbeit teilen Material und Erfahrungen zur Friedensbildung.', inst: ['Friedensarbeit EKD', null], m: 49 }
+    { id: 'frieden', n: 'Friedenspädagogik', ab: 'FP', col: C.kooperieren, ty: 'thema', mine: 'Mitglied', bio: 'Frieden lernen – in Schule und Gemeinde.', back: 'Lehrkräfte, Gemeindepädagog:innen und Engagierte aus der Friedensarbeit teilen Material und Erfahrungen zur Friedensbildung.', inst: ['Friedensarbeit EKD', null], m: 49 },
+    { id: 'oercommunity', n: 'OER-Community', ab: 'OC', col: C.hub, ty: 'netz', ver: true, mine: 'folge ich', bio: 'Community of Communities des Projekts FOERBICO: Vernetzung religionsbezogener OER-Communities, gemeinsame Qualitätskriterien und Metadatenstandards.', back: 'Wer selbst offene Materialien erstellt oder in einem Netzwerk daran mitarbeitet, findet hier Austausch, Tagungen und Wissensgrundlagen zu OER.', inst: ['OER-Community', 'oercommunity'], m: 9, series: [] }
   ];
   const cyFollow = new Set(CY.filter(c => c.mine).map(c => c.id));
   let cyFilter = 'alle', cyQ = '';
   function cyBtn(c) { const on = cyFollow.has(c.id); return `<button type="button" class="cy-follow${on ? ' on' : ''}" data-cyf="${c.id}">${on ? (c.mine === 'Mitglied' ? 'Mitglied ✓' : 'Folge ich ✓') : 'Folgen'}</button>`; }
+  // Newsletter einer Community: auf Nostr je Eintrag ein Web-Lesezeichen nach NIP-B0 (kind 39701) vom Community-Schlüssel, Tag newsletter
+  const nlLink = x => x[2] ? `<a href="${x[2]}" target="_blank" rel="noopener">anmelden ›</a>` : `<a href="#" data-todo="Anmeldung zum ${x[0]}">anmelden ›</a>`;
+  function nlLine(c) { return c.nl ? `<div class="cr-nl">${c.nl.map(x => `Newsletter: <b>${x[0]}</b> · ${x[1]} · ${nlLink(x)}`).join('<br>')}</div>` : ''; }
+  function nlBox() {
+    const list = CY.filter(c => c.nl);
+    return `<div class="rt-nl"><h4>Newsletter der Communities</h4><ul>${list.map(c => c.nl.map(x => `<li><span>${x[0]} <small style="display:inline;margin:0">(${c.n} · ${x[1]})</small></span>${nlLink(x)}</li>`).join('')).join('')}</ul><small>Nostr: je Newsletter ein NIP-B0-Lesezeichen (kind 39701) des Community-Schlüssels mit Tag <code>newsletter</code> und der Anmelde-URL als <code>d</code>-Tag.</small></div>`;
+  }
+  { const nb = document.getElementById('rtNl'); if (nb) nb.outerHTML = nlBox(); }
   function cyRel(c) { if (!c.inst) return ''; return c.inst[1] ? `<a class="cy-rel" href="#${c.inst[1]}">↔ Instanz: ${c.inst[0]} ›</a>` : `<span class="cy-rel">↔ Instanz: ${c.inst[0]}</span>`; }
   function cyAv(c) { return `<div class="cy-av" style="--av:${c.col}"><span class="${c.id === 'relilab' ? 'rl' : ''}" style="background:${c.col};color:${c.tx || '#fff'}">${c.id === 'relilab' ? '#' : c.ab}</span></div>`; }
   function cyCards(list, ctxRel) { return list.map(c => `<div class="cy-card" ${ctxRel ? `id="cy-${c.id}"` : `data-rid="cy-${c.id}"`} tabindex="0" aria-label="${c.n}">
       <div class="cy-in">
-        <div class="cy-f">${cyAv(c)}<h3>${c.n}${c.ver ? SHIELD : ''}</h3><p class="cy-bio">${c.bio}</p>${c.series ? `<div class="cy-ser">${c.series.map(x => `<span>Serie: ${x[0]}</span>`).join('')}</div>` : ''}${ctxRel ? cyRel(c) : ''}<span style="flex:1"></span>${cyBtn(c)}</div>
+        <div class="cy-f">${cyAv(c)}<h3>${c.n}${c.ver ? SHIELD : ''}</h3><p class="cy-bio">${c.bio}</p>${c.series ? `<div class="cy-ser">${c.series.map(x => `<span>Serie: ${x[0]}</span>`).join('')}</div>` : ''}${c.nl ? `<div class="cy-nl">${c.nl.map(x => `<span>Newsletter: ${x[0]}</span>`).join('')}</div>` : ''}${ctxRel ? cyRel(c) : ''}<span style="flex:1"></span>${cyBtn(c)}</div>
         <div class="cy-f cy-back"><small>Über die Community</small><h3>${c.n}</h3><p>${c.back}</p><div class="meta">${c.m} Mitglieder${c.series ? ' · ' + c.series.map(x => x[1]).filter(Boolean)[0] : ''}</div>${ctxRel ? cyRel(c) : ''}<span style="flex:1"></span><button type="button" class="cy-follow open" data-cyopen="${c.id}">Community-Raum öffnen ›</button>${cyBtn(c)}</div>
       </div></div>`).join('') || '<p class="cy-empty">Keine Community gefunden.</p>'; }
   function cyRender() {
@@ -1982,7 +2157,66 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     set: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>'
   };
   const T_ = (type, t, extra) => Object.assign({ type, t }, extra);
+  // ---------- OER-Community: Schnappschuss von oer.community (Stand 29.09.2026); Bilder per URL mit Fallback ----------
+  const OC_POSTS = [
+    { t: 'Metadaten – die unsichtbare Infrastruktur offener Bildung', date: '29.09.2026', ago: 'vor 4 Wochen', tags: ['OER', 'Metadaten', 'interoperabel', 'Vernetzung', 'dezentral', 'Qualitätskriterien'], x: 'Wer selbst OER erstellt, kennt die entscheidende Frage, die sich nach der Veröffentlichung stellt: Wird meine Ressource überhaupt gefunden?', img: 'https://blossom.edufeed.org/0e857e7892b60f5786bd00327d2e21f7de4c49e9575dc5d14ac59144761f0854.jpg', lic: 'Unsplash-Lizenz', url: 'https://oer.community/metadaten-die-unsichtbare-infrastruktur-offener-bildung/' },
+    { t: 'ALPIKA-Leitendentagung – (Komplementäre) Kooperationen, aber wie?', date: '28.09.2026', ago: 'vor 4 Wochen', tags: ['Kollaboration', 'OEP', 'Vernetzung', 'Community', 'FOERBICO in Kontakt'], x: 'Was können wir gemeinsam entwickeln, ohne das aufzugeben, was uns regional und institutionell ausmacht?', img: 'https://oer.community/alpika-tagung-2026/IMG_3549.jpg', lic: 'CC BY 4.0', url: 'https://oer.community/alpika-tagung-2026/' },
+    { t: 'Offen. Vernetzt. Zukunft. – Tagung zu Open Education in (religionsbezogenen) Communitys', date: '22.09.2026', ago: 'vor 5 Wochen', tags: ['OER', 'OEP', 'Vernetzung', 'OER-Community'], x: 'Wie können lebendige und nachhaltige Ökosysteme für offenes Lernen entstehen?', img: 'https://blossom.edufeed.org/fe6099cdb93b9bf7c2ca1162a8de550902efa1a0b0d2a677f30cba8578382757.png', lic: 'CC BY 4.0', url: 'https://oer.community/foerbico-tagung-2027/' },
+    { t: 'Künstliche Intelligenz im evangelischen Religionsunterricht', date: '11.09.2026', ago: 'vor 7 Wochen', tags: ['KI', 'Religionsunterricht', 'Urteilsbildung', 'AI literacy', 'FOERBICO in Kontakt'], x: 'Warum ist das zentrale evangelische Kriterium für KI im Religionsunterricht nicht Effizienz, sondern Freiheit und die Fähigkeit zum eigenen Urteil?', img: 'https://blossom.edufeed.org/bb3dfcb3815161763ed2e6250c11446c95934f0f1bed60c5c6dca80148867d7b.jpg', lic: '', url: 'https://oer.community/ki-im-evangelischen-religionsunterricht/' },
+    { t: 'Zwischen OER, Demokratie und hOERoskop – Eindrücke vom OERcamp 2026', date: '02.09.2026', ago: 'vor 8 Wochen', tags: ['OER', 'OEP', 'Barcamp', 'OERcamp', 'OER-Community'], x: 'Ein Wochenende voller Impulse, spannender Diskussionen, neuer Ideen und dazwischen viel schöne Natur: Das OERcamp 2026 in Erkner hatte einiges zu bieten.', img: 'https://blossom.edufeed.org/20a027ca751e79b5339cdef11fad2a19f145d576e6cfb43b50f78e107de09d0a.jpeg', lic: 'CC BY 4.0', url: 'https://oer.community/oercamp-2026/' }
+  ];
+  const OC_TAGUNGEN = [
+    { t: 'Abschlusstagung „Offen. Vernetzt. Zukunft“', when: '2. und 3. Februar 2027 · Goethe-Universität Frankfurt', x: 'Open Education in (religionsbezogenen) Communities: OER-Communities und Akteur:innen aus Wissenschaft, Bildungspraxis, Kirche und Zivilgesellschaft diskutieren, wie offene Bildungsökosysteme wachsen.', link: ['Anmeldung bis 22. Januar 2027', 'https://www.uni-frankfurt.de/de/fachbereich-7/professuren/mediendidaktik-und-religionspaedagogik/news/foerbico-abschlusstagung'] },
+    { t: 'Zwischenfazit-Tagung „Mit OER zu einer Kultur des Teilens“', when: '28. und 29. April 2026 · Nürnberg', x: 'Wie arbeiten OER-Communities zusammen, wie entstehen Materialien kollaborativ, und wie kann eine Kultur des Teilens konkret gelebt werden? Impulse aus der Forschung trafen Perspektiven aus der Praxis.', link: ['Rückblick', 'https://oer.community/tagungen/'] }
+  ];
+  // Teamseite oer.community/unser-team (öffentlich); Porträts sind dort ©, deshalb hier Initialen statt Bilder
+  const OC_TEAM = [
+    { g: 'Comenius-Institut', url: 'https://comenius.de/', p: [
+      { n: 'Dr. Jens Dechow', f: 'Direktor des Comenius-Instituts, verantwortet FOERBICO' },
+      { n: 'Jörg Lohrer', f: 'Projektkoordination, Community-Management' },
+      { n: 'Gina Buchwald-Chassée', f: 'Community-Management, Öffentlichkeitsarbeit' },
+      { n: 'Ludger Sicking', f: 'technische Umsetzung' } ] },
+    { g: 'Goethe-Universität Frankfurt', url: 'https://www.uni-frankfurt.de/de/fachbereich-7/professuren/mediendidaktik-und-religionspaedagogik', p: [
+      { n: 'Prof. Dr. Viera Pirker', f: 'Professur für Religionspädagogik und Mediendidaktik' },
+      { n: 'Dr. Laura Mößle', f: 'wissenschaftliche Mitarbeiterin; seit 10/2026 Professur an der KH Freiburg' },
+      { n: 'Dr. Florian Mayrhofer', f: 'wissenschaftlicher Koordinator' },
+      { n: 'Paula Gregorio Rodrigo', f: 'wissenschaftliche Mitarbeiterin' } ] },
+    { g: 'FAU Erlangen-Nürnberg', url: 'https://www.fau.de/', p: [
+      { n: 'Prof. Dr. Manfred Pirner', f: 'Lehrstuhl für Religionspädagogik und Didaktik des Evangelischen Religionsunterrichts' },
+      { n: 'Phillip Angelina', f: 'wissenschaftlicher Mitarbeiter, Empirie' } ] }
+  ];
+  const ocInit = n => n.replace(/^(Prof\. |Dr\. )+/, '').split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const ocExt = (href, label) => `<a href="${href}" target="_blank" rel="noopener">${label}</a>`;
+  function ocRender() {
+    const root = document.getElementById('ocRoot');
+    const posts = OC_POSTS.map(p => `<article class="oc-card"><div class="img"><span>${p.t}</span><img src="${p.img}" alt="" loading="lazy" onerror="this.remove()">${p.lic ? `<span class="oc-lic">${p.lic}</span>` : ''}</div><div class="tx"><h3>${ocExt(p.url, p.t)}</h3><span class="oc-date">${p.date}</span><div class="oc-tags">${p.tags.map(t => `<span>${t}</span>`).join('')}</div><p>${p.x}</p></div></article>`).join('');
+    const tag = OC_TAGUNGEN.map(e => `<article class="oc-card"><div class="tx"><h3>${e.t}</h3><span class="oc-date">${e.when}</span><p>${e.x}</p><p>${ocExt(e.link[1], e.link[0] + ' ›')}</p></div></article>`).join('');
+    const team = OC_TEAM.map(g => `<h3 class="oc-g">${ocExt(g.url, g.g)}</h3><div class="oc-team">${g.p.map(m => `<div class="oc-person"><span class="oc-av" aria-hidden="true">${ocInit(m.n)}</span><div><b>${m.n}</b><small>${m.f}</small></div></div>`).join('')}</div>`).join('');
+    root.innerHTML = `
+      <section class="oc-sec oc-start" id="oc-start">
+        <img src="https://oer.community/images/FOERBICO.png" alt="" onerror="this.remove()">
+        <h1>FOERBICO</h1>
+        <h2>Förderung offener Bildungspraktiken in religionsbezogenen Communities durch die Entwicklung eines koordinierten OER-Ökosystems</h2>
+        <p>Du bist interessiert an offenen Materialien (OER) für das Lernen und Lehren, hast selbst schon Materialien erstellt oder arbeitest in einer Community daran mit? Dann bist du bei FOERBICO richtig.</p>
+        <p>Im Sinne einer <i>Community of Communities</i> vernetzt FOERBICO religionsbezogene Communities, um gemeinsame Qualitätskriterien und Metadatenstandards zu entwickeln, damit OER in verschiedene Materialpools eingepflegt, weiterverbreitet und weiterentwickelt werden können.</p>
+        <p>${ocExt('https://matrix.to/#/#oercommunity:rpi-virtuell.de', '<span class="oc-btn">Space „OERcommunity“ (Element)</span>')}<button type="button" class="oc-btn alt" data-ocs="oc-team">Zum Team</button></p>
+      </section>
+      <section class="oc-sec" id="oc-blog"><h2>Blog</h2><div class="oc-grid">${posts}</div><p style="margin:14px 0 0">${ocExt('https://oer.community/blog/', 'Alle Beiträge auf oer.community ›')}</p></section>
+      <section class="oc-sec" id="oc-tagungen"><h2>Tagungen</h2><div class="oc-grid">${tag}</div></section>
+      <section class="oc-sec" id="oc-oer"><h2>Was ist OER? · Qualität</h2><div class="oc-grid">
+        <article class="oc-card"><div class="tx"><h3>${ocExt('https://oer.community/oer-und-oep/', 'OER und OEP')}</h3><p>Was Open Educational Resources und Open Educational Practices sind, warum offene Materialien Zusammenarbeit möglich machen, und ein Selbstlernmodul zum Einstieg.</p></div></article>
+        <article class="oc-card" id="oc-qualitaet"><div class="tx"><h3>${ocExt('https://oer.community/qualitaet/', 'Qualität')}</h3><p>Qualität als Prinzip offener religiöser Bildung: was allgemeine OER-Qualitätsmodelle leisten und welche religionspädagogischen Kriterien dazukommen.</p></div></article>
+      </div></section>
+      <section class="oc-sec" id="oc-team"><h2>Unser Team</h2>${team}</section>`;
+  }
+  ocRender();
+  document.getElementById('v-oercommunity').addEventListener('click', e => {
+    const b = e.target.closest('[data-ocs]');
+    if (b) document.getElementById(b.dataset.ocs).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
   const CR = {
+    oercommunity: { act: OC_POSTS.map(p => T_('Artikel', p.t, { who: 'OER-Community', ago: p.ago, x: p.x, tags: p.tags, url: p.url })) },
     relilab: { act: [
         T_('Termin', 'Den Ramadan in der Schule gestalten – Interreligiöses Lernen', { who: 'relilab', ago: 'vor 4 Tagen', d: ['11', 'JAN', '2027, 16:00'], tags: ['Ramadan', 'Fastenbrechen', 'Id al-Fitr'] }),
         T_('Termin', 'Weihnachten religionssensibel gestalten – Interreligiöses Lernen', { who: 'relilab', ago: 'vor 4 Tagen', d: ['12', 'NOV', '2026, 16:00'], tags: ['Weihnachten', 'Advent', 'Maria'] }),
@@ -2053,7 +2287,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
           <div class="cr-bottom">${nav('mem', CR_ICON.mem, 'Mitglieder')}${nav('set', CR_ICON.set, 'Einstellungen')}</div></nav></aside>
       <main>
         <div class="cr-top"><span class="ring" style="width:240px;height:240px;background:${c.col};right:-50px;top:-120px"></span><span class="ring" style="width:170px;height:170px;background:var(--c-koop);right:130px;bottom:-120px"></span><div class="cr-id"><div class="cr-name">${crAv(c, 64)}<h1>${c.n}</h1><button type="button" class="cr-fol${fol ? '' : ' off'}" data-cract="follow">${fol ? '✓ Folge ich' : '+ Folgen'}</button></div>
-          <button type="button" class="cr-mem" data-crtab="mem"><span class="st">${PEOPLE.slice(0, 3).map((p, i) => `<span style="background:${PCOL[i]}">${ini(p)}</span>`).join('')}</span>${c.m} Mitglieder ›</button>${c.inst ? `<div>${cyRel(c)}</div>` : ''}</div>
+          <button type="button" class="cr-mem" data-crtab="mem"><span class="st">${PEOPLE.slice(0, 3).map((p, i) => `<span style="background:${PCOL[i]}">${ini(p)}</span>`).join('')}</span>${c.m} Mitglieder ›</button>${c.inst ? `<div>${cyRel(c)}</div>` : ''}${nlLine(c)}</div>
           <div class="cr-act">${mem ? '<span class="cr-badge">✓ Mitglied</span>' : req ? '<span class="cr-badge">Anfrage gesendet</span>' : '<button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button>'}${mem ? '' : '<a data-cract="code">Einladungscode einlösen</a><div class="cr-code" id="crCode" hidden><input placeholder="Code eingeben" aria-label="Einladungscode"><button type="button" class="cr-pill" data-cract="redeem">Einlösen</button></div>'}</div></div>
         ${crMain(c)}
       </main>`;
@@ -2067,7 +2301,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     if (k === 'code') { const box = document.getElementById('crCode'); box.hidden = !box.hidden; if (!box.hidden) box.querySelector('input').focus(); }
     if (k === 'redeem') { const v = document.querySelector('#crCode input').value.trim(); if (!v) { document.querySelector('#crCode input').focus(); return; } crMember[crId] = true; cyFollow.add(crId); cyRender(); crRender(); toast(`Willkommen! Du bist jetzt Mitglied in <b>${c.n}</b>.`); }
     if (k === 'leave') { crMember[crId] = false; crTab = 'home'; crRender(); toast(`Du hast <b>${c.n}</b> verlassen.`); }
-    if (k === 'blog') openBlog(c.n);
+    if (k === 'blog') openBlog(c.n, { room: true });
     if (k === 'learn') openChooser(c.n);
     if (k === 'event') openEvent(c.n);
   }
@@ -2138,7 +2372,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       h += `<span class="${today.year === y && today.month === m && today.day === d ? 't' : ''}">${d}${evs.map(e => `<button type="button" class="${e.a === 'relilab-impuls' ? 'imp' : ''}" data-rtj="${RT_EV.indexOf(e)}" title="${rtEsc(fT.format(e.s * 1000) + ' · ' + e.t)}">${fT.format(e.s * 1000)} ${rtEsc(e.t)}</button>`).join('')}</span>`;
     }
     h += '<span class="o"></span>'.repeat((7 - (lead + days) % 7) % 7) + '</div>';
-    return h + `<p style="font-size:13px;color:#7A808A;margin-top:10px">${list.length} Termine ${rt.f ? 'mit #' + rtEsc(rt.f) : 'insgesamt'} · Klick auf einen Termin zeigt die Details.</p>`;
+    return h + `<p style="font-size:13px;color:#5F6670;margin-top:10px">${list.length} Termine ${rt.f ? 'mit #' + rtEsc(rt.f) : 'insgesamt'} · Klick auf einen Termin zeigt die Details.</p>`;
   }
   function rtRender() {
     const base = rtBase(), list = rtList(), cnt = {};
@@ -2152,14 +2386,14 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     else { let cur = ''; list.forEach(e => { const mo = fMY.format(e.s * 1000); if (mo !== cur) { h += `<h2 class="rt-month">${mo}</h2>`; cur = mo; } h += rtCard(e); }); }
     document.getElementById('rtMain').innerHTML = h;
     const per = {}; RT_EV.forEach(e => per[e.a] = (per[e.a] || 0) + 1);
-    document.getElementById('rtSrc').innerHTML = Object.keys(RT_SRC).map(a => `<li><i style="background:${RT_SRC[a][0]}"></i>${a} <span style="color:#7A808A">(${per[a] || 0})</span><code>${RT_SRC[a][1]}</code></li>`).join('');
+    document.getElementById('rtSrc').innerHTML = Object.keys(RT_SRC).map(a => `<li><i style="background:${RT_SRC[a][0]}"></i>${a} <span style="color:#5F6670">(${per[a] || 0})</span><code>${RT_SRC[a][1]}</code></li>`).join('');
     document.getElementById('rtStand').textContent = `Schnappschuss vom ${RT_STAND} · ${RT_EV.length} Termine ab Oktober 2026`;
   }
   function rtOpen(p) {
     rt.f = p.get('filter') || ''; rt.q = p.get('q') || ''; rt.v = p.get('ansicht') === 'monat' ? 'monat' : 'liste'; rt.von = p.get('von') === 'konsole'; rt.m = null;
     document.getElementById('rtQ').value = rt.q;
     const pre = document.getElementById('rtPre'); pre.classList.toggle('on', rt.von);
-    pre.innerHTML = rt.von ? `<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="#008C86" opacity=".85"/><circle cx="20" cy="20" r="6" fill="#fff"/></svg><span>Über die <b>reli_hub-Steuerkonsole</b> (finden › Fortbildungen): Hier im relilab zeigt sie dir die relilab-Termine. </span>` : '';
+    pre.innerHTML = rt.von ? `<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="${C.finden}" opacity=".85"/><circle cx="20" cy="20" r="6" fill="#fff"/></svg><span>Über die <b>reli_hub-Steuerkonsole</b> (finden › Fortbildungen): Hier im relilab zeigt sie dir die relilab-Termine. </span>` : '';
     rtRender();
   }
   const rtRoot = document.querySelector('#v-relilab [data-rlsec="termine"]');
@@ -2189,7 +2423,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 
   // ---------- Kontexte der Steuerkonsole: dieselbe Steuerkonsole, je nach Seite andere Aktionen ----------
   let LOGGED = false;
-  const VIEW_OF = { 'finden.material': 'materialpool', 'hub.profil': 'profil', 'hub.home': 'start', 'erstellen.labor': 'relilab', 'erstellen.schreibtisch': 'relidesk?tab=schreibtisch' };
+  const VIEW_OF = { 'finden.material': 'materialpool', 'finden.beitraege': 'profil?zu=artikel', 'hub.profil': 'profil', 'hub.home': 'start', 'erstellen.labor': 'relilab', 'erstellen.schreibtisch': 'relidesk?tab=schreibtisch' };
   function navTo(view, url) { const q = new URL(url).search; go(view + (q ? (view.includes('?') ? '&' + q.slice(1) : q) : '')); }
   function info(d) {
     if (!['finden', 'erstellen', 'kooperieren', 'veroeffentlichen'].includes(d.action)) return false;
@@ -2219,6 +2453,18 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       if (d.action === 'veroeffentlichen.beitrag') { openBlog('materialpool'); return false; }
       if (d.action === 'finden.material') { window.scrollTo({ top: 0, behavior: 'smooth' }); toast('Du bist bereits im Materialpool.'); return false; }
       if (d.action === 'hub') { go(LOGGED ? 'profil' : 'start'); return false; }
+      if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); return false; }
+      if (info(d)) return false;
+      later(d); return false;
+    }
+  });
+  RelihubSteuerkonsole.registerContext('oer-community', {
+    handler: d => {
+      if (d.action === 'hub.home') { go('start'); return false; }
+      if (d.action === 'hub') { go(LOGGED ? 'profil' : 'start'); return false; }
+      if (d.action === 'finden.material') { go('materialpool?thema=OER'); return false; }
+      if (d.action === 'veroeffentlichen.beitrag') { openBlog('OER-Community'); return false; }
+      if (d.action === 'kooperieren.communities') { go('community?c=oercommunity'); return false; }
       if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); return false; }
       if (info(d)) return false;
       later(d); return false;
@@ -2305,16 +2551,16 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   function route() {
     const raw = CUR;
     const [view, qs] = raw.split('?');
-    const v = ['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community'].includes(view) ? view : (view === 'partner' ? 'start' : 'start');
+    const v = ['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity'].includes(view) ? view : (view === 'partner' ? 'start' : 'start');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
     document.querySelectorAll('.proto a').forEach(a => a.classList.toggle('on', a.dataset.v === v));
-    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum' }[v];
+    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO' }[v];
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || 'relilab', pp.get('tab')); }
     if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); }
     if (v === 'relilab') rlShow(qs);
     if (v === 'relidesk') rdTab(new URLSearchParams(qs || '').get('tab'));
     if (view === 'partner') { setTimeout(() => document.getElementById('partner').scrollIntoView(), 30); return; }
-    if (v === 'profil') LOGGED = true;
+    if (v === 'profil') { LOGGED = true; renderArtikel(); const zu = new URLSearchParams(qs || '').get('zu'); if (zu) setTimeout(() => { const t = document.getElementById(zu); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
     if (v === 'start') explainDefault();
     if (v === 'materialpool') {
       const p = new URLSearchParams(qs || ''), pre = document.getElementById('mpPre');
