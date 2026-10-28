@@ -88,3 +88,11 @@ Deno.test('Teilen in Communities im Beitrags- und Termin-Editor', () => {
   assert(/function shareTo\(/.test(s) && /kind 16/.test(s) && /h-Tag/.test(s), 'shareTo oder Toast-Text fehlt');
   assert(/function isMember\(/.test(s), 'isMember fehlt');
 });
+
+Deno.test('finden hat die Knospe Beiträge und das Profil ein Artikel-Panel', () => {
+  const c = consoleScript(), s = appScript();
+  assert(/finden\.beitraege/.test(c) && /'\/finden\/beitraege'/.test(c + s), 'Knospe oder Route fehlt');
+  assert(/'finden\.beitraege':\s*'Beiträge'/.test(s), 'SUBL-Eintrag fehlt');
+  assert(html.includes('id="artikel"') && html.includes('Artikel aus deinen Communities'), 'Panel fehlt');
+  assert(/function renderArtikel\(/.test(s) && s.includes('Folge Communities, um hier Artikel zu sehen.'), 'renderArtikel oder Leerzustand fehlt');
+});
