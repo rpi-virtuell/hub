@@ -532,7 +532,12 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .cy-f h3 svg{flex:0 0 auto;width:16px;height:16px}
 .cy-bio{font-size:15px;line-height:1.45;color:var(--muted);margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .cy-ser{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-top:10px}
-.cy-ser span{font-size:12.5px;font-weight:600;color:#6B3F00;background:var(--t-erstellen);border-radius:999px;padding:2px 9px}
+.cy-ser span{font-size:12.5px;font-weight:600;color:var(--x-erstellen);background:var(--t-erstellen);border-radius:999px;padding:2px 9px}
+/* Newsletter je Community (Issue da392383): Pille auf der Kachel, Zeile im Raum-Kopf, Liste bei den relilab-Terminen */
+.cy-nl{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-top:6px}
+.cy-nl span{font-size:12.5px;font-weight:600;color:var(--x-finden);background:var(--t-finden);border-radius:999px;padding:2px 9px}
+.cr-nl{margin-top:8px;font-size:14px;color:var(--x-finden)}.cr-nl a{color:inherit;font-weight:600}
+.rt-nl li{flex-direction:column;align-items:flex-start;gap:2px}.rt-nl li a{color:#1F1F25;font-weight:600}.rt-nl small{display:block;margin-top:6px;color:#5F6670}
 .cy-rel{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#7A1A3E;background:#fff;border:1px solid #F0C7D6;border-radius:999px;padding:2px 10px;margin-top:10px;text-decoration:none}
 .cy-follow{margin-top:8px;align-self:center;border:0;border-radius:999px;background:var(--c-koop);color:#fff;font:inherit;font-size:15px;font-weight:600;padding:9px 24px;cursor:pointer}
 .cy-follow.on{background:transparent;color:var(--x-koop);box-shadow:inset 0 0 0 1.5px var(--c-koop)}
@@ -1017,6 +1022,7 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
           <small id="rtStand"></small>
         </div>
         <div><h4>Im reli_hub weiterverfolgen</h4>Termine, die du dir merkst, erscheinen in deinem reli_hub-Profil unter „Meine Termine“ – über die Steuerkonsole kommst du jederzeit hierher zurück.</div>
+        <div id="rtNl"></div>
       </aside>
     </div>
   </div></section>
@@ -2072,7 +2078,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   // ---------- Communities (Beispieldaten; Texte teils von edufeed.org übernommen) ----------
   const SHIELD = '<svg viewBox="0 0 24 24" aria-label="verifiziert"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z" fill="#4E8FE0"/><path d="M12 4.2 6 6.5V11c0 3.9 2.5 7.4 6 8.8z" fill="#7FB1EE"/></svg>';
   const CY = [
-    { id: 'relilab', n: 'relilab', ab: 'rl', col: C.erstellen, tx: '#2B1A00', ty: 'netz', mine: 'Mitglied', bio: 'Die Menschen hinter dem relilab.', back: 'Die relilab-Community steuert und entwickelt das relilab gemeinsam weiter: Lernbausteine, Live-Anlässe und Serien. Wer mitgestalten möchte, ist eingeladen.', inst: ['relilab', 'relilab'], m: 214, rl: 1, series: [['Live-Anlässe im relilab', 'laufend']] },
+    { id: 'relilab', n: 'relilab', ab: 'rl', nl: [['relilab-Newsletter', 'monatlich', null]], col: C.erstellen, tx: '#2B1A00', ty: 'netz', mine: 'Mitglied', bio: 'Die Menschen hinter dem relilab.', back: 'Die relilab-Community steuert und entwickelt das relilab gemeinsam weiter: Lernbausteine, Live-Anlässe und Serien. Wer mitgestalten möchte, ist eingeladen.', inst: ['relilab', 'relilab'], m: 214, rl: 1, series: [['Live-Anlässe im relilab', 'laufend']] },
     { id: 'religlobal', n: 'reliGlobal', ab: 'rG', col: C.kooperieren, ty: 'thema', bio: 'Globales Lernen im Religionsunterricht fördern.', back: 'Die Hauptamtlichen, die für reliGlobal arbeiten, und verbundene Personen, die gemeinsam mit dem Team Globales Lernen im Religionsunterricht fördern möchten.', inst: ['reliGlobal', null], m: 63, rl: 1, series: [['reliGlobal.Werkstatt', 'mehrmals im Jahr']] },
     { id: 'konfi', n: 'Konfiarbeit EKD', ab: 'KA', col: C.kooperieren, ty: 'ziel', ver: true, bio: 'Hier vernetzt sich die ALPIKA-AG Konfiarbeit und erprobt den nostr-Datenraum und die edufeed-Logik für die EKD-weite Konfiarbeit.', back: 'Die ALPIKA-AG Konfiarbeit vernetzt sich hier und erprobt den nostr-Datenraum und die edufeed-Logik für die Konfiarbeit in der ganzen EKD.', inst: ['Konfi-Arbeit bundesweit', null], m: 41 },
     { id: 'narrt', n: 'narrt', ab: 'na', col: C.kooperieren, ty: 'thema', mine: 'Mitglied', bio: 'Antisemitismus- und rassismuskritische Religionspädagogik und Theologie.', back: 'Menschen, die kritisch reflektieren, wie Religionspädagogik und Theologie in antisemitische und rassistische Verhältnisse verstrickt sind – und gemeinsam nach Alternativen für Denken, Handeln und Material suchen.', inst: ['narrt', null], m: 102 },
@@ -2083,7 +2089,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     { id: 'kph', n: 'KPH Wien/NÖ Zentrum Fortbildung Religion', ab: 'PH', col: C.finden, ty: 'netz', ver: true, bio: 'Keine Biografie verfügbar', back: 'Zentrum Fortbildung Religion der Kirchlichen Pädagogischen Hochschule Wien/Niederösterreich – Fortbildungen für Religionslehrkräfte.', m: 24 },
     { id: 'rpi', n: 'Religionspädagogisches Institut von EKKW und EKHN', ab: 'RPI', col: C.hub, ty: 'netz', bio: 'Keine Biografie verfügbar', back: 'Religionspädagogisches Institut der Evangelischen Kirche von Kurhessen-Waldeck und der Evangelischen Kirche in Hessen und Nassau – Fortbildung, Beratung und Material.', m: 73 },
     { id: 'schulseelsorge', n: 'relilab.Schulseelsorge', ab: 'SS', col: C.hub, ty: 'ziel', rl: 1, bio: 'voneinander lernen. miteinander entwickeln.', back: 'Schulseelsorgende aus Deutschland und Österreich reflektieren in kurzen Online-Fortbildungen ihre Praxis und entwickeln Schulseelsorge gemeinsam weiter.', inst: ['relilab', 'relilab'], m: 58, series: [['Relilab.Schulseelsorge – Learningsnacks', 'monatlich, donnerstags 16–17 Uhr']] },
-    { id: 'muenchen', n: 'Münchner Reli Room', ab: 'MR', col: C.finden, ty: 'ziel', rl: 1, bio: 'Updates zur digitalen Religionspädagogik für katholische Religionslehrkräfte.', back: 'Die Fachstelle Medien und Digitalität und die Religionspädagogische Materialstelle Bayern (RPZ) bieten mit weiteren Fachleuten regelmäßige Online-Updates für katholische Religionslehrkräfte im Erzbistum München und Freising.', inst: ['relilab', 'relilab'], m: 77, series: [['Münchner Reli Room-Snack', 'ca. 90 Minuten online'], ['Münchner Reli Room-Newsletter', '4–6 Mal im Jahr']] },
+    { id: 'muenchen', n: 'Münchner Reli Room', ab: 'MR', nl: [['Münchner Reli Room-Newsletter', '4–6 Mal im Jahr', null]], col: C.finden, ty: 'ziel', rl: 1, bio: 'Updates zur digitalen Religionspädagogik für katholische Religionslehrkräfte.', back: 'Die Fachstelle Medien und Digitalität und die Religionspädagogische Materialstelle Bayern (RPZ) bieten mit weiteren Fachleuten regelmäßige Online-Updates für katholische Religionslehrkräfte im Erzbistum München und Freising.', inst: ['relilab', 'relilab'], m: 77, series: [['Münchner Reli Room-Snack', 'ca. 90 Minuten online'], ['Münchner Reli Room-Newsletter', '4–6 Mal im Jahr']] },
     { id: 'nrw', n: 'relilab NRW', ab: 'NRW', col: C.erstellen, tx: '#2B1A00', ty: 'netz', rl: 1, bio: 'Kurzer Input, Austausch, Praxisphase – in der reli.werkstatt.', back: 'Das relilab NRW verantwortet die reli.werkstatt: ein kurzer thematischer Input zu Digitalität, Heterogenität, Methodik oder Theologie, danach Austausch und eine Praxisphase.', inst: ['relilab', 'relilab'], m: 64, series: [['reli.werkstatt', 'meist alle zwei Wochen, dienstags 16:30–17:30']] },
     { id: 'impulse', n: '#relilab Impulse', ab: '#I', col: C.veroeffentlichen, ty: 'thema', rl: 1, bio: 'Neue Perspektiven auf Jesus Christus – theologische Tiefe und multikulturelle Weite.', back: 'RPZ Zweibrücken und RPI Baden laden gemeinsam zu Workshops mit Fachleuten ein – zu neuer theologischer Forschung über Jesus und zu ihrer Umsetzung im Unterricht der Sekundarstufen.', inst: ['relilab', 'relilab'], m: 45, series: [['Spotlight Jesus', 'freitags 16–17 Uhr, Herbst'], ['Jesus Christus im Unterricht (Sek I+II)', 'freitags 16–17 Uhr, Frühjahr']] },
     { id: 'bru', n: 'relilab|BRU', ab: 'BRU', col: C.hub, ty: 'ziel', rl: 1, bio: 'Religionsunterricht an beruflichen Schulen.', back: 'Kirchliche Institute und das ZSL Baden-Württemberg teilen Angebote und Ideen für Religionslehrkräfte an beruflichen Schulen.', inst: ['relilab', 'relilab'], m: 39, series: [['relilab|BRU', 'meist 1. und 2. Donnerstag im Monat, 15:30–17 Uhr']] },
@@ -2096,11 +2102,19 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   const cyFollow = new Set(CY.filter(c => c.mine).map(c => c.id));
   let cyFilter = 'alle', cyQ = '';
   function cyBtn(c) { const on = cyFollow.has(c.id); return `<button type="button" class="cy-follow${on ? ' on' : ''}" data-cyf="${c.id}">${on ? (c.mine === 'Mitglied' ? 'Mitglied ✓' : 'Folge ich ✓') : 'Folgen'}</button>`; }
+  // Newsletter einer Community: auf Nostr je Eintrag ein Web-Lesezeichen nach NIP-B0 (kind 39701) vom Community-Schlüssel, Tag newsletter
+  const nlLink = x => x[2] ? `<a href="${x[2]}" target="_blank" rel="noopener">anmelden ›</a>` : `<a href="#" data-todo="Anmeldung zum ${x[0]}">anmelden ›</a>`;
+  function nlLine(c) { return c.nl ? `<div class="cr-nl">${c.nl.map(x => `Newsletter: <b>${x[0]}</b> · ${x[1]} · ${nlLink(x)}`).join('<br>')}</div>` : ''; }
+  function nlBox() {
+    const list = CY.filter(c => c.nl);
+    return `<div class="rt-nl"><h4>Newsletter der Communities</h4><ul>${list.map(c => c.nl.map(x => `<li><span>${x[0]} <small style="display:inline;margin:0">(${c.n} · ${x[1]})</small></span>${nlLink(x)}</li>`).join('')).join('')}</ul><small>Nostr: je Newsletter ein NIP-B0-Lesezeichen (kind 39701) des Community-Schlüssels mit Tag <code>newsletter</code> und der Anmelde-URL als <code>d</code>-Tag.</small></div>`;
+  }
+  { const nb = document.getElementById('rtNl'); if (nb) nb.outerHTML = nlBox(); }
   function cyRel(c) { if (!c.inst) return ''; return c.inst[1] ? `<a class="cy-rel" href="#${c.inst[1]}">↔ Instanz: ${c.inst[0]} ›</a>` : `<span class="cy-rel">↔ Instanz: ${c.inst[0]}</span>`; }
   function cyAv(c) { return `<div class="cy-av" style="--av:${c.col}"><span class="${c.id === 'relilab' ? 'rl' : ''}" style="background:${c.col};color:${c.tx || '#fff'}">${c.id === 'relilab' ? '#' : c.ab}</span></div>`; }
   function cyCards(list, ctxRel) { return list.map(c => `<div class="cy-card" ${ctxRel ? `id="cy-${c.id}"` : `data-rid="cy-${c.id}"`} tabindex="0" aria-label="${c.n}">
       <div class="cy-in">
-        <div class="cy-f">${cyAv(c)}<h3>${c.n}${c.ver ? SHIELD : ''}</h3><p class="cy-bio">${c.bio}</p>${c.series ? `<div class="cy-ser">${c.series.map(x => `<span>Serie: ${x[0]}</span>`).join('')}</div>` : ''}${ctxRel ? cyRel(c) : ''}<span style="flex:1"></span>${cyBtn(c)}</div>
+        <div class="cy-f">${cyAv(c)}<h3>${c.n}${c.ver ? SHIELD : ''}</h3><p class="cy-bio">${c.bio}</p>${c.series ? `<div class="cy-ser">${c.series.map(x => `<span>Serie: ${x[0]}</span>`).join('')}</div>` : ''}${c.nl ? `<div class="cy-nl">${c.nl.map(x => `<span>Newsletter: ${x[0]}</span>`).join('')}</div>` : ''}${ctxRel ? cyRel(c) : ''}<span style="flex:1"></span>${cyBtn(c)}</div>
         <div class="cy-f cy-back"><small>Über die Community</small><h3>${c.n}</h3><p>${c.back}</p><div class="meta">${c.m} Mitglieder${c.series ? ' · ' + c.series.map(x => x[1]).filter(Boolean)[0] : ''}</div>${ctxRel ? cyRel(c) : ''}<span style="flex:1"></span><button type="button" class="cy-follow open" data-cyopen="${c.id}">Community-Raum öffnen ›</button>${cyBtn(c)}</div>
       </div></div>`).join('') || '<p class="cy-empty">Keine Community gefunden.</p>'; }
   function cyRender() {
@@ -2272,7 +2286,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
           <div class="cr-bottom">${nav('mem', CR_ICON.mem, 'Mitglieder')}${nav('set', CR_ICON.set, 'Einstellungen')}</div></nav></aside>
       <main>
         <div class="cr-top"><span class="ring" style="width:240px;height:240px;background:${c.col};right:-50px;top:-120px"></span><span class="ring" style="width:170px;height:170px;background:var(--c-koop);right:130px;bottom:-120px"></span><div class="cr-id"><div class="cr-name">${crAv(c, 64)}<h1>${c.n}</h1><button type="button" class="cr-fol${fol ? '' : ' off'}" data-cract="follow">${fol ? '✓ Folge ich' : '+ Folgen'}</button></div>
-          <button type="button" class="cr-mem" data-crtab="mem"><span class="st">${PEOPLE.slice(0, 3).map((p, i) => `<span style="background:${PCOL[i]}">${ini(p)}</span>`).join('')}</span>${c.m} Mitglieder ›</button>${c.inst ? `<div>${cyRel(c)}</div>` : ''}</div>
+          <button type="button" class="cr-mem" data-crtab="mem"><span class="st">${PEOPLE.slice(0, 3).map((p, i) => `<span style="background:${PCOL[i]}">${ini(p)}</span>`).join('')}</span>${c.m} Mitglieder ›</button>${c.inst ? `<div>${cyRel(c)}</div>` : ''}${nlLine(c)}</div>
           <div class="cr-act">${mem ? '<span class="cr-badge">✓ Mitglied</span>' : req ? '<span class="cr-badge">Anfrage gesendet</span>' : '<button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button>'}${mem ? '' : '<a data-cract="code">Einladungscode einlösen</a><div class="cr-code" id="crCode" hidden><input placeholder="Code eingeben" aria-label="Einladungscode"><button type="button" class="cr-pill" data-cract="redeem">Einlösen</button></div>'}</div></div>
         ${crMain(c)}
       </main>`;

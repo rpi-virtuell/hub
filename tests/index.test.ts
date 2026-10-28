@@ -96,3 +96,10 @@ Deno.test('finden hat die Knospe Beiträge und das Profil ein Artikel-Panel', ()
   assert(html.includes('id="artikel"') && html.includes('Artikel aus deinen Communities'), 'Panel fehlt');
   assert(/function renderArtikel\(/.test(s) && s.includes('Folge Communities, um hier Artikel zu sehen.'), 'renderArtikel oder Leerzustand fehlt');
 });
+
+Deno.test('Newsletter je Community', () => {
+  const s = appScript();
+  assert((s.match(/\bnl:\s*\[\[/g) || []).length >= 2, 'weniger als zwei nl-Einträge');
+  assert(/function nlBox\(/.test(s) && s.includes('Newsletter der Communities') && s.includes('39701'), 'nlBox fehlt');
+  assert(/cy-nl/.test(s) && /Newsletter:/.test(s), 'Kachel-Pille oder Raum-Kopf fehlt');
+});
