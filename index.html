@@ -8,10 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@400;500;600&family=Oswald:wght@500;600&family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --c-hub:#233E99;--c-finden:#008C86;--c-erstellen:#F39200;--c-koop:#D6336C;--c-ver:#7B4FB8;--c-profil:#233E99;
+  --c-hub:#203A8F;--c-finden:#007A75;--c-erstellen:#FFA500;--c-koop:#D6336C;--c-ver:#7B4FB8;--c-profil:#203A8F;
+  /* Textfarben je Bereich: mindestens 4,5:1 auf paper, card und eigenem Tint */
+  --x-hub:#203A8F;--x-finden:#00605C;--x-erstellen:#8A4C00;--x-koop:#7A1A3E;--x-ver:#5A3590;
   --t-hub:#E6EAF5;--t-finden:#DDF1F0;--t-erstellen:#FEEFD9;--t-koop:#FAE1EA;--t-ver:#EEE7F7;--t-profil:#E6EAF5;
   --ink:#1D1D1B;--muted:#5F5E5A;--line:#E7E4DC;--paper:#FBFAF7;--card:#FFFFFF;
   --mp:#00726D;--mp-dark:#004E4A;--mp-l1:#8FD3CE;--mp-l2:#3FA9A2;--mp-soft:#E3F2F1;
+  /* FOERBICO-Palette (Styleguide oer.community) für das Schaufenster */
+  --fo-blau:#203A8F;--fo-orange:#FFA500;--fo-titel:#002366;--fo-text:#333333;--fo-hell:#F0F8FF;--fo-kopf:#E6F2FF;--fo-rahmen:#D3D3D3;
+  /* Steuerkonsole liest diese Werte; ohne sie gelten ihre eingebauten Standardfarben */
+  --relihub-c-hub:var(--c-hub);--relihub-c-finden:var(--c-finden);--relihub-c-erstellen:var(--c-erstellen);--relihub-c-kooperieren:var(--c-koop);--relihub-c-veroeffentlichen:var(--c-ver);
+  --relihub-x-hub:var(--x-hub);--relihub-x-finden:var(--x-finden);--relihub-x-erstellen:var(--x-erstellen);--relihub-x-kooperieren:var(--x-koop);--relihub-x-veroeffentlichen:var(--x-ver);
+  --relihub-text-hub:#FFFFFF;--relihub-text-finden:#FFFFFF;--relihub-text-erstellen:#2B1A00;--relihub-text-kooperieren:#FFFFFF;--relihub-text-veroeffentlichen:#FFFFFF;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -36,12 +44,13 @@ button{font:inherit}
 .btn-profil{background:var(--c-profil);color:#fff}
 .btn-ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
 .btn:focus-visible,a:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 
 /* ---------- Ansicht 1: Start ---------- */
 .stage{position:relative;text-align:center;padding:10px 16px 40px;overflow:hidden}
 .deco{position:absolute;border-radius:50%;opacity:.10;pointer-events:none}
 .eyebrow{font-family:"Barlow Condensed",sans-serif;font-weight:600;letter-spacing:2px;text-transform:uppercase;font-size:15px;margin:18px 0 6px;color:var(--muted)}
-.eyebrow b{color:var(--c-hub)}.eyebrow i{font-style:normal;color:var(--c-finden)}.eyebrow u{text-decoration:none;color:var(--c-koop)}
+.eyebrow b{color:var(--x-hub)}.eyebrow i{font-style:normal;color:var(--x-finden)}.eyebrow u{text-decoration:none;color:var(--x-koop)}
 .stage h1{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:clamp(32px,4.6vw,52px);line-height:1.05;margin:0 auto;max-width:20ch}
 .flower-wrap{display:flex;justify-content:center;padding:92px 0 70px}
 .explain{max-width:620px;margin:0 auto;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px 24px 22px 24px;display:flex;gap:18px;align-items:flex-start;min-height:132px;transition:border-color .25s}
@@ -93,13 +102,13 @@ button{font:inherit}
 .panel h2 .more:hover{color:var(--ink)}
 .mat{display:flex;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
 .mat:first-of-type{border-top:0}
-.mat .th{flex:0 0 auto;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--t-finden);color:var(--c-finden)}
+.mat .th{flex:0 0 auto;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--t-finden);color:var(--x-finden)}
 .mat .th svg{width:26px;height:26px}
 .mat b{display:block;font-size:17px;line-height:1.3}
 .mat .meta{font-size:14px;color:var(--muted);margin:2px 0 6px}
 .why{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:#1B2F73;background:var(--t-profil);border-radius:999px;padding:2px 10px}
 .why i{width:8px;height:8px;border-radius:50%;background:var(--c-profil)}
-.src{font-size:13px;color:var(--c-finden);font-weight:600;margin-left:8px;text-decoration:none}
+.src{font-size:13px;color:var(--x-finden);font-weight:600;margin-left:8px;text-decoration:none}
 .news{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
 .news:first-of-type{border-top:0}
 .news .who{flex:0 0 auto;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;font-size:14px}
@@ -113,7 +122,7 @@ button{font:inherit}
 .cm span{font-size:12.5px;color:var(--muted)}
 .ev{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line);align-items:center}
 .ev:first-of-type{border-top:0}
-.ev .date{flex:0 0 auto;width:54px;height:54px;border-radius:50%;background:var(--t-finden);color:var(--c-finden);display:grid;place-items:center;text-align:center;line-height:1;font-family:"Barlow Condensed",sans-serif;font-weight:600}
+.ev .date{flex:0 0 auto;width:54px;height:54px;border-radius:50%;background:var(--t-finden);color:var(--x-finden);display:grid;place-items:center;text-align:center;line-height:1;font-family:"Barlow Condensed",sans-serif;font-weight:600}
 .ev .date b{display:block;font-size:22px}.ev .date small{font-size:12px;letter-spacing:1px}
 .ev .tx b{display:block;font-size:16px;line-height:1.25}
 .ev .tx span{font-size:13.5px;color:var(--muted)}
@@ -162,7 +171,7 @@ button{font:inherit}
 .ages a:nth-child(3){background:var(--mp);color:#fff}
 .ages a:nth-child(4){background:var(--mp-dark);color:#fff}
 .reco{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);border:1px solid #D8E6E4;border-left:6px solid var(--mp);border-radius:12px;overflow:hidden}
-.reco .img{background:var(--mp-soft);display:grid;place-items:center;min-height:240px;color:#4E928C}
+.reco .img{background:var(--mp-soft);display:grid;place-items:center;min-height:240px;color:#2F6F6A}
 .reco .img svg{width:64px;height:64px}
 .reco .tx{padding:28px 32px}
 .reco .ey{color:var(--mp);font-weight:600;margin:0 0 6px}
@@ -236,7 +245,7 @@ button{font:inherit}
 @media (max-width:560px){.rl-cards{grid-template-columns:1fr}.rl-cal .wd{font-size:0}.rl-cal .wd::first-letter{font-size:11px}}
 
 /* ---------- Ansicht 5: relidesk (Nachbau des ReliDesk-Prototyps, in der Farbe von „erstellen“) ---------- */
-#v-relidesk{--rd-deep:#8A4C00;--rd-head:#A65B00;--rd:#B86500;--rd-acc:#F39200;--rd-mid:#FBD49A;--rd-soft:#FDE6C2;--rd-light:#FFF6EA;--rd-ink:#2B1A00;
+#v-relidesk{--rd-deep:#8A4C00;--rd-head:#A65B00;--rd:#AD5F00;--rd-acc:#F39200;--rd-mid:#FBD49A;--rd-soft:#FDE6C2;--rd-light:#FFF6EA;--rd-ink:#2B1A00;
   background:#FBFAF8;color:#2E2A25;font-family:Inter,system-ui,sans-serif;font-size:15px;min-height:100vh}
 .rd-note{background:var(--rd-mid);color:#5A3300;font-size:12.5px;font-weight:600;padding:5px 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rd-head{display:flex;align-items:center;gap:16px;padding:12px 26px;background:var(--rd-head);color:#fff}
@@ -244,7 +253,7 @@ button{font:inherit}
 .rd-brand svg{width:22px;height:22px;color:var(--rd-mid)}
 .rd-proto{font-size:11px;font-weight:600;letter-spacing:0;background:rgba(255,255,255,.22);border-radius:999px;padding:2px 9px}
 .rd-toggle{display:flex;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:3px;margin-left:12px}
-.rd-toggle button{border:0;background:transparent;color:#FDE6C2;font-size:10.5px;font-weight:700;letter-spacing:1px;padding:6px 16px;border-radius:6px;cursor:pointer}
+.rd-toggle button{border:0;background:transparent;color:#FFF6EA;font-size:10.5px;font-weight:700;letter-spacing:1px;padding:6px 16px;border-radius:6px;cursor:pointer}
 .rd-toggle button.on{background:var(--rd-mid);color:var(--rd-ink)}
 .rd-nav{margin-left:auto;display:flex;gap:6px;align-items:center}
 .rd-nav a{display:flex;align-items:center;gap:7px;color:#fff;text-decoration:none;font-size:14px;letter-spacing:2.4px;text-transform:uppercase;padding:10px 10px;border-bottom:2px solid transparent}
@@ -253,15 +262,15 @@ button{font:inherit}
 .rd-user{width:34px;height:34px;border-radius:50%;background:var(--rd-mid);color:var(--rd-ink);display:grid;place-items:center;font-weight:700;font-size:13px;margin-left:10px;text-decoration:none}
 .rd-tab{display:none}.rd-tab.on{display:block}
 .rd-hero{background:var(--rd);color:#fff;padding:64px clamp(16px,11vw,156px) 56px}
-.rd-hero .rd-ey,.rd-ey{font-size:11px;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;color:var(--rd-mid);margin:0 0 14px}
+.rd-hero .rd-ey,.rd-ey{font-size:11px;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;color:#FFF6EA;margin:0 0 14px}
 .rd-hero h1{font-weight:300;font-size:clamp(34px,5vw,56px);letter-spacing:clamp(3px,.6vw,8px);text-transform:uppercase;margin:0 0 20px;line-height:1.1}
-.rd-hero p{font-size:17.5px;line-height:1.75;max-width:640px;margin:0 0 30px;color:#FFF3E2}
+.rd-hero p{font-size:17.5px;line-height:1.75;max-width:640px;margin:0 0 30px;color:#FFFFFF}
 .rd-ask{display:flex;align-items:center;gap:14px;background:#fff;padding:14px 14px 14px 28px;box-shadow:0 14px 34px rgba(60,30,0,.22)}
 .rd-ask svg{width:22px;height:22px;color:var(--rd);flex:0 0 auto}
 .rd-ask input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:18px;color:var(--rd-ink)}
 .rd-btn{background:var(--rd);color:#fff;border:0;font:inherit;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:15px 34px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px}
 .rd-btn.dark{background:var(--rd-deep)}
-.rd-hero .rd-src{font-size:12.5px;line-height:1.5;color:#FFE3BC;margin:22px 0 0}
+.rd-hero .rd-src{font-size:12.5px;line-height:1.5;color:#FFF6EA;margin:22px 0 0}
 .rd-sec{padding:54px clamp(16px,11vw,156px)}
 .rd-sec .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:1px solid #E7E1D8;padding-bottom:20px;margin-bottom:40px}
 .rd-sec h2{font-weight:300;font-size:42px;margin:0;color:#2E2A25}
@@ -385,7 +394,7 @@ button{font:inherit}
 .ef-sh b{font-weight:500;font-size:17px;color:#3C3832}
 .ef-sh button{border:0;background:transparent;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
 .ef-steps{display:flex;align-items:center;justify-content:center;gap:10px;margin:0 0 30px}
-.ef-steps i{font-style:normal;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:600;color:#8A8378}
+.ef-steps i{font-style:normal;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:600;color:#6F665A}
 .ef-steps i.done,.ef-steps i.cur{background:#3F7B78;color:#fff}
 .ef-steps i.cur{box-shadow:0 0 0 3px #ECE6DA,0 0 0 4px rgba(63,123,120,.35)}
 .ef-steps u{width:30px;height:4px;border-radius:2px;background:#D6CEC1;text-decoration:none}
@@ -466,9 +475,9 @@ button{font:inherit}
 .cy-ser span{font-size:12.5px;font-weight:600;color:#6B3F00;background:var(--t-erstellen);border-radius:999px;padding:2px 9px}
 .cy-rel{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#7A1A3E;background:#fff;border:1px solid #F0C7D6;border-radius:999px;padding:2px 10px;margin-top:10px;text-decoration:none}
 .cy-follow{margin-top:8px;align-self:center;border:0;border-radius:999px;background:var(--c-koop);color:#fff;font:inherit;font-size:15px;font-weight:600;padding:9px 24px;cursor:pointer}
-.cy-follow.on{background:transparent;color:var(--c-koop);box-shadow:inset 0 0 0 1.5px var(--c-koop)}
+.cy-follow.on{background:transparent;color:var(--x-koop);box-shadow:inset 0 0 0 1.5px var(--c-koop)}
 .cy-back .cy-follow.on{background:#fff}
-.cy-back small{font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--c-koop)}
+.cy-back small{font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--x-koop)}
 .cy-back h3{justify-content:flex-start;margin:2px 0 8px}
 .cy-back p{margin:0 0 6px;font-size:15px;line-height:1.45;color:#4A1530}
 .cy-back .meta{font-size:13.5px;color:#7A1A3E}
@@ -481,7 +490,7 @@ button{font:inherit}
 
 /* ---------- relilab: Termine via Nostr ---------- */
 .rt{max-width:1180px;margin:0 auto;padding:22px 20px 80px}
-.rt-crumb{font-size:13px;color:#7A808A;margin:0 0 10px}.rt-crumb a{color:#B23BD8;text-decoration:none;font-weight:500}
+.rt-crumb{font-size:13px;color:#5F6670;margin:0 0 10px}.rt-crumb a{color:#B23BD8;text-decoration:none;font-weight:500}
 .rt h1{font-family:Oswald,"Roboto Condensed",sans-serif;font-weight:500;font-size:36px;color:#1F1F25;margin:0 0 8px;letter-spacing:-.3px}
 .rt h1 .nz{display:inline-block;vertical-align:middle;margin-left:10px;font-family:Roboto,sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;color:#fff;background:#8E44D9;border-radius:999px;padding:3px 10px}
 .rt-intro{max-width:74ch;color:#3A3F47;margin:0 0 16px;line-height:1.6}
@@ -523,9 +532,9 @@ button{font:inherit}
 .rt-side ul{list-style:none;margin:0 0 10px;padding:0}
 .rt-side li{display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid #F1F2F4}
 .rt-side li i{flex:0 0 auto;width:10px;height:10px;border-radius:50%}
-.rt-side li code{margin-left:auto;font-size:11.5px;color:#7A808A}
+.rt-side li code{margin-left:auto;font-size:11.5px;color:#5F6670}
 .rt-side .rt-act{margin-top:8px}
-.rt-side small{display:block;color:#7A808A;font-size:12.5px;margin-top:6px}
+.rt-side small{display:block;color:#5F6670;font-size:12.5px;margin-top:6px}
 .rt-cal-h{display:flex;align-items:center;gap:10px;margin:0 0 12px}
 .rt-cal-h b{font-family:Oswald,"Roboto Condensed",sans-serif;font-weight:500;font-size:22px;color:#1F1F25;flex:1}
 .rt-cal-h button{font:inherit;border:1px solid #D5D8DD;background:#fff;border-radius:6px;width:36px;height:34px;cursor:pointer}
@@ -563,7 +572,7 @@ button{font:inherit}
 .cr-name{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .cr-name h1{font-family:"Barlow Condensed",sans-serif;font-size:40px;font-weight:600;line-height:1;margin:0}
 .cr-fol{border:0;border-radius:999px;background:var(--c-koop);color:#fff;font:inherit;font-size:14px;font-weight:600;padding:5px 14px;cursor:pointer}
-.cr-fol.off{background:transparent;color:var(--c-koop);box-shadow:inset 0 0 0 1.5px var(--c-koop)}
+.cr-fol.off{background:transparent;color:var(--x-koop);box-shadow:inset 0 0 0 1.5px var(--c-koop)}
 .cr-mem{display:flex;align-items:center;gap:10px;border:0;background:transparent;font:inherit;color:var(--muted);cursor:pointer;padding:0}
 .cr-mem .st{display:flex}
 .cr-mem .st span{width:30px;height:30px;border-radius:50%;border:2px solid #fff;margin-left:-8px;display:grid;place-items:center;font-size:12px;color:#fff;font-weight:600}
@@ -573,7 +582,7 @@ button{font:inherit}
 .cr-code{display:flex;gap:6px}
 .cr-code[hidden]{display:none}
 .cr-code input{font:inherit;font-size:15px;border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;background:var(--card);width:150px}
-.cr-badge{display:inline-flex;align-items:center;gap:6px;color:var(--c-koop);border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--c-koop);font-size:15px;font-weight:600;padding:8px 16px;background:#fff}
+.cr-badge{display:inline-flex;align-items:center;gap:6px;color:var(--x-koop);border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--c-koop);font-size:15px;font-weight:600;padding:8px 16px;background:#fff}
 .cr-cols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:22px}
 .cr-cols.one{grid-template-columns:minmax(0,1fr);max-width:820px}
 .cr-h{display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:"Barlow Condensed",sans-serif;font-size:26px;font-weight:600;margin:0 0 12px}
@@ -583,10 +592,10 @@ button{font:inherit}
 .cr-item .who small{color:var(--muted);font-size:13.5px}
 .cr-item h4{font-size:18px;font-weight:600;line-height:1.3;margin:0 0 10px}
 .cr-item p{margin:0 0 10px;color:#3D3D3A;font-size:15px;line-height:1.5}
-.cr-type{margin-left:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:5px;background:var(--t-finden);color:#00605C;border-radius:999px;font-size:13px;font-weight:600;padding:2px 10px;white-space:nowrap}
+.cr-type{margin-left:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:5px;background:var(--t-finden);color:var(--x-finden);border-radius:999px;font-size:13px;font-weight:600;padding:2px 10px;white-space:nowrap}
 .cr-type.art{background:var(--t-ver);color:#4B2E78}.cr-type.lern{background:var(--t-erstellen);color:#6B3F00}
 .cr-date{display:flex;align-items:center;gap:14px;margin:0 0 10px}
-.cr-date>div{flex:0 0 auto;width:58px;height:58px;border-radius:50%;background:var(--t-finden);color:var(--c-finden);display:grid;place-items:center;align-content:center;line-height:1;font-family:"Barlow Condensed",sans-serif;font-weight:600}
+.cr-date>div{flex:0 0 auto;width:58px;height:58px;border-radius:50%;background:var(--t-finden);color:var(--x-finden);display:grid;place-items:center;align-content:center;line-height:1;font-family:"Barlow Condensed",sans-serif;font-weight:600}
 .cr-date b{display:block;font-size:24px;text-align:center}
 .cr-date small{display:block;font-size:12px;letter-spacing:1px;text-align:center}
 .cr-date span{font-size:16px;font-weight:500;color:#3D3D3A}
@@ -594,7 +603,7 @@ button{font:inherit}
 .cr-tags span{background:var(--paper);border:1px solid var(--line);border-radius:999px;font-size:13.5px;padding:2px 11px}
 .cr-ev{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:10px;cursor:pointer;color:var(--ink)}
 .cr-ev:before{content:"";flex:0 0 auto;width:12px;height:12px;border-radius:50%;background:var(--c-finden);opacity:.7}
-.cr-ev small{display:block;color:var(--c-finden);font-size:13.5px;font-weight:600;margin-bottom:2px}
+.cr-ev small{display:block;color:var(--x-finden);font-size:13.5px;font-weight:600;margin-bottom:2px}
 .cr-ev b{font-weight:600;font-size:16px;line-height:1.3}
 .cr-lock{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;text-align:center;color:#3D3D3A}
 .cr-lock b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:24px;color:var(--ink);margin-bottom:6px}
@@ -1117,6 +1126,7 @@ button{font:inherit}
     f.ux = Math.cos(a); f.uy = Math.sin(a);
     f.cx = D * f.ux; f.cy = D * f.uy;
     f.light = mix(f.color, '#FFFFFF', 0.22);
+    f.ink = mix(f.color, '#000000', 0.4);
   });
 
   const ROUTES = {
@@ -1220,7 +1230,20 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       this._closeT = null;
       this._touchAct = false;
     }
+    /* Farben aus dem Dokument übernehmen (--relihub-c-<id>, --relihub-text-<id>); fehlen sie, bleiben die eingebauten Werte */
+    applyTheme() {
+      const cs = getComputedStyle(this);
+      FUNCS.forEach(f => {
+        const c = cs.getPropertyValue('--relihub-c-' + f.id).trim(), t = cs.getPropertyValue('--relihub-text-' + f.id).trim(), x = cs.getPropertyValue('--relihub-x-' + f.id).trim();
+        if (/^#[0-9a-fA-F]{6}$/.test(c)) f.color = c.toUpperCase();
+        if (/^#[0-9a-fA-F]{6}$/.test(t)) f.text = t.toUpperCase();
+        f.light = mix(f.color, '#FFFFFF', 0.22);
+        // Textfarbe auf hellem Grund (Pille): aus dem Dokument oder abgedunkelte Flächenfarbe
+        f.ink = /^#[0-9a-fA-F]{6}$/.test(x) ? x.toUpperCase() : mix(f.color, '#000000', 0.4);
+      });
+    }
     connectedCallback() {
+      this.applyTheme();
       this.render();
       this._outside = e => { if (this.hasAttribute('open') && !e.composedPath().includes(this)) this.closePop(0); };
       this._esc = e => { if (e.key === 'Escape' && this.hasAttribute('open')) { this.closePop(0); if (this.miniBtn) this.miniBtn.focus(); } };
@@ -1379,7 +1402,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         const pill = el('g', { class: 'pill act', 'data-action': f.id }, pop);
         const w = Math.max(96, f.label.length * 12 + 34);
         el('rect', { x: -w / 2, y: -18, width: w, height: 36, rx: 18 }, pill);
-        this.text(pill, f.label, 0, 1, 21, f.color, 'lbl');
+        this.text(pill, f.label, 0, 1, 21, f.ink, 'lbl');
       } else {
         el('circle', { class: 'act main', 'data-action': f.id, r: R, fill: f.color, 'fill-opacity': 0.96 }, pop);
         this.text(pop, f.label, 0, 2, f.label.length > 12 ? 22 : f.label.length > 9 ? 26 : 30, f.text, 'lbl');
@@ -1487,8 +1510,11 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 </script>
 <script>
 (() => {
-  const C = { hub:'#233E99', finden:'#008C86', erstellen:'#F39200', kooperieren:'#D6336C', koop:'#D6336C', veroeffentlichen:'#7B4FB8' };
-  const T = { hub:'#FFFFFF', finden:'#FFFFFF', erstellen:'#2B1A00', kooperieren:'#FFFFFF', veroeffentlichen:'#FFFFFF' };
+  // Alle Bereichsfarben kommen aus :root (Issue fd31ec90): ein Theme-Wechsel ist ein Austausch der Variablen.
+  const cssVar = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const C = { hub:cssVar('--c-hub'), finden:cssVar('--c-finden'), erstellen:cssVar('--c-erstellen'), kooperieren:cssVar('--c-koop'), koop:cssVar('--c-koop'), veroeffentlichen:cssVar('--c-ver') };
+  const T = { hub:cssVar('--relihub-text-hub'), finden:cssVar('--relihub-text-finden'), erstellen:cssVar('--relihub-text-erstellen'), kooperieren:cssVar('--relihub-text-kooperieren'), veroeffentlichen:cssVar('--relihub-text-veroeffentlichen') };
+  const X = { hub:cssVar('--x-hub'), finden:cssVar('--x-finden'), erstellen:cssVar('--x-erstellen'), kooperieren:cssVar('--x-koop'), koop:cssVar('--x-koop'), veroeffentlichen:cssVar('--x-ver') };
 
   // ---------- kleine Symbole der Steuerkonsole (Logo, Abschnittssymbole) ----------
   const ORDER = ['hub','finden','erstellen','kooperieren','veroeffentlichen'];
@@ -1565,8 +1591,8 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     ['Comenius-Institut', 'Evangelische Bildungsforschung', 'hub', 'CI', null, 'Evangelische Arbeitsstätte für Erziehungswissenschaft in Münster – Forschung, Netzwerke und Projekte wie FOERBICO, aus dem der reli_hub entsteht.'],
     ['edufeed', 'offene Bildungsdaten im Nostr-Netz', 'hub', 'ef', null, 'Offene Infrastruktur für Bildungsdaten: Relays und Editoren, über die Materialien, Termine und Beiträge im ganzen Ökosystem geteilt werden.']
   ];
-  const TINT = { finden:'#DDF1F0', erstellen:'#FEEFD9', kooperieren:'#FAE1EA', hub:'#E6EAF5' };
-  const TINK = { finden:'#004E4A', erstellen:'#6B3F00', kooperieren:'#7A1A3E', hub:'#1B2F73' };
+  const TINT = { finden:cssVar('--t-finden'), erstellen:cssVar('--t-erstellen'), kooperieren:cssVar('--t-koop'), hub:cssVar('--t-hub') };
+  const TINK = { finden:X.finden, erstellen:X.erstellen, kooperieren:X.kooperieren, hub:X.hub };
   document.getElementById('pgrid').innerHTML = PARTNERS.map(([n, d, k, ab, href, back, tag]) =>
     `<a class="pcard" href="${href || '#'}" ${href ? '' : `data-todo="${n}"`} style="--bk:${TINT[k]};--bt:${TINK[k]}" aria-label="${n}: ${back}"><span class="pin">`
     + `<span class="pface"><span class="cc" style="background:${C[k]};color:${T[k]}">${ab}</span><span><b>${n}</b><small>${d}</small>${tag ? `<span class="tag">${tag}</span>` : ''}</span></span>`
@@ -1918,7 +1944,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     { id: 'konfi', n: 'Konfiarbeit EKD', ab: 'KA', col: C.kooperieren, ty: 'ziel', ver: true, bio: 'Hier vernetzt sich die ALPIKA-AG Konfiarbeit und erprobt den nostr-Datenraum und die edufeed-Logik für die EKD-weite Konfiarbeit.', back: 'Die ALPIKA-AG Konfiarbeit vernetzt sich hier und erprobt den nostr-Datenraum und die edufeed-Logik für die Konfiarbeit in der ganzen EKD.', inst: ['Konfi-Arbeit bundesweit', null], m: 41 },
     { id: 'narrt', n: 'narrt', ab: 'na', col: C.kooperieren, ty: 'thema', mine: 'Mitglied', bio: 'Antisemitismus- und rassismuskritische Religionspädagogik und Theologie.', back: 'Menschen, die kritisch reflektieren, wie Religionspädagogik und Theologie in antisemitische und rassistische Verhältnisse verstrickt sind – und gemeinsam nach Alternativen für Denken, Handeln und Material suchen.', inst: ['narrt', null], m: 102 },
     { id: 'relimentar', n: 'relimentar', ab: 're', col: C.kooperieren, ty: 'ziel', mine: 'folge ich', bio: 'Religionspädagogik in der Kita.', back: 'Fachkräfte aus Krippe, Kindergarten und Hort teilen religionspädagogisches Material, Fortbildungen und Erfahrungen aus der Praxis.', inst: ['relimentar', null], m: 87, rl: 1, series: [['Bilderbuchstunde', 'im relilab'], ['Café relimentar', 'im relilab']] },
-    { id: 'campuscom', n: 'CampusCom – die Hochschul-Community', ab: 'CC', col: '#7B4FB8', ty: 'ziel', bio: 'Die Community CampusCom macht Personen, Materialien, Artikel, Projekte, Termine und Veranstaltungen zur Hochschullehre sichtbar.', back: 'CampusCom macht Personen, Materialien, Artikel, Projekte, Termine und Veranstaltungen zur Hochschullehre sichtbar – für Lehrende in Religionspädagogik und Theologie.', m: 56 },
+    { id: 'campuscom', n: 'CampusCom – die Hochschul-Community', ab: 'CC', col: C.veroeffentlichen, ty: 'ziel', bio: 'Die Community CampusCom macht Personen, Materialien, Artikel, Projekte, Termine und Veranstaltungen zur Hochschullehre sichtbar.', back: 'CampusCom macht Personen, Materialien, Artikel, Projekte, Termine und Veranstaltungen zur Hochschullehre sichtbar – für Lehrende in Religionspädagogik und Theologie.', m: 56 },
     { id: 'kuru', n: 'KuRU & Schuldek.de', ab: 'KS', col: C.hub, ty: 'ziel', bio: 'Kirche-und-Religionsunterricht.de & schuldek.de – die Community der Büros der Schuldekaninnen und Schuldekane.', back: 'Kirche-und-Religionsunterricht.de und schuldek.de: die Community der Büros der Schuldekaninnen und Schuldekane – Austausch, Material und Termine rund um den Religionsunterricht.', m: 38 },
     { id: 'agdm', n: 'AG Didaktische Metadaten', ab: 'DM', col: C.finden, ty: 'thema', ver: true, bio: 'Keine Biografie verfügbar', back: 'Arbeitsgruppe rund um didaktische Metadaten für offene Bildungsmaterialien: Wie lassen sich Materialien so beschreiben, dass sie nach Lernzielen und Einsatz gefunden werden?', m: 19 },
     { id: 'kph', n: 'KPH Wien/NÖ Zentrum Fortbildung Religion', ab: 'PH', col: C.finden, ty: 'netz', ver: true, bio: 'Keine Biografie verfügbar', back: 'Zentrum Fortbildung Religion der Kirchlichen Pädagogischen Hochschule Wien/Niederösterreich – Fortbildungen für Religionslehrkräfte.', m: 24 },
@@ -2138,7 +2164,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       h += `<span class="${today.year === y && today.month === m && today.day === d ? 't' : ''}">${d}${evs.map(e => `<button type="button" class="${e.a === 'relilab-impuls' ? 'imp' : ''}" data-rtj="${RT_EV.indexOf(e)}" title="${rtEsc(fT.format(e.s * 1000) + ' · ' + e.t)}">${fT.format(e.s * 1000)} ${rtEsc(e.t)}</button>`).join('')}</span>`;
     }
     h += '<span class="o"></span>'.repeat((7 - (lead + days) % 7) % 7) + '</div>';
-    return h + `<p style="font-size:13px;color:#7A808A;margin-top:10px">${list.length} Termine ${rt.f ? 'mit #' + rtEsc(rt.f) : 'insgesamt'} · Klick auf einen Termin zeigt die Details.</p>`;
+    return h + `<p style="font-size:13px;color:#5F6670;margin-top:10px">${list.length} Termine ${rt.f ? 'mit #' + rtEsc(rt.f) : 'insgesamt'} · Klick auf einen Termin zeigt die Details.</p>`;
   }
   function rtRender() {
     const base = rtBase(), list = rtList(), cnt = {};
@@ -2152,14 +2178,14 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     else { let cur = ''; list.forEach(e => { const mo = fMY.format(e.s * 1000); if (mo !== cur) { h += `<h2 class="rt-month">${mo}</h2>`; cur = mo; } h += rtCard(e); }); }
     document.getElementById('rtMain').innerHTML = h;
     const per = {}; RT_EV.forEach(e => per[e.a] = (per[e.a] || 0) + 1);
-    document.getElementById('rtSrc').innerHTML = Object.keys(RT_SRC).map(a => `<li><i style="background:${RT_SRC[a][0]}"></i>${a} <span style="color:#7A808A">(${per[a] || 0})</span><code>${RT_SRC[a][1]}</code></li>`).join('');
+    document.getElementById('rtSrc').innerHTML = Object.keys(RT_SRC).map(a => `<li><i style="background:${RT_SRC[a][0]}"></i>${a} <span style="color:#5F6670">(${per[a] || 0})</span><code>${RT_SRC[a][1]}</code></li>`).join('');
     document.getElementById('rtStand').textContent = `Schnappschuss vom ${RT_STAND} · ${RT_EV.length} Termine ab Oktober 2026`;
   }
   function rtOpen(p) {
     rt.f = p.get('filter') || ''; rt.q = p.get('q') || ''; rt.v = p.get('ansicht') === 'monat' ? 'monat' : 'liste'; rt.von = p.get('von') === 'konsole'; rt.m = null;
     document.getElementById('rtQ').value = rt.q;
     const pre = document.getElementById('rtPre'); pre.classList.toggle('on', rt.von);
-    pre.innerHTML = rt.von ? `<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="#008C86" opacity=".85"/><circle cx="20" cy="20" r="6" fill="#fff"/></svg><span>Über die <b>reli_hub-Steuerkonsole</b> (finden › Fortbildungen): Hier im relilab zeigt sie dir die relilab-Termine. </span>` : '';
+    pre.innerHTML = rt.von ? `<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="${C.finden}" opacity=".85"/><circle cx="20" cy="20" r="6" fill="#fff"/></svg><span>Über die <b>reli_hub-Steuerkonsole</b> (finden › Fortbildungen): Hier im relilab zeigt sie dir die relilab-Termine. </span>` : '';
     rtRender();
   }
   const rtRoot = document.querySelector('#v-relilab [data-rlsec="termine"]');
