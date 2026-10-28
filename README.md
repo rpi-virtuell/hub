@@ -21,3 +21,5 @@ Die Grundentscheidungen des Prototyps stehen als ADRs in `docs/adr/` (Vorlage un
 | [0005](docs/adr/0005-artikel-im-finden.md) | Artikel und Nachrichten gehören zu „finden“ | angenommen |
 
 **Prüfungen:** `deno task test` führt textbasierte Prüfungen über `index.html` aus (Syntax beider Inline-Skripte, Farbkontraste aus den Variablen, Struktur der Ansichten, ADRs). Kein Build; die Datei bleibt direkt im Browser lauffähig.
+
+**Betrieb:** Forgejo-Arbeitskopie `Comenius-Institut/hub`, GitHub-Spiegel `rpi-virtuell/hub`, Auslieferung über GitHub Pages (`rpi-virtuell.github.io/hub`, später `hub.rpi-virtuell.net`): siehe [docs/betrieb.md](docs/betrieb.md).
