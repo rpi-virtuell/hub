@@ -27,6 +27,12 @@ export function consoleScript(): string { return scripts[0]; }
 /** Text des letzten <script>-Blocks (Prototyp-Anwendung) */
 export function appScript(): string { return scripts[scripts.length - 1]; }
 
+Deno.test('Beide Inline-Skripte sind syntaktisch gültig', () => {
+  // Function-Konstruktor parst, ohne auszuführen (kein DOM nötig)
+  new Function(consoleScript());
+  new Function(appScript());
+});
+
 Deno.test('Textfarben je Bereich erreichen 4,5:1 auf paper, card und Tint', () => {
   const v = rootVars();
   for (const b of ['hub', 'finden', 'erstellen', 'koop', 'ver']) {
@@ -58,4 +64,18 @@ Deno.test('Konsole liest Custom Properties und behält Fallback', () => {
 
 Deno.test('Generische Fokusregel vorhanden', () => {
   assert(/button:focus-visible[^{]*\[tabindex\]:focus-visible[^{]*\{[^}]*outline:\s*3px/.test(html), 'Fokusregel fehlt');
+});
+
+Deno.test('Schaufenster OER-Community ist verdrahtet', () => {
+  const s = appScript();
+  assert(html.includes('id="v-oercommunity"'), 'View fehlt');
+  assert(/<nav class="proto"[\s\S]*?href="#oercommunity"[^>]*>FOERBICO<\/a>/.test(html), 'Leisten-Eintrag fehlt');
+  assert(/'OER-Community',\s*'Schaufenster des Projekts FOERBICO'/.test(s), 'Partner-Kachel fehlt');
+  assert(/id:\s*'oercommunity'[\s\S]*?inst:\s*\['OER-Community',\s*'oercommunity'\]/.test(s), 'CY-Eintrag fehlt');
+  assert(/registerContext\('oer-community'/.test(s), 'Kontext fehlt');
+  assert(/'oercommunity'/.test(s.match(/function route\(\)[\s\S]*?includes\(view\)/)![0]), 'route kennt den View nicht');
+  assert(/Roboto\+Condensed:wght@400/.test(html), 'Roboto Condensed 400 fehlt');
+  assert((s.match(/const OC_TEAM[\s\S]*?\n  \];/)![0].match(/\bn:/g) || []).length === 10, 'OC_TEAM hat nicht 10 Personen');
+  assert((s.match(/const OC_POSTS[\s\S]*?\n  \];/)![0].match(/\bt:/g) || []).length === 5, 'OC_POSTS hat nicht 5 Beiträge');
+  assert(/onerror=/.test(s.match(/function ocRender[\s\S]*?\n  \}/)![0]), 'kein Bild-Fallback');
 });

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>reli_hub · Prototyp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@400;500;600&family=Oswald:wght@500;600&family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@400;500;600&family=Oswald:wght@500;600&family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --c-hub:#203A8F;--c-finden:#007A75;--c-erstellen:#FFA500;--c-koop:#D6336C;--c-ver:#7B4FB8;--c-profil:#203A8F;
@@ -45,6 +45,52 @@ button{font:inherit}
 .btn-ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
 .btn:focus-visible,a:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+/* ---------- Ansicht 8: OER-Community (Nachbau oer.community, Hugo/PaperMod; Farben aus dem FOERBICO-Styleguide) ---------- */
+#v-oercommunity{font-family:"Roboto Condensed",sans-serif;background:#fff;color:var(--fo-text);min-height:100vh}
+.oc-head{background:var(--fo-kopf);border-bottom:2px solid var(--fo-orange)}
+.oc-in{max-width:960px;margin:0 auto;padding:0 20px}
+.oc-head .oc-in{display:flex;align-items:center;gap:18px;min-height:60px;flex-wrap:wrap}
+.oc-brand{font-weight:700;font-size:22px;color:var(--fo-titel);text-decoration:none}
+.oc-nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.oc-nav button{border:0;background:transparent;font:inherit;font-size:16px;color:var(--fo-titel);padding:8px 10px;cursor:pointer;border-radius:5px}
+.oc-nav button:hover{background:#fff}
+.oc-main{padding:28px 0 40px}
+.oc-sec{padding:28px 0;border-top:1px solid var(--fo-rahmen)}
+.oc-sec:first-child{border-top:0}
+.oc-sec h2{color:var(--fo-titel);font-size:28px;margin:0 0 16px}
+.oc-start{text-align:center}
+.oc-start img{width:140px;height:140px}
+.oc-start h1{color:var(--fo-titel);font-size:44px;margin:10px 0 4px;letter-spacing:1px}
+.oc-start h2{font-size:22px;font-weight:400;color:var(--fo-blau);margin:0 auto 18px;max-width:720px}
+.oc-start p{max-width:720px;margin:0 auto 12px;line-height:1.6;font-size:17px}
+.oc-btn{display:inline-block;background:var(--fo-blau);color:#fff;text-decoration:none;padding:9px 16px;border-radius:5px;font-weight:600;margin:6px 4px;border:0;font:inherit;cursor:pointer}
+.oc-btn.alt{background:#fff;color:var(--fo-titel);border:1.5px solid var(--fo-orange)}
+.oc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.oc-card{border:1px solid var(--fo-orange);border-radius:5px;background:#fff;overflow:hidden;display:flex;flex-direction:column}
+.oc-card .img{position:relative;aspect-ratio:16/9;background:var(--fo-hell);display:grid;place-items:center;color:var(--fo-titel);font-weight:600;text-align:center;padding:8px}
+.oc-card .img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.oc-lic{position:absolute;right:8px;bottom:8px;background:rgba(255,255,255,.94);color:var(--fo-text);font-size:12px;border-radius:999px;padding:3px 9px;border:1px solid var(--fo-rahmen)}
+.oc-card .tx{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px}
+.oc-card h3{margin:0;font-size:19px;line-height:1.3}
+.oc-card h3 a{color:var(--fo-titel);text-decoration:none}
+.oc-card h3 a:hover{text-decoration:underline}
+.oc-date{font-size:14px;color:#555555}
+.oc-tags{display:flex;flex-wrap:wrap;gap:6px}
+.oc-tags span{font-size:13px;background:var(--fo-hell);color:var(--fo-titel);border-radius:999px;padding:3px 9px}
+.oc-card p{margin:0;line-height:1.5;font-size:15.5px}
+.oc-card p a{color:var(--fo-blau)}
+.oc-team{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.oc-g{margin:18px 0 10px;font-size:20px;color:var(--fo-blau)}
+.oc-g a{color:inherit}
+.oc-person{display:flex;gap:12px;align-items:center;border:1px solid var(--fo-rahmen);border-radius:5px;padding:10px 12px;background:#fff}
+.oc-av{flex:0 0 auto;width:46px;height:46px;border-radius:50%;background:var(--fo-blau);color:#fff;display:grid;place-items:center;font-weight:700}
+.oc-person b{display:block;color:var(--fo-titel)}
+.oc-person small{font-size:13.5px;color:var(--fo-text);line-height:1.35}
+.oc-foot{border-top:2px solid var(--fo-orange);background:var(--fo-kopf);padding:18px 0;font-size:14px;color:var(--fo-text);line-height:1.6}
+.oc-foot a{color:var(--fo-titel)}
+.oc-foot .hub{display:flex;align-items:center;gap:8px;margin-top:8px;color:var(--fo-titel);font-weight:600}
+@media (max-width:640px){.oc-start h1{font-size:34px}.oc-nav{margin-left:0}}
 
 /* ---------- Ansicht 1: Start ---------- */
 .stage{position:relative;text-align:center;padding:10px 16px 40px;overflow:hidden}
@@ -1036,8 +1082,24 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
   <relihub-steuerkonsole id="rdFlower" floating size="58" popover-size="210" context="relidesk"></relihub-steuerkonsole>
 </div>
 
+<!-- ========== Ansicht 8: OER-Community – Nachbau von oer.community (Hugo/PaperMod), Schaufenster des Projekts FOERBICO ========== -->
+<div class="view" id="v-oercommunity">
+  <header class="oc-head"><div class="oc-in">
+    <a class="oc-brand" href="#oercommunity">oer.community</a>
+    <nav class="oc-nav" aria-label="oer.community">
+      <button type="button" data-ocs="oc-tagungen">Tagungen</button><button type="button" data-ocs="oc-oer">Was ist OER?</button><button type="button" data-ocs="oc-qualitaet">Qualität</button><button type="button" data-ocs="oc-team">Team</button><button type="button" data-ocs="oc-blog">Blog</button>
+    </nav>
+  </div></header>
+  <main class="oc-main"><div class="oc-in" id="ocRoot"></div></main>
+  <footer class="oc-foot"><div class="oc-in">
+    <div>CC BY 2024–2026 FOERBICO – soweit nicht anders angegeben · <a href="https://oer.community/impressum/" target="_blank" rel="noopener">Impressum</a> &amp; <a href="https://oer.community/datenschutz/" target="_blank" rel="noopener">Datenschutz</a></div>
+    <div class="hub"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> Teil des reli_hub · Datenstand 29.09.2026</div>
+  </div></footer>
+  <relihub-steuerkonsole id="ocFlower" floating size="58" popover-size="210" context="oer-community"></relihub-steuerkonsole>
+</div>
+
 <nav class="proto" aria-label="Prototyp-Ansichten"><span class="plbl">Prototyp</span>
-  <a href="#start" data-v="start">Start</a><a href="#profil" data-v="profil">Profil</a><a href="#materialpool" data-v="materialpool"><span class="lg">Materialpool</span><span class="sh">Pool</span></a><a href="#relilab" data-v="relilab">relilab</a><a href="#relidesk" data-v="relidesk">relidesk</a>
+  <a href="#start" data-v="start">Start</a><a href="#profil" data-v="profil">Profil</a><a href="#materialpool" data-v="materialpool"><span class="lg">Materialpool</span><span class="sh">Pool</span></a><a href="#relilab" data-v="relilab">relilab</a><a href="#relidesk" data-v="relidesk">relidesk</a><a href="#oercommunity" data-v="oercommunity">FOERBICO</a>
 </nav>
 <div class="ef-overlay" id="efOverlay" hidden></div>
 <div class="toast" id="toast" role="status"></div>
@@ -1589,7 +1651,8 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     ['Friedensarbeit EKD', 'Evangelische Friedensarbeit', 'kooperieren', 'FA', null, 'Dachmarke der Friedensarbeit im Raum der EKD: Nachrichten, Termine, Projekte und Friedensbildung.'],
     ['InkRV', 'Inklusive Religionspädagogik der Vielfalt', 'kooperieren', 'iV', null, 'Inklusive Religionspädagogik der Vielfalt. Die Plattform wird gerade überarbeitet und kommt bald wieder ins Ökosystem.', 'in Überarbeitung'],
     ['Comenius-Institut', 'Evangelische Bildungsforschung', 'hub', 'CI', null, 'Evangelische Arbeitsstätte für Erziehungswissenschaft in Münster – Forschung, Netzwerke und Projekte wie FOERBICO, aus dem der reli_hub entsteht.'],
-    ['edufeed', 'offene Bildungsdaten im Nostr-Netz', 'hub', 'ef', null, 'Offene Infrastruktur für Bildungsdaten: Relays und Editoren, über die Materialien, Termine und Beiträge im ganzen Ökosystem geteilt werden.']
+    ['edufeed', 'offene Bildungsdaten im Nostr-Netz', 'hub', 'ef', null, 'Offene Infrastruktur für Bildungsdaten: Relays und Editoren, über die Materialien, Termine und Beiträge im ganzen Ökosystem geteilt werden.'],
+    ['OER-Community', 'Schaufenster des Projekts FOERBICO', 'hub', 'OC', '#oercommunity', 'Community of Communities: Blog, Tagungen, Wissensgrundlagen zu OER und Qualität und das Team des Projekts, aus dem der reli_hub hervorgeht.']
   ];
   const TINT = { finden:cssVar('--t-finden'), erstellen:cssVar('--t-erstellen'), kooperieren:cssVar('--t-koop'), hub:cssVar('--t-hub') };
   const TINK = { finden:X.finden, erstellen:X.erstellen, kooperieren:X.kooperieren, hub:X.hub };
@@ -1626,7 +1689,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   const COMM = [['relilab', 'Mitglied', 'rl', 3, 'relilab'], ['relimentar', 'folge ich', 're', 0, 'relimentar'], ['narrt', 'Mitglied', 'na', 1, 'narrt'], ['efabinet', 'folge ich', 'ef', 0, null], ['Friedens­pädagogik', 'Mitglied', 'FP', 5, 'frieden']];
   document.getElementById('comm').innerHTML = COMM.map(([n, s, ab, c, cid], i) =>
     `<div class="cm" ${cid ? `data-go="community?c=${cid}" role="link" tabindex="0" style="cursor:pointer"` : `data-todo="Community ${n.replace('­','')}"`}><div class="cir" style="opacity:${s === 'Mitglied' ? 1 : .72}">${ab}${c ? `<em>${c}</em>` : ''}</div><b>${n}</b><span>${s}</span></div>`).join('');
-  const EVENTS = [['12', 'NOV', 'Bibliolog digital – Einführung', 'Religionspädagogisches Institut · online · 16–18 Uhr'], ['19', 'NOV', 'KI im RU: Werkstattabend', 'relilab · online · 19 Uhr'], ['03', 'DEZ', 'Frieden lernen – Fachtag Sek I', 'Comenius-Institut · online']];
+  const EVENTS = [['12', 'NOV', 'Bibliolog digital – Einführung', 'Religionspädagogisches Institut · online · 16–18 Uhr'], ['19', 'NOV', 'KI im RU: Werkstattabend', 'relilab · online · 19 Uhr'], ['03', 'DEZ', 'Frieden lernen – Fachtag Sek I', 'Comenius-Institut · online'], ['02', 'FEB', 'Offen. Vernetzt. Zukunft – Abschlusstagung', 'OER-Community · Goethe-Universität Frankfurt · 2./3. Feb. 2027']];
   document.getElementById('events').innerHTML = EVENTS.map(([d, m, t, s]) =>
     `<div class="ev" ${s.startsWith('relilab') ? 'data-go="relilab" style="cursor:pointer"' : ''}><span class="date"><span><b>${d}</b><small>${m}</small></span></span><div class="tx"><b>${t}</b><span>${s}</span></div></div>`).join('');
 
@@ -1957,7 +2020,8 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     { id: 'junior', n: 'relilab|Junior', ab: 'Jr', col: C.finden, ty: 'ziel', rl: 1, bio: 'Digitale Unterrichtsideen für die Klassen 1–6.', back: 'ZSL, ptz Stuttgart-Birkach und Fachberatungen geben einfache, praxisnahe digitale Ideen und Materialien für den Religionsunterricht der Klassen 1 bis 6 weiter.', inst: ['relilab', 'relilab'], m: 52, series: [['relilab|Junior', '1. Donnerstag im Monat (Schulwochen BW und Bayern)']] },
     { id: 'interrel', n: 'relilab|interreligiös', ab: 'ir', col: C.kooperieren, ty: 'thema', rl: 1, bio: 'Christentum und Islam im Klassenzimmer.', back: 'ptz und ZSL Baden-Württemberg entwickeln kreative digitale Ideen zu Themen, die Christentum und Islam gleichermaßen betreffen – für Klassen mit Schüler:innen verschiedener Religionen.', inst: ['relilab', 'relilab'], m: 33, series: [['relilab|interreligiös', 'mit Anmeldung, im geschützten Moodle-Raum']] },
     { id: 'makerspace', n: 'Makerspace asynchrone Lernressourcen', ab: 'MS', col: C.erstellen, tx: '#2B1A00', ty: 'thema', rl: 1, bio: 'Wie lassen sich asynchrone Lernressourcen didaktisch gestalten?', back: 'Im Makerspace geht es um die Frage, wie asynchrone Lernressourcen didaktisch gestaltet werden können – einmal im Monat, praktisch und gemeinsam.', inst: ['relilab', 'relilab'], m: 27, series: [['Makerspace „asynchrone Lernressourcen“', 'einmal im Monat']] },
-    { id: 'frieden', n: 'Friedenspädagogik', ab: 'FP', col: C.kooperieren, ty: 'thema', mine: 'Mitglied', bio: 'Frieden lernen – in Schule und Gemeinde.', back: 'Lehrkräfte, Gemeindepädagog:innen und Engagierte aus der Friedensarbeit teilen Material und Erfahrungen zur Friedensbildung.', inst: ['Friedensarbeit EKD', null], m: 49 }
+    { id: 'frieden', n: 'Friedenspädagogik', ab: 'FP', col: C.kooperieren, ty: 'thema', mine: 'Mitglied', bio: 'Frieden lernen – in Schule und Gemeinde.', back: 'Lehrkräfte, Gemeindepädagog:innen und Engagierte aus der Friedensarbeit teilen Material und Erfahrungen zur Friedensbildung.', inst: ['Friedensarbeit EKD', null], m: 49 },
+    { id: 'oercommunity', n: 'OER-Community', ab: 'OC', col: C.hub, ty: 'netz', ver: true, mine: 'folge ich', bio: 'Community of Communities des Projekts FOERBICO: Vernetzung religionsbezogener OER-Communities, gemeinsame Qualitätskriterien und Metadatenstandards.', back: 'Wer selbst offene Materialien erstellt oder in einem Netzwerk daran mitarbeitet, findet hier Austausch, Tagungen und Wissensgrundlagen zu OER.', inst: ['OER-Community', 'oercommunity'], m: 9, series: [] }
   ];
   const cyFollow = new Set(CY.filter(c => c.mine).map(c => c.id));
   let cyFilter = 'alle', cyQ = '';
@@ -2008,7 +2072,66 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     set: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>'
   };
   const T_ = (type, t, extra) => Object.assign({ type, t }, extra);
+  // ---------- OER-Community: Schnappschuss von oer.community (Stand 29.09.2026); Bilder per URL mit Fallback ----------
+  const OC_POSTS = [
+    { t: 'Metadaten – die unsichtbare Infrastruktur offener Bildung', date: '29.09.2026', ago: 'vor 4 Wochen', tags: ['OER', 'Metadaten', 'interoperabel', 'Vernetzung', 'dezentral', 'Qualitätskriterien'], x: 'Wer selbst OER erstellt, kennt die entscheidende Frage, die sich nach der Veröffentlichung stellt: Wird meine Ressource überhaupt gefunden?', img: 'https://blossom.edufeed.org/0e857e7892b60f5786bd00327d2e21f7de4c49e9575dc5d14ac59144761f0854.jpg', lic: 'Unsplash-Lizenz', url: 'https://oer.community/metadaten-die-unsichtbare-infrastruktur-offener-bildung/' },
+    { t: 'ALPIKA-Leitendentagung – (Komplementäre) Kooperationen, aber wie?', date: '28.09.2026', ago: 'vor 4 Wochen', tags: ['Kollaboration', 'OEP', 'Vernetzung', 'Community', 'FOERBICO in Kontakt'], x: 'Was können wir gemeinsam entwickeln, ohne das aufzugeben, was uns regional und institutionell ausmacht?', img: 'https://oer.community/alpika-tagung-2026/IMG_3549.jpg', lic: 'CC BY 4.0', url: 'https://oer.community/alpika-tagung-2026/' },
+    { t: 'Offen. Vernetzt. Zukunft. – Tagung zu Open Education in (religionsbezogenen) Communitys', date: '22.09.2026', ago: 'vor 5 Wochen', tags: ['OER', 'OEP', 'Vernetzung', 'OER-Community'], x: 'Wie können lebendige und nachhaltige Ökosysteme für offenes Lernen entstehen?', img: 'https://blossom.edufeed.org/fe6099cdb93b9bf7c2ca1162a8de550902efa1a0b0d2a677f30cba8578382757.png', lic: 'CC BY 4.0', url: 'https://oer.community/foerbico-tagung-2027/' },
+    { t: 'Künstliche Intelligenz im evangelischen Religionsunterricht', date: '11.09.2026', ago: 'vor 7 Wochen', tags: ['KI', 'Religionsunterricht', 'Urteilsbildung', 'AI literacy', 'FOERBICO in Kontakt'], x: 'Warum ist das zentrale evangelische Kriterium für KI im Religionsunterricht nicht Effizienz, sondern Freiheit und die Fähigkeit zum eigenen Urteil?', img: 'https://blossom.edufeed.org/bb3dfcb3815161763ed2e6250c11446c95934f0f1bed60c5c6dca80148867d7b.jpg', lic: '', url: 'https://oer.community/ki-im-evangelischen-religionsunterricht/' },
+    { t: 'Zwischen OER, Demokratie und hOERoskop – Eindrücke vom OERcamp 2026', date: '02.09.2026', ago: 'vor 8 Wochen', tags: ['OER', 'OEP', 'Barcamp', 'OERcamp', 'OER-Community'], x: 'Ein Wochenende voller Impulse, spannender Diskussionen, neuer Ideen und dazwischen viel schöne Natur: Das OERcamp 2026 in Erkner hatte einiges zu bieten.', img: 'https://blossom.edufeed.org/20a027ca751e79b5339cdef11fad2a19f145d576e6cfb43b50f78e107de09d0a.jpeg', lic: 'CC BY 4.0', url: 'https://oer.community/oercamp-2026/' }
+  ];
+  const OC_TAGUNGEN = [
+    { t: 'Abschlusstagung „Offen. Vernetzt. Zukunft“', when: '2. und 3. Februar 2027 · Goethe-Universität Frankfurt', x: 'Open Education in (religionsbezogenen) Communities: OER-Communities und Akteur:innen aus Wissenschaft, Bildungspraxis, Kirche und Zivilgesellschaft diskutieren, wie offene Bildungsökosysteme wachsen.', link: ['Anmeldung bis 22. Januar 2027', 'https://www.uni-frankfurt.de/de/fachbereich-7/professuren/mediendidaktik-und-religionspaedagogik/news/foerbico-abschlusstagung'] },
+    { t: 'Zwischenfazit-Tagung „Mit OER zu einer Kultur des Teilens“', when: '28. und 29. April 2026 · Nürnberg', x: 'Wie arbeiten OER-Communities zusammen, wie entstehen Materialien kollaborativ, und wie kann eine Kultur des Teilens konkret gelebt werden? Impulse aus der Forschung trafen Perspektiven aus der Praxis.', link: ['Rückblick', 'https://oer.community/tagungen/'] }
+  ];
+  // Teamseite oer.community/unser-team (öffentlich); Porträts sind dort ©, deshalb hier Initialen statt Bilder
+  const OC_TEAM = [
+    { g: 'Comenius-Institut', url: 'https://comenius.de/', p: [
+      { n: 'Dr. Jens Dechow', f: 'Direktor des Comenius-Instituts, verantwortet FOERBICO' },
+      { n: 'Jörg Lohrer', f: 'Projektkoordination, Community-Management' },
+      { n: 'Gina Buchwald-Chassée', f: 'Community-Management, Öffentlichkeitsarbeit' },
+      { n: 'Ludger Sicking', f: 'technische Umsetzung' } ] },
+    { g: 'Goethe-Universität Frankfurt', url: 'https://www.uni-frankfurt.de/de/fachbereich-7/professuren/mediendidaktik-und-religionspaedagogik', p: [
+      { n: 'Prof. Dr. Viera Pirker', f: 'Professur für Religionspädagogik und Mediendidaktik' },
+      { n: 'Dr. Laura Mößle', f: 'wissenschaftliche Mitarbeiterin; seit 10/2026 Professur an der KH Freiburg' },
+      { n: 'Dr. Florian Mayrhofer', f: 'wissenschaftlicher Koordinator' },
+      { n: 'Paula Gregorio Rodrigo', f: 'wissenschaftliche Mitarbeiterin' } ] },
+    { g: 'FAU Erlangen-Nürnberg', url: 'https://www.fau.de/', p: [
+      { n: 'Prof. Dr. Manfred Pirner', f: 'Lehrstuhl für Religionspädagogik und Didaktik des Evangelischen Religionsunterrichts' },
+      { n: 'Phillip Angelina', f: 'wissenschaftlicher Mitarbeiter, Empirie' } ] }
+  ];
+  const ocInit = n => n.replace(/^(Prof\. |Dr\. )+/, '').split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const ocExt = (href, label) => `<a href="${href}" target="_blank" rel="noopener">${label}</a>`;
+  function ocRender() {
+    const root = document.getElementById('ocRoot');
+    const posts = OC_POSTS.map(p => `<article class="oc-card"><div class="img"><span>${p.t}</span><img src="${p.img}" alt="" loading="lazy" onerror="this.remove()">${p.lic ? `<span class="oc-lic">${p.lic}</span>` : ''}</div><div class="tx"><h3>${ocExt(p.url, p.t)}</h3><span class="oc-date">${p.date}</span><div class="oc-tags">${p.tags.map(t => `<span>${t}</span>`).join('')}</div><p>${p.x}</p></div></article>`).join('');
+    const tag = OC_TAGUNGEN.map(e => `<article class="oc-card"><div class="tx"><h3>${e.t}</h3><span class="oc-date">${e.when}</span><p>${e.x}</p><p>${ocExt(e.link[1], e.link[0] + ' ›')}</p></div></article>`).join('');
+    const team = OC_TEAM.map(g => `<h3 class="oc-g">${ocExt(g.url, g.g)}</h3><div class="oc-team">${g.p.map(m => `<div class="oc-person"><span class="oc-av" aria-hidden="true">${ocInit(m.n)}</span><div><b>${m.n}</b><small>${m.f}</small></div></div>`).join('')}</div>`).join('');
+    root.innerHTML = `
+      <section class="oc-sec oc-start" id="oc-start">
+        <img src="https://oer.community/images/FOERBICO.png" alt="" onerror="this.remove()">
+        <h1>FOERBICO</h1>
+        <h2>Förderung offener Bildungspraktiken in religionsbezogenen Communities durch die Entwicklung eines koordinierten OER-Ökosystems</h2>
+        <p>Du bist interessiert an offenen Materialien (OER) für das Lernen und Lehren, hast selbst schon Materialien erstellt oder arbeitest in einer Community daran mit? Dann bist du bei FOERBICO richtig.</p>
+        <p>Im Sinne einer <i>Community of Communities</i> vernetzt FOERBICO religionsbezogene Communities, um gemeinsame Qualitätskriterien und Metadatenstandards zu entwickeln, damit OER in verschiedene Materialpools eingepflegt, weiterverbreitet und weiterentwickelt werden können.</p>
+        <p>${ocExt('https://matrix.to/#/#oercommunity:rpi-virtuell.de', '<span class="oc-btn">Space „OERcommunity“ (Element)</span>')}<button type="button" class="oc-btn alt" data-ocs="oc-team">Zum Team</button></p>
+      </section>
+      <section class="oc-sec" id="oc-blog"><h2>Blog</h2><div class="oc-grid">${posts}</div><p style="margin:14px 0 0">${ocExt('https://oer.community/blog/', 'Alle Beiträge auf oer.community ›')}</p></section>
+      <section class="oc-sec" id="oc-tagungen"><h2>Tagungen</h2><div class="oc-grid">${tag}</div></section>
+      <section class="oc-sec" id="oc-oer"><h2>Was ist OER? · Qualität</h2><div class="oc-grid">
+        <article class="oc-card"><div class="tx"><h3>${ocExt('https://oer.community/oer-und-oep/', 'OER und OEP')}</h3><p>Was Open Educational Resources und Open Educational Practices sind, warum offene Materialien Zusammenarbeit möglich machen, und ein Selbstlernmodul zum Einstieg.</p></div></article>
+        <article class="oc-card" id="oc-qualitaet"><div class="tx"><h3>${ocExt('https://oer.community/qualitaet/', 'Qualität')}</h3><p>Qualität als Prinzip offener religiöser Bildung: was allgemeine OER-Qualitätsmodelle leisten und welche religionspädagogischen Kriterien dazukommen.</p></div></article>
+      </div></section>
+      <section class="oc-sec" id="oc-team"><h2>Unser Team</h2>${team}</section>`;
+  }
+  ocRender();
+  document.getElementById('v-oercommunity').addEventListener('click', e => {
+    const b = e.target.closest('[data-ocs]');
+    if (b) document.getElementById(b.dataset.ocs).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
   const CR = {
+    oercommunity: { act: OC_POSTS.map(p => T_('Artikel', p.t, { who: 'OER-Community', ago: p.ago, x: p.x, tags: p.tags, url: p.url })) },
     relilab: { act: [
         T_('Termin', 'Den Ramadan in der Schule gestalten – Interreligiöses Lernen', { who: 'relilab', ago: 'vor 4 Tagen', d: ['11', 'JAN', '2027, 16:00'], tags: ['Ramadan', 'Fastenbrechen', 'Id al-Fitr'] }),
         T_('Termin', 'Weihnachten religionssensibel gestalten – Interreligiöses Lernen', { who: 'relilab', ago: 'vor 4 Tagen', d: ['12', 'NOV', '2026, 16:00'], tags: ['Weihnachten', 'Advent', 'Maria'] }),
@@ -2250,6 +2373,18 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       later(d); return false;
     }
   });
+  RelihubSteuerkonsole.registerContext('oer-community', {
+    handler: d => {
+      if (d.action === 'hub.home') { go('start'); return false; }
+      if (d.action === 'hub') { go(LOGGED ? 'profil' : 'start'); return false; }
+      if (d.action === 'finden.material') { go('materialpool?thema=OER'); return false; }
+      if (d.action === 'veroeffentlichen.beitrag') { openBlog('OER-Community'); return false; }
+      if (d.action === 'kooperieren.communities') { go('community?c=oercommunity'); return false; }
+      if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); return false; }
+      if (info(d)) return false;
+      later(d); return false;
+    }
+  });
   RelihubSteuerkonsole.registerContext('relilab', {
     actions: { 'finden.material': { params: { thema: 'Digitalität' } } },
     handler: d => {
@@ -2331,10 +2466,10 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   function route() {
     const raw = CUR;
     const [view, qs] = raw.split('?');
-    const v = ['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community'].includes(view) ? view : (view === 'partner' ? 'start' : 'start');
+    const v = ['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity'].includes(view) ? view : (view === 'partner' ? 'start' : 'start');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
     document.querySelectorAll('.proto a').forEach(a => a.classList.toggle('on', a.dataset.v === v));
-    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum' }[v];
+    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO' }[v];
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || 'relilab', pp.get('tab')); }
     if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); }
     if (v === 'relilab') rlShow(qs);
