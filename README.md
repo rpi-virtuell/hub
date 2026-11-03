@@ -21,6 +21,7 @@ Die Grundentscheidungen des Prototyps stehen als ADRs in `docs/adr/` (Vorlage un
 | [0003](docs/adr/0003-teilen-in-communities.md) | Teilen in Communities nach dem edufeed-Modell | angenommen |
 | [0004](docs/adr/0004-newsletter-als-nip-b0.md) | Newsletter einer Community als NIP-B0-Lesezeichen | angenommen |
 | [0005](docs/adr/0005-artikel-im-finden.md) | Artikel und Nachrichten gehören zu „finden“ | angenommen |
+| [0006](docs/adr/0006-live-daten-mit-rueckfall.md) | Live-Daten mit Schnappschuss als Rückfall, Kennzeichnung „Nachbau“ (ersetzt Punkt 1 von ADR-0002) | angenommen |
 
 **Prüfungen:** `deno task test` führt textbasierte Prüfungen über `index.html` aus (Syntax beider Inline-Skripte, Farbkontraste aus den Variablen, Struktur der Ansichten, ADRs). Kein Build; die Datei bleibt direkt im Browser lauffähig.
 
