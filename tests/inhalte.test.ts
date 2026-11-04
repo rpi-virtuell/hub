@@ -67,3 +67,22 @@ Deno.test('ocLaden: ein REQ je Relay, Seiten und Beiträge getrennt', () => {
     });
   });
 });
+
+Deno.test('Schaufenster live: Routen, Menü, Abschnitte, Schnappschuss', async () => {
+  const route = block(/function route\(\)[\s\S]*?window\.scrollTo/);
+  assert(/split\('\/'\)/.test(route) && /ocOpen\(/.test(route), 'Unterroute #oercommunity/<d>');
+  const oc = block(/function ocRender\(daten\)[\s\S]*?\n  \}/);
+  assert(/navigation/.test(oc) && /#oercommunity\/spielregeln/.test(oc) && /id="oc-termine"/.test(oc) && /FOERBICO_und_rpi-virtuell\/issues/.test(oc), 'Menü, Spielregeln-Eintrag, Termine-Archiv, Logbuch');
+  assert(/mdSeite\(/.test(oc) && /beitragBild\(/.test(oc) && /beitragUrl\(/.test(oc), 'Seiten und Beiträge aus Events');
+  assert(/OC_TEAM/.test(oc) && /ocInit\(/.test(oc), 'Team bleibt Schnappschuss mit Initialen');
+  assert(/noch keine Termine/.test(oc), 'ehrlicher Satz bei leerem Archiv');
+  assert(/in Vorbereitung/.test(block(/function ocOpen\(sub\)[\s\S]*?\n  \}/) + block(/function ocSchau\([^)]*\)[\s\S]*?\n  \}/) + oc), 'fehlende Seite');
+  assert(/schnappschuss:beitraege \*\/[\s\S]*let OC_RAW = \[[\s\S]*let OC_STAND = '\d\d\.\d\d\.\d{4}'[\s\S]*\/schnappschuss:beitraege/.test(s), 'Schnappschuss-Block Beiträge');
+  assert(/const OC_POSTS = OC_RAW\.map\(/.test(s), 'OC_POSTS aus OC_RAW');
+  assert(!/<\//.test(s.match(/let OC_RAW = .*/)![0]), 'OC_RAW enthält </');
+  const t = await Deno.readTextFile(new URL('../tools/schnappschuss.ts', import.meta.url));
+  assert(/schnappschuss:beitraege/.test(t) && /30023/.test(t) && /'seite'/.test(t), 'Skript kennt den zweiten Block');
+  const seite = block(/function ocSeite\(ev\)[\s\S]*?\n  \}/);
+  assert(seite.includes("'Lizenz: siehe oer.community'") && seite.includes("=== 'CC BY 4.0'") && !seite.includes('/^CC BY \\d/'), 'Lizenzzeile behauptet nichts, was das Event nicht trägt');
+  assert((html.match(/<div class="view"/g) || []).length - 1 === (html.match(/class="stand"/g) || []).length, 'Stand-Zeilen vollständig');
+});

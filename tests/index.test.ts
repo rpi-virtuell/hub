@@ -52,8 +52,9 @@ Deno.test('Schaufenster OER-Community ist verdrahtet', () => {
   assert(/'oercommunity'/.test(s.match(/function route\(\)[\s\S]*?includes\(view\)/)![0]), 'route kennt den View nicht');
   assert(/Roboto\+Condensed:wght@400/.test(html), 'Roboto Condensed 400 fehlt');
   assert((s.match(/const OC_TEAM[\s\S]*?\n  \];/)![0].match(/\bn:/g) || []).length === 10, 'OC_TEAM hat nicht 10 Personen');
-  assert((s.match(/const OC_POSTS[\s\S]*?\n  \];/)![0].match(/\bt:/g) || []).length === 5, 'OC_POSTS hat nicht 5 Beiträge');
-  assert(/onerror=/.test(s.match(/function ocRender[\s\S]*?\n  \}/)![0]), 'kein Bild-Fallback');
+  assert(((s.match(/let OC_RAW = .*/) || [''])[0].match(/"kind":30023/g) || []).length === 6, 'OC_RAW hat nicht 6 Beiträge');
+  assert(/const OC_POSTS = OC_RAW\.map\(/.test(s), 'OC_POSTS entsteht nicht aus dem Schnappschuss der Beiträge');
+  assert(/onerror=/.test(s.match(/const ocKarte[^\n]*/)![0]), 'kein Bild-Fallback');
 });
 
 Deno.test('Teilen in Communities im Beitrags- und Termin-Editor', () => {
