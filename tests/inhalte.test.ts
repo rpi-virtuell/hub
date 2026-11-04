@@ -82,5 +82,7 @@ Deno.test('Schaufenster live: Routen, Menü, Abschnitte, Schnappschuss', async (
   assert(!/<\//.test(s.match(/let OC_RAW = .*/)![0]), 'OC_RAW enthält </');
   const t = await Deno.readTextFile(new URL('../tools/schnappschuss.ts', import.meta.url));
   assert(/schnappschuss:beitraege/.test(t) && /30023/.test(t) && /'seite'/.test(t), 'Skript kennt den zweiten Block');
+  const seite = block(/function ocSeite\(ev\)[\s\S]*?\n  \}/);
+  assert(seite.includes("'Lizenz: siehe oer.community'") && seite.includes("=== 'CC BY 4.0'") && !seite.includes('/^CC BY \\d/'), 'Lizenzzeile behauptet nichts, was das Event nicht trägt');
   assert((html.match(/<div class="view"/g) || []).length - 1 === (html.match(/class="stand"/g) || []).length, 'Stand-Zeilen vollständig');
 });

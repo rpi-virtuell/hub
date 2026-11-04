@@ -2718,7 +2718,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   function ocSeite(ev) {
     const d = tagWert(ev, 'd'), lic = tagWert(ev, 'license'), label = lizenzLabel(lic);
     return `<article class="oc-seite"><h1>${esc(tagWert(ev, 'title') || d)}</h1><p class="oc-date">${ocDatum(ev)}</p>${mdSeite(ev.content)}
-      <p class="oc-date">${!lic || /^CC BY \d/.test(label) ? 'CC BY 4.0 FOERBICO' : 'Lizenz: ' + esc(label)}</p>
+      <p class="oc-date">${!lic ? ocExt('https://oer.community/' + encodeURIComponent(d) + '/', 'Lizenz: siehe oer.community') : label === 'CC BY 4.0' ? 'CC BY 4.0 FOERBICO' : 'Lizenz: ' + esc(label)}</p>
       <p>${ocExt('https://oer.community/' + encodeURIComponent(d) + '/', 'Auf oer.community ansehen ›')} · <a href="#oercommunity">‹ Schaufenster</a></p></article>`;
   }
   /** Zeigt Schaufenster oder Seite `sub`; daten null = noch nichts vom Relay; geladen = Antwort ist da */
