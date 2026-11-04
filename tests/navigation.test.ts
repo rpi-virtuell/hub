@@ -112,3 +112,11 @@ Deno.test('Navigation: Tabelle, Farben in der Konsole, Lerninhalte in den Materi
   const nullZiele = [...block(/const EX = \{[\s\S]*?\n  \};/).matchAll(/go:\['[^']*',null\]/g)].length;
   assert(nullZiele === 1, `offene Ziele in EX: ${nullZiele}, erlaubt ist nur Personen`);
 });
+
+Deno.test('Konsole auf der Startseite verankert', () => {
+  const s = appScript(), start = hblock(/id="v-start"[\s\S]*?<!-- =+ Ansicht 2/);
+  assert(/<relihub-steuerkonsole id="startFloat" floating[^>]*context="hub-start-float"/.test(start), 'schwebende Konsole fehlt auf der Startseite');
+  assert(/new IntersectionObserver\(/.test(s) && /\.observe\(document\.getElementById\('startFlower'\)\)/.test(s), 'Observer fehlt');
+  assert(/registerContext\('hub-start-float'/.test(s) && /MODUS === 'direkt'/.test(block(/registerContext\('hub-start-float'[\s\S]*?\n  \}\);/)), 'Kontext fehlt');
+  assert(/unten rechts/.test(block(/function explainDefault[\s\S]*?\n  \}/)), 'Hinweissatz fehlt');
+});
