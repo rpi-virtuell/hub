@@ -1,5 +1,5 @@
 import { assert } from 'jsr:@std/assert@1';
-import { html, appScript, consoleScript, leisteScript } from './helfer.ts';
+import { html, appScript, consoleScript, leisteScript, rootVars, contrast } from './helfer.ts';
 const block = (re: RegExp) => (appScript().match(re) || [''])[0];   // Ausschnitt aus dem Anwendungsskript
 const hblock = (re: RegExp) => (html.match(re) || [''])[0];         // Ausschnitt aus dem HTML
 
@@ -79,4 +79,25 @@ Deno.test('Leiste: eigenständiges Widget, klar von der Konsole unterschieden', 
   assert(si > 0 && si < rt.indexOf('return'), 'setItems läuft nicht bei jedem Routenaufruf');
   const d = await Deno.readTextFile(new URL('../docs/leiste.md', import.meta.url));
   assert(/relihub-leiste-select/.test(d) && /setItems/.test(d) && /Tätigkeiten/.test(d), 'docs/leiste.md unvollständig');
+});
+
+Deno.test('rpi-virtuell: eigene Instanz in Leiste, Kachel, Konsole und Community', () => {
+  const s = appScript(), v = rootVars();
+  const view = hblock(/<div class="view" id="v-rpi-virtuell"[\s\S]*?<\/div>\s*\n<!--/);
+  assert(view && /data-stand="nachbau:/.test(view), 'Ansicht fehlt');
+  assert(v['rv'] && v['rv-x'] && contrast(v['rv-x'], v['paper']) >= 4.5 && contrast(v['rv-x'], v['card']) >= 4.5, 'rpi-virtuell-Textfarbe unter 4,5:1');
+  assert(/'rpi-virtuell'/.test(block(/function route\(\)[\s\S]*?includes\(view\)/)) && /function rvOpen\(qs\)/.test(s), 'Route');
+  assert(/registerContext\('rpi-virtuell'/.test(s) && /'rpi-virtuell': 'rpi-virtuell'/.test(s), 'Kontext');
+  assert(/id: 'rpi-virtuell', label: 'rpi-virtuell'/.test(block(/const LEISTE = \[[\s\S]*?\n  \];/)), 'Leisten-Eintrag');
+  assert(/\['rpi-virtuell', 'Materialpool, Fortbildungen, News', 'finden', 'rv', '#rpi-virtuell'/.test(s) && !/'FK', null/.test(s), 'Partner-Kachel');
+  assert(/id: 'rpi-virtuell'[^}]*inst: \['rpi-virtuell', 'rpi-virtuell'\]/.test(block(/const CY = \[[\s\S]*?\n  \];/)), 'Community-Bezug');
+  assert(/'finden\.fortbildungen': 'rpi-virtuell\?tab=fortbildungen'/.test(s) && /'#rpi-virtuell\?tab=fortbildungen'/.test(s), 'Fortbildungen haben ein Ziel');
+  const rv = block(/function rvOpen[\s\S]*?hubFetch\('rpi-virtuell'[\s\S]*?\]\s*\)/);
+  assert(/kinds: \[31923\]/.test(rv) && /kinds: \[30023\]/.test(rv) && /npubToHex\('npub12jguy/.test(rv) && !/amb-relay/.test(rv), 'Filter der Ansicht');
+  assert(/mit Teilnahmebescheinigung/.test(view) && /href="#relilab"/.test(view), 'Institutslogik und Verweis auf das relilab');
+});
+
+Deno.test('rpi-virtuell: Tabs mit Standard', () => {
+  const rv = block(/function rvOpen\(qs\)[\s\S]*?\n  \}/);
+  assert(/\['material', 'fortbildungen', 'news'\]\.includes\(/.test(rv) && /: 'material'/.test(rv), 'unbekannter Tab fällt nicht auf material zurück');
 });
