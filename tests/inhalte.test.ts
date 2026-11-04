@@ -1,5 +1,5 @@
 import { assert, assertEquals } from 'jsr:@std/assert@1';
-import { appScript, html } from './helfer.ts';
+import { appScript, html, rootVars, contrast } from './helfer.ts';
 const s = appScript();
 const block = (re: RegExp) => (s.match(re) || [''])[0];
 const esc = (t: string) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
@@ -100,4 +100,20 @@ Deno.test('Spielregeln: vier Seiten mit Vorbereitungs-Rückfall', async () => {
   assert((s.match(/#oercommunity\/spielregeln/g) || []).length >= 2, 'Menü mit und ohne Relay-Liste führt zum Bereich');
   const n = await Deno.readTextFile(new URL('../docs/navigation.md', import.meta.url));
   assert(/Spielregeln/.test(n), 'docs/navigation.md');
+});
+
+Deno.test('Materialpool live: Karten ohne unsichere Adressen, Zähler, Rückfall', () => {
+  const mp = block(/function mpLaden\(\)[\s\S]*?\n  \}/);
+  assert(/hubFetch\('materialpool', \[\{ kinds: \[30142\], limit: 200 \}\]/.test(mp), 'ein Filter, alle Relays');
+  const m = block(/function mpMaterial\(ev\)[\s\S]*?\n  \}/);
+  assert(/sichereUrl\(/.test(m) && /lizenzStand\(/.test(m) && /lizenzLabel\(/.test(m) && /vollstaendig/.test(m), 'Felder');
+  const r = block(/function mpRender\(\)[\s\S]*?\n  \}/);
+  assert(/#materialpool\?d=/.test(r) && /encodeURIComponent/.test(r) && /Lizenz nicht angegeben/.test(r) && /vollständigen Metadaten/.test(r), 'Karten, Pille, Zähler');
+  assert(/MP\.map\(/.test(r) || /MP\.map\(/.test(s), 'Rückfall auf den Schnappschuss');
+  assert(/function mpOpen\(qs\)/.test(s) && /mpOpen\(qs\)/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'route ruft mpOpen');
+  assert(/lic-offen/.test(html) && /lic-geschuetzt/.test(html) && /lic-unbekannt/.test(html), 'drei Pillen im CSS');
+  const v = rootVars();
+  for (const k of ['offen', 'geschuetzt', 'unbekannt']) for (const bg of [v['lic-' + k], v['paper'], v['card']]) {
+    assert(contrast(v['lic-' + k + '-x'], bg) >= 4.5, `Pille ${k}: ${v['lic-' + k + '-x']} auf ${bg}`);
+  }
 });
