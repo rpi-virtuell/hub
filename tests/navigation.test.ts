@@ -29,3 +29,12 @@ Deno.test('Schnappschuss-Skript und Doku vorhanden', async () => {
   const dj = JSON.parse(await Deno.readTextFile(new URL('../deno.json', import.meta.url)));
   assert(dj.tasks.schnappschuss, 'deno task schnappschuss fehlt');
 });
+
+Deno.test('Konsole: Aktivieren meldet sich sofort', () => {
+  const c = consoleScript(), s = appScript();
+  assert(/new CustomEvent\('relihub-activate'/.test(c), 'Ereignis fehlt');
+  assert(/onActivate\(/.test(c), 'Profil-Haken onActivate fehlt');
+  assert(/relihub-activate/.test((c.match(/\/\*!?[\s\S]*?\*\//) || [''])[0]), 'Doku-Kommentar nennt das Ereignis nicht');
+  assert(/registerContext\('hub-start',\s*\{[\s\S]*?onActivate:/.test(s), 'hub-start nutzt onActivate nicht');
+  assert(/_touchAct = true/.test(c), 'Touch-Regel verloren');
+});

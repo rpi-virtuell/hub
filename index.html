@@ -1192,6 +1192,11 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
  * EREIGNIS
  *   Jeder Klick löst "relihub-action" aus (bubbles, composed, cancelable) mit
  *   detail = { action, label, url, context }. preventDefault() verhindert die Navigation.
+ *   Schon das Aktivieren eines Kreises (Überfahren, Fokus, erstes Antippen) löst
+ *   "relihub-activate" aus (bubbles, composed, nicht cancelable) mit
+ *   detail = { action, label, context, source }, source = "pointer" | "keyboard", und nur
+ *   wenn sich der aktive Kreis ändert. Vorher ruft die Konsole den optionalen Haken
+ *   onActivate(detail) des Kontextprofils (registerContext) auf.
  *
  * GESTALTUNG ÜBER CSS-VARIABLEN (auf dem Element oder einem Elternelement)
  *   --relihub-font, --relihub-label (Schriftfarbe außen), --relihub-halo (Hof um Schrift),
@@ -1536,6 +1541,10 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         });
       }
       this.markKbd();
+      // Sofort melden, was aktiv wurde (Profil-Haken zuerst, dann Ereignis).
+      const detail = { action: f.id, label: LABELS[f.id], context: this.ctx, source: fromKbd ? 'keyboard' : 'pointer' };
+      const prof = CONTEXTS[this.ctx]; if (prof && prof.onActivate) prof.onActivate(detail);
+      this.dispatchEvent(new CustomEvent('relihub-activate', { detail, bubbles: true, composed: true }));
     }
     // Ragt eine Knospen-Beschriftung über den Bildschirmrand (v. a. mobil), rückt sie
     // unter bzw. über die Knospe und so weit nach innen, dass sie vollständig lesbar bleibt.
@@ -2529,6 +2538,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   function later(d) { toast(`<b>${d.label}</b> führt später hierhin:<br><code>${d.url}</code>`); }
 
   RelihubSteuerkonsole.registerContext('hub-start', {
+    onActivate: d => explain(d.action),
     handler: d => { explain(d.action); exEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); return false; }
   });
   RelihubSteuerkonsole.registerContext('hub-profil', {
