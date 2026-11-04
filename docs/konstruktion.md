@@ -112,10 +112,10 @@ Das Muster ist überall gleich: echte Protokollbegriffe und echte Relay-Adressen
 Seit Etappe 3 kommen die redaktionellen Inhalte nicht mehr aus dem Code, sondern als Events (Begründung: [ADR-0007](adr/0007-inhalte-aus-events.md), Quellen und Abfragen: [daten.md](daten.md)):
 
 - **Seiten und Menü**: Langform-Artikel (`kind:30023`) mit Seiten-Label vom Schaufenster-Schlüssel; Menü und Fußzeile als Listen (`kind:30004`, `d=navigation` und `d=fusszeile`). Die vier Spielregeln-Seiten werden über feste `d`-Namen gefunden und erscheinen, solange sie fehlen, als „in Vorbereitung“.
-- **Beiträge und Termine**: Beiträge (`kind:30023` ohne Seiten-Label) speisen den Blog, Termine (`kind:31923`) das Termine-Archiv. Beide haben einen Schnappschuss als Rückfall.
+- **Beiträge und Termine**: Beiträge (`kind:30023` ohne Seiten-Label) speisen den Blog, Termine (`kind:31923`) das Termine-Archiv. Die Beiträge haben einen Schnappschuss als Rückfall; die Termine kommen nur live, ohne Antwort zeigt das Archiv den Satz, dass unter dem Schaufenster-Schlüssel keine Termine liegen.
 - **Markdown** rendert ein eigener, maskierender Renderer ohne Tabellen und ohne HTML-Durchreichung.
 - **Materialien** (`kind:30142`) kommen von allen drei Relays; ein Material ist über `pubkey:d` bestimmt, die Detailansicht nimmt es aus dem Listen-Zwischenspeicher und baut das JSON-LD aus den Tags.
-- **Lizenzstand**: Aus `license:id` folgt offen, geschützt oder unbekannt (unbekannt gilt wie geschützt). Aktionen, die der Stand nicht erlaubt, bleiben sichtbar und sind deaktiviert; ein Prüf-Marker über ein NIP-32-Label ist Stufe B.
+- **Lizenzstand**: Aus `license:id` folgt offen, geschützt oder unbekannt (unbekannt gilt wie geschützt). Aktionen, die der Stand nicht erlaubt, bleiben sichtbar und sind deaktiviert; die Auswertung eines Prüf-Markers (`l=geprueft`, NIP-32) ist angelegt, bisher trägt kein Event das Label; wer prüfen darf, ist Stufe B.
 - Die Teamseite bleibt ein Schnappschuss mit Initialen (Porträts sind urheberrechtlich geschützt).
 
 ## Instanzen und Communities

@@ -152,6 +152,7 @@ Deno.test('Material-Detail: Felder, Lizenzstand, Rohdaten, kein zweiter REQ bei 
   assert(mo.includes("mpDetail(p.get('d')") && mo.includes("p.get('p')") && !/decodeURIComponent/.test(mo), 'mpOpen wertet ?d= und &p= aus, ohne zweites Entschlüsseln');
   assert(s.includes('function leseHash()') && (s.match(/= leseHash\(\)/g) || []).length === 3 && !/decodeURIComponent\(location\.hash/.test(s), 'leseHash an drei Stellen');
   assert(/authors: \[p\]/.test(det) && /&p=\$\{m\.pk\}/.test(block(/function mpRender\(\)[\s\S]*?\n  \}/)), 'Material wird über pubkey und d bestimmt');
+  assert(/\[0-9a-f\]\{64\}/.test(s) && block(/function mpLaden\(\)[\s\S]*?\n  \}/).includes('istHex64(ev.pubkey)') && mo.includes('istHex64(p.get(\'p\'))'), 'Schlüssel aus dem Relay wird vor Karte, Filter und naddr geprüft');
   assert(/id="mpDetail"/.test(html), 'Detail-Block in der Ansicht');
 });
 
@@ -161,4 +162,21 @@ Deno.test('ADR-0007 und README nennen die Etappe', async () => {
   assert(!/Arbeitspaket|Meilenstein|Förderkennzeichen|Projektträger|Zwischenbericht/.test(adr), 'Projektsprache');
   const r = await Deno.readTextFile(new URL('../README.md', import.meta.url));
   assert(/0007-inhalte-aus-events/.test(r) && /Spielregeln/.test(r), 'README');
+});
+
+Deno.test('Feindlicher Relay-Text: mpMaterial liefert Zeichenketten, die maskiert harmlos sind; fremder Schlüssel fällt durch', () => {
+  const fn = (n: string) => block(new RegExp(`  function ${n}\\([^)]*\\) \\{[\\s\\S]*?\\n  \\}`));
+  const namen = ['tagWert', 'tagWerte', 'ambWerte', 'ambFeld', 'lizenzLabel', 'lizenzStand', 'mpMaterial', 'istHex64'];
+  const quelle = namen.map(fn).join('\n');
+  for (const n of namen) assert(fn(n), 'Quelltext gefunden: ' + n);
+  const f = new Function('esc', 'sichereUrl', quelle + '; return { mpMaterial, istHex64 };')(esc, sichereUrl);
+  const bos = '<img src=x onerror=alert(1)>', pk = 'x" onfocus=alert(1)';
+  const m = f.mpMaterial({ kind: 30142, pubkey: pk, created_at: 1, content: bos, tags: [['d', 'a"b'], ['name', bos], ['license:id', 'javascript:alert(1)'], ['r', 'javascript:alert(1)'], ['image', 'data:text/html,x']] });
+  for (const k of ['t', 'x', 'd', 'pk', 'lic', 'licLabel', 'art', 'quelle']) {
+    assertEquals(typeof m[k], 'string', k);
+    assert(!/[<"]/.test(esc(m[k])), `maskiert ohne rohes < oder " in ${k}`);
+  }
+  assertEquals(m.url, '', 'javascript:-Adresse wird verworfen');
+  assertEquals(m.bild, '', 'data:-Adresse wird verworfen');
+  assert(f.istHex64('ab'.repeat(32)) && !f.istHex64(pk) && !f.istHex64('AB'.repeat(32)) && !f.istHex64(undefined), 'istHex64 lässt nur 64 Hex-Zeichen klein zu');
 });
