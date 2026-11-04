@@ -1,10 +1,11 @@
 // Textbasierte Prüfungen über index.html (kein Build, kein DOM): Farbkontraste rechnerisch, Struktur per Regex.
 import { assert } from 'jsr:@std/assert@1';
-import { html, rootVars, contrast, consoleScript, appScript } from './helfer.ts';
+import { html, rootVars, contrast, consoleScript, leisteScript, appScript } from './helfer.ts';
 
-Deno.test('Beide Inline-Skripte sind syntaktisch gültig', () => {
+Deno.test('Alle Inline-Skripte sind syntaktisch gültig', () => {
   // Function-Konstruktor parst, ohne auszuführen (kein DOM nötig)
   new Function(consoleScript());
+  new Function(leisteScript());
   new Function(appScript());
 });
 
@@ -44,7 +45,7 @@ Deno.test('Generische Fokusregel vorhanden', () => {
 Deno.test('Schaufenster OER-Community ist verdrahtet', () => {
   const s = appScript();
   assert(html.includes('id="v-oercommunity"'), 'View fehlt');
-  assert(/<nav class="proto"[\s\S]*?href="#oercommunity"[^>]*>FOERBICO<\/a>/.test(html), 'Leisten-Eintrag fehlt');
+  assert(/id:\s*'oercommunity',\s*label:\s*'FOERBICO'/.test(s), 'Leisten-Eintrag fehlt');
   assert(/'OER-Community',\s*'Schaufenster des Projekts FOERBICO'/.test(s), 'Partner-Kachel fehlt');
   assert(/id:\s*'oercommunity'[\s\S]*?inst:\s*\['OER-Community',\s*'oercommunity'\]/.test(s), 'CY-Eintrag fehlt');
   assert(/registerContext\('oer-community'/.test(s), 'Kontext fehlt');

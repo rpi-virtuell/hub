@@ -715,10 +715,6 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 }
 
 /* ---------- Prototyp-Leiste und Hinweis ---------- */
-.proto{position:fixed;left:14px;bottom:14px;z-index:9000;display:flex;gap:4px;align-items:center;background:#1D1D1B;color:#fff;border-radius:999px;padding:5px 6px 5px 14px;font-family:Barlow,sans-serif;font-size:13px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
-.proto a{color:#fff;text-decoration:none;padding:5px 11px;border-radius:999px}
-.proto a.on{background:#fff;color:#1D1D1B;font-weight:600}
-.proto .sh{display:none}
 .toast{position:fixed;left:50%;bottom:64px;transform:translate(-50%,20px);opacity:0;z-index:30000;background:#1D1D1B;color:#fff;border-radius:14px;padding:12px 18px;font-family:Barlow,sans-serif;font-size:15px;max-width:min(92vw,560px);transition:opacity .2s,transform .2s;pointer-events:none}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .toast code{font-size:13px;color:#C9C6BC;word-break:break-all}
@@ -742,10 +738,6 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
   .panel h2 .more{margin-left:40px;width:100%}
   .explain.sheet{position:fixed;left:0;right:0;bottom:0;max-height:60vh;overflow:auto;z-index:9500;border-radius:18px 18px 0 0;margin:0;max-width:none;box-shadow:0 -8px 30px rgba(0,0,0,.18)}
   .sheet-x{position:absolute;top:10px;right:12px;width:36px;height:36px;border:0;border-radius:50%;background:transparent;font-size:18px;color:var(--muted);cursor:pointer}
-  .proto{left:10px;bottom:12px;font-size:12px;padding:4px 5px 4px 10px}
-  .proto a{padding:4px 7px}
-  .proto .plbl{display:none}
-  .proto .lg{display:none}.proto .sh{display:inline}
   .explain{flex-direction:column}
   .hello{flex-direction:column;align-items:flex-start}
   .ages{grid-template-columns:1fr}
@@ -1140,9 +1132,7 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
   <relihub-steuerkonsole id="ocFlower" floating size="58" popover-size="210" context="oer-community"></relihub-steuerkonsole>
 </div>
 
-<nav class="proto" aria-label="Prototyp-Ansichten"><span class="plbl">Prototyp</span>
-  <a href="#start" data-v="start">Start</a><a href="#profil" data-v="profil">Profil</a><a href="#materialpool" data-v="materialpool"><span class="lg">Materialpool</span><span class="sh">Pool</span></a><a href="#relilab" data-v="relilab">relilab</a><a href="#relidesk" data-v="relidesk">relidesk</a><a href="#oercommunity" data-v="oercommunity">FOERBICO</a>
-</nav>
+<relihub-leiste id="leiste" label="Orte"></relihub-leiste>
 <div class="ef-overlay" id="efOverlay" hidden></div>
 <div class="toast" id="toast" role="status"></div>
 
@@ -1330,6 +1320,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 @media (max-width:560px){:host([floating]) .popover{position:fixed;top:auto;bottom:96px;left:50%;right:auto!important;transform:translate(-50%,10px) scale(.96)}
   :host([floating][open]) .popover{transform:translate(-50%,0)}}
 @media (prefers-reduced-motion:reduce){.pop,.bud,.popover{transition:none}}
+.cap{position:absolute;top:14px;left:0;right:0;text-align:center;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#5F5E5A}
 `;
 
   class RelihubSteuerkonsoleElement extends HTMLElement {
@@ -1423,6 +1414,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         const popEl = document.createElement('div');
         popEl.className = 'popover';
         popEl.setAttribute('data-align', this.getAttribute('popover-align') === 'left' ? 'left' : 'right');
+        const cap = document.createElement('span'); cap.className = 'cap'; cap.textContent = 'Tätigkeiten'; popEl.appendChild(cap);   // Konsole = Tätigkeiten, Leiste = Orte
         const box = document.createElement('div'); box.className = 'fbox';
         popEl.appendChild(box); root.appendChild(popEl);
         holder = box;
@@ -1630,6 +1622,93 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   if (!customElements.get('relihub-steuerkonsole')) customElements.define('relihub-steuerkonsole', RelihubSteuerkonsoleElement);
 })();
 
+</script>
+<script>
+/*!
+ * reli_hub-Leiste – Orte-Leiste unten links (Prototyp)
+ *
+ * ZWECK
+ *   Klammer um die Instanzen und Communities des reli_hub: Du wechselst den Ort
+ *   und bleibst doch im Ökosystem. Die Leiste zeigt Orte; die Steuerkonsole zeigt
+ *   Tätigkeiten. Beide sind getrennte Elemente.
+ *
+ * EINBINDEN
+ *   <script src="relihub-leiste.js" defer><\/script>
+ *   <relihub-leiste label="Orte"></relihub-leiste>
+ *   RelihubLeiste.setItems([{ id: 'start', label: 'Start', href: '#start', kind: 'instanz' }]);
+ *
+ * ATTRIBUTE
+ *   current   ID des aktiven Eintrags (wird weiß hervorgehoben)
+ *   label     Beschriftung links (Standard „Orte“), unter 640 px ausgeblendet
+ *
+ * API
+ *   RelihubLeiste.setItems(items) setzt die Einträge aller Leisten der Seite.
+ *   item = { id, label, short?, href, kind }, kind ∈ 'instanz' | 'community'.
+ *   Communities stehen nach einem Trennstrich mit Ring-Symbol; short ersetzt label unter 640 px.
+ *
+ * EREIGNIS
+ *   Jeder Klick löst "relihub-leiste-select" aus (bubbles, composed, cancelable) mit
+ *   detail = { id, href, kind }. Ohne preventDefault() navigiert die Leiste zu href.
+ *
+ * CSS-VARIABLEN
+ *   --relihub-leiste-bg   Hintergrund (Standard #1D1D1B)
+ *   --relihub-leiste-fg   Schrift (Standard #FFFFFF); der aktive Eintrag kehrt beide um
+ */
+(() => {
+  let ITEMS = [];
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const RING = '<svg class="ring" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+  const CSS = `
+:host{position:fixed;left:14px;bottom:14px;z-index:9000;font-family:Barlow,sans-serif;font-size:13px}
+nav{display:flex;gap:4px;align-items:center;white-space:nowrap;background:var(--relihub-leiste-bg,#1D1D1B);color:var(--relihub-leiste-fg,#FFFFFF);
+  border-radius:999px;padding:5px 6px 5px 14px;box-shadow:0 6px 20px rgba(0,0,0,.2);
+  max-width:calc(100vw - 110px);overflow-x:auto;scrollbar-width:none}   /* rechts bleibt Platz für die schwebende Konsole; zu viele Orte scrollen waagrecht */
+nav::-webkit-scrollbar{display:none}
+.lbl{margin-right:4px;opacity:.75}
+a{flex:none;color:inherit;text-decoration:none;padding:5px 11px;border-radius:999px;display:inline-flex;align-items:center;gap:5px}
+a.on{background:var(--relihub-leiste-fg,#FFFFFF);color:var(--relihub-leiste-bg,#1D1D1B);font-weight:600}
+a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
+.sep{width:1px;align-self:stretch;margin:4px 4px;background:currentColor;opacity:.4}
+.ring{width:11px;height:11px;flex:none}
+.short{display:none}
+@media (max-width:640px){
+  :host{left:10px;bottom:12px;font-size:12px}
+  nav{padding:4px 5px;max-width:calc(100vw - 96px)}
+  a{padding:4px 7px}
+  .lbl,.long{display:none}.short{display:inline}
+}`;
+
+  class RelihubLeisteElement extends HTMLElement {
+    static get observedAttributes() { return ['current', 'label']; }
+    constructor() {
+      super();
+      this.attachShadow({ mode: 'open' });
+      this.shadowRoot.addEventListener('click', e => {
+        const a = e.target.closest('a[data-id]'); if (!a) return;
+        if (e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;   // neuer Tab bleibt Sache des Browsers
+        e.preventDefault();
+        const it = ITEMS.find(x => x.id === a.dataset.id); if (!it) return;
+        const ok = this.dispatchEvent(new CustomEvent('relihub-leiste-select', { detail: { id: it.id, href: it.href, kind: it.kind }, bubbles: true, composed: true, cancelable: true }));
+        if (ok) location.href = it.href;
+      });
+    }
+    connectedCallback() { this.render(); }
+    attributeChangedCallback() { if (this.isConnected) this.render(); }
+    render() {
+      const cur = this.getAttribute('current'), label = this.getAttribute('label') || 'Orte';
+      const link = it => `<a href="${esc(it.href)}" data-id="${esc(it.id)}"${it.id === cur ? ' class="on" aria-current="page"' : ''}>${it.kind === 'community' ? RING : ''}${it.short ? `<span class="long">${esc(it.label)}</span><span class="short">${esc(it.short)}</span>` : esc(it.label)}</a>`;
+      const inst = ITEMS.filter(x => x.kind !== 'community'), comm = ITEMS.filter(x => x.kind === 'community');
+      this.shadowRoot.innerHTML = `<style>${CSS}</style><nav aria-label="${esc(label)}"><span class="lbl">${esc(label)}</span>${inst.map(link).join('')}${comm.length ? '<span class="sep" aria-hidden="true"></span>' + comm.map(link).join('') : ''}</nav>`;
+    }
+  }
+
+  function setItems(items) {
+    ITEMS = (items || []).slice();
+    document.querySelectorAll('relihub-leiste').forEach(n => { if (n.render) n.render(); });   // noch nicht aufgerüstete Elemente rendern beim Einhängen
+  }
+  window.RelihubLeiste = { version: '0.1.0', setItems };
+  if (!customElements.get('relihub-leiste')) customElements.define('relihub-leiste', RelihubLeisteElement);
+})();
 </script>
 <script>
 (() => {
@@ -2647,6 +2726,23 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     }
   });
 
+  // ---------- Leiste unten links (Orte): Daten für <relihub-leiste>, das Widget selbst steht im zweiten Skript ----------
+  const LEISTE = [
+    { id: 'start', label: 'Start', href: '#start', kind: 'instanz' },
+    { id: 'materialpool', label: 'Materialpool', short: 'Pool', href: '#materialpool', kind: 'instanz' },
+    { id: 'relilab', label: 'relilab', href: '#relilab', kind: 'instanz' },
+    { id: 'relidesk', label: 'relidesk', href: '#relidesk', kind: 'instanz' },
+    { id: 'oercommunity', label: 'FOERBICO', href: '#oercommunity', kind: 'instanz' }
+  ];
+  // Angemeldet kommen die Communities dazu, in denen die Persona Mitglied ist (nur solche mit eigenem Raum)
+  function leisteItems() {
+    if (!LOGGED) return LEISTE;
+    return LEISTE.concat(COMM.filter(c => c[1] === 'Mitglied' && c[4]).map(c => ({ id: 'c-' + c[4], label: c[0].replace(/\u00ad/g, ''), href: '#community?c=' + c[4], kind: 'community' })));
+  }
+  const leisteEl = document.getElementById('leiste');
+  let leisteLogged = null;
+  document.addEventListener('relihub-leiste-select', e => { e.preventDefault(); go(e.detail.href.slice(1)); });
+
   // ---------- Ansichten (Hash-Routing) ----------
   const PRE_NAMES = { sek1: 'Sekundarstufe I' };
   // Eigene Navigation statt reiner Hash-Links: funktioniert auch in Vorschauen, die Links abfangen
@@ -2674,15 +2770,16 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     const [view, qs] = raw.split('?');
     const v = ['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity'].includes(view) ? view : (view === 'partner' || view === 'hilfe' ? 'start' : 'start');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
-    document.querySelectorAll('.proto a').forEach(a => a.classList.toggle('on', a.dataset.v === v));
     document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO' }[v];
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || 'relilab', pp.get('tab')); }
+    leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v);
     if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); }
     if (v === 'relilab') rlShow(qs);
     if (v === 'relidesk') rdTab(new URLSearchParams(qs || '').get('tab'));
+    if (v === 'profil') { LOGGED = true; if (MODUS !== 'direkt') setModus('direkt'); renderArtikel(); const zu = new URLSearchParams(qs || '').get('zu'); if (zu) setTimeout(() => { const t = document.getElementById(zu); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
+    if (leisteLogged !== LOGGED) { leisteLogged = LOGGED; RelihubLeiste.setItems(leisteItems()); }   // vor jedem return: Anmeldung/Abmeldung ändert die Communities
     if (view === 'partner') { setTimeout(() => document.getElementById('partner').scrollIntoView(), 30); return; }
     if (view === 'hilfe') { explainDefault(); setTimeout(() => document.getElementById('explain').scrollIntoView({ behavior: 'smooth', block: 'start' }), 30); return; }
-    if (v === 'profil') { LOGGED = true; if (MODUS !== 'direkt') setModus('direkt'); renderArtikel(); const zu = new URLSearchParams(qs || '').get('zu'); if (zu) setTimeout(() => { const t = document.getElementById(zu); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
     if (v === 'start') explainDefault();
     if (v === 'materialpool') {
       const p = new URLSearchParams(qs || ''), pre = document.getElementById('mpPre');
