@@ -33,6 +33,6 @@ Die Grundentscheidungen des Prototyps stehen als ADRs in `docs/adr/` (Vorlage un
 
 **Prüfungen:** `deno task test` führt textbasierte Prüfungen über `index.html` aus (Syntax aller Inline-Skripte, Farbkontraste aus den Variablen, Struktur der Ansichten, ADRs). Kein Build; die Datei bleibt direkt im Browser lauffähig.
 
-**Daten:** Ansichten laden live von den edufeed-Relays; ein eingebetteter Schnappschuss ist Startzustand und Rückfall, ohne Netz bleibt die Datei vorführbar. Jede Ansicht nennt ihren Datenstand (`live`, `Stand vom …` oder `Nachbau`). Vor Vorführungen den Schnappschuss mit `deno task schnappschuss` erneuern: siehe [docs/daten.md](docs/daten.md).
+**Daten:** relilab-Termine und rpi-virtuell laden live von den edufeed-Relays, die übrigen Ansichten zeigen einen Schnappschuss oder einen gekennzeichneten Nachbau (siehe [docs/daten.md](docs/daten.md)); bei relilab ist der eingebettete Schnappschuss Startzustand und Rückfall, ohne Netz bleibt die Datei vorführbar. Jede Ansicht nennt ihren Datenstand (`live`, `Stand vom …` oder `Nachbau`). Vor Vorführungen den Schnappschuss mit `deno task schnappschuss` erneuern: siehe [docs/daten.md](docs/daten.md).
 
 **Betrieb:** Forgejo-Arbeitskopie `Comenius-Institut/hub`, Auslieferung unter `hub.rpi-virtuell.net` (seit 04.11.2026 ohne GitHub Pages): siehe [docs/betrieb.md](docs/betrieb.md).
