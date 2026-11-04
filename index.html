@@ -14,6 +14,8 @@
   --t-hub:#E6EAF5;--t-finden:#DDF1F0;--t-erstellen:#FEEFD9;--t-koop:#FAE1EA;--t-ver:#EEE7F7;--t-profil:#E6EAF5;
   --ink:#1D1D1B;--muted:#5F5E5A;--line:#E7E4DC;--paper:#FBFAF7;--card:#FFFFFF;
   --mp:#00726D;--mp-dark:#004E4A;--mp-l1:#8FD3CE;--mp-l2:#3FA9A2;--mp-soft:#E3F2F1;
+  /* rpi-virtuell.de (Blocksy-Palette: Farbe 1 Leitfarbe, Farbe 5 Hellton); Textfarbe abgedunkelt, 4,5:1 auch auf dem Hellton */
+  --rv:#0072AA;--rv-x:#00669A;--rv-soft:#DFE8ED;
   /* FOERBICO-Palette (Styleguide oer.community) für das Schaufenster */
   --fo-blau:#203A8F;--fo-orange:#FFA500;--fo-titel:#002366;--fo-text:#333333;--fo-hell:#F0F8FF;--fo-kopf:#E6F2FF;--fo-rahmen:#D3D3D3;
   /* Steuerkonsole liest diese Werte; ohne sie gelten ihre eingebauten Standardfarben */
@@ -240,6 +242,44 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .mp-foot .in{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;align-items:center}
 .mp-foot .hubmark{display:inline-flex;align-items:center;gap:8px}
 .mp-foot svg{width:22px;height:22px}
+
+/* ---------- Ansicht 9: rpi-virtuell (Nachbau rpi-virtuell.de; Farben aus deren Theme, Schrift: System-Schrift dort, hier Inter) ---------- */
+#v-rpi-virtuell{font-family:Inter,system-ui,sans-serif;background:var(--card);color:var(--ink);font-size:16px;min-height:100vh}
+#v-rpi-virtuell .stand{color:var(--rv-x);margin-top:8px}
+.rv-head{background:var(--card);border-bottom:4px solid var(--rv)}
+.rv-in{max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+.rv-head .rv-in{display:flex;align-items:center;gap:12px;min-height:72px;flex-wrap:wrap}
+.rv-brand{font-weight:700;font-size:28px;letter-spacing:-.5px;color:var(--rv);text-decoration:none}
+.rv-head .sp{flex:1}
+.rv-prof{color:var(--rv-x);font-weight:600;text-decoration:none;font-size:15px}
+.rv-tabs{background:var(--rv)}
+.rv-tabs .rv-in{display:flex;gap:4px;flex-wrap:wrap}
+.rv-tabs button{border:0;background:transparent;font:inherit;font-weight:600;font-size:15px;text-transform:uppercase;color:var(--card);padding:12px 14px;cursor:pointer;border-bottom:3px solid transparent}
+.rv-tabs button.on{border-bottom-color:var(--card)}
+.rv-tabs button:hover{background:var(--rv-x)}
+.rv-pre{display:none;align-items:center;gap:10px;flex-wrap:wrap;background:var(--rv-soft);border-radius:10px;padding:10px 14px;margin:16px 0 0;font-size:15px}
+.rv-pre.on{display:flex}
+.rv-pre .tg{background:var(--card);color:var(--rv-x);border-radius:999px;padding:2px 10px;font-weight:600;font-size:14px}
+.rv-pre button{margin-left:auto;background:transparent;border:0;color:var(--rv-x);cursor:pointer;font-size:14px;text-decoration:underline}
+.rv-main{padding:24px 0 40px}
+.rv-main h2{color:var(--rv-x);font-size:26px;margin:0 0 14px}
+.rv-main [data-rvtab]{display:none}
+.rv-main [data-rvtab].on{display:block}
+.rv-lead{background:var(--rv-soft);border-left:5px solid var(--rv);padding:12px 16px;margin:0 0 18px}
+.rv-lead a,.rv-card a,.rv-row a,.rv-leer a{color:var(--rv-x);font-weight:600}
+.rv-card{border:1px solid var(--line);border-top:4px solid var(--rv);border-radius:6px;padding:20px 22px;max-width:640px}
+.rv-card h3{margin:0 0 8px;color:var(--rv-x)}
+.rv-row{display:grid;grid-template-columns:110px minmax(0,1fr);gap:4px 16px;padding:12px 0;border-bottom:1px solid var(--line)}
+.rv-row time{color:var(--rv-x);font-weight:600;font-size:14px}
+.rv-row b{display:block;line-height:1.35}
+.rv-row small{display:block;color:var(--muted);font-size:13px;margin-top:3px}
+.rv-row p{margin:4px 0 0;font-size:15px;color:var(--muted)}
+.rv-leer{color:var(--muted)}
+.rv-foot{border-top:1px solid var(--line);background:var(--rv-soft);padding:18px 0 26px;font-size:14px;color:var(--ink)}
+.rv-foot .rv-in{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;align-items:center}
+.rv-foot .hubmark{display:inline-flex;align-items:center;gap:8px}
+.rv-foot svg{width:22px;height:22px}
+@media (max-width:640px){.rv-row{grid-template-columns:1fr}}
 
 /* ---------- Ansicht 4: relilab (Nachbau relilab.org) ---------- */
 #v-relilab{background:#fff;color:#3A3F47;font-family:Roboto,system-ui,sans-serif;font-size:15px;min-height:100vh}
@@ -948,6 +988,44 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
     <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> Teil des reli_hub</span>
   </div></footer>
   <relihub-steuerkonsole id="mpFlower" floating size="58" popover-size="210" context="rpi-materialpool"></relihub-steuerkonsole>
+</div>
+
+<!-- ===================== Ansicht 9: rpi-virtuell (Nachbau rpi-virtuell.de) ===================== -->
+<div class="view" id="v-rpi-virtuell" data-stand="nachbau:Termine und News laden">
+  <header class="rv-head"><div class="rv-in">
+    <a class="rv-brand" href="#rpi-virtuell">rpi-virtuell</a>
+    <span class="sp"></span>
+    <a class="rv-prof" href="#profil">Mein Profil</a>
+  </div></header>
+  <nav class="rv-tabs" aria-label="rpi-virtuell"><div class="rv-in">
+    <button type="button" data-rvgo="material">Material</button><button type="button" data-rvgo="fortbildungen">Fortbildungen</button><button type="button" data-rvgo="news">News</button>
+  </div></nav>
+  <p class="stand" aria-live="polite"></p>
+  <main class="rv-main"><div class="rv-in">
+    <div class="rv-pre" id="rvPre"></div>
+    <section data-rvtab="material">
+      <h2>Material</h2>
+      <div class="rv-card">
+        <h3>Materialpool Religion</h3>
+        <p>Der Materialpool ist der Katalog von rpi-virtuell: geprüftes, offen lizenziertes Material für Schule, Kita, Gemeinde und Bildungsarbeit.</p>
+        <a href="#materialpool">Zum Materialpool ›</a>
+      </div>
+    </section>
+    <section data-rvtab="fortbildungen">
+      <h2>Fortbildungen</h2>
+      <p class="rv-lead">Fortbildung der Institute: mit Anmeldung, in klarer Verantwortung, mit Teilnahmebescheinigung. Zum Ausprobieren ohne Anmeldung: das <a href="#relilab">relilab</a>.</p>
+      <div id="rvTermine"><p class="rv-leer">Termine werden geladen …</p></div>
+    </section>
+    <section data-rvtab="news">
+      <h2>News</h2>
+      <div id="rvNews"><p class="rv-leer">News werden geladen …</p></div>
+    </section>
+  </div></main>
+  <footer class="rv-foot"><div class="rv-in">
+    <span>Termine und News live von wss://relay.edufeed.org und wss://relay-rpi.edufeed.org · Original: <a href="https://rpi-virtuell.de" target="_blank" rel="noopener">rpi-virtuell.de</a></span>
+    <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> Teil des reli_hub</span>
+  </div></footer>
+  <relihub-steuerkonsole id="rvFlower" floating size="58" popover-size="210" context="rpi-virtuell"></relihub-steuerkonsole>
 </div>
 
 <!-- ===================== Ansicht 4: relilab (Nachbau relilab.org) ===================== -->
@@ -1797,7 +1875,7 @@ a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     'finden': { fn:'finden', t:'Material, Fortbildungen und Beiträge', p:'Geprüftes, offen lizenziertes Material, digitale Fortbildungen und Artikel aus deinen Communities – an einem Ort auffindbar. Lehr- und Lerninhalte liegen im Materialpool, Beiträge kommen aus Communities und Instanzen.', subs:['finden.material','finden.fortbildungen','finden.beitraege'] },
     'finden.material': { fn:'finden › Material', t:'Material', p:'Finde aktuelles, redaktionell geprüftes Material zu deinen Themen und deiner Zielgruppe.', go:['Zum Materialpool','#materialpool'] },
     'finden.beitraege': { fn:'finden › Beiträge', t:'Artikel und Nachrichten', p:'Artikel und Nachrichten aus deinen Communities und Instanzen. Lehr- und Lerninhalte findest du im Materialpool.', go:['Zu den Artikeln','#profil?zu=artikel'] },
-    'finden.fortbildungen': { fn:'finden › Fortbildungen', t:'Fortbildungen', p:'Entdecke digitale Fortbildungen religionspädagogischer Institute und Communities – deutschlandweit, meist online, in einem gemeinsamen Kalender.', go:['Zum Fortbildungskalender',null] },
+    'finden.fortbildungen': { fn:'finden › Fortbildungen', t:'Fortbildungen', p:'Entdecke digitale Fortbildungen religionspädagogischer Institute und Communities – deutschlandweit, meist online, in einem gemeinsamen Kalender.', go:['Zum Fortbildungskalender','#rpi-virtuell?tab=fortbildungen'] },
     'erstellen': { fn:'erstellen', t:'Unterricht vorbereiten, Material entwickeln', p:'Allein am eigenen Schreibtisch oder gemeinsam im Labor: Hier wird aus Material Unterricht – und aus Ideen neues Material.', lock:true, subs:['erstellen.schreibtisch','erstellen.labor'] },
     'erstellen.schreibtisch': { fn:'erstellen › Schreibtisch', t:'Mein Schreibtisch', p:'Sammle Materialien auf deinem digitalen Schreibtisch, ordne sie, passe sie an und plane daraus deine nächste Lernsequenz.', lock:true, go:['Zum relidesk','#relidesk?tab=schreibtisch'] },
     'erstellen.labor': { fn:'erstellen › Labor', t:'Unser Labor', p:'Entwickle gemeinsam mit anderen Material weiter, erprobe Neues und hol dir Rückmeldung. Stelle Unfertiges vor und lade zum Mitmachen ein.', lock:true, go:['Ins relilab','#relilab'] },
@@ -1868,7 +1946,7 @@ a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   // ---------- Partnerseiten ----------
   const PARTNERS = [
     ['rpi-virtuell Materialpool', 'Material finden', 'finden', 'MP', '#materialpool', 'Offener Materialpool für Schule, Kita, Gemeinde und Bildungsarbeit. Die Materialdaten kommen aus dem Nostr-Netz (edufeed).'],
-    ['rpi-virtuell Fortbildungs\u00adkalender', 'Fortbildungen finden', 'finden', 'FK', null, 'Digitale Fortbildungen religionspädagogischer Institute und Communities aus ganz Deutschland in einem gemeinsamen Kalender.'],
+    ['rpi-virtuell', 'Materialpool, Fortbildungen, News', 'finden', 'rv', '#rpi-virtuell', 'Die Angebote der religionspädagogischen Institute an einem Ort: Materialpool, Fortbildungskalender und Bildungsnews. Fortbildung mit Anmeldung und Bescheinigung; zum Ausprobieren gibt es das relilab.'],
     ['relilab', 'gemeinsam Material entwickeln', 'erstellen', 'rl', '#relilab', 'Netzwerk für religiöses Lehren und Lernen unter dem Vorzeichen der Digitalität: Lernbausteine gestalten, Live-Anlässe, kollegialer Austausch.'],
     ['relidesk', 'Unterricht am Schreibtisch planen', 'erstellen', 'rd', '#relidesk', 'Digitaler Schreibtisch: Materialien sammeln, ordnen, anpassen und daraus die nächste Unterrichtsstunde planen.'],
     ['relimentar', 'Elementarpädagogik', 'kooperieren', 're', null, 'Religionspädagogisches Material für Kitas – Krippe, Kindergarten und Hort – mit Fortbildungen und regionalen Anbietern.'],
@@ -2009,7 +2087,7 @@ a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   // ---------- Editoren (Nachbau der edufeed-Editoren): Termin und Lerninhalt ----------
   const EF = document.getElementById('efOverlay');
   const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const CTX_NAME = { hub: 'reli_hub', relilab: 'relilab', materialpool: 'rpi-virtuell Materialpool', relidesk: 'relidesk' };
+  const CTX_NAME = { hub: 'reli_hub', relilab: 'relilab', materialpool: 'rpi-virtuell Materialpool', relidesk: 'relidesk', 'rpi-virtuell': 'rpi-virtuell' };
   function efOpen(html) { EF.innerHTML = html; EF.hidden = false; document.body.style.overflow = 'hidden'; const f = EF.querySelector('[autofocus]'); if (f) setTimeout(() => f.focus(), 30); }
   function efClose() { EF.hidden = true; EF.innerHTML = ''; document.body.style.overflow = ''; }
 
@@ -2315,6 +2393,7 @@ a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     { id: 'interrel', n: 'relilab|interreligiös', ab: 'ir', col: C.kooperieren, ty: 'thema', rl: 1, bio: 'Christentum und Islam im Klassenzimmer.', back: 'ptz und ZSL Baden-Württemberg entwickeln kreative digitale Ideen zu Themen, die Christentum und Islam gleichermaßen betreffen – für Klassen mit Schüler:innen verschiedener Religionen.', inst: ['relilab', 'relilab'], m: 33, series: [['relilab|interreligiös', 'mit Anmeldung, im geschützten Moodle-Raum']] },
     { id: 'makerspace', n: 'Makerspace asynchrone Lernressourcen', ab: 'MS', col: C.erstellen, tx: '#2B1A00', ty: 'thema', rl: 1, bio: 'Wie lassen sich asynchrone Lernressourcen didaktisch gestalten?', back: 'Im Makerspace geht es um die Frage, wie asynchrone Lernressourcen didaktisch gestaltet werden können – einmal im Monat, praktisch und gemeinsam.', inst: ['relilab', 'relilab'], m: 27, series: [['Makerspace „asynchrone Lernressourcen“', 'einmal im Monat']] },
     { id: 'frieden', n: 'Friedenspädagogik', ab: 'FP', col: C.kooperieren, ty: 'thema', mine: 'Mitglied', bio: 'Frieden lernen – in Schule und Gemeinde.', back: 'Lehrkräfte, Gemeindepädagog:innen und Engagierte aus der Friedensarbeit teilen Material und Erfahrungen zur Friedensbildung.', inst: ['Friedensarbeit EKD', null], m: 49 },
+    { id: 'rpi-virtuell', n: 'rpi-virtuell', ab: 'rv', col: C.finden, ty: 'netz', bio: 'Redaktionskreis und Institute hinter Materialpool, Fortbildungskalender und Bildungsnews.', back: 'Der Redaktionskreis von rpi-virtuell und die religionspädagogischen Institute, die Material sichten, Fortbildungen in den gemeinsamen Kalender stellen und die Bildungsnews schreiben: die Menschen hinter den rezeptiven Angeboten.', inst: ['rpi-virtuell', 'rpi-virtuell'], m: 35 },
     { id: 'oercommunity', n: 'OER-Community', ab: 'OC', col: C.hub, ty: 'netz', ver: true, mine: 'folge ich', bio: 'Community of Communities des Projekts FOERBICO: Vernetzung religionsbezogener OER-Communities, gemeinsame Qualitätskriterien und Metadatenstandards.', back: 'Wer selbst offene Materialien erstellt oder in einem Netzwerk daran mitarbeitet, findet hier Austausch, Tagungen und Wissensgrundlagen zu OER.', inst: ['OER-Community', 'oercommunity'], m: 9, series: [] }
   ];
   const cyFollow = new Set(CY.filter(c => c.mine).map(c => c.id));
@@ -2645,10 +2724,59 @@ a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   });
   document.getElementById('rtQ').addEventListener('input', e => { rt.q = e.target.value.trim(); rt.m = null; rtSync(); rtRender(); });
 
+  // ---------- rpi-virtuell: Material, Fortbildungen über alle Absender, News der Redaktion (live, ADR-0006) ----------
+  // News-Redaktion rpi-virtuell: der Schlüssel hat kein Profil, deshalb steht der Name hier
+  const RV_NEWS = 'npub12jguyxp6sdanpafe3mjelezm7dtlzuxqwc4qczdkr260azqqsstq05rr6j';
+  const fRvD = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const fRvZ = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' });
+  let rvTab = 'material', rvGeholt = false, rvDaten = null, rvThemen = [];
+  /** Absender eines Termins: bekannter Name aus RT_SRC, sonst gekürzter npub */
+  function rvAbs(pk) { return RT_HEX[pk] || (bech32('npub', pk.match(/../g).map(h => parseInt(h, 16))).slice(0, 14) + '…'); }
+  function rvLeer() { return '<p class="rv-leer">Gerade keine Verbindung zu den Relays; die Termine stehen auch unter <a href="https://rpi-virtuell.de" target="_blank" rel="noopener">rpi-virtuell.de</a>.</p>'; }
+  function rvRender(termine, news) {
+    const tEl = document.getElementById('rvTermine'), nEl = document.getElementById('rvNews');
+    if (!termine) { tEl.innerHTML = nEl.innerHTML = rvLeer(); return; }
+    const jetzt = Date.now() / 1000;
+    let list = termine.filter(e => e.s >= jetzt).sort((a, b) => a.s - b.s);
+    if (rvThemen.length) list = list.filter(e => rvThemen.some(t => (e.t + ' ' + e.g.join(' ')).toLowerCase().includes(t.toLowerCase())));
+    tEl.innerHTML = list.length ? list.slice(0, 40).map(e => `<div class="rv-row"><time>${fRvD.format(e.s * 1000)}<br>${fRvZ.format(e.s * 1000)} Uhr</time><div><b><a href="${rtEsc(e.u)}" target="_blank" rel="noopener">${rtEsc(e.t || 'ohne Titel')}</a></b><small>${rtEsc(e.a)}${e.l ? ' · ' + rtEsc(e.l) : ''}</small></div></div>`).join('')
+      : '<p class="rv-leer">Keine bevorstehenden Termine gefunden.</p>';
+    nEl.innerHTML = news.length ? news.map(n => `<div class="rv-row"><time>${fRvD.format(n.d * 1000)}</time><div><b><a href="${rtEsc(n.u)}" target="_blank" rel="noopener">${rtEsc(n.t)}</a></b>${n.x ? `<p>${rtEsc(n.x)}</p>` : ''}<small>News-Redaktion rpi-virtuell</small></div></div>`).join('')
+      : '<p class="rv-leer">Gerade keine News von der Redaktion.</p>';
+  }
+  function rvOpen(qs) {
+    const p = new URLSearchParams(qs || '');
+    const tab = ['material', 'fortbildungen', 'news'].includes(p.get('tab')) ? p.get('tab') : 'material';
+    rvTab = tab;
+    document.querySelectorAll('#v-rpi-virtuell [data-rvtab]').forEach(n => n.classList.toggle('on', n.dataset.rvtab === tab));
+    document.querySelectorAll('#v-rpi-virtuell [data-rvgo]').forEach(b => { b.classList.toggle('on', b.dataset.rvgo === tab); b.setAttribute('aria-pressed', b.dataset.rvgo === tab); });
+    rvThemen = p.getAll('thema');   // Vorauswahl über die Steuerkonsole filtert die Termine
+    const pre = document.getElementById('rvPre'); pre.classList.toggle('on', rvThemen.length > 0);
+    pre.innerHTML = rvThemen.length ? `Vorauswahl über die reli_hub-Steuerkonsole: ${rvThemen.map(t => `<span class="tg">${rtEsc(t)}</span>`).join('')}<button type="button" data-rvgo="${tab}">Vorauswahl entfernen</button>` : '';
+    if (rvDaten) rvRender(rvDaten[0], rvDaten[1]);
+    if (rvGeholt) return; rvGeholt = true;   // einmal je Sitzung; hubFetch hält das Ergebnis zusätzlich 60 s im Zwischenspeicher
+    hubFetch('rpi-virtuell', [
+      { kinds: [31923], since: Math.floor(Date.now() / 1000) - 180 * 86400, limit: 300 },
+      { kinds: [30023], authors: [npubToHex('npub12jguyxp6sdanpafe3mjelezm7dtlzuxqwc4qczdkr260azqqsstq05rr6j')], limit: 10 }
+    ], { relays: ['wss://relay.edufeed.org', 'wss://relay-rpi.edufeed.org'] }).then(evs => {
+      if (!evs.length) { rvDaten = null; datenstand('v-rpi-virtuell', 'nachbau', 'Relay nicht erreichbar'); rvRender(null); return; }
+      const tag = (ev, k) => (ev.tags.find(t => t[0] === k) || [])[1] || '';
+      const neu = new Map();   // adressierbare Events: je Adresse (kind:pubkey:d) gilt die neueste Fassung, auch über beide Relays
+      evs.forEach(ev => { const a = ev.kind + ':' + ev.pubkey + ':' + tag(ev, 'd'), b = neu.get(a); if (!b || ev.created_at > b.created_at) neu.set(a, ev); });
+      const alle = [...neu.values()];
+      const termine = alle.filter(ev => ev.kind === 31923).map(ev => Object.assign(evToTermin(ev), { a: rvAbs(ev.pubkey) }));
+      // „[entfernt]“ ist der Platzhalter, mit dem die Redaktion zurückgezogene Beiträge überschreibt
+      const news = alle.filter(ev => ev.kind === 30023 && tag(ev, 'title') !== '[entfernt]').map(ev => ({ t: tag(ev, 'title') || 'ohne Titel', d: +tag(ev, 'published_at') || ev.created_at, x: tag(ev, 'summary'), u: 'https://edufeed.org/' + naddr(tag(ev, 'd'), ev.pubkey, 30023) })).sort((a, b) => b.d - a.d).slice(0, 10);
+      rvDaten = [termine, news];
+      datenstand('v-rpi-virtuell', 'live', `${termine.filter(e => e.s >= Date.now() / 1000).length} Termine · ${news.length} News`);
+      rvRender(termine, news);
+    });
+  }
+  document.getElementById('v-rpi-virtuell').addEventListener('click', e => { const b = e.target.closest('[data-rvgo]'); if (b) go('rpi-virtuell?tab=' + b.dataset.rvgo); });
 
   // ---------- Kontexte der Steuerkonsole: dieselbe Steuerkonsole, je nach Seite andere Aktionen ----------
   let LOGGED = false;
-  const VIEW_OF = { 'finden.material': 'materialpool', 'finden.beitraege': 'profil?zu=artikel', 'hub.profil': 'profil', 'hub.home': 'start', 'erstellen.labor': 'relilab', 'erstellen.schreibtisch': 'relidesk?tab=schreibtisch' };
+  const VIEW_OF = { 'finden.material': 'materialpool', 'finden.beitraege': 'profil?zu=artikel', 'hub.profil': 'profil', 'hub.home': 'start', 'erstellen.labor': 'relilab', 'erstellen.schreibtisch': 'relidesk?tab=schreibtisch', 'finden.fortbildungen': 'rpi-virtuell?tab=fortbildungen' };
   function navTo(view, url) { const q = new URL(url).search; go(view + (q ? (view.includes('?') ? '&' + q.slice(1) : q) : '')); }
   function info(d) {
     if (!['finden', 'erstellen', 'kooperieren', 'veroeffentlichen'].includes(d.action)) return false;
@@ -2684,6 +2812,18 @@ a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     handler: d => {
       if (d.action === 'finden.material') { window.scrollTo({ top: 0, behavior: 'smooth' }); toast('Du bist bereits im Materialpool.'); return false; }
       return standardAktion(d, 'materialpool');
+    }
+  });
+  RelihubSteuerkonsole.registerContext('rpi-virtuell', {
+    handler: d => {
+      if (d.action === 'finden.fortbildungen') {
+        if (CUR.split('?')[0] === 'rpi-virtuell' && rvTab === 'fortbildungen') { window.scrollTo({ top: 0, behavior: 'smooth' }); toast('Du bist bereits bei den Fortbildungen.'); }
+        else go('rpi-virtuell?tab=fortbildungen');
+        return false;
+      }
+      if (d.action === 'finden.material') { go('materialpool'); return false; }
+      if (d.action === 'erstellen.labor') { go('relilab'); return false; }
+      return standardAktion(d, 'rpi-virtuell');
     }
   });
   RelihubSteuerkonsole.registerContext('oer-community', {
@@ -2731,6 +2871,7 @@ a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     { id: 'start', label: 'Start', href: '#start', kind: 'instanz' },
     { id: 'materialpool', label: 'Materialpool', short: 'Pool', href: '#materialpool', kind: 'instanz' },
     { id: 'relilab', label: 'relilab', href: '#relilab', kind: 'instanz' },
+    { id: 'rpi-virtuell', label: 'rpi-virtuell', short: 'rpi', href: '#rpi-virtuell', kind: 'instanz' },
     { id: 'relidesk', label: 'relidesk', href: '#relidesk', kind: 'instanz' },
     { id: 'oercommunity', label: 'FOERBICO', href: '#oercommunity', kind: 'instanz' }
   ];
@@ -2768,13 +2909,14 @@ a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     exEl.classList.remove('sheet');   // jeder Routenwechsel schließt das Sheet
     const raw = CUR;
     const [view, qs] = raw.split('?');
-    const v = ['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity'].includes(view) ? view : (view === 'partner' || view === 'hilfe' ? 'start' : 'start');
+    const v = ['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell'].includes(view) ? view : (view === 'partner' || view === 'hilfe' ? 'start' : 'start');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
-    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO' }[v];
+    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || 'relilab', pp.get('tab')); }
     leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v);
     if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); }
     if (v === 'relilab') rlShow(qs);
+    if (v === 'rpi-virtuell') rvOpen(qs);
     if (v === 'relidesk') rdTab(new URLSearchParams(qs || '').get('tab'));
     if (v === 'profil') { LOGGED = true; if (MODUS !== 'direkt') setModus('direkt'); renderArtikel(); const zu = new URLSearchParams(qs || '').get('zu'); if (zu) setTimeout(() => { const t = document.getElementById(zu); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
     if (leisteLogged !== LOGGED) { leisteLogged = LOGGED; RelihubLeiste.setItems(leisteItems()); }   // vor jedem return: Anmeldung/Abmeldung ändert die Communities
