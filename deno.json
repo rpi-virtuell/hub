@@ -1,1 +1,6 @@
-{ "tasks": { "test": "deno test --allow-read tests/" } }
+{
+  "tasks": {
+    "test": "deno test --allow-read tests/",
+    "schnappschuss": "deno run --allow-net --allow-read --allow-write tools/schnappschuss.ts"
+  }
+}
