@@ -105,6 +105,7 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .explain h2{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:30px;line-height:1.1;margin:2px 0 6px}
 .explain p{margin:0 0 14px;color:#3D3D3A}
 .explain .acts{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.explain .acts .modus{margin-left:auto}
 .explain .hint{font-size:14px;color:var(--muted)}
 .explain.anim{animation:pop .28s cubic-bezier(.3,1.3,.5,1)}
 @keyframes pop{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
@@ -760,6 +761,7 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
     <a class="brand" href="#start"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg>reli_hub<small>Startplatz Religionspädagogik</small></a>
     <span class="sp"></span>
     <nav>
+      <a href="#hilfe">Hilfe</a>
       <a href="#partner">Ökosystem</a>
       <a class="btn btn-profil" href="#profil">Anmelden</a>
     </nav>
@@ -1720,6 +1722,17 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     'veroeffentlichen.beitrag': { fn:'veröffentlichen › Beitrag', t:'Beitrag', p:'Schreibe einen Blogbeitrag, berichte aus deiner Praxis oder stelle ein Projekt vor. Dein Beitrag erscheint in deinem Profil und in den Communities, denen du ihn zuordnest.', lock:true, go:['Beitrag schreiben','@beitrag'] }
   };
   const exEl = document.getElementById('explain');
+  // Kleiner Speicher: ein Argument liest, zwei schreiben; ohne localStorage (privates Fenster, gesperrt) einfach null
+  function speicher(key, value) {
+    if (arguments.length < 2) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+    try { localStorage.setItem(key, value); return value; } catch (e) { return null; }
+  }
+  // Tutorialmodus: Knospen auf der Startseite erklären; Direktmodus: Knospen führen sofort zur Aktion
+  let MODUS = speicher('relihub-modus') || 'tutorial';
+  function setModus(m) {
+    MODUS = m; speicher('relihub-modus', m);
+    if (document.getElementById('v-start').classList.contains('on')) explainDefault();
+  }
   function icon(fnKey) {
     const only = fnKey.split('.')[0];
     return `<svg class="ic" viewBox="-205 -205 410 410" aria-hidden="true">${ORDER.map((k, i) => {
@@ -1729,7 +1742,11 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   }
   function explainDefault() {
     exEl.style.borderColor = '';
-    exEl.innerHTML = `${icon('none')}<div><p class="fn" style="color:var(--muted)">So funktioniert's</p><h2>Wähle einen Bereich der Steuerkonsole</h2><p>Fahre an den äußeren Rand eines Kreises – er springt heraus. Klicke ihn oder eine seiner Knospen an, und hier erfährst du, worum es geht.</p><div class="acts"><span class="hint">Schon dabei?</span><a class="btn btn-ghost" href="#profil">Anmelden</a></div></div>`;
+    const direkt = MODUS === 'direkt';
+    const kopf = direkt ? `<h2>Die Konsole führt dich direkt zur Aktion</h2><p>Ein Klick auf eine Knospe öffnet sofort, was dahintersteht. Unter „Hilfe“ zeigt dir die Konsole die Erklärungen wieder.</p>`
+      : `<h2>Wähle einen Bereich der Steuerkonsole</h2><p>Fahre an den äußeren Rand eines Kreises – er springt heraus. Klicke ihn oder eine seiner Knospen an, und hier erfährst du, worum es geht.</p>`;
+    const umschalter = direkt ? `<button type="button" class="btn btn-ghost modus" data-modus="tutorial">Konsole wieder erklären lassen</button>` : `<button type="button" class="btn btn-ghost modus" data-modus="direkt">Verstanden, direkt loslegen</button>`;
+    exEl.innerHTML = `${icon('none')}<div><p class="fn" style="color:var(--muted)">So funktioniert's</p>${kopf}<div class="acts"><span class="hint">Schon dabei?</span><a class="btn btn-ghost" href="#profil">Anmelden</a>${umschalter}</div></div>`;
   }
   function explain(action) {
     const e = EX[action]; if (!e) return;
@@ -1743,7 +1760,10 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   }
   explainDefault();
   document.getElementById('logout').addEventListener('click', () => { LOGGED = false; });
-  document.addEventListener('click', e => { const b = e.target.closest('[data-ex]'); if (b) explain(b.dataset.ex); });
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-ex]'); if (b) explain(b.dataset.ex);
+    const m = e.target.closest('[data-modus]'); if (m) setModus(m.dataset.modus);
+  });
   const sf = document.getElementById('startFlower');
   const fit = () => sf.setAttribute('size', window.innerWidth < 640 ? '240' : '320');
   fit(); window.addEventListener('resize', fit);
@@ -2539,44 +2559,41 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   }
   function later(d) { toast(`<b>${d.label}</b> führt später hierhin:<br><code>${d.url}</code>`); }
 
+  // Gemeinsame Kette aller Kontexte: Knospe → Aktion (Editor, Ansicht), sonst Hinweis oder „führt später hierhin“
+  function standardAktion(d, ctx) {
+    if (d.action === 'kooperieren.communities') { go('communities'); return false; }
+    if (d.action === 'veroeffentlichen.beitrag') { openBlog(ctx); return false; }
+    if (d.action === 'veroeffentlichen.termin') { openEvent(ctx); return false; }
+    if (d.action === 'veroeffentlichen.lerninhalte') { openChooser(ctx); return false; }
+    if (d.action === 'hub') { go(LOGGED ? 'profil' : 'start'); return false; }
+    if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); return false; }
+    if (info(d)) return false;
+    later(d); return false;
+  }
+
   RelihubSteuerkonsole.registerContext('hub-start', {
     onActivate: d => explain(d.action),
-    handler: d => { explain(d.action); exEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); return false; }
+    handler: d => {
+      if (MODUS === 'direkt' && d.action.includes('.')) return standardAktion(d, 'hub');
+      explain(d.action); exEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); return false;
+    }
   });
   RelihubSteuerkonsole.registerContext('hub-profil', {
     actions: { 'finden.material': { params: { thema: ['Schöpfung', 'Friedenspädagogik', 'KI im Religionsunterricht'], stufe: 'sek1' } } },
-    handler: d => {
-      if (d.action === 'kooperieren.communities') { go('communities'); return false; }
-      if (d.action === 'veroeffentlichen.beitrag') { openBlog('hub'); return false; }
-      if (d.action === 'veroeffentlichen.termin') { openEvent('hub'); return false; }
-      if (d.action === 'veroeffentlichen.lerninhalte') { openChooser('hub'); return false; }
-      if (d.action === 'hub') { go(LOGGED ? 'profil' : 'start'); return false; }
-      if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); return false; }
-      if (info(d)) return false;
-      later(d); return false;
-    }
+    handler: d => { return standardAktion(d, 'hub'); }
   });
   RelihubSteuerkonsole.registerContext('rpi-materialpool', {
     handler: d => {
-      if (d.action === 'kooperieren.communities') { go('communities'); return false; }
-      if (d.action === 'veroeffentlichen.beitrag') { openBlog('materialpool'); return false; }
       if (d.action === 'finden.material') { window.scrollTo({ top: 0, behavior: 'smooth' }); toast('Du bist bereits im Materialpool.'); return false; }
-      if (d.action === 'hub') { go(LOGGED ? 'profil' : 'start'); return false; }
-      if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); return false; }
-      if (info(d)) return false;
-      later(d); return false;
+      return standardAktion(d, 'materialpool');
     }
   });
   RelihubSteuerkonsole.registerContext('oer-community', {
     handler: d => {
       if (d.action === 'hub.home') { go('start'); return false; }
-      if (d.action === 'hub') { go(LOGGED ? 'profil' : 'start'); return false; }
       if (d.action === 'finden.material') { go('materialpool?thema=OER'); return false; }
-      if (d.action === 'veroeffentlichen.beitrag') { openBlog('OER-Community'); return false; }
       if (d.action === 'kooperieren.communities') { go('community?c=oercommunity'); return false; }
-      if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); return false; }
-      if (info(d)) return false;
-      later(d); return false;
+      return standardAktion(d, 'OER-Community');
     }
   });
   RelihubSteuerkonsole.registerContext('relilab', {
@@ -2584,55 +2601,30 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     handler: d => {
       if (d.action === 'kooperieren.communities') { go('relilab?tab=communities'); return false; }
       if (d.action === 'finden.fortbildungen') { go('relilab?tab=termine&von=konsole'); return false; }
-
-      if (d.action === 'veroeffentlichen.beitrag') { openBlog('relilab'); return false; }
-      if (d.action === 'veroeffentlichen.termin') { openEvent('relilab'); return false; }
-      if (d.action === 'veroeffentlichen.lerninhalte') { openChooser('relilab'); return false; }
       if (d.action === 'erstellen.labor') { go('relilab'); toast('Du bist im relilab.'); return false; }
-      if (d.action === 'hub') { go(LOGGED ? 'profil' : 'start'); return false; }
-      if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); return false; }
-      if (info(d)) return false;
-      later(d); return false;
+      return standardAktion(d, 'relilab');
     }
   });
 
   RelihubSteuerkonsole.registerContext('relidesk', {
     actions: { 'finden.material': { params: { thema: 'Schöpfung', stufe: 'sek1' } } },
     handler: d => {
-      if (d.action === 'kooperieren.communities') { go('communities'); return false; }
-      if (d.action === 'veroeffentlichen.beitrag') { openBlog('relidesk'); return false; }
       if (d.action === 'erstellen.schreibtisch') { go('relidesk?tab=schreibtisch'); toast('Du bist auf deinem Schreibtisch im relidesk.'); return false; }
-      if (d.action === 'hub') { go(LOGGED ? 'profil' : 'start'); return false; }
-      if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); return false; }
-      if (info(d)) return false;
-      later(d); return false;
+      return standardAktion(d, 'relidesk');
     }
   });
 
   RelihubSteuerkonsole.registerContext('hub-communities', {
     handler: d => {
       if (d.action === 'kooperieren.communities') { window.scrollTo({ top: 0, behavior: 'smooth' }); toast('Du bist bereits bei den Communities.'); return false; }
-      if (d.action === 'veroeffentlichen.termin') { openEvent('hub'); return false; }
-      if (d.action === 'veroeffentlichen.lerninhalte') { openChooser('hub'); return false; }
-      if (d.action === 'veroeffentlichen.beitrag') { openBlog('hub'); return false; }
-      if (d.action === 'hub') { go(LOGGED ? 'profil' : 'start'); return false; }
-      if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); return false; }
-      if (info(d)) return false;
-      later(d); return false;
+      return standardAktion(d, 'hub');
     }
   });
 
   RelihubSteuerkonsole.registerContext('hub-community', {
     handler: d => {
       const c = CY.find(x => x.id === crId), nm = c ? c.n : 'Community';
-      if (d.action === 'kooperieren.communities') { go('communities'); return false; }
-      if (d.action === 'veroeffentlichen.termin') { openEvent(nm); return false; }
-      if (d.action === 'veroeffentlichen.lerninhalte') { openChooser(nm); return false; }
-      if (d.action === 'veroeffentlichen.beitrag') { openBlog(nm); return false; }
-      if (d.action === 'hub') { go(LOGGED ? 'profil' : 'start'); return false; }
-      if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); return false; }
-      if (info(d)) return false;
-      later(d); return false;
+      return standardAktion(d, nm);
     }
   });
 
@@ -2660,7 +2652,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   function route() {
     const raw = CUR;
     const [view, qs] = raw.split('?');
-    const v = ['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity'].includes(view) ? view : (view === 'partner' ? 'start' : 'start');
+    const v = ['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity'].includes(view) ? view : (view === 'partner' || view === 'hilfe' ? 'start' : 'start');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
     document.querySelectorAll('.proto a').forEach(a => a.classList.toggle('on', a.dataset.v === v));
     document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO' }[v];
@@ -2669,7 +2661,8 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     if (v === 'relilab') rlShow(qs);
     if (v === 'relidesk') rdTab(new URLSearchParams(qs || '').get('tab'));
     if (view === 'partner') { setTimeout(() => document.getElementById('partner').scrollIntoView(), 30); return; }
-    if (v === 'profil') { LOGGED = true; renderArtikel(); const zu = new URLSearchParams(qs || '').get('zu'); if (zu) setTimeout(() => { const t = document.getElementById(zu); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
+    if (view === 'hilfe') { explainDefault(); setTimeout(() => document.getElementById('explain').scrollIntoView({ behavior: 'smooth', block: 'start' }), 30); return; }
+    if (v === 'profil') { LOGGED = true; if (MODUS !== 'direkt') setModus('direkt'); renderArtikel(); const zu = new URLSearchParams(qs || '').get('zu'); if (zu) setTimeout(() => { const t = document.getElementById(zu); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
     if (v === 'start') explainDefault();
     if (v === 'materialpool') {
       const p = new URLSearchParams(qs || ''), pre = document.getElementById('mpPre');
