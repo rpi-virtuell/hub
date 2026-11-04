@@ -93,6 +93,18 @@ Zählerregel: „n von m Materialien mit vollständigen Metadaten · live von k 
 
 Rückfall: Kommt keine Antwort, bleiben die sechs Karten, die Stand-Zeile „Stand vom 22.10.2026“ und die Fußzeile unverändert; eine leere Antwort wird nicht gehalten, der nächste Besuch fragt erneut.
 
+### Verbraucher: Material-Detail
+
+`#materialpool?d=<d>` (`mpOpen` ruft `mpDetail(decodeURIComponent(d))`) blendet Hero und Abschnitte aus und zeigt ein Material. Cache vor Netz: `mpDetail` sucht zuerst in `mpDaten`, der Liste der Sitzung (läuft deren Abfrage noch, wird sie abgewartet); nur bei Fehlen folgt eine gezielte Abfrage `hubFetch('material:' + d, [{ kinds: [30142], '#d': [d], limit: 2 }])`, das neueste Event gilt; fehlt auch das, steht dort „Material nicht gefunden.“ mit Weg zurück. Es gibt keine Subscription je Eintrag.
+
+Die Felder Fach, Bildungsstufe, Art und Zielgruppe kommen aus `ambWerte(ev, feld)` (`feld:id` plus folgendes `feld:prefLabel:de`, ältere Events mit bloßem `feld`), je Wert ein Chip, der auf die Kennung im Vokabular verweist (`sichereUrl`, sonst ohne Link). Der Bildnachweis erscheint nur mit `image:license:id` oder `image:creator:name`.
+
+Lizenzstand-Regel (`lizenzStand`, Aktionen aus `lizenzAktionen(stand, m)`): bei `offen` gehen alle sechs Aktionen (auf den Schreibtisch holen, in der Community weiterbearbeiten, in Sammlung aufnehmen, ansehen, Link kopieren, empfehlen); bei `geschuetzt` und `unbekannt` (gilt als geschützt) gehen nur die letzten drei, die ersten drei bleiben sichtbar und ausgegraut („nur mit offener Lizenz“).
+
+Rohdaten: `ambJsonLd(ev)` bildet das AMB-Objekt allein aus den Tags (Kontext `https://w3id.org/kim/amb/context.jsonld`); ein neues Objekt je Feld beginnt bei `feld:id`, bei `feld:name` oder `feld:type`, wenn das aktuelle Objekt den Schlüssel schon hat; `feld:prefLabel:<sprache>` wird zu `prefLabel: { <sprache>: … }`. Fehlende Felder fehlen, nichts wird ergänzt.
+
+Prüf-Marker (Stufe B): Trägt das Event ein Tag `l` mit dem Wert `geprueft`, steht „Nach den Qualitätskriterien geprüft.“; sonst „Noch nicht nach den Qualitätskriterien geprüft.“ mit Link zu den Kriterien (`spielregelLink`). Bisher trägt kein Event das Tag, die Lücke bleibt sichtbar.
+
 ## Schnappschuss erneuern
 
 ```bash

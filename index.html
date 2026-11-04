@@ -265,6 +265,37 @@ a.mp-card:hover{border-color:var(--mp)}
 .mp-card .lic-unbekannt{background:var(--lic-unbekannt);color:var(--lic-unbekannt-x)}
 .mp-card b{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:18px;line-height:1.3;color:var(--mp-dark);margin-bottom:6px}
 .mp-card span{font-size:14px;color:#5A6B69}
+.mp-detail{max-width:900px;margin:0 auto;padding:24px clamp(16px,4vw,40px) 40px}
+.mp-detail[hidden]{display:none}
+#v-materialpool.detail .mp-hero,#v-materialpool.detail .mp-sec{display:none}
+.mp-detail .mp-zurueck{display:inline-block;margin-bottom:14px;color:var(--mp-dark);font-weight:600;text-decoration:none}
+.mp-detail h1{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:clamp(28px,4vw,40px);line-height:1.15;margin:0 0 16px;color:var(--mp-dark);letter-spacing:-.3px}
+.mp-detail .mp-bild{display:block;max-width:100%;max-height:360px;border-radius:12px;margin:0 0 16px;background:var(--mp-soft)}
+.mp-detail .mp-bild-fehlt{display:grid;place-items:center;width:100%;height:120px;border-radius:12px;margin:0 0 16px;background:var(--mp-soft);color:var(--mp-dark);font-weight:600}
+.mp-detail .mp-beschr{font-size:18px;line-height:1.55;margin:0 0 18px}
+.mp-detail dl{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr);gap:10px 18px;margin:0 0 20px}
+.mp-detail dt{color:var(--mp-dark);font-weight:700}
+.mp-detail dd{margin:0}
+.mp-detail .chip{display:inline-block;margin:0 6px 6px 0;padding:3px 12px;border-radius:999px;background:var(--mp-soft);border:1px solid var(--mp-dark);color:var(--mp-dark);font-size:15px;font-weight:500;text-decoration:none}
+.mp-detail a.chip:hover{background:#fff}
+.mp-detail .mp-links{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0 0 22px}
+.mp-detail .mp-links a{color:var(--mp-dark);font-weight:600}
+.mp-detail .lic{display:inline-block;border-radius:999px;padding:5px 16px;font-size:16px;font-weight:600;text-decoration:none}
+.mp-detail .lic-offen{background:var(--lic-offen);color:var(--lic-offen-x)}
+.mp-detail .lic-geschuetzt{background:var(--lic-geschuetzt);color:var(--lic-geschuetzt-x)}
+.mp-detail .lic-unbekannt{background:var(--lic-unbekannt);color:var(--lic-unbekannt-x)}
+.mp-detail .mp-nachweis{font-size:14px;color:#5A6B69;margin:8px 0 0}
+.mp-detail .mp-stand{margin:14px 0 10px;font-size:16px;line-height:1.5}
+.mp-detail .mp-aktionen{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 14px}
+.mp-detail .mp-aktionen button{background:#fff;color:var(--mp-dark);border:2px solid var(--mp-dark);border-radius:10px;padding:9px 16px;font:inherit;font-weight:600;cursor:pointer}
+.mp-detail .mp-aktionen button[disabled]{border-style:dashed;border-color:#6F7F7D;color:#4A5A58;background:#F3F5F4;cursor:not-allowed;opacity:.9}
+.mp-detail .mp-pruef{font-size:15px;margin:0 0 20px}
+.mp-detail .mp-roh{border:1px solid #D8E6E4;border-radius:10px;padding:10px 14px}
+.mp-detail .mp-roh summary{cursor:pointer;font-weight:600;color:var(--mp-dark)}
+.mp-detail .mp-roh .hint{font-size:14px;color:#5A6B69;margin:8px 0}
+.mp-detail .mp-roh pre{overflow:auto;max-height:340px;background:#F4F8F7;border-radius:8px;padding:12px;font-size:13px;line-height:1.45}
+.mp-detail .mp-roh button{margin-top:8px;background:var(--mp-dark);color:#fff;border:0;border-radius:8px;padding:8px 18px;font:inherit;font-weight:600;cursor:pointer}
+@media (max-width:600px){.mp-detail dl{grid-template-columns:minmax(0,1fr);gap:2px}.mp-detail dd{margin-bottom:10px}}
 .mp-foot{margin-top:46px;border-top:1px solid #D8E6E4;padding:22px clamp(16px,4vw,40px) 30px;color:#5A6B69;font-size:14px}
 .mp-foot .in{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;align-items:center}
 .mp-foot .hubmark{display:inline-flex;align-items:center;gap:8px}
@@ -978,6 +1009,8 @@ relihub-steuerkonsole[hidden]{display:none}
     </nav>
   </header>
   <p class="stand" aria-live="polite"></p>
+
+  <section class="mp-detail" id="mpDetail" hidden></section>
 
   <section class="mp-hero">
     <div class="mp-in">
@@ -2261,6 +2294,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   // ---------- Materialpool: Materialien live als kind:30142 (Issue 04, ADR-0006) ----------
   let mpDaten = null, mpLauf = null, mpGeholt = false;   // aufgelöste Materialien, laufende Abfrage, einmal je Sitzung
   let mpSuche = '', mpVorauswahl = [];
+  let mpAktuell = null, mpAktionen = [], mpDetailLauf = 0;   // geöffnetes Material, seine Aktionen, Zähler gegen späte Antworten
   /** Erster Wert eines AMB-Felds: Bezeichnung (deutsch) und Kennung; ältere Events tragen den Feldnamen ohne :id */
   function ambFeld(ev, feld) {
     const id = tagWert(ev, feld + ':id') || tagWert(ev, feld), label = tagWert(ev, feld + ':prefLabel:de') || tagWert(ev, feld + ':prefLabel');
@@ -2299,6 +2333,115 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       vollstaendig: !!(name && tagWert(ev, 'description') && lic && art.id && (fach.id || stufe.id))
     };
   }
+  /** Werte eines AMB-Felds in Tag-Reihenfolge: `feld:id` (älter: `feld` mit Adresse) beginnt einen Eintrag, `feld:prefLabel:de` benennt den letzten; ohne Bezeichnung zählt der letzte Pfadteil der Kennung */
+  function ambWerte(ev, feld) {
+    const liste = [];
+    for (const t of (ev.tags || [])) {
+      if (t[1] == null) continue;
+      if (t[0] === feld + ':id' || (t[0] === feld && /^https?:\/\//.test(t[1]))) liste.push({ id: t[1], label: '' });
+      else if ((t[0] === feld + ':prefLabel:de' || t[0] === feld + ':prefLabel') && liste.length) liste[liste.length - 1].label = t[1];
+    }
+    return liste.map(e => ({ id: e.id, label: e.label || String(e.id).replace(/[\/#]+$/, '').split(/[\/#]/).pop() }));
+  }
+  /** Das Event als AMB-Objekt (JSON-LD) aus seinen Tags; nur was im Event steht, nichts wird ergänzt */
+  function ambJsonLd(ev) {
+    const j = { '@context': ['https://w3id.org/kim/amb/context.jsonld'] };
+    const d = tagWert(ev, 'd'), typen = tagWerte(ev, 'type'), sprachen = tagWerte(ev, 'inLanguage'), schlag = tagWerte(ev, 'keywords');
+    const lic = tagWert(ev, 'license:id') || tagWert(ev, 'license'), frei = tagWert(ev, 'isAccessibleForFree');
+    if (d) j.id = d;
+    if (typen.length) j.type = typen;
+    for (const k of ['name', 'description', 'image', 'dateCreated', 'datePublished', 'dateModified']) { const v = tagWert(ev, k); if (v) j[k] = v; }
+    if (sprachen.length) j.inLanguage = sprachen.length > 1 ? sprachen : sprachen[0];
+    if (lic) j.license = { id: lic };
+    if (frei) j.isAccessibleForFree = frei === 'true';
+    if (schlag.length) j.keywords = schlag;
+    const felder = ['about', 'learningResourceType', 'educationalLevel', 'audience', 'creator', 'publisher', 'conditionsOfAccess', 'interactivityType'], aktuell = {};
+    for (const t of (ev.tags || [])) {
+      const teile = String(t[0]).split(':'), feld = teile[0];
+      if (!felder.includes(feld) || t[1] == null) continue;
+      const schluessel = teile.length === 1 ? 'id' : teile[1];
+      if (teile.length === 1 && !/^https?:\/\//.test(t[1])) continue;
+      const liste = j[feld] || (j[feld] = []);
+      let obj = aktuell[feld];
+      if (!obj || schluessel === 'id' || ((schluessel === 'name' || schluessel === 'type') && schluessel in obj)) { obj = aktuell[feld] = {}; liste.push(obj); }
+      if (schluessel === 'prefLabel' && teile[2]) { if (typeof obj.prefLabel !== 'object') obj.prefLabel = {}; obj.prefLabel[teile[2]] = t[1]; }
+      else obj[schluessel] = t[1];
+    }
+    return j;
+  }
+  /** Was der Lizenzstand erlaubt: sechs Aktionen in fester Reihenfolge; ohne offene Lizenz gehen die ersten drei nicht (sie bleiben sichtbar, Issue 15). `m` wird erst beim Auslösen gelesen. */
+  function lizenzAktionen(stand, m) {
+    const offen = stand === 'offen';
+    return [
+      { label: 'Auf den Schreibtisch holen', geht: offen, tu: () => go('relidesk?tab=schreibtisch') },
+      { label: 'In der Community weiterbearbeiten', geht: offen, tu: () => openChooser('materialpool') },
+      { label: 'In Sammlung aufnehmen', geht: offen, tu: () => toast('Sammlungen kommen in der nächsten Etappe.') },
+      { label: 'Ansehen', geht: true, tu: () => { if (m.url) window.open(m.url, '_blank', 'noopener'); else toast('Keine Adresse hinterlegt.'); } },
+      { label: 'Link kopieren', geht: true, tu: () => rtCopy(location.href, 'Link kopiert.') },
+      { label: 'Empfehlen', geht: true, tu: () => toast('Teilen in Communities folgt.') }
+    ];
+  }
+  /** Detailansicht: erst aus der Liste der Sitzung (kein Netz), sonst eine gezielte Abfrage `#d`; Text maskiert, Adressen über sichereUrl */
+  function mpDetail(d, p) {
+    const box = document.getElementById('mpDetail'), zurueck = '<a class="mp-zurueck" href="#materialpool">‹ Materialpool</a>';
+    const datumText = ts => { const x = new Date(ts * 1000), z = n => String(n).padStart(2, '0'); return z(x.getDate()) + '.' + z(x.getMonth() + 1) + '.' + x.getFullYear(); };
+    const chips = (ev, feld) => ambWerte(ev, feld).map(w => {
+      const u = sichereUrl(w.id);
+      return u ? `<a class="chip" href="${esc(u)}" target="_blank" rel="noopener" title="Begriff im Vokabular">${esc(w.label)}</a>` : `<span class="chip">${esc(w.label)}</span>`;
+    }).join('');
+    const zeige = m => {
+      try { zeigeRoh(m); } catch (e) { fehlt(); }
+    };
+    const zeigeRoh = m => {
+      const ev = m.ev;
+      mpAktuell = m; mpAktionen = lizenzAktionen(m.stand, m);
+      const felder = [['Fach', 'about'], ['Bildungsstufe', 'educationalLevel'], ['Art', 'learningResourceType'], ['Zielgruppe', 'audience']]
+        .map(([titel, feld]) => [titel, chips(ev, feld)]).filter(f => f[1]);
+      const quelle = tagWerte(ev, 'publisher:name').concat(tagWerte(ev, 'creator:name')).join(', ');
+      if (quelle) felder.push(['Quelle', esc(quelle)]);
+      felder.push(['Datum', datumText(m.datum)]);
+      const bildL = tagWert(ev, 'image:license:id'), bildU = tagWert(ev, 'image:creator:name');
+      const nachweis = bildL || bildU ? `<p class="mp-nachweis">Bildnachweis: ${[bildU && esc(bildU), bildL && esc(lizenzLabel(bildL))].filter(Boolean).join(' · ')}</p>` : '';
+      const licU = sichereUrl(m.lic), pille = `<span class="lic lic-${m.stand}">${esc(m.licLabel || 'Lizenz nicht angegeben')}</span>`;
+      const satz = {
+        offen: 'Offen lizenziert: Du kannst es auf den Schreibtisch holen, in der Community weiterbearbeiten und in Sammlungen aufnehmen.',
+        geschuetzt: 'Geschützt: Du kannst es ansehen, verlinken und empfehlen; Weiterbearbeiten und Sammeln gehen nur mit offener Lizenz.',
+        unbekannt: 'Lizenz nicht angegeben: Bis das geklärt ist, gilt es als geschützt.'
+      }[m.stand];
+      const aktionen = mpAktionen.map((a, i) => a.geht
+        ? `<button type="button" data-mp-aktion="${i}">${esc(a.label)}</button>`
+        : `<button type="button" disabled aria-disabled="true" title="nur mit offener Lizenz" data-mp-aktion="${i}">${esc(a.label)}</button>`).join('');
+      const geprueft = tagWerte(ev, 'l').includes('geprueft');
+      const pruef = geprueft ? 'Nach den Qualitätskriterien geprüft.' : `Noch nicht nach den Qualitätskriterien geprüft. <a href="${spielregelLink('spielregeln-qualitaetskriterien')}">Zu den Kriterien ›</a>`;
+      const bildSrc = sichereUrl(tagWert(ev, 'image'));
+      const bild = bildSrc ? `<img class="mp-bild" src="${esc(bildSrc)}" alt="" loading="lazy">` : `<div class="mp-bild-fehlt">${esc(m.art || 'Material')}</div>`;
+      const roh = JSON.stringify(ambJsonLd(ev), null, 2);
+      const links = (m.url ? `<a href="${esc(m.url)}" target="_blank" rel="noopener">Zur Ressource ›</a>` : '') + `<a href="https://edufeed.org/${naddr(m.d, m.pk, 30142)}" target="_blank" rel="noopener">Bei edufeed ansehen ›</a>`;
+      box.innerHTML = `${zurueck}<h1>${esc(m.t)}</h1>${bild}<p class="mp-beschr">${esc(m.x)}</p>
+        <dl>${felder.map(f => `<dt>${f[0]}</dt><dd>${f[1]}</dd>`).join('')}</dl>
+        <div class="mp-links">${links}</div>
+        <p>${licU ? `<a class="lic lic-${m.stand}" href="${esc(licU)}" target="_blank" rel="noopener">${esc(m.licLabel)}</a>` : pille}</p>${nachweis}
+        <p class="mp-stand">${satz}</p><div class="mp-aktionen">${aktionen}</div>
+        <p class="mp-pruef">${pruef}</p>
+        <details class="mp-roh"><summary>Rohdaten (JSON-LD)</summary><p class="hint">aus dem Event gebildet (AMB-Kontext)</p><pre>${esc(roh)}</pre><button type="button" data-mp-copy>Kopieren</button></details>`;
+    };
+    const fehlt = () => { box.innerHTML = `${zurueck}<h1>Material nicht gefunden.</h1><p><a href="#materialpool">‹ Zum Materialpool</a></p>`; };
+    const dort = () => (mpDaten || []).find(m => m.d === d && (!p || m.pk === p));
+    const lauf = ++mpDetailLauf, aktuell = () => lauf === mpDetailLauf && CUR.split('?')[0] === 'materialpool';
+    box.hidden = false;
+    document.getElementById('v-materialpool').classList.add('detail');
+    box.innerHTML = zurueck + '<p>Lade Material …</p>';
+    Promise.resolve(mpDaten ? null : mpLauf).catch(() => null).then(() => {
+      if (!aktuell()) return;
+      const m = dort();
+      if (m) { zeige(m); return; }
+      hubFetch('material:' + d + (p ? ':' + p : ''), [p ? { kinds: [30142], '#d': [d], authors: [p], limit: 2 } : { kinds: [30142], '#d': [d], limit: 2 }]).then(events => {
+        if (!aktuell()) return;
+        const ev = events.filter(e => tagWert(e, 'd') === d && (!p || e.pubkey === p)).sort((a, b) => b.created_at - a.created_at)[0];
+        if (ev) zeige(mpMaterial(ev)); else fehlt();
+      }, fehlt);
+    });
+  }
   /** Alle Begriffe müssen (ohne Groß-/Kleinschreibung) in Titel, Beschreibung, Fach, Stufe, Art, Schlagworten oder t-Tags stehen */
   function mpPasst(m, begriffe) {
     if (!begriffe.length) return true;
@@ -2317,29 +2460,41 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     liste.innerHTML = treffer.length ? treffer.map(m => {
       const zeile = [m.art, m.quelle, m.stufe].filter(Boolean).map(esc).join(' · ');
       const pille = m.licLabel || (m.stand === 'unbekannt' ? 'Lizenz nicht angegeben' : '');
-      return `<a class="mp-card" href="#materialpool?d=${encodeURIComponent(m.d)}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand}">${esc(pille || 'Lizenz nicht angegeben')}</span></a>`;
+      return `<a class="mp-card" href="#materialpool?d=${encodeURIComponent(m.d)}&p=${m.pk}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand}">${esc(pille || 'Lizenz nicht angegeben')}</span></a>`;
     }).join('') : '<p>Nichts gefunden; Vorauswahl entfernen oder anders suchen.</p>';
     // k = Zahl der abgefragten Relays: hubFetch meldet nicht, welche geantwortet haben
     const n = mpDaten.filter(m => m.vollstaendig).length;
     fuss.textContent = `${n} von ${mpDaten.length} Materialien mit vollständigen Metadaten · live von ${RELAYS.length} Relays`;
   }
-  /** Ansicht #materialpool: Vorauswahl-Banner (thema, stufe), sofort Rückfall oder Daten, einmal je Sitzung live nachladen; ?d= folgt mit der Detailansicht */
+  /** Ansicht #materialpool: Vorauswahl-Banner (thema, stufe), sofort Rückfall oder Daten, einmal je Sitzung live nachladen; mit ?d= die Detailansicht */
   function mpOpen(qs) {
-    const p = new URLSearchParams(qs || ''), pre = document.getElementById('mpPre');
+    const p = new URLSearchParams(qs || ''), pre = document.getElementById('mpPre'), d = p.get('d');
     const tags = p.getAll('thema').concat(p.getAll('stufe').map(s => PRE_NAMES[s] || s));
     pre.classList.toggle('on', tags.length > 0);
     pre.innerHTML = tags.length ? `Vorauswahl über die reli_hub-Steuerkonsole: ${tags.map(t => `<span class="tg">${esc(t)}</span>`).join('')}<button type="button" id="preX">Vorauswahl entfernen</button>` : '';
     const x = document.getElementById('preX'); if (x) x.onclick = () => go('materialpool');
     mpVorauswahl = tags;
+    const ladeEinmal = () => {
+      if (mpGeholt) return;
+      mpGeholt = true;
+      mpLaden().then(liste => {
+        if (!liste.length) { mpGeholt = false; return; }   // keine Antwort: Schnappschuss bleibt, nächster Besuch versucht es erneut
+        datenstand('v-materialpool', 'live', liste.length + ' Materialien');
+        if (CUR.split('?')[0] === 'materialpool') mpRender();
+      });
+    };
+    if (d) { ladeEinmal(); mpDetail(p.get('d'), p.get('p') || ''); return; }
+    mpDetailLauf++; mpAktuell = null;
+    document.getElementById('mpDetail').hidden = true;
+    document.getElementById('v-materialpool').classList.remove('detail');
     mpRender();
-    if (mpGeholt) return;
-    mpGeholt = true;
-    mpLaden().then(liste => {
-      if (!liste.length) { mpGeholt = false; return; }   // keine Antwort: Schnappschuss bleibt, nächster Besuch versucht es erneut
-      datenstand('v-materialpool', 'live', liste.length + ' Materialien');
-      if (CUR.split('?')[0] === 'materialpool') mpRender();
-    });
+    ladeEinmal();
   }
+  document.getElementById('v-materialpool').addEventListener('click', e => {
+    const k = e.target.closest('[data-mp-copy]'), a = e.target.closest('[data-mp-aktion]');
+    if (k && mpAktuell) rtCopy(JSON.stringify(ambJsonLd(mpAktuell.ev), null, 2), 'Rohdaten kopiert.');
+    if (a && !a.disabled && mpAktionen[a.dataset.mpAktion]) mpAktionen[a.dataset.mpAktion].tu();
+  });
   document.querySelector('#v-materialpool input[type=search]').addEventListener('input', e => { mpSuche = e.target.value; mpRender(); });
   mpRender();
   const ROT = ['für die Schule', 'für die Kita', 'für die Gemeinde', 'für die Jugendarbeit', 'für die Erwachsenenbildung'];
@@ -3296,7 +3451,14 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   // ---------- Ansichten (Hash-Routing) ----------
   const PRE_NAMES = { sek1: 'Sekundarstufe I' };
   // Eigene Navigation statt reiner Hash-Links: funktioniert auch in Vorschauen, die Links abfangen
-  let CUR = decodeURIComponent(location.hash.replace(/^#/, '')) || 'start';
+  /** Route aus dem Adressfragment: nur der Teil vor dem ersten ? wird entschlüsselt, die Abfrage bleibt roh (URLSearchParams entschlüsselt selbst) */
+  function leseHash() {
+    const roh = location.hash.replace(/^#/, ''), i = roh.indexOf('?');
+    let pfad = i < 0 ? roh : roh.slice(0, i);
+    try { pfad = decodeURIComponent(pfad); } catch (e) {}
+    return (pfad + (i < 0 ? '' : roh.slice(i))) || 'start';
+  }
+  let CUR = leseHash();
   function go(h) {
     CUR = h || 'start';
     try { history.pushState(null, '', '#' + CUR); } catch (e) {}
@@ -3338,8 +3500,8 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     if (v === 'materialpool') mpOpen(qs);
     window.scrollTo(0, 0);
   }
-  window.addEventListener('hashchange', () => { CUR = decodeURIComponent(location.hash.replace(/^#/, '')) || 'start'; route(); });
-  window.addEventListener('popstate', () => { CUR = decodeURIComponent(location.hash.replace(/^#/, '')) || 'start'; route(); });
+  window.addEventListener('hashchange', () => { CUR = leseHash(); route(); });
+  window.addEventListener('popstate', () => { CUR = leseHash(); route(); });
   route();
 })();
 </script>
