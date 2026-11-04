@@ -103,6 +103,8 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .oc-termin{border:1px solid var(--fo-rahmen);border-radius:5px;padding:9px 12px;background:#fff}
 .oc-termin a{color:var(--fo-blau)}
 .oc-termin.vergangen{background:var(--fo-hell);color:var(--fo-text)}
+#v-oercommunity .oc-vorbereitung{align-self:flex-start;font-size:13.5px;color:var(--fo-text);background:var(--fo-hell);border:1px solid var(--fo-rahmen);border-radius:4px;padding:2px 8px}
+#v-oercommunity .oc-spielregeln h1{color:var(--fo-titel)}
 #v-oercommunity .img-fehlt{display:inline-block;font-size:13.5px;color:var(--fo-text);background:var(--fo-hell);border-radius:4px;padding:2px 8px}
 @media (max-width:640px){.oc-start h1{font-size:34px}.oc-nav{margin-left:0}}
 
@@ -2656,8 +2658,18 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   const ocZeitFmt = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   const ocDatum = ev => ocDatumFmt.format(new Date((+tagWert(ev, 'published_at') || ev.created_at) * 1000));
   /** Seiten, die das Schaufenster kennt; fehlt eine auf dem Relay, erscheint „in Vorbereitung“ statt einer toten Adresse */
-  const OC_SEITEN = ['startseite', 'tagungen', 'qualitaet', 'oer-und-oep', 'unser-team', 'impressum', 'datenschutz', 'spielregeln'];
-  const OC_NAV_STD = '<button type="button" data-ocs="oc-tagungen">Tagungen</button><button type="button" data-ocs="oc-oer">Was ist OER?</button><button type="button" data-ocs="oc-qualitaet">Qualität</button><button type="button" data-ocs="oc-team">Team</button><button type="button" data-ocs="oc-blog">Blog</button>';
+  const SPIELREGELN = [
+    { d: 'spielregeln-qualitaetskriterien', t: 'Qualitätskriterien', x: 'Vier Dimensionen, Checklisten, die Handreichung.', heute: 'https://oer.community/qualitaet/' },
+    { d: 'spielregeln-metadatenprofil', t: 'Metadatenprofil', x: 'Welche Felder, welche Vokabulare, mit Links auf die Begriffe.', heute: 'https://oer.community/metadaten-die-unsichtbare-infrastruktur-offener-bildung/' },
+    { d: 'spielregeln-redaktion', t: 'Redaktion', x: 'Wie ein Entwurf zur Veröffentlichung wird, wer freigibt, wie Bildnachweise aussehen.', heute: 'https://oer.community/blog/' },
+    { d: 'spielregeln-ablaeufe', t: 'Abläufe', x: 'Vom Beitrag im Git zum Relay, von der Webseite zum Termin.', heute: 'https://oer.community/blog/' }
+  ];
+  /** Route zu einer Spielregeln-Seite: liegt sie vor, direkt dorthin, sonst zum Bereich (Lizenzpille, Prüf-Marker) */
+  function spielregelLink(d) {
+    return ocDaten && ocDaten.seiten.has(d) ? '#oercommunity/' + d : '#oercommunity/spielregeln';
+  }
+  const OC_SEITEN = ['startseite', 'tagungen', 'qualitaet', 'oer-und-oep', 'unser-team', 'impressum', 'datenschutz', 'spielregeln', ...SPIELREGELN.map(s => s.d)];
+  const OC_NAV_STD = '<button type="button" data-ocs="oc-tagungen">Tagungen</button><button type="button" data-ocs="oc-oer">Was ist OER?</button><button type="button" data-ocs="oc-qualitaet">Qualität</button><a href="#oercommunity/spielregeln">Spielregeln</a><button type="button" data-ocs="oc-team">Team</button><button type="button" data-ocs="oc-blog">Blog</button>';
   const OC_FUSS_STD = `${ocExt('https://oer.community/impressum/', 'Impressum')} &amp; ${ocExt('https://oer.community/datenschutz/', 'Datenschutz')}`;
   const OC_OER = [
     ['oer-und-oep', 'OER und OEP', 'Was Open Educational Resources und Open Educational Practices sind, warum offene Materialien Zusammenarbeit möglich machen, und ein Selbstlernmodul zum Einstieg.'],
@@ -2721,12 +2733,32 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       <p class="oc-date">${!lic ? ocExt('https://oer.community/' + encodeURIComponent(d) + '/', 'Lizenz: siehe oer.community') : label === 'CC BY 4.0' ? 'CC BY 4.0 FOERBICO' : 'Lizenz: ' + esc(label)}</p>
       <p>${ocExt('https://oer.community/' + encodeURIComponent(d) + '/', 'Auf oer.community ansehen ›')} · <a href="#oercommunity">‹ Schaufenster</a></p></article>`;
   }
+  /** Bereich Spielregeln: vier Kacheln (Lesen, wenn die Seite vorliegt, sonst „in Vorbereitung“ mit Verweis) und der Weg zum Veröffentlichen */
+  function ocSpielregeln(daten) {
+    const sf = daten ? daten.seiten : new Map();
+    const kacheln = SPIELREGELN.map(r => sf.has(r.d)
+      ? `<article class="oc-card"><div class="tx"><h3>${esc(r.t)}</h3><p>${esc(tagWert(sf.get(r.d), 'summary') || r.x)}</p><p><a href="#oercommunity/${encodeURIComponent(r.d)}">Lesen ›</a></p></div></article>`
+      : `<article class="oc-card"><div class="tx"><h3>${esc(r.t)}</h3><span class="oc-vorbereitung">in Vorbereitung</span><p>${esc(r.x)}</p><p>${ocExt(r.heute, 'Heute: auf oer.community ›')}</p></div></article>`).join('');
+    return `<section class="oc-sec oc-spielregeln"><h1>Spielregeln</h1><p>Die gemeinsame Grammatik des Ökosystems: nach diesen Regeln entstehen Material, Beiträge und Termine.</p>
+      <div class="oc-grid">${kacheln}<article class="oc-card"><div class="tx"><h3>Veröffentlichen: so geht es</h3><p>Die Konsole zeigt dir die drei Wege zum Relay.</p><p><button type="button" class="oc-btn" data-oc-tutorial>Zur Konsole ›</button></p></div></article></div>
+      <p style="margin:14px 0 0"><a href="#oercommunity">‹ Schaufenster</a></p></section>`;
+  }
+  /** Stand-Zeile des Schaufensters; im Bereich Spielregeln zählt sie die vorliegenden Seiten */
+  function ocStand(daten, bereich) {
+    const da = daten && (daten.seiten.size || daten.beitraege.length || daten.termine.length || daten.listen.navigation);
+    if (bereich) {
+      if (da) datenstand('v-oercommunity', 'live', `${SPIELREGELN.filter(r => daten.seiten.has(r.d)).length} von 4 Seiten`);
+      else datenstand('v-oercommunity', 'stand', OC_STAND + ' · 0 von 4 Seiten');
+    } else if (da) datenstand('v-oercommunity', 'live', `${daten.beitraege.length} Beiträge · ${daten.seiten.size} Seiten`);
+    else datenstand('v-oercommunity', 'stand', OC_STAND);
+  }
   /** Zeigt Schaufenster oder Seite `sub`; daten null = noch nichts vom Relay; geladen = Antwort ist da */
   function ocSchau(daten, sub, geladen) {
     const root = document.getElementById('ocRoot'), ev = daten && daten.seiten.get(sub);
     ocRender(daten);
     if (!sub) return;
-    if (ev) root.innerHTML = ocSeite(ev);
+    if (sub === 'spielregeln') root.innerHTML = ocSpielregeln(daten);
+    else if (ev) root.innerHTML = ocSeite(ev);
     else if (!geladen) root.innerHTML = '<section class="oc-sec"><p>Seite wird geladen …</p></section>';
     else if (OC_SEITEN.includes(sub)) root.innerHTML = `<section class="oc-sec"><p>Diese Seite ist in Vorbereitung. ${ocExt('https://oer.community/' + encodeURIComponent(sub) + '/', 'Auf oer.community ansehen ›')} · <a href="#oercommunity">‹ Schaufenster</a></p></section>`;
     else toast('Diese Seite gibt es im Schaufenster nicht.');
@@ -2734,16 +2766,19 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   /** Route #oercommunity[/<d>]: sofort Schnappschuss (oder die schon geladenen Daten), dann die Antwort der Relays */
   function ocOpen(sub) {
     ocSchau(ocDaten, sub, !!ocDaten);
+    const bereich = sub === 'spielregeln';   // Bereich mit eigener Stand-Zeile
+    ocStand(ocDaten, bereich);
     ocLaden().then(daten => {
       const [v, s] = CUR.split('?')[0].split('/');
       if (v !== 'oercommunity' || s !== sub) return;   // Nutzende sind weitergezogen
       const da = daten.seiten.size || daten.beitraege.length || daten.termine.length || daten.listen.navigation;
-      if (da) datenstand('v-oercommunity', 'live', `${daten.beitraege.length} Beiträge · ${daten.seiten.size} Seiten`);
+      ocStand(da ? daten : null, bereich);
       if (da || sub) ocSchau(da ? daten : null, sub, true);   // ohne Antwort: eine offene Seite nicht auf „wird geladen“ stehen lassen
     });
   }
   ocRender(null);
   document.getElementById('v-oercommunity').addEventListener('click', e => {
+    if (e.target.closest('[data-oc-tutorial]')) { setModus('tutorial'); go('start'); toast('Die Konsole erklärt die drei Wege zum Relay.'); return; }
     const b = e.target.closest('[data-ocs]'); if (!b) return;
     if (!document.getElementById(b.dataset.ocs)) go('oercommunity');   // von einer Seite des Schaufensters zurück zum Schaufenster
     document.getElementById(b.dataset.ocs).scrollIntoView({ behavior: 'smooth', block: 'start' });
