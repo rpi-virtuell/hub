@@ -137,16 +137,20 @@ Deno.test('ambJsonLd und ambWerte: aus Tags gebildet, nichts erfunden', () => {
   assertEquals(j['@context'], ['https://w3id.org/kim/amb/context.jsonld']);
   assertEquals(j.id, 'https://x.org/r'); assertEquals(j.license, { id: 'https://creativecommons.org/licenses/by/4.0/' }); assertEquals(j.isAccessibleForFree, true);
   assertEquals(j.about[0], { id: 'https://w3id.org/kim/hochschulfaechersystematik/n0', prefLabel: { de: 'Fachübergreifend' } });
+  assertEquals(ambJsonLd({ tags: [['about:id', 'https://x.org/a'], ['about:prefLabel', 'X']] }).about[0].prefLabel, 'X', 'keine erfundene Sprache');
   assertEquals(j.audience[0].prefLabel, { de: 'Lehrperson' }); assert(!('description' in j) && !('educationalLevel' in j), 'fehlende Felder fehlen');
 });
 
 Deno.test('Material-Detail: Felder, Lizenzstand, Rohdaten, kein zweiter REQ bei Treffer im Cache', () => {
-  const det = block(/function mpDetail\(d\)[\s\S]*?\n  \}/);
-  assert(/mpDaten/.test(det) && /hubFetch\('material:' \+ d, \[\{ kinds: \[30142\], '#d': \[d\]/.test(det) && det.indexOf('mpDaten') < det.indexOf('hubFetch'), 'Cache vor Netz');
+  const det = block(/function mpDetail\(d, p\)[\s\S]*?\n  \}/);
+  assert(/mpDaten/.test(det) && /hubFetch\('material:' \+ d/.test(det) && /kinds: \[30142\], '#d': \[d\]/.test(det) && det.indexOf('mpDaten') < det.indexOf('hubFetch'), 'Cache vor Netz');
   assert(/Material nicht gefunden/.test(det) && /ambJsonLd\(/.test(det) && /lizenzAktionen\(/.test(det) && /spielregelLink\(/.test(det) && /naddr\(/.test(det), 'Bausteine');
   assert(/Begriff im Vokabular/.test(det) && /target="_blank" rel="noopener"/.test(det), 'Vokabular-Links');
   assert(/Offen lizenziert/.test(det) && /nur mit offener Lizenz/.test(det) && /disabled aria-disabled="true"/.test(det), 'Lizenzstand mit ausgegrauten Aktionen');
   assert(/image:license:id|image:creator:name/.test(det), 'Bildnachweis nur mit Tag');
-  assert(/mpDetail\(decodeURIComponent/.test(block(/function mpOpen\(qs\)[\s\S]*?\n  \}/)), 'mpOpen wertet ?d= aus');
+  const mo = block(/function mpOpen\(qs\)[\s\S]*?\n  \}/);
+  assert(mo.includes("mpDetail(p.get('d')") && mo.includes("p.get('p')") && !/decodeURIComponent/.test(mo), 'mpOpen wertet ?d= und &p= aus, ohne zweites Entschlüsseln');
+  assert(s.includes('function leseHash()') && (s.match(/= leseHash\(\)/g) || []).length === 3 && !/decodeURIComponent\(location\.hash/.test(s), 'leseHash an drei Stellen');
+  assert(/authors: \[p\]/.test(det) && /&p=\$\{m\.pk\}/.test(block(/function mpRender\(\)[\s\S]*?\n  \}/)), 'Material wird über pubkey und d bestimmt');
   assert(/id="mpDetail"/.test(html), 'Detail-Block in der Ansicht');
 });
