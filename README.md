@@ -2,7 +2,7 @@
 
 **Aktuelle Fassung zum Ausprobieren:** https://hub.rpi-virtuell.net. Quelle ist dieses Repo auf gitworkshop.dev; ausgeliefert wird der Stand von `main` aus der Forgejo-Arbeitskopie.
 
-Prototyp des reli_hub: eine einzelne HTML-Datei ohne Build und ohne Framework (`index.html`). Alle Ansichten sind Blöcke in einer Seite, umgeschaltet per Hash-Routing; die Steuerkonsole ist als Web Component angelegt. Leiste unten links (Orte) und Steuerkonsole (Tätigkeiten) sind zwei getrennte Elemente: siehe [docs/leiste.md](docs/leiste.md). Die Datei kann direkt im Browser geöffnet werden.
+Prototyp des reli_hub: eine einzelne HTML-Datei ohne Build und ohne Framework (`index.html`). Alle Ansichten sind Blöcke in einer Seite, umgeschaltet per Hash-Routing; die Steuerkonsole ist als Web Component angelegt. Leiste unten links (Orte) und Steuerkonsole (Tätigkeiten) sind zwei getrennte Elemente: siehe [docs/leiste.md](docs/leiste.md); Begriffe, Farben und Ziele von Startseite, Konsole und Leiste stehen in [docs/navigation.md](docs/navigation.md). Die Datei kann direkt im Browser geöffnet werden.
 
 **Herkunft:** Entwurf von Jens Dechow (`npub17z39pld9w3z7w872zx0a6cte4s7ezhcy8w69jjzku7d8xv295q8s6dmu40`), Prototyp 5 vom 26.10.2026, geschenkt zum Start des reli_hub-Repos im Oktober 2026. Die Konstruktionsbeschreibung in `docs/konstruktion.md` ist aus der Datei rekonstruiert (Jörg Lohrer) und beschreibt Leitidee, Funktionsmodell und Bauweise.
 

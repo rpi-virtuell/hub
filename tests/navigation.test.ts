@@ -101,3 +101,14 @@ Deno.test('rpi-virtuell: Tabs mit Standard', () => {
   const rv = block(/function rvOpen\(qs\)[\s\S]*?\n  \}/);
   assert(/\['material', 'fortbildungen', 'news'\]\.includes\(/.test(rv) && /: 'material'/.test(rv), 'unbekannter Tab fällt nicht auf material zurück');
 });
+
+Deno.test('Navigation: Tabelle, Farben in der Konsole, Lerninhalte in den Materialpool', async () => {
+  const c = consoleScript(), s = appScript();
+  const d = await Deno.readTextFile(new URL('../docs/navigation.md', import.meta.url));
+  assert(/\| Begriff \| Startseite \| Konsole \(Aktion\) \| Ziel \(Route\) \| Leiste \(Instanz\) \| Farbe \| Stand \|/.test(d), 'Tabellenkopf');
+  for (const b of ['Material', 'Fortbildungen', 'Beiträge', 'Schreibtisch', 'Labor', 'Communities', 'Personen', 'Lerninhalte', 'Termin', 'Beitrag', 'Profil', 'Start', 'Hilfe']) assert(new RegExp(`\\| ${b} \\|`).test(d), `Zeile ${b} fehlt`);
+  assert(/this\.text\(bud, s\.label[^;]*f\.ink, 'out'\)/.test(c) && !/\.out\{[^}]*fill:/.test(c), 'Knospen nicht in Bereichsfarbe');
+  assert(/veroeffentlichen\.lerninhalte'\) \{ go\('materialpool'\); openChooser\('materialpool'\)/.test(block(/function standardAktion[\s\S]*?\n  \}/)), 'Lerninhalte springen nicht in den Materialpool');
+  const nullZiele = [...block(/const EX = \{[\s\S]*?\n  \};/).matchAll(/go:\['[^']*',null\]/g)].length;
+  assert(nullZiele === 1, `offene Ziele in EX: ${nullZiele}, erlaubt ist nur Personen`);
+});
