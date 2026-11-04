@@ -50,4 +50,20 @@ Deno.test('ocLaden: ein REQ je Relay, Seiten und Beiträge getrennt', () => {
   assert(/relay-rpi\.edufeed\.org/.test(oc) && /relay\.edufeed\.org/.test(oc) && !/amb-relay/.test(oc), 'Relays des Schaufensters');
   assert(/published_at/.test(oc), 'Beiträge nach published_at');
   assert(!/groups\.edufeed\.org/.test(html));
+  // Verhalten: leere Antwort wird nicht gehalten, nichtleere schon
+  const bauOc = (antworten: unknown[][]) => {
+    let n = 0;
+    const hubFetch = () => Promise.resolve(antworten[Math.min(n++, antworten.length - 1)]);
+    const code = 'let ocDaten = null, ocLauf = null;\n' + block(/  function tagWert\([^)]*\) \{[\s\S]*?\n  \}/) + block(/  function tagWerte\([^)]*\) \{[\s\S]*?\n  \}/) + oc + '; return ocLaden;';
+    return { ocLaden: new Function('hubFetch', 'FO_HEX', code)(hubFetch, 'ab'), aufrufe: () => n };
+  };
+  const leer = bauOc([[], [{ kind: 30023, pubkey: 'ab', created_at: 1, tags: [['d', 'x'], ['l', 'seite']] }]]);
+  return leer.ocLaden().then((r1: any) => {
+    assertEquals(r1.seiten.size, 0);
+    return leer.ocLaden().then((r2: any) => {
+      assertEquals(leer.aufrufe(), 2, 'leere Antwort: erneuter Versuch');
+      assertEquals(r2.seiten.size, 1);
+      return leer.ocLaden().then(() => assertEquals(leer.aufrufe(), 2, 'nichtleere Antwort wird gehalten'));
+    });
+  });
 });

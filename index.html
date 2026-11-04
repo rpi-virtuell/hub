@@ -1995,8 +1995,9 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       const datum = ev => +tagWert(ev, 'published_at') || ev.created_at;
       beitraege.sort((a, b) => datum(b) - datum(a));
       termine.sort((a, b) => (+tagWert(a, 'start') || 0) - (+tagWert(b, 'start') || 0));
-      ocDaten = { seiten, beitraege, listen, termine };
-      return ocDaten;
+      const daten = { seiten, beitraege, listen, termine };
+      if (events.length) ocDaten = daten; else ocLauf = null;   // leere Antwort (Relays nicht erreichbar) nicht halten: der nächste Aufruf versucht es erneut
+      return daten;
     });
     return ocLauf;
   }

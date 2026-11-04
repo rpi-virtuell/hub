@@ -65,7 +65,7 @@ Das Schaufenster auf oer.community liegt als Events unter einem eigenen Schlüss
 | 3 | `{ kinds: [30004], authors: [FO_HEX], limit: 5 }` | Listen (Navigation, Fußzeile) |
 | 4 | `{ kinds: [31923], authors: [FO_HEX], limit: 200 }` | Termine |
 
-Je Adresse (`kind:pubkey:d`) gilt das Event mit dem neuesten `created_at`. Seiten sind `kind:30023` mit Tag `['l','seite',…]` (Schlüssel: `d`), alle übrigen `kind:30023` sind Beiträge, sortiert nach `published_at` (sonst `created_at`) absteigend; Termine sind nach `start` aufsteigend sortiert. Das Ergebnis `{ seiten, beitraege, listen, termine }` bleibt in `ocDaten`; spätere Aufrufe liefern es ohne Netz.
+Je Adresse (`kind:pubkey:d`) gilt das Event mit dem neuesten `created_at`. Seiten sind `kind:30023` mit Tag `['l','seite',…]` (Schlüssel: `d`), alle übrigen `kind:30023` sind Beiträge, sortiert nach `published_at` (sonst `created_at`) absteigend; Termine sind nach `start` aufsteigend sortiert. Das Ergebnis `{ seiten, beitraege, listen, termine }` bleibt in `ocDaten`; spätere Aufrufe liefern es ohne Netz. Eine leere Antwort (Relays nicht erreichbar) wird nicht gehalten: der nächste Aufruf fragt erneut.
 
 **Sicherheitsregel für `mdSeite(src)`:** Inhalte vom Relay sind fremder Text. Jede Zeile wird zuerst mit `esc()` maskiert, erst danach entsteht Auszeichnung (Überschriften eine Stufe tiefer, Absätze, Listen, Zitate, Fett, Kursiv, Code, Trennlinie). `href` und `src` gehen nur über `sichereUrl()` (nur `http(s)://`): ein Link mit anderer Adresse wird zum bloßen Text, ein Bild mit relativer oder unsicherer Adresse zu „Bild: <alt>“. Tabellen werden nicht erkannt, rohes HTML bleibt maskiert.
 
