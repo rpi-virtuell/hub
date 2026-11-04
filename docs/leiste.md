@@ -46,6 +46,17 @@ Ein Klick löst `relihub-leiste-select` aus (bubbles, composed, cancelable) mit 
 document.addEventListener('relihub-leiste-select', e => { e.preventDefault(); go(e.detail.href.slice(1)); });
 ```
 
+Der Knopf „⋯“ am Ende der Leiste (`data-cfg`, `aria-label="Leiste anpassen"`) löst `relihub-leiste-config` aus (bubbles, composed, nicht abbrechbar) mit `detail = { items }`, den aktuellen Einträgen. Das Element selbst ändert nichts; die Anwendung entscheidet, was angepasst werden darf.
+
+## Konfiguration
+
+Zwei Ebenen, beide in der Anwendung (das Element bleibt datenfrei):
+
+- **Pro Community/Instanz:** `LEISTE_KONTEXT` nennt je Ansicht die Einträge, die dort nicht erscheinen, z. B. `{ relilab: { aus: ['relidesk', 'oercommunity'] } }`. Ohne Eintrag zeigt eine Instanz alles. „Start“ bleibt immer als Anker; Communities werden nie ausgeblendet.
+- **Pro Person:** `leisteItems()` zieht zusätzlich die IDs ab, die die Person abgewählt hat. Sie stehen als JSON-Liste im Speicher unter `relihub-leiste-aus`. Der Knopf „⋯“ öffnet das Panel `#leisteCfg` (ein Kästchen je Instanz, „Fertig“ schließt, Escape ebenso); eine Änderung wirkt sofort.
+- **Vorauswahl:** alle Instanzen sichtbar. Ist der Speicher gesperrt oder ungültig, bleibt alles sichtbar.
+- **Offen:** Reihenfolge per Drag-and-drop und die Aufnahmeregel für neue Instanzen (Faden „Anordnung“). Das Panel sagt „Reihenfolge ändern folgt“.
+
 ## CSS-Variablen
 
 - `--relihub-leiste-bg`: Hintergrund (Standard `#1D1D1B`)
@@ -71,5 +82,5 @@ Gedacht wie bei der Steuerkonsole als eigene Skript-Datei; im Prototyp steht das
 
 ## Was fehlt
 
-- Konfiguration: welche Orte eine Instanz zeigt, folgt mit einem eigenen Schritt (Filter in `leisteItems()`).
+- Reihenfolge ändern (Drag-and-drop) und die Aufnahmeregel für neue Instanzen: Faden „Anordnung“, siehe Abschnitt Konfiguration.
 - Profil-Daten: Welche Communities angezeigt werden, kommt im Prototyp aus der Persona (`COMM`); echte Daten folgen mit der Personen-Ansicht.
