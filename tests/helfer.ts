@@ -23,5 +23,7 @@ export function contrast(a: string, b: string): number {
 const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
 /** Text des ersten <script>-Blocks (Web Component relihub-steuerkonsole) */
 export function consoleScript(): string { return scripts[0]; }
+/** Text des zweiten <script>-Blocks (Web Component relihub-leiste) */
+export function leisteScript(): string { return scripts[1]; }
 /** Text des letzten <script>-Blocks (Prototyp-Anwendung) */
 export function appScript(): string { return scripts[scripts.length - 1]; }

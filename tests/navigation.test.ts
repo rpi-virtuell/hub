@@ -1,5 +1,5 @@
 import { assert } from 'jsr:@std/assert@1';
-import { html, appScript, consoleScript } from './helfer.ts';
+import { html, appScript, consoleScript, leisteScript } from './helfer.ts';
 const block = (re: RegExp) => (appScript().match(re) || [''])[0];   // Ausschnitt aus dem Anwendungsskript
 const hblock = (re: RegExp) => (html.match(re) || [''])[0];         // Ausschnitt aus dem HTML
 
@@ -65,4 +65,18 @@ Deno.test('Konsole mobil: Sheet statt Sprung, Toleranz beim Tippen', () => {
   assert(/function kleinerSchirm\(\)/.test(s) && /data-sheet-close/.test(s), 'Sheet-Logik fehlt');
   assert(/const TOUCH_SLACK = 18/.test(c) && /nearest\(p, slack\)/.test(c) && /this\.exclusive\(p\) \|\| this\.nearest\(p, TOUCH_SLACK\)/.test(c), 'Toleranz fehlt');
   assert(/function explainDefault\(\) \{\s*exEl\.classList\.remove\('sheet'\)/.test(s) && /function route\(\) \{\s*exEl\.classList\.remove\('sheet'\)/.test(s), 'Sheet wird bei Routenwechsel nicht geschlossen');
+});
+
+Deno.test('Leiste: eigenständiges Widget, klar von der Konsole unterschieden', async () => {
+  const l = leisteScript(), s = appScript(), c = consoleScript();
+  assert(/customElements\.define\('relihub-leiste'/.test(l) && /relihub-leiste-select/.test(l) && /setItems\(items\)/.test(l), 'Widget');
+  assert(/--relihub-leiste-bg/.test(l) && /label/.test(l), 'Variablen oder Beschriftung fehlen');
+  assert(html.includes('<relihub-leiste id="leiste" label="Orte"') && !/class="proto"/.test(html), 'Leiste nicht ersetzt');
+  assert(/const LEISTE = \[/.test(s) && !/id: 'profil'/.test(block(/const LEISTE = \[[\s\S]*?\n  \];/)), 'LEISTE oder Profil-Eintrag');
+  assert(/function leisteItems\(\)/.test(s) && /kind: 'community'/.test(s) && /relihub-leiste-select/.test(s), 'Anwendung nutzt das Widget nicht');
+  assert(/Tätigkeiten/.test(c) && /\.cap\{/.test(c), 'Konsole ohne Überschrift');
+  const rt = block(/function route\(\)[\s\S]*?window\.scrollTo/), si = rt.indexOf('setItems(leisteItems())');
+  assert(si > 0 && si < rt.indexOf('return'), 'setItems läuft nicht bei jedem Routenaufruf');
+  const d = await Deno.readTextFile(new URL('../docs/leiste.md', import.meta.url));
+  assert(/relihub-leiste-select/.test(d) && /setItems/.test(d) && /Tätigkeiten/.test(d), 'docs/leiste.md unvollständig');
 });
