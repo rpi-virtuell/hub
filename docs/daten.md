@@ -54,6 +54,29 @@ Relays: `wss://relay.edufeed.org`, `wss://relay-rpi.edufeed.org` (nicht das AMB-
 
 Stand-Zeile: vor der Antwort `Nachbau · Termine und News laden`; mit Antwort `live · <n> Termine · <m> News` (`n` = bevorstehende Termine, `m` = News); ohne Antwort `Nachbau · Relay nicht erreichbar`, und die Tabs zeigen „Gerade keine Verbindung zu den Relays; die Termine stehen auch unter rpi-virtuell.de“ mit Link. Weil `since` auf `created_at` wirkt, fehlen Termine, die vor mehr als 180 Tagen angelegt und seitdem nicht geändert wurden.
 
+## Inhalte aus Events
+
+Das Schaufenster auf oer.community liegt als Events unter einem eigenen Schlüssel; im Code steht nur der npub (`FO_NPUB`, daraus `FO_HEX`). `ocLaden()` fragt einmal je Sitzung beide Relays (`wss://relay-rpi.edufeed.org`, `wss://relay.edufeed.org`) mit **einem** `REQ` je Relay und vier Filtern:
+
+| Filter | Wert | Zweck |
+|---|---|---|
+| 1 | `{ kinds: [30023], authors: [FO_HEX], '#l': ['seite'], limit: 40 }` | Seiten (Beiträge mit Label `seite`) |
+| 2 | `{ kinds: [30023], authors: [FO_HEX], limit: 40 }` | Beiträge |
+| 3 | `{ kinds: [30004], authors: [FO_HEX], limit: 5 }` | Listen (Navigation, Fußzeile) |
+| 4 | `{ kinds: [31923], authors: [FO_HEX], limit: 200 }` | Termine |
+
+Je Adresse (`kind:pubkey:d`) gilt das Event mit dem neuesten `created_at`. Seiten sind `kind:30023` mit Tag `['l','seite',…]` (Schlüssel: `d`), alle übrigen `kind:30023` sind Beiträge, sortiert nach `published_at` (sonst `created_at`) absteigend; Termine sind nach `start` aufsteigend sortiert. Das Ergebnis `{ seiten, beitraege, listen, termine }` bleibt in `ocDaten`; spätere Aufrufe liefern es ohne Netz.
+
+**Sicherheitsregel für `mdSeite(src)`:** Inhalte vom Relay sind fremder Text. Jede Zeile wird zuerst mit `esc()` maskiert, erst danach entsteht Auszeichnung (Überschriften eine Stufe tiefer, Absätze, Listen, Zitate, Fett, Kursiv, Code, Trennlinie). `href` und `src` gehen nur über `sichereUrl()` (nur `http(s)://`): ein Link mit anderer Adresse wird zum bloßen Text, ein Bild mit relativer oder unsicherer Adresse zu „Bild: <alt>“. Tabellen werden nicht erkannt, rohes HTML bleibt maskiert.
+
+**Lizenzregel:** `lizenzLabel(url)` macht aus der Lizenzadresse ein Kürzel (`CC BY-SA 4.0`, `CC0 (Public Domain)`, bei Länderfassung `CC BY 3.0 DE`; `legalcode.de` und `deed.de` am Ende werden vorher abgeschnitten); Unbekanntes bleibt die Adresse. `lizenzStand(url)` ordnet in drei Werte ein:
+
+| Wert | Adressen | erlaubt |
+|---|---|---|
+| `offen` | CC0, Public Domain Mark, CC BY, CC BY-SA | holen, weiterbearbeiten, sammeln |
+| `geschuetzt` | CC mit NC oder ND, Wikipedia-Urheberrecht, Unsplash, Pixabay, Canva | ansehen, verlinken |
+| `unbekannt` | leer oder nicht erkannt | gilt als geschützt: ansehen, verlinken |
+
 ## Schnappschuss erneuern
 
 ```bash

@@ -1890,6 +1890,121 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     return bech32('naddr', [3, 4, kind >>> 24 & 255, kind >> 16 & 255, kind >> 8 & 255, kind & 255, 2, 32, ...pubHex.match(/../g).map(h => parseInt(h, 16)), 0, id.length, ...id]);
   }
 
+  // ---------- Inhalte aus Events: Seiten, Beiträge, Materialien (ADR-0027 oer.community, Issues 10/03/04/15) ----------
+  // Schaufenster-Schlüssel oer.community (ADR-0027 dort): nur der npub steht im Code
+  const FO_NPUB = 'npub1tgftg8kptdrxxg0g3sm3hckuglv3j0uu3way4vylc5qyt0f44m0s3gun6e';
+  const FO_HEX = npubToHex(FO_NPUB);
+  let ocDaten = null, ocLauf = null;   // aufgelöste Daten, laufende Abfrage (einmal je Sitzung)
+  /** Erster Wert des Tags `name` oder '' */
+  function tagWert(ev, name) {
+    const t = (ev.tags || []).find(x => x[0] === name);
+    return t && t[1] != null ? t[1] : '';
+  }
+  /** Alle Werte des Tags `name` als Array */
+  function tagWerte(ev, name) {
+    return (ev.tags || []).filter(x => x[0] === name && x[1] != null).map(x => x[1]);
+  }
+  /** Markdown der Seiten und Beiträge → HTML. Fremder Text: erst esc(), dann Auszeichnung; href/src nur über sichereUrl; keine Tabellen, kein rohes HTML. */
+  function mdSeite(src) {
+    if (!src) return '';
+    const teile = [];   // Bilder als Platzhalter, damit die Link-Regel sie nicht erfasst
+    const inline = t => {
+      t = t.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (m, alt, u) => {
+        const ok = sichereUrl(u);
+        teile.push(ok ? `<figure><img loading="lazy" alt="${alt}" src="${ok}"></figure>` : `<span class="img-fehlt">Bild: ${alt}</span>`);
+        return '\u0000' + (teile.length - 1) + '\u0000';
+      });
+      t = t.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, text, u) => {
+        const ok = sichereUrl(u);
+        return ok ? `<a href="${ok}" target="_blank" rel="noopener">${text}</a>` : text;
+      });
+      t = t.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\*([^*\s][^*]*?)\*/g, '<i>$1</i>').replace(/`([^`]+)`/g, '<code>$1</code>');
+      return t.replace(/\u0000(\d+)\u0000/g, (m, i) => teile[+i]);
+    };
+    const out = []; let art = '', puffer = [];
+    const schliessen = () => {
+      if (!puffer.length) { art = ''; return; }
+      const z = puffer.map(p => p.trim());
+      if (art === 'ul' || art === 'ol') out.push(`<${art}>` + z.map(p => `<li>${inline(p)}</li>`).join('') + `</${art}>`);
+      else if (art === 'bq') out.push('<blockquote>' + inline(z.join(' ')) + '</blockquote>');
+      else { const h = inline(z.join(' ')); out.push(h.includes('<figure') ? `<div>${h}</div>` : `<p>${h}</p>`); }
+      puffer = []; art = '';
+    };
+    for (const roh of String(src).replace(/\r/g, '').split('\n')) {
+      const z = esc(roh); let m;
+      if (!z.trim()) { schliessen(); continue; }
+      if ((m = z.match(/^(#{1,4}) +(.+)$/))) { schliessen(); const n = m[1].length + 1; out.push(`<h${n}>${inline(m[2].trim())}</h${n}>`); continue; }
+      if (/^ {0,3}-{3,} *$/.test(z)) { schliessen(); out.push('<hr>'); continue; }
+      let neu = 'p', text = z;
+      if ((m = z.match(/^[-*] +(.*)$/))) { neu = 'ul'; text = m[1]; }
+      else if ((m = z.match(/^\d+\. +(.*)$/))) { neu = 'ol'; text = m[1]; }
+      else if ((m = z.match(/^&gt; ?(.*)$/))) { neu = 'bq'; text = m[1]; }
+      if (neu !== art) schliessen();
+      art = neu; puffer.push(text);
+    }
+    schliessen();
+    return out.join('');
+  }
+  /** Lizenzkürzel nach lizenzlabel.js (oer-community-Repo): CC0, Public Domain, Unsplash, Pixabay, Canva, Wikipedia-Urheberrecht, MIT, CC <KÜRZEL> <Version>[ <LAND>]; unbekannt → die URL; leer → '' */
+  function lizenzLabel(url) {
+    const roh = String(url || '').trim(); if (!roh) return '';
+    const u = roh.toLowerCase().replace(/\/+$/, '').replace(/\/(legalcode|deed)(\.[a-z]{2})?$/, '').replace(/\/+$/, '');
+    if (/creativecommons\.org\/publicdomain\/zero\//.test(u + '/')) return 'CC0 (Public Domain)';
+    if (/creativecommons\.org\/publicdomain\/mark\//.test(u + '/')) return 'Public Domain';
+    const cc = u.match(/creativecommons\.org\/licenses\/([a-z-]+)\/(\d+\.\d+)(?:\/([a-z]{2}))?$/);
+    if (cc) return 'CC ' + cc[1].toUpperCase() + ' ' + cc[2] + (cc[3] ? ' ' + cc[3].toUpperCase() : '');
+    if (/wikipedia\.org\/wiki\/urheberrecht/.test(u)) return 'Urheberrechtlich geschützt';
+    if (/unsplash\./.test(u)) return 'Unsplash';
+    if (/pixabay\./.test(u)) return 'Pixabay';
+    if (/canva\./.test(u)) return 'Canva';
+    if (/opensource\.org\/licenses\/mit$/.test(u)) return 'MIT';
+    return roh;
+  }
+  /** Lizenzstand 'offen' | 'geschuetzt' | 'unbekannt' (Issue 15, Spec 4.3): offen = holen, weiterbearbeiten, sammeln; geschützt = ansehen und verlinken; unbekannt gilt als geschützt */
+  function lizenzStand(url) {
+    const u = String(url || '').trim().toLowerCase(); if (!u) return 'unbekannt';
+    if (/creativecommons\.org\/publicdomain\/(zero|mark)\//.test(u + '/')) return 'offen';
+    const cc = u.match(/creativecommons\.org\/licenses\/([a-z-]+)\//);
+    if (cc) return /^(by|by-sa)$/.test(cc[1]) ? 'offen' : /nc|nd/.test(cc[1]) ? 'geschuetzt' : 'unbekannt';
+    if (/wikipedia\.org\/wiki\/urheberrecht|unsplash\.|pixabay\.|canva\./.test(u)) return 'geschuetzt';
+    return 'unbekannt';
+  }
+  /** Seiten, Beiträge, Listen und Termine des Schaufensters in einer Abfrage (ein REQ je Relay), einmal je Sitzung; je Adresse gilt das neueste created_at */
+  function ocLaden() {
+    if (ocDaten) return Promise.resolve(ocDaten);
+    if (ocLauf) return ocLauf;
+    ocLauf = hubFetch('oercommunity', [
+      { kinds: [30023], authors: [FO_HEX], '#l': ['seite'], limit: 40 },
+      { kinds: [30023], authors: [FO_HEX], limit: 40 },
+      { kinds: [30004], authors: [FO_HEX], limit: 5 },
+      { kinds: [31923], authors: [FO_HEX], limit: 200 }
+    ], { relays: ['wss://relay-rpi.edufeed.org', 'wss://relay.edufeed.org'] }).then(events => {
+      const neu = new Map();
+      for (const ev of events) {
+        const k = ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd'), alt = neu.get(k);
+        if (!alt || ev.created_at > alt.created_at) neu.set(k, ev);
+      }
+      const seiten = new Map(), beitraege = [], termine = [], listen = { navigation: null, fusszeile: null };
+      for (const ev of neu.values()) {
+        if (ev.kind === 30023) {
+          if (tagWerte(ev, 'l').includes('seite')) seiten.set(tagWert(ev, 'd'), ev); else beitraege.push(ev);
+        } else if (ev.kind === 30004) {
+          const d = tagWert(ev, 'd'); if (d in listen) listen[d] = ev;
+        } else if (ev.kind === 31923) termine.push(ev);
+      }
+      const datum = ev => +tagWert(ev, 'published_at') || ev.created_at;
+      beitraege.sort((a, b) => datum(b) - datum(a));
+      termine.sort((a, b) => (+tagWert(a, 'start') || 0) - (+tagWert(b, 'start') || 0));
+      ocDaten = { seiten, beitraege, listen, termine };
+      return ocDaten;
+    });
+    return ocLauf;
+  }
+  /** Adresse eines Beitrags auf oer.community */
+  function beitragUrl(ev) { return 'https://oer.community/' + encodeURIComponent(tagWert(ev, 'd')) + '/'; }
+  /** Titelbild eines Beitrags; relative Bildnamen ergeben '' (Platzhalter mit Titel, ADR-0002 Punkt 3) */
+  function beitragBild(ev) { return sichereUrl(tagWert(ev, 'image')); }
+
   // ---------- kleine Symbole der Steuerkonsole (Logo, Abschnittssymbole) ----------
   const ORDER = ['hub','finden','erstellen','kooperieren','veroeffentlichen'];
   function petals(svg, only) {
