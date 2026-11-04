@@ -86,3 +86,14 @@ Deno.test('Schaufenster live: Routen, Menü, Abschnitte, Schnappschuss', async (
   assert(seite.includes("'Lizenz: siehe oer.community'") && seite.includes("=== 'CC BY 4.0'") && !seite.includes('/^CC BY \\d/'), 'Lizenzzeile behauptet nichts, was das Event nicht trägt');
   assert((html.match(/<div class="view"/g) || []).length - 1 === (html.match(/class="stand"/g) || []).length, 'Stand-Zeilen vollständig');
 });
+
+Deno.test('Spielregeln: vier Seiten mit Vorbereitungs-Rückfall', async () => {
+  const sr = block(/const SPIELREGELN = \[[\s\S]*?\n  \];/);
+  for (const d of ['spielregeln-qualitaetskriterien', 'spielregeln-metadatenprofil', 'spielregeln-redaktion', 'spielregeln-ablaeufe']) assert(sr.includes(`d: '${d}'`), d);
+  assert((sr.match(/heute: 'https:\/\//g) || []).length === 4, 'jede Kachel hat einen Verweis für heute');
+  assert(/in Vorbereitung/.test(s) && /oc-vorbereitung/.test(s) && /von 4 Seiten/.test(s), 'Rückfall sichtbar');
+  assert(/function spielregelLink\(d\)/.test(s), 'spielregelLink');
+  assert(/'spielregeln'/.test(block(/function ocOpen\(sub\)[\s\S]*?\n  \}/)), 'ocOpen kennt den Bereich');
+  const n = await Deno.readTextFile(new URL('../docs/navigation.md', import.meta.url));
+  assert(/Spielregeln/.test(n), 'docs/navigation.md');
+});
