@@ -1,6 +1,8 @@
 # Betrieb: Forgejo, GitHub-Spiegel, GitHub Pages, Domain
 
-Stand 28.10.2026. Diese Anleitung richtet sich an die technische Umsetzung. Ziel: Der Prototyp (`index.html`) ist zuerst unter `https://rpi-virtuell.github.io/hub/` erreichbar, danach unter `https://hub.rpi-virtuell.net`.
+Stand 28.10.2026, ergänzt 04.11.2026. Diese Anleitung richtet sich an die technische Umsetzung.
+
+**Stand 04.11.2026:** Der Prototyp wird unter `https://hub.rpi-virtuell.net` ausgeliefert (eigener Server, Caddy), nicht mehr über den GitHub-Spiegel und GitHub Pages. Die Schritte 1 bis 3 unten beschreiben den früheren Weg über GitHub und bleiben als Rückfall stehen; der Weg von der Forgejo-Arbeitskopie zum Server ist hier noch nicht beschrieben.
 
 ## Wie der Code fließt
 

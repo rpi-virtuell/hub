@@ -104,7 +104,7 @@ Deno.test('Newsletter je Community', () => {
   assert(/cy-nl/.test(s) && /Newsletter:/.test(s), 'Kachel-Pille oder Raum-Kopf fehlt');
 });
 
-const ADRS = ['0001-farbsystem', '0002-instanzen-als-nachbau', '0003-teilen-in-communities', '0004-newsletter-als-nip-b0', '0005-artikel-im-finden'];
+const ADRS = ['0001-farbsystem', '0002-instanzen-als-nachbau', '0003-teilen-in-communities', '0004-newsletter-als-nip-b0', '0005-artikel-im-finden', '0006-live-daten-mit-rueckfall'];
 Deno.test('ADRs und README-Abschnitt', async () => {
   const readme = await Deno.readTextFile(new URL('../README.md', import.meta.url));
   assert(readme.includes('## Grundentscheidungen'), 'README-Abschnitt fehlt');
@@ -116,6 +116,11 @@ Deno.test('ADRs und README-Abschnitt', async () => {
     alle.push(t);
   }
   assert(!/Arbeitspaket|Meilenstein|Förderkennzeichen|01PO23012/.test(alle.join('\n') + readme), 'Projektdoku-Begriffe in ADRs/README');
+});
+
+Deno.test('ADR-0002 verweist auf ADR-0006', async () => {
+  const t = await Deno.readTextFile(new URL('../docs/adr/0002-instanzen-als-nachbau.md', import.meta.url));
+  assert(/ersetzt durch ADR-0006/.test(t), 'ADR-0002 ohne Ersatzvermerk');
 });
 
 Deno.test('Review-Fixes: Picker-Bindung, Escaping, Raum-Kontext, Mitgliedschaft, Platzhalter', () => {
