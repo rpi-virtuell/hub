@@ -1277,7 +1277,7 @@ relihub-steuerkonsole[hidden]{display:none}
   <main class="oc-main"><div class="oc-in" id="ocRoot"></div></main>
   <footer class="oc-foot"><div class="oc-in">
     <div>CC BY 2024–2026 FOERBICO – soweit nicht anders angegeben · <span id="ocFuss"></span></div>
-    <div class="hub"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> Teil des reli_hub · Datenstand 29.09.2026</div>
+    <div class="hub"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> Teil des reli_hub</div>
   </div></footer>
   <relihub-steuerkonsole id="ocFlower" floating size="58" popover-size="210" context="oer-community"></relihub-steuerkonsole>
 </div>
@@ -2300,6 +2300,10 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const id = tagWert(ev, feld + ':id') || tagWert(ev, feld), label = tagWert(ev, feld + ':prefLabel:de') || tagWert(ev, feld + ':prefLabel');
     return { id, label: label || String(id).replace(/\/+$/, '').split('/').pop() };
   }
+  /** 64 Hex-Zeichen klein: nur so ein Schlüssel aus dem Relay in Adressen und Filter darf */
+  function istHex64(x) {
+    return typeof x === 'string' && /^[0-9a-f]{64}$/.test(x);
+  }
   /** Materialien von allen drei Relays in einer Abfrage (ein REQ je Relay), einmal je Sitzung; je Adresse (pubkey:d) gilt das neueste created_at */
   function mpLaden() {
     if (mpDaten) return Promise.resolve(mpDaten);
@@ -2307,6 +2311,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     mpLauf = hubFetch('materialpool', [{ kinds: [30142], limit: 200 }]).then(events => {
       const neu = new Map();
       for (const ev of events) {
+        if (!istHex64(ev.pubkey)) continue;   // Herausgeber-Schlüssel kommt vom Relay: nur gültiger Hex-Wert
         const k = ev.pubkey + ':' + tagWert(ev, 'd'), alt = neu.get(k);
         if (!alt || ev.created_at > alt.created_at) neu.set(k, ev);
       }
@@ -2406,7 +2411,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       const satz = {
         offen: 'Offen lizenziert: Du kannst es auf den Schreibtisch holen, in der Community weiterbearbeiten und in Sammlungen aufnehmen.',
         geschuetzt: 'Geschützt: Du kannst es ansehen, verlinken und empfehlen; Weiterbearbeiten und Sammeln gehen nur mit offener Lizenz.',
-        unbekannt: 'Lizenz nicht angegeben: Bis das geklärt ist, gilt es als geschützt.'
+        unbekannt: m.lic ? 'Lizenz nicht erkannt: Bis das geklärt ist, gilt es als geschützt.' : 'Lizenz nicht angegeben: Bis das geklärt ist, gilt es als geschützt.'
       }[m.stand];
       const aktionen = mpAktionen.map((a, i) => a.geht
         ? `<button type="button" data-mp-aktion="${i}">${esc(a.label)}</button>`
@@ -2425,7 +2430,11 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
         <p class="mp-pruef">${pruef}</p>
         <details class="mp-roh"><summary>Rohdaten (JSON-LD)</summary><p class="hint">aus dem Event gebildet (AMB-Kontext)</p><pre>${esc(roh)}</pre><button type="button" data-mp-copy>Kopieren</button></details>`;
     };
-    const fehlt = () => { box.innerHTML = `${zurueck}<h1>Material nicht gefunden.</h1><p><a href="#materialpool">‹ Zum Materialpool</a></p>`; };
+    const fehlt = () => {
+      // ohne Listenantwort ist offen, ob das Material fehlt oder nur keine Verbindung besteht
+      const text = mpDaten ? 'Material nicht gefunden.' : 'Gerade keine Verbindung zu den Relays oder Material nicht vorhanden.';
+      box.innerHTML = `${zurueck}<h1>${text}</h1><p><a href="#materialpool">‹ Zum Materialpool</a></p>`;
+    };
     const dort = () => (mpDaten || []).find(m => m.d === d && (!p || m.pk === p));
     const lauf = ++mpDetailLauf, aktuell = () => lauf === mpDetailLauf && CUR.split('?')[0] === 'materialpool';
     box.hidden = false;
@@ -2459,12 +2468,12 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const treffer = mpDaten.filter(m => mpPasst(m, begriffe)).sort((a, b) => b.datum - a.datum).slice(0, 24);
     liste.innerHTML = treffer.length ? treffer.map(m => {
       const zeile = [m.art, m.quelle, m.stufe].filter(Boolean).map(esc).join(' · ');
-      const pille = m.licLabel || (m.stand === 'unbekannt' ? 'Lizenz nicht angegeben' : '');
+      const pille = m.licLabel || (m.stand === 'unbekannt' && !m.lic ? 'Lizenz nicht angegeben' : '');
       return `<a class="mp-card" href="#materialpool?d=${encodeURIComponent(m.d)}&p=${m.pk}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand}">${esc(pille || 'Lizenz nicht angegeben')}</span></a>`;
     }).join('') : '<p>Nichts gefunden; Vorauswahl entfernen oder anders suchen.</p>';
     // k = Zahl der abgefragten Relays: hubFetch meldet nicht, welche geantwortet haben
     const n = mpDaten.filter(m => m.vollstaendig).length;
-    fuss.textContent = `${n} von ${mpDaten.length} Materialien mit vollständigen Metadaten · live von ${RELAYS.length} Relays`;
+    fuss.textContent = `${n} von ${mpDaten.length} Materialien mit vollständigen Metadaten · abgefragt bei ${RELAYS.length} Relays`;
   }
   /** Ansicht #materialpool: Vorauswahl-Banner (thema, stufe), sofort Rückfall oder Daten, einmal je Sitzung live nachladen; mit ?d= die Detailansicht */
   function mpOpen(qs) {
@@ -2483,7 +2492,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
         if (CUR.split('?')[0] === 'materialpool') mpRender();
       });
     };
-    if (d) { ladeEinmal(); mpDetail(p.get('d'), p.get('p') || ''); return; }
+    if (d) { ladeEinmal(); mpDetail(p.get('d'), istHex64(p.get('p')) ? p.get('p') : null); return; }
     mpDetailLauf++; mpAktuell = null;
     document.getElementById('mpDetail').hidden = true;
     document.getElementById('v-materialpool').classList.remove('detail');
@@ -3007,6 +3016,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     if (sub === 'spielregeln') root.innerHTML = ocSpielregeln(daten);
     else if (ev) root.innerHTML = ocSeite(ev);
     else if (!geladen) root.innerHTML = '<section class="oc-sec"><p>Seite wird geladen …</p></section>';
+    else if (OC_SEITEN.includes(sub) && (!daten || (!daten.seiten.size && !daten.beitraege.length))) root.innerHTML = `<section class="oc-sec"><p>Die Relays antworten gerade nicht. ${ocExt('https://oer.community/' + encodeURIComponent(sub) + '/', 'Seite auf oer.community ansehen ›')} · <a href="#oercommunity">‹ Schaufenster</a></p></section>`;
     else if (OC_SEITEN.includes(sub)) root.innerHTML = `<section class="oc-sec"><p>Diese Seite ist in Vorbereitung. ${ocExt('https://oer.community/' + encodeURIComponent(sub) + '/', 'Auf oer.community ansehen ›')} · <a href="#oercommunity">‹ Schaufenster</a></p></section>`;
     else toast('Diese Seite gibt es im Schaufenster nicht.');
   }
@@ -3032,7 +3042,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   });
 
   const CR = {
-    oercommunity: { act: OC_POSTS.map(p => T_('Artikel', p.t, { who: 'OER-Community', ago: p.ago, x: p.x, tags: p.tags, url: p.url })) },
+    oercommunity: { act: OC_POSTS.map(p => T_('Artikel', esc(p.t), { who: 'OER-Community', ago: p.ago, x: esc(p.x), tags: p.tags.map(esc), url: p.url })) },
     relilab: { act: [
         T_('Termin', 'Den Ramadan in der Schule gestalten – Interreligiöses Lernen', { who: 'relilab', ago: 'vor 4 Tagen', d: ['11', 'JAN', '2027, 16:00'], tags: ['Ramadan', 'Fastenbrechen', 'Id al-Fitr'] }),
         T_('Termin', 'Weihnachten religionssensibel gestalten – Interreligiöses Lernen', { who: 'relilab', ago: 'vor 4 Tagen', d: ['12', 'NOV', '2026, 16:00'], tags: ['Weihnachten', 'Advent', 'Maria'] }),
