@@ -33,3 +33,4 @@ Regeln: Deutsch; Produktsicht (keine Projektverwaltung, keine Berichtsbezüge); 
 | [0004](0004-newsletter-als-nip-b0.md) | Newsletter einer Community als NIP-B0-Lesezeichen | angenommen |
 | [0005](0005-artikel-im-finden.md) | Artikel und Nachrichten gehören zu „finden“ | angenommen |
 | [0006](0006-live-daten-mit-rueckfall.md) | Live-Daten mit Schnappschuss als Rückfall, Kennzeichnung „Nachbau“ (ersetzt Punkt 1 von ADR-0002) | angenommen |
+| [0007](0007-inhalte-aus-events.md) | Inhalte aus Events: Seiten, Beiträge, Materialien, Lizenzstand | angenommen |

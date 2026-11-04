@@ -154,3 +154,11 @@ Deno.test('Material-Detail: Felder, Lizenzstand, Rohdaten, kein zweiter REQ bei 
   assert(/authors: \[p\]/.test(det) && /&p=\$\{m\.pk\}/.test(block(/function mpRender\(\)[\s\S]*?\n  \}/)), 'Material wird über pubkey und d bestimmt');
   assert(/id="mpDetail"/.test(html), 'Detail-Block in der Ansicht');
 });
+
+Deno.test('ADR-0007 und README nennen die Etappe', async () => {
+  const adr = await Deno.readTextFile(new URL('../docs/adr/0007-inhalte-aus-events.md', import.meta.url));
+  assert(/^# ADR-0007/.test(adr) && /## Status/.test(adr) && /## Entscheidung/.test(adr) && /4a3d1b54/.test(adr) && /516faa60/.test(adr));
+  assert(!/Arbeitspaket|Meilenstein|Förderkennzeichen|Projektträger|Zwischenbericht/.test(adr), 'Projektsprache');
+  const r = await Deno.readTextFile(new URL('../README.md', import.meta.url));
+  assert(/0007-inhalte-aus-events/.test(r) && /Spielregeln/.test(r), 'README');
+});
