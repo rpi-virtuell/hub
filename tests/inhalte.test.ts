@@ -94,6 +94,10 @@ Deno.test('Spielregeln: vier Seiten mit Vorbereitungs-Rückfall', async () => {
   assert(/in Vorbereitung/.test(s) && /oc-vorbereitung/.test(s) && /von 4 Seiten/.test(s), 'Rückfall sichtbar');
   assert(/function spielregelLink\(d\)/.test(s), 'spielregelLink');
   assert(/'spielregeln'/.test(block(/function ocOpen\(sub\)[\s\S]*?\n  \}/)), 'ocOpen kennt den Bereich');
+  const bereich = block(/function ocSpielregeln[\s\S]*?\n  \}/);
+  for (const k of ['data-oc-tutorial', 'Lesen ›', 'in Vorbereitung']) assert(bereich.includes(k), 'Bereich: ' + k);
+  assert(s.includes("setModus('tutorial')"), 'Klick-Handler schaltet den Tutorial-Modus');
+  assert((s.match(/#oercommunity\/spielregeln/g) || []).length >= 2, 'Menü mit und ohne Relay-Liste führt zum Bereich');
   const n = await Deno.readTextFile(new URL('../docs/navigation.md', import.meta.url));
   assert(/Spielregeln/.test(n), 'docs/navigation.md');
 });

@@ -2669,7 +2669,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     return ocDaten && ocDaten.seiten.has(d) ? '#oercommunity/' + d : '#oercommunity/spielregeln';
   }
   const OC_SEITEN = ['startseite', 'tagungen', 'qualitaet', 'oer-und-oep', 'unser-team', 'impressum', 'datenschutz', 'spielregeln', ...SPIELREGELN.map(s => s.d)];
-  const OC_NAV_STD = '<button type="button" data-ocs="oc-tagungen">Tagungen</button><button type="button" data-ocs="oc-oer">Was ist OER?</button><button type="button" data-ocs="oc-qualitaet">Qualität</button><button type="button" data-ocs="oc-team">Team</button><button type="button" data-ocs="oc-blog">Blog</button>';
+  const OC_NAV_STD = '<button type="button" data-ocs="oc-tagungen">Tagungen</button><button type="button" data-ocs="oc-oer">Was ist OER?</button><button type="button" data-ocs="oc-qualitaet">Qualität</button><a href="#oercommunity/spielregeln">Spielregeln</a><button type="button" data-ocs="oc-team">Team</button><button type="button" data-ocs="oc-blog">Blog</button>';
   const OC_FUSS_STD = `${ocExt('https://oer.community/impressum/', 'Impressum')} &amp; ${ocExt('https://oer.community/datenschutz/', 'Datenschutz')}`;
   const OC_OER = [
     ['oer-und-oep', 'OER und OEP', 'Was Open Educational Resources und Open Educational Practices sind, warum offene Materialien Zusammenarbeit möglich machen, und ein Selbstlernmodul zum Einstieg.'],
