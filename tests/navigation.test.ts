@@ -64,4 +64,5 @@ Deno.test('Konsole mobil: Sheet statt Sprung, Toleranz beim Tippen', () => {
   assert(/@media \(max-width:640px\)\{[\s\S]*?\.explain\.sheet\{[^}]*position:fixed/.test(html), 'Sheet-Regel fehlt');
   assert(/function kleinerSchirm\(\)/.test(s) && /data-sheet-close/.test(s), 'Sheet-Logik fehlt');
   assert(/const TOUCH_SLACK = 18/.test(c) && /nearest\(p, slack\)/.test(c) && /this\.exclusive\(p\) \|\| this\.nearest\(p, TOUCH_SLACK\)/.test(c), 'Toleranz fehlt');
+  assert(/function explainDefault\(\) \{\s*exEl\.classList\.remove\('sheet'\)/.test(s) && /function route\(\) \{\s*exEl\.classList\.remove\('sheet'\)/.test(s), 'Sheet wird bei Routenwechsel nicht geschlossen');
 });
