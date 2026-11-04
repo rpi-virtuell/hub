@@ -18,7 +18,7 @@ Die Relays weisen Adressen ab, die viele Anfragen schnell hintereinander stellen
 - `hubFetch(name, filters, opts)` → `Promise<Event[]>`: sendet die Filter als ein `REQ` an jedes Relay aus `opts.relays` (Standard: alle `RELAYS`), sammelt `EVENT`s, dedupliziert nach `id` und schließt bei `EOSE` oder nach `TIMEOUT_MS`. Bei `NOTICE`, `CLOSED` oder Verbindungsfehler schließt der Socket, und das bis dahin Empfangene zählt. Das Versprechen löst immer auf, nie ab; im schlechtesten Fall mit `[]`. Das Ergebnis liegt in `sessionStorage` unter `relihub:<name>` als `{t, events}`; ist der Speicher gesperrt (privates Fenster), läuft alles ohne Zwischenspeicher.
 - `datenstand(viewId, zustand, info)`: schreibt die Stand-Zeile `<p class="stand">` der Ansicht: `live · <info>`, `Stand vom <info>` oder `Nachbau · <info>`.
 - `npubToHex(npub)`: Bech32 nach NIP-19, liefert 64 Hex-Zeichen.
-- `evToTermin(ev)`: NIP-52-Event (kind 31923) → Termin-Objekt der relilab-Ansicht (`id` aus dem `d`-Tag, Titel, Start, Ende, Kurztext aus `summary`, Ort, `t`-Tags, Bild, Anmeldelink aus `r`, Absender über `RT_SRC`, `naddr` und edufeed-Link).
+- `evToTermin(ev)`: NIP-52-Event (kind 31923) → Termin-Objekt der relilab-Ansicht (`id` aus dem `d`-Tag, Titel, Start, Ende, Kurztext aus `summary`, Ort, `t`-Tags, Bild und Anmeldelink aus `r` nur mit `http(s)://`, sonst leer (`sichereUrl`), Absender über `RT_SRC`, `naddr` und edufeed-Link).
 
 ## Zustände je Ansicht
 
@@ -27,7 +27,8 @@ Jede Ansicht außer der Startseite trägt direkt unter ihrer Kopfzeile eine Stan
 | Ansicht | Startwert | Datenquelle |
 |---|---|---|
 | `v-profil` | Nachbau · Persona Luca Beispiel | keine, Persona |
-| `v-communities`, `v-community` | Stand vom 26.10.2026 | eingebettete Beispieldaten |
+| `v-communities` | Stand vom 26.10.2026 · Texte teils Beispiel | eingebettete Liste realer Communities, Beschreibungen teils Beispieltext |
+| `v-community` | Nachbau · Beispielinhalte | Beispielinhalte (Beiträge, Chat), keine Datenquelle |
 | `v-materialpool` | Stand vom 22.10.2026 | eingebettete Liste |
 | `v-relilab` | Stand vom `RT_STAND` → live | Schnappschuss, dann `hubFetch('relilab-termine', …)` |
 | `v-relidesk` | Nachbau · relidesk ohne Datenquelle | keine |

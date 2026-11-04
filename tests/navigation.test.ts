@@ -140,3 +140,53 @@ Deno.test('Leiste konfigurierbar: pro Community und pro Person', async () => {
   const d = await Deno.readTextFile(new URL('../docs/leiste.md', import.meta.url));
   assert(/relihub-leiste-config/.test(d) && /LEISTE_KONTEXT|pro Community/.test(d), 'Doku');
 });
+
+Deno.test('Nacharbeit: ehrliche Kennzeichnung der Communities-Ansichten', async () => {
+  assert(/id="v-community" data-stand="nachbau:/.test(html), 'Community-Raum ist Nachbau mit Beispielinhalten');
+  assert(html.includes('id="v-communities" data-stand="stand:26.10.2026 · Texte teils Beispiel"'), 'Communities: Texte teils Beispiel');
+  const d = await Deno.readTextFile(new URL('../docs/daten.md', import.meta.url));
+  assert(/`v-community` \| Nachbau · Beispielinhalte/.test(d) && /Texte teils Beispiel/.test(d), 'Tabelle in docs/daten.md');
+});
+
+Deno.test('Nacharbeit: Links aus Live-Daten nur mit http(s)', () => {
+  const s = appScript();
+  assert(/(function|const) sichereUrl/.test(s), 'sichereUrl fehlt');
+  const ev = block(/function evToTermin\(ev\)[\s\S]*?\n  \}/);
+  assert((ev.match(/sichereUrl\(/g) || []).length >= 2 && /i: sichereUrl\(tag\('image'\)\)/.test(ev) && /src: sichereUrl\(tag\('r'\)\)/.test(ev), 'evToTermin prüft Bild und Anmeldelink nicht');
+  const def = s.match(/const sichereUrl = [^\n]*/)![0];
+  const sichereUrl = new Function(def + '; return sichereUrl;')();
+  assert(sichereUrl('javascript:alert(1)') === '' && sichereUrl('data:text/html,x') === '' && sichereUrl(undefined) === '', 'unsichere Links bleiben leer');
+  assert(sichereUrl('https://x.y/z') === 'https://x.y/z' && sichereUrl('HTTP://x.y') === 'HTTP://x.y', 'http(s) bleibt');
+});
+
+Deno.test('Nacharbeit: Fokus der Leiste bleibt erhalten', () => {
+  const l = leisteScript(), s = appScript();
+  assert(/attributeChangedCallback\(name, alt, neu\) \{ if \(alt === neu\) return;/.test(l), 'gleicher Wert zeichnet neu');
+  const r = (l.match(/\n    render\(\) \{[\s\S]*?\n    \}/) || [''])[0];
+  assert(/activeElement/.test(r) && /\.focus\(\)/.test(r), 'render rettet den Fokus nicht');
+  const zu = block(/function leisteCfgZu\(\) \{[\s\S]*?\n  \}/);
+  assert(/querySelector\('\[data-cfg\]'\)/.test(zu) && /\.focus\(\)/.test(zu), 'Panel schließen gibt den Fokus nicht an „⋯“ zurück');
+  assert(/data-cfg-done\]'\)\) leisteCfgZu\(\)/.test(s) && /Escape' && !leisteCfg\.hidden\) leisteCfgZu\(\)/.test(s), 'Fertig und Escape nutzen leisteCfgZu');
+});
+
+Deno.test('Nacharbeit: Karte bleibt nach Klick stehen', () => {
+  const s = appScript();
+  const ctx = block(/registerContext\('hub-start', \{[\s\S]*?\n  \}\);/);
+  assert(/onActivate: d => \{ if \(exPinned && d\.source === 'pointer'\) return;/.test(ctx), 'onActivate prüft exPinned nicht');
+  assert(/handler: d => \{\s*exPinned = true;/.test(ctx), 'Klick heftet die Karte nicht an');
+  assert(/addEventListener\('pointerleave', \(\) => \{ exPinned = false; \}\)/.test(s), 'Verlassen der Konsole löst nicht');
+  assert(/function route\(\) \{[\s\S]{0,200}exPinned = false;/.test(s), 'Routenwechsel löst nicht');
+});
+
+Deno.test('Nacharbeit: fehlerhafter Profil-Haken hält das Ereignis nicht auf', () => {
+  const c = consoleScript();
+  assert(/try \{ prof\.onActivate\(detail\); \} catch/.test(c), 'onActivate ungeschützt');
+  assert(/catch \(e\) \{\} \}[^\n]*\n\s*this\.dispatchEvent\(new CustomEvent\('relihub-activate'/.test(c), 'Ereignis folgt nach dem Haken');
+});
+
+Deno.test('Nacharbeit: ehrliche Wortwahl in README und rpi-virtuell', async () => {
+  const r = await Deno.readTextFile(new URL('../README.md', import.meta.url));
+  assert(!/Ansichten laden live/.test(r) && /relilab-Termine und rpi-virtuell laden live/.test(r), 'README');
+  const foot = hblock(/<footer class="rv-foot">[\s\S]*?<\/footer>/);
+  assert(/Quelle: relay\.edufeed\.org, relay-rpi\.edufeed\.org/.test(foot) && !/live von/.test(foot), 'Fußzeile rpi-virtuell');
+});

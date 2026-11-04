@@ -909,7 +909,7 @@ relihub-steuerkonsole[hidden]{display:none}
 </div>
 
 <!-- ===================== Ansicht 6: Communities ===================== -->
-<div class="view" id="v-communities" data-stand="stand:26.10.2026">
+<div class="view" id="v-communities" data-stand="stand:26.10.2026 · Texte teils Beispiel">
   <header class="hub-top">
     <a class="brand" href="#start"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg>reli_hub</a>
     <span class="sp"></span>
@@ -933,7 +933,7 @@ relihub-steuerkonsole[hidden]{display:none}
 </div>
 
 <!-- ===================== Ansicht 7: Community-Raum ===================== -->
-<div class="view" id="v-community" data-stand="stand:26.10.2026">
+<div class="view" id="v-community" data-stand="nachbau:Beispielinhalte">
   <header class="hub-top">
     <a class="brand" href="#start"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg>reli_hub</a>
     <a class="cr-back" href="#communities">‹ Alle Communities</a>
@@ -1041,7 +1041,7 @@ relihub-steuerkonsole[hidden]{display:none}
     </section>
   </div></main>
   <footer class="rv-foot"><div class="rv-in">
-    <span>Termine und News live von wss://relay.edufeed.org und wss://relay-rpi.edufeed.org · Original: <a href="https://rpi-virtuell.de" target="_blank" rel="noopener">rpi-virtuell.de</a></span>
+    <span>Quelle: relay.edufeed.org, relay-rpi.edufeed.org · Original: <a href="https://rpi-virtuell.de" target="_blank" rel="noopener">rpi-virtuell.de</a></span>
     <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> Teil des reli_hub</span>
   </div></footer>
   <relihub-steuerkonsole id="rvFlower" floating size="58" popover-size="210" context="rpi-virtuell"></relihub-steuerkonsole>
@@ -1651,7 +1651,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       this.markKbd();
       // Sofort melden, was aktiv wurde (Profil-Haken zuerst, dann Ereignis).
       const detail = { action: f.id, label: LABELS[f.id], context: this.ctx, source: fromKbd ? 'keyboard' : 'pointer' };
-      const prof = CONTEXTS[this.ctx]; if (prof && prof.onActivate) prof.onActivate(detail);
+      const prof = CONTEXTS[this.ctx]; if (prof && prof.onActivate) { try { prof.onActivate(detail); } catch (e) {} }   // ein fehlerhafter Haken hält das Ereignis nicht auf
       this.dispatchEvent(new CustomEvent('relihub-activate', { detail, bubbles: true, composed: true }));
     }
     // Ragt eine Knospen-Beschriftung über den Bildschirmrand (v. a. mobil), rückt sie
@@ -1803,12 +1803,15 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       });
     }
     connectedCallback() { this.render(); }
-    attributeChangedCallback() { if (this.isConnected) this.render(); }
+    attributeChangedCallback(name, alt, neu) { if (alt === neu) return; if (this.isConnected) this.render(); }
     render() {
+      // Fokus über das Neuzeichnen retten: Eintrag (data-id) oder Knopf „⋯“ (data-cfg)
+      const fa = this.shadowRoot.activeElement, fokus = fa ? (fa.dataset.id ? `a[data-id="${fa.dataset.id}"]` : fa.hasAttribute('data-cfg') ? '[data-cfg]' : '') : '';
       const cur = this.getAttribute('current'), label = this.getAttribute('label') || 'Orte';
       const link = it => `<a href="${esc(it.href)}" data-id="${esc(it.id)}"${it.id === cur ? ' class="on" aria-current="page"' : ''}>${it.kind === 'community' ? RING : ''}${it.short ? `<span class="long">${esc(it.label)}</span><span class="short">${esc(it.short)}</span>` : esc(it.label)}</a>`;
       const inst = ITEMS.filter(x => x.kind !== 'community'), comm = ITEMS.filter(x => x.kind === 'community');
       this.shadowRoot.innerHTML = `<style>${CSS}</style><nav aria-label="${esc(label)}"><span class="lbl">${esc(label)}</span>${inst.map(link).join('')}${comm.length ? '<span class="sep" aria-hidden="true"></span>' + comm.map(link).join('') : ''}<button type="button" class="cfg" data-cfg aria-label="Leiste anpassen" title="Leiste anpassen">⋯</button></nav>`;
+      if (fokus) { const z = this.shadowRoot.querySelector(fokus); if (z) z.focus(); }
     }
   }
 
@@ -1972,6 +1975,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const m = e.target.closest('[data-modus]'); if (m) setModus(m.dataset.modus);
   });
   const sf = document.getElementById('startFlower');
+  sf.addEventListener('pointerleave', () => { exPinned = false; });
   const fit = () => sf.setAttribute('size', window.innerWidth < 640 ? '240' : '320');
   fit(); window.addEventListener('resize', fit);
 
@@ -2034,12 +2038,14 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   // Absender der Termine: [Farbe, gekürzter npub für die Anzeige, vollständiger npub]
   const RT_SRC = { 'relilab-Termine-Bot': ['#E23BD2', 'npub17mq54…jqk3d', 'npub17mq54dad6ewkrnunzx5xs4t4c0edur99gz7ymhu3dam0pz034fpsxjqk3d'], 'relilab-impuls': ['#FF8A1E', 'npub1lde03…5vz8y', 'npub1lde034983zllh2nhe48lt60q6p3a6lsxn0g90uemhg0906jsnzesh5vz8y'], 'relilab': ['#8E44D9', 'npub1fpcxa…2fxgk', 'npub1fpcxaz2wvjl90gjs60x37ny2pa5u4yqfx7fklz73rgfjnnfujl3sr2fxgk'] };
   const RT_HEX = {}; Object.keys(RT_SRC).forEach(a => RT_HEX[npubToHex(RT_SRC[a][2])] = a);
+  // Links aus Live-Daten nur mit http(s): javascript:, data: u. Ä. werden zu ''
+  const sichereUrl = u => /^https?:\/\//i.test(u || '') ? u : '';
   /** NIP-52-Event (kind 31923) → Termin der relilab-Ansicht; Ort ohne Zoom-Links, Tag „relilab“ weggelassen, Kurztext aus summary */
   function evToTermin(ev) {
     const tag = k => (ev.tags.find(t => t[0] === k) || [])[1] || '', d = tag('d'), n = naddr(d, ev.pubkey, ev.kind), loc = tag('location');
     let x = (tag('summary') || ev.content).replace(/\s+/g, ' ').trim(); if (x.length > 300) x = x.slice(0, x.lastIndexOf(' ', 300)) + ' …';
     return { id: d, k: ev.kind, t: tag('title'), s: +tag('start'), e: +tag('end') || 0, x, l: /zoom/i.test(loc) ? 'Online (Zoom)' : /^https?:/.test(loc) ? 'Online' : loc,
-      g: ev.tags.filter(t => t[0] === 't' && t[1] !== 'relilab').map(t => t[1]), i: tag('image'), u: 'https://edufeed.org/' + n, src: tag('r'), a: RT_HEX[ev.pubkey] || ev.pubkey.slice(0, 8), n };
+      g: ev.tags.filter(t => t[0] === 't' && t[1] !== 'relilab').map(t => t[1]), i: sichereUrl(tag('image')), u: 'https://edufeed.org/' + n, src: sichereUrl(tag('r')), a: RT_HEX[ev.pubkey] || ev.pubkey.slice(0, 8), n };
   }
   // relilab-Termine: Schnappschuss der Nostr-Kalenderereignisse (NIP-52) von relilab, relilab-impuls und relilab-Termine-Bot.
   // Rohe Events zwischen den Markern; erneuern mit `deno task schnappschuss` (tools/schnappschuss.ts). Live-Daten ersetzen sie in rtOpen.
@@ -2828,9 +2834,13 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     later(d); return false;
   }
 
+  // Nach einem Klick bleibt die Karte stehen: Überfahren anderer Kreise (Maus) ersetzt sie nicht,
+  // bis der Zeiger die große Konsole verlässt oder die Route wechselt. Tastatur wirkt immer.
+  let exPinned = false;
   RelihubSteuerkonsole.registerContext('hub-start', {
-    onActivate: d => explain(d.action),
+    onActivate: d => { if (exPinned && d.source === 'pointer') return; explain(d.action); },
     handler: d => {
+      exPinned = true;
       if (MODUS === 'direkt' && d.action.includes('.')) return standardAktion(d, 'hub');
       if (kleinerSchirm()) { exEl.classList.add('sheet'); explain(d.action); } else { explain(d.action); exEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
       return false;
@@ -2942,7 +2952,11 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const aus = leisteAus();
     leisteCfg.querySelector('form').innerHTML = LEISTE.map(x => `<label><input type="checkbox" data-leiste-id="${x.id}"${x.id === 'start' ? ' disabled checked' : (aus.includes(x.id) ? '' : ' checked')}> ${x.label}</label>`).join('');
   }
-  function leisteCfgZu() { leisteCfg.hidden = true; }
+  function leisteCfgZu() {
+    leisteCfg.hidden = true;
+    // Fokus zurück auf den Knopf „⋯“, der das Panel geöffnet hat
+    const l = document.getElementById('leiste'), k = l && l.shadowRoot && l.shadowRoot.querySelector('[data-cfg]'); if (k) k.focus();
+  }
   document.addEventListener('relihub-leiste-config', () => { leisteCfgRender(); leisteCfg.hidden = false; leisteCfg.querySelector('input:not(:disabled)').focus(); });
   leisteCfg.addEventListener('change', () => {
     const ab = [...leisteCfg.querySelectorAll('input[data-leiste-id]:not(:checked)')].map(i => i.dataset.leisteId);
@@ -2975,6 +2989,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   });
   function route() {
     exEl.classList.remove('sheet');   // jeder Routenwechsel schließt das Sheet
+    exPinned = false;
     const raw = CUR;
     const [view, qs] = raw.split('?');
     const v = ['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell'].includes(view) ? view : (view === 'partner' || view === 'hilfe' ? 'start' : 'start');
