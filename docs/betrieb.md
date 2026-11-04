@@ -62,6 +62,14 @@ cd ~/repositories/reli-hub && git fetch origin && git checkout main && git merge
 
 Dabei ist `forgejo` ein zweites Remote: `git remote add forgejo git@git.rpi-virtuell.de:Comenius-Institut/hub.git`.
 
+**Schnappschuss erneuern** (vor Vorführungen und bei Bedarf): Die relilab-Termine tragen einen eingebetteten Schnappschuss als Rückfall (ADR-0006). Im Klon auf einem `pr/`-Branch:
+
+```bash
+cd ~/repositories/reli-hub && deno task schnappschuss && deno task test
+```
+
+Das Skript meldet `<n> Termine, Stand <Datum>`; das Ergebnis kommt wie jede Änderung als Pull Request. Nicht mehrmals kurz hintereinander laufen lassen, die Relays sperren sonst die Adresse. Einzelheiten: [daten.md](daten.md).
+
 Nie direkt auf GitHub committen. Issues zum Prototyp werden auf gitworkshop geführt; Forgejo-Issues gehören zur Projektarbeit.
 
 ## Wenn etwas nicht geht
