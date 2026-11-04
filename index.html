@@ -761,6 +761,11 @@ relihub-steuerkonsole[hidden]{display:none}
 }
 
 /* ---------- Prototyp-Leiste und Hinweis ---------- */
+.leiste-cfg{position:fixed;left:14px;bottom:64px;z-index:9100;background:var(--card);color:var(--ink);border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.2);min-width:220px}
+.leiste-cfg[hidden]{display:none}
+.leiste-cfg h2{font-size:16px;margin:0 0 8px}
+.leiste-cfg label{display:flex;gap:8px;align-items:center;padding:3px 0;cursor:pointer}
+.leiste-cfg .hint{margin:8px 0 10px}
 .toast{position:fixed;left:50%;bottom:64px;transform:translate(-50%,20px);opacity:0;z-index:30000;background:#1D1D1B;color:#fff;border-radius:14px;padding:12px 18px;font-family:Barlow,sans-serif;font-size:15px;max-width:min(92vw,560px);transition:opacity .2s,transform .2s;pointer-events:none}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .toast code{font-size:13px;color:#C9C6BC;word-break:break-all}
@@ -1226,6 +1231,12 @@ relihub-steuerkonsole[hidden]{display:none}
 
 <relihub-leiste id="leiste" label="Orte"></relihub-leiste>
 <div class="ef-overlay" id="efOverlay" hidden></div>
+<div class="leiste-cfg" id="leisteCfg" hidden role="dialog" aria-label="Leiste anpassen">
+  <h2>Leiste anpassen</h2>
+  <form></form>
+  <p class="hint">Reihenfolge ändern folgt.</p>
+  <button type="button" class="btn" data-cfg-done>Fertig</button>
+</div>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -1742,6 +1753,10 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
  *   Jeder Klick löst "relihub-leiste-select" aus (bubbles, composed, cancelable) mit
  *   detail = { id, href, kind }. Ohne preventDefault() navigiert die Leiste zu href.
  *
+ *   Der Knopf „⋯“ am Ende (data-cfg, aria-label „Leiste anpassen“) löst "relihub-leiste-config"
+ *   aus (bubbles, composed, nicht abbrechbar) mit detail = { items } (aktuelle Einträge).
+ *   Das Element kennt keine Regeln: Was angepasst werden darf, entscheidet die Anwendung.
+ *
  * CSS-VARIABLEN
  *   --relihub-leiste-bg   Hintergrund (Standard #1D1D1B)
  *   --relihub-leiste-fg   Schrift (Standard #FFFFFF); der aktive Eintrag kehrt beide um
@@ -1759,7 +1774,9 @@ nav::-webkit-scrollbar{display:none}
 .lbl{margin-right:4px;opacity:.75}
 a{flex:none;color:inherit;text-decoration:none;padding:5px 11px;border-radius:999px;display:inline-flex;align-items:center;gap:5px}
 a.on{background:var(--relihub-leiste-fg,#FFFFFF);color:var(--relihub-leiste-bg,#1D1D1B);font-weight:600}
-a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
+button.cfg{flex:none;font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:5px 9px;border-radius:999px;opacity:.75}
+button.cfg:hover{opacity:1}
+a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 .sep{width:1px;align-self:stretch;margin:4px 4px;background:currentColor;opacity:.4}
 .ring{width:11px;height:11px;flex:none}
 .short{display:none}
@@ -1776,6 +1793,7 @@ a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       super();
       this.attachShadow({ mode: 'open' });
       this.shadowRoot.addEventListener('click', e => {
+        if (e.target.closest('[data-cfg]')) { this.dispatchEvent(new CustomEvent('relihub-leiste-config', { detail: { items: ITEMS.slice() }, bubbles: true, composed: true })); return; }
         const a = e.target.closest('a[data-id]'); if (!a) return;
         if (e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;   // neuer Tab bleibt Sache des Browsers
         e.preventDefault();
@@ -1790,7 +1808,7 @@ a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       const cur = this.getAttribute('current'), label = this.getAttribute('label') || 'Orte';
       const link = it => `<a href="${esc(it.href)}" data-id="${esc(it.id)}"${it.id === cur ? ' class="on" aria-current="page"' : ''}>${it.kind === 'community' ? RING : ''}${it.short ? `<span class="long">${esc(it.label)}</span><span class="short">${esc(it.short)}</span>` : esc(it.label)}</a>`;
       const inst = ITEMS.filter(x => x.kind !== 'community'), comm = ITEMS.filter(x => x.kind === 'community');
-      this.shadowRoot.innerHTML = `<style>${CSS}</style><nav aria-label="${esc(label)}"><span class="lbl">${esc(label)}</span>${inst.map(link).join('')}${comm.length ? '<span class="sep" aria-hidden="true"></span>' + comm.map(link).join('') : ''}</nav>`;
+      this.shadowRoot.innerHTML = `<style>${CSS}</style><nav aria-label="${esc(label)}"><span class="lbl">${esc(label)}</span>${inst.map(link).join('')}${comm.length ? '<span class="sep" aria-hidden="true"></span>' + comm.map(link).join('') : ''}<button type="button" class="cfg" data-cfg aria-label="Leiste anpassen" title="Leiste anpassen">⋯</button></nav>`;
     }
   }
 
@@ -2902,14 +2920,37 @@ a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     { id: 'relidesk', label: 'relidesk', href: '#relidesk', kind: 'instanz' },
     { id: 'oercommunity', label: 'FOERBICO', href: '#oercommunity', kind: 'instanz' }
   ];
-  // Angemeldet kommen die Communities dazu, in denen die Persona Mitglied ist (nur solche mit eigenem Raum)
+  // Ebene 1, je Community/Instanz: Einträge, die auf dieser Instanz nicht erscheinen (Beispiel aus dem Issue). Ohne Eintrag zeigt eine Instanz alles.
+  const LEISTE_KONTEXT = { relilab: { aus: ['relidesk', 'oercommunity'] } };
+  // Ebene 2, je Person: abgewählte IDs als JSON im Speicher; alles Ungültige zählt als „nichts abgewählt“
+  function leisteAus() {
+    try { const a = JSON.parse(speicher('relihub-leiste-aus')); return Array.isArray(a) ? a.filter(x => typeof x === 'string') : []; } catch (e) { return []; }
+  }
+  // Instanzen gefiltert (Kontext der aktuellen Ansicht, dann Person; „Start“ bleibt immer als Anker); angemeldet kommen die Communities dazu, in denen die Persona Mitglied ist (nur solche mit eigenem Raum), nie gefiltert
   function leisteItems() {
-    if (!LOGGED) return LEISTE;
-    return LEISTE.concat(COMM.filter(c => c[1] === 'Mitglied' && c[4]).map(c => ({ id: 'c-' + c[4], label: c[0].replace(/\u00ad/g, ''), href: '#community?c=' + c[4], kind: 'community' })));
+    const v = CUR.split('?')[0], aus = ((LEISTE_KONTEXT[v] || {}).aus || []).concat(leisteAus());
+    const inst = LEISTE.filter(x => x.id === 'start' || !aus.includes(x.id));
+    if (!LOGGED) return inst;
+    return inst.concat(COMM.filter(c => c[1] === 'Mitglied' && c[4]).map(c => ({ id: 'c-' + c[4], label: c[0].replace(/\u00ad/g, ''), href: '#community?c=' + c[4], kind: 'community' })));
   }
   const leisteEl = document.getElementById('leiste');
-  let leisteLogged = null;
+  let leisteKey = null;   // Ansicht + Anmeldung: ändert sich eins davon, setzt route() die Einträge neu
   document.addEventListener('relihub-leiste-select', e => { e.preventDefault(); go(e.detail.href.slice(1)); });
+  // Panel „Leiste anpassen“: ein Kästchen je Instanz; Änderungen gelten sofort und bleiben im Speicher
+  const leisteCfg = document.getElementById('leisteCfg');
+  function leisteCfgRender() {
+    const aus = leisteAus();
+    leisteCfg.querySelector('form').innerHTML = LEISTE.map(x => `<label><input type="checkbox" data-leiste-id="${x.id}"${x.id === 'start' ? ' disabled checked' : (aus.includes(x.id) ? '' : ' checked')}> ${x.label}</label>`).join('');
+  }
+  function leisteCfgZu() { leisteCfg.hidden = true; }
+  document.addEventListener('relihub-leiste-config', () => { leisteCfgRender(); leisteCfg.hidden = false; leisteCfg.querySelector('input:not(:disabled)').focus(); });
+  leisteCfg.addEventListener('change', () => {
+    const ab = [...leisteCfg.querySelectorAll('input[data-leiste-id]:not(:checked)')].map(i => i.dataset.leisteId);
+    speicher('relihub-leiste-aus', JSON.stringify(ab));
+    RelihubLeiste.setItems(leisteItems());
+  });
+  leisteCfg.addEventListener('click', e => { if (e.target.closest('[data-cfg-done]')) leisteCfgZu(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !leisteCfg.hidden) leisteCfgZu(); });
 
   // ---------- Ansichten (Hash-Routing) ----------
   const PRE_NAMES = { sek1: 'Sekundarstufe I' };
@@ -2946,7 +2987,7 @@ a:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (v === 'rpi-virtuell') rvOpen(qs);
     if (v === 'relidesk') rdTab(new URLSearchParams(qs || '').get('tab'));
     if (v === 'profil') { LOGGED = true; if (MODUS !== 'direkt') setModus('direkt'); renderArtikel(); const zu = new URLSearchParams(qs || '').get('zu'); if (zu) setTimeout(() => { const t = document.getElementById(zu); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
-    if (leisteLogged !== LOGGED) { leisteLogged = LOGGED; RelihubLeiste.setItems(leisteItems()); }   // vor jedem return: Anmeldung/Abmeldung ändert die Communities
+    if (leisteKey !== v + '|' + LOGGED) { leisteKey = v + '|' + LOGGED; RelihubLeiste.setItems(leisteItems()); }   // vor jedem return: Ansicht (Kontext-Filter) und Anmeldung (Communities) ändern die Einträge
     if (view === 'partner') { setTimeout(() => document.getElementById('partner').scrollIntoView(), 30); return; }
     if (view === 'hilfe') { explainDefault(); setTimeout(() => document.getElementById('explain').scrollIntoView({ behavior: 'smooth', block: 'start' }), 30); return; }
     if (v === 'start') explainDefault();

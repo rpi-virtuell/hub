@@ -130,3 +130,13 @@ Deno.test('Startseite erzählt die Haltung', () => {
   assert(/<small>offen · vernetzt · digital<\/small>/.test(start) && !/class="eyebrow"/.test(start), 'Marke und Eyebrow');
   assert(/offen lizenziert/.test(n) && /Institute/.test(n) && /mitmachen/.test(n), 'Kernaussagen fehlen');
 });
+
+Deno.test('Leiste konfigurierbar: pro Community und pro Person', async () => {
+  const l = leisteScript(), s = appScript();
+  assert(/data-cfg/.test(l) && /relihub-leiste-config/.test(l) && /Leiste anpassen/.test(l), 'Knopf oder Ereignis fehlt');
+  assert(/const LEISTE_KONTEXT = \{[\s\S]*relilab: \{ aus: \['relidesk', 'oercommunity'\] \}/.test(s), 'Community-Konfiguration');
+  assert(/speicher\('relihub-leiste-aus'/.test(s) && /LEISTE_KONTEXT\[/.test(block(/function leisteItems\(\)[\s\S]*?\n  \}/)), 'leisteItems filtert nicht');
+  assert(html.includes('id="leisteCfg"') && /Reihenfolge ändern folgt/.test(html), 'Panel');
+  const d = await Deno.readTextFile(new URL('../docs/leiste.md', import.meta.url));
+  assert(/relihub-leiste-config/.test(d) && /LEISTE_KONTEXT|pro Community/.test(d), 'Doku');
+});
