@@ -29,7 +29,7 @@ Jede Ansicht außer der Startseite trägt direkt unter ihrer Kopfzeile eine Stan
 | `v-profil` | Nachbau · Persona Luca Beispiel | keine, Persona |
 | `v-communities` | Stand vom 26.10.2026 · Texte teils Beispiel | eingebettete Liste realer Communities, Beschreibungen teils Beispieltext |
 | `v-community` | Nachbau · Beispielinhalte | Beispielinhalte (Beiträge, Chat), keine Datenquelle |
-| `v-materialpool` | Stand vom 22.10.2026 | eingebettete Liste |
+| `v-materialpool` | Stand vom 22.10.2026 → live | eingebettete Liste (`MP`), dann `mpLaden()` |
 | `v-relilab` | Stand vom `RT_STAND` → live | Schnappschuss, dann `hubFetch('relilab-termine', …)` |
 | `v-relidesk` | Nachbau · relidesk ohne Datenquelle | keine |
 | `v-oercommunity` | Stand vom `OC_STAND` → live | Schnappschuss der Beiträge, dann `ocLaden()` |
@@ -82,6 +82,16 @@ Der Bereich `#oercommunity/spielregeln` (Konstante `SPIELREGELN`) kennt vier Sei
 ### Verbraucher: Schaufenster
 
 `#oercommunity` zeigt sofort den Schnappschuss (`ocRender(null)`: Beiträge aus `OC_RAW`/`OC_POSTS`, Tagungen und Team eingebettet) und rendert danach mit der Antwort von `ocLaden()` (`ocRender(daten)`); die Filter sind die von `ocLaden`, die Stand-Zeile wechselt auf „live · n Beiträge · m Seiten“, bei leerer Antwort bleibt sie beim Stand. Das Menü entsteht aus der Liste `navigation` (die `a`-Tags nennen `30023:<pubkey>:<d>`, Beschriftung ist der `title` der Seite, fehlende Seiten fallen weg), danach kommen Spielregeln, Blog und Team; die Fußzeile aus `fusszeile`. Ohne Liste bleiben die festen Knöpfe und Links. Die Route `#oercommunity/<d>` zeigt die Seite `d` als Artikel (`mdSeite`); fehlt eine bekannte Seite auf dem Relay, steht dort „in Vorbereitung“ mit Verweis auf oer.community, ein unbekanntes `d` führt zum Schaufenster mit Hinweis. Der Block `/* schnappschuss:beitraege */` (`OC_RAW`, `OC_STAND`) enthält die sechs neuesten Beiträge ohne Text und wird wie der Terminblock mit `deno task schnappschuss` erneuert.
+
+### Verbraucher: Materialpool
+
+`#materialpool` zeigt sofort die sechs Karten aus `MP` (Stand vom 22.10.2026) und rendert danach mit der Antwort von `mpLaden()`; `mpOpen(qs)` wird aus `route()` gerufen und liest die Vorauswahl (`thema`, `stufe`). Der Filter ist ein einziger: `{ kinds: [30142], limit: 200 }` auf allen drei Relays, ein REQ je Relay. Je Adresse (`pubkey:d`) gilt das neueste `created_at`. Die Karten zeigen die neuesten 24 nach `datum` (`datePublished`, sonst `dateCreated`, sonst `created_at`), jede Karte verweist auf `#materialpool?d=<d>`.
+
+Suche und Vorauswahl nutzen dieselbe Regel (`mpPasst`): jeder Begriff muss ohne Groß-/Kleinschreibung in Titel, Beschreibung, Fach, Stufe, Art, Schlagworten, `t`-Tags oder `about:prefLabel:de` vorkommen. Ältere Events tragen Felder ohne `:id`; sie gelten als Rückfall (`feld` für `feld:id`, `feld:prefLabel` für `feld:prefLabel:de`).
+
+Zählerregel: „n von m Materialien mit vollständigen Metadaten · live von k Relays“. m sind alle Materialien nach dem Zusammenführen, n die mit Name, Beschreibung, Lizenz, Materialart und Fach oder Stufe; k ist die Zahl der abgefragten Relays, weil `hubFetch` nicht meldet, welche geantwortet haben. Die Lizenzpille folgt `lizenzStand` (`offen`, `geschuetzt`, `unbekannt`); ohne Lizenzangabe steht „Lizenz nicht angegeben“.
+
+Rückfall: Kommt keine Antwort, bleiben die sechs Karten, die Stand-Zeile „Stand vom 22.10.2026“ und die Fußzeile unverändert; eine leere Antwort wird nicht gehalten, der nächste Besuch fragt erneut.
 
 ## Schnappschuss erneuern
 
