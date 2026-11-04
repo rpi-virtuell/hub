@@ -119,3 +119,34 @@ Deno.test('Materialpool live: Karten ohne unsichere Adressen, Zähler, Rückfall
     assert(contrast(v['lic-' + k + '-x'], bg) >= 4.5, `Pille ${k}: ${v['lic-' + k + '-x']} auf ${bg}`);
   }
 });
+
+Deno.test('lizenzAktionen: offen alles, geschützt nur ansehen', () => {
+  const la = new Function('go', 'openChooser', 'toast', 'rtCopy', block(/  function lizenzAktionen\(stand, m\) \{[\s\S]*?\n  \}/) + '; return lizenzAktionen;')(() => {}, () => {}, () => {}, () => {});
+  assertEquals(la('offen', {}).map((a: any) => a.geht), [true, true, true, true, true, true]);
+  assertEquals(la('geschuetzt', {}).map((a: any) => a.geht).slice(0, 3), [false, false, false]);
+  assertEquals(la('unbekannt', {}).map((a: any) => a.geht).slice(0, 3), [false, false, false]);
+  assertEquals(la('geschuetzt', {}).length, 6, 'nichts verschwindet');
+});
+
+Deno.test('ambJsonLd und ambWerte: aus Tags gebildet, nichts erfunden', () => {
+  const ev = { kind: 30142, pubkey: 'ab'.repeat(32), created_at: 1, content: '', tags: [['d', 'https://x.org/r'], ['type', 'LearningResource'], ['name', 'N'], ['license:id', 'https://creativecommons.org/licenses/by/4.0/'], ['about:id', 'https://w3id.org/kim/hochschulfaechersystematik/n0'], ['about:prefLabel:de', 'Fachübergreifend'], ['about:id', 'https://w3id.org/kim/x/n1'], ['audience:id', 'http://purl.org/dcx/lrmi-vocabs/educationalAudienceRole/teacher'], ['audience:prefLabel:de', 'Lehrperson'], ['isAccessibleForFree', 'true']] };
+  const src = block(/  function tagWert\(ev, name\)[\s\S]*?\n  \}/) + block(/  function tagWerte\(ev, name\)[\s\S]*?\n  \}/) + block(/  function ambWerte\(ev, feld\)[\s\S]*?\n  \}/) + block(/  function ambJsonLd\(ev\)[\s\S]*?\n  \}/);
+  const { ambWerte, ambJsonLd } = new Function(src + '; return { ambWerte, ambJsonLd };')();
+  assertEquals(ambWerte(ev, 'about'), [{ id: 'https://w3id.org/kim/hochschulfaechersystematik/n0', label: 'Fachübergreifend' }, { id: 'https://w3id.org/kim/x/n1', label: 'n1' }]);
+  const j = ambJsonLd(ev);
+  assertEquals(j['@context'], ['https://w3id.org/kim/amb/context.jsonld']);
+  assertEquals(j.id, 'https://x.org/r'); assertEquals(j.license, { id: 'https://creativecommons.org/licenses/by/4.0/' }); assertEquals(j.isAccessibleForFree, true);
+  assertEquals(j.about[0], { id: 'https://w3id.org/kim/hochschulfaechersystematik/n0', prefLabel: { de: 'Fachübergreifend' } });
+  assertEquals(j.audience[0].prefLabel, { de: 'Lehrperson' }); assert(!('description' in j) && !('educationalLevel' in j), 'fehlende Felder fehlen');
+});
+
+Deno.test('Material-Detail: Felder, Lizenzstand, Rohdaten, kein zweiter REQ bei Treffer im Cache', () => {
+  const det = block(/function mpDetail\(d\)[\s\S]*?\n  \}/);
+  assert(/mpDaten/.test(det) && /hubFetch\('material:' \+ d, \[\{ kinds: \[30142\], '#d': \[d\]/.test(det) && det.indexOf('mpDaten') < det.indexOf('hubFetch'), 'Cache vor Netz');
+  assert(/Material nicht gefunden/.test(det) && /ambJsonLd\(/.test(det) && /lizenzAktionen\(/.test(det) && /spielregelLink\(/.test(det) && /naddr\(/.test(det), 'Bausteine');
+  assert(/Begriff im Vokabular/.test(det) && /target="_blank" rel="noopener"/.test(det), 'Vokabular-Links');
+  assert(/Offen lizenziert/.test(det) && /nur mit offener Lizenz/.test(det) && /disabled aria-disabled="true"/.test(det), 'Lizenzstand mit ausgegrauten Aktionen');
+  assert(/image:license:id|image:creator:name/.test(det), 'Bildnachweis nur mit Tag');
+  assert(/mpDetail\(decodeURIComponent/.test(block(/function mpOpen\(qs\)[\s\S]*?\n  \}/)), 'mpOpen wertet ?d= aus');
+  assert(/id="mpDetail"/.test(html), 'Detail-Block in der Ansicht');
+});
