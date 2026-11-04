@@ -260,9 +260,9 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 a.mp-card{display:block;text-decoration:none;color:inherit}
 a.mp-card:hover{border-color:var(--mp)}
 .mp-card .lic{display:inline-block;margin-top:10px;border-radius:999px;padding:2px 10px;font-size:13px;font-weight:600}
-.lic-offen{background:var(--lic-offen);color:var(--lic-offen-x)}
-.lic-geschuetzt{background:var(--lic-geschuetzt);color:var(--lic-geschuetzt-x)}
-.lic-unbekannt{background:var(--lic-unbekannt);color:var(--lic-unbekannt-x)}
+.mp-card .lic-offen{background:var(--lic-offen);color:var(--lic-offen-x)}
+.mp-card .lic-geschuetzt{background:var(--lic-geschuetzt);color:var(--lic-geschuetzt-x)}
+.mp-card .lic-unbekannt{background:var(--lic-unbekannt);color:var(--lic-unbekannt-x)}
 .mp-card b{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:18px;line-height:1.3;color:var(--mp-dark);margin-bottom:6px}
 .mp-card span{font-size:14px;color:#5A6B69}
 .mp-foot{margin-top:46px;border-top:1px solid #D8E6E4;padding:22px clamp(16px,4vw,40px) 30px;color:#5A6B69;font-size:14px}
@@ -2328,7 +2328,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const p = new URLSearchParams(qs || ''), pre = document.getElementById('mpPre');
     const tags = p.getAll('thema').concat(p.getAll('stufe').map(s => PRE_NAMES[s] || s));
     pre.classList.toggle('on', tags.length > 0);
-    pre.innerHTML = tags.length ? `Vorauswahl über die reli_hub-Steuerkonsole: ${tags.map(t => `<span class="tg">${t}</span>`).join('')}<button type="button" id="preX">Vorauswahl entfernen</button>` : '';
+    pre.innerHTML = tags.length ? `Vorauswahl über die reli_hub-Steuerkonsole: ${tags.map(t => `<span class="tg">${esc(t)}</span>`).join('')}<button type="button" id="preX">Vorauswahl entfernen</button>` : '';
     const x = document.getElementById('preX'); if (x) x.onclick = () => go('materialpool');
     mpVorauswahl = tags;
     mpRender();

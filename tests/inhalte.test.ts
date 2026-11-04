@@ -109,9 +109,11 @@ Deno.test('Materialpool live: Karten ohne unsichere Adressen, Zähler, Rückfall
   assert(/sichereUrl\(/.test(m) && /lizenzStand\(/.test(m) && /lizenzLabel\(/.test(m) && /vollstaendig/.test(m), 'Felder');
   const r = block(/function mpRender\(\)[\s\S]*?\n  \}/);
   assert(/#materialpool\?d=/.test(r) && /encodeURIComponent/.test(r) && /Lizenz nicht angegeben/.test(r) && /vollständigen Metadaten/.test(r), 'Karten, Pille, Zähler');
-  assert(/MP\.map\(/.test(r) || /MP\.map\(/.test(s), 'Rückfall auf den Schnappschuss');
+  assert(/MP\.map\(/.test(r), 'Rückfall auf den Schnappschuss');
   assert(/function mpOpen\(qs\)/.test(s) && /mpOpen\(qs\)/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'route ruft mpOpen');
   assert(/lic-offen/.test(html) && /lic-geschuetzt/.test(html) && /lic-unbekannt/.test(html), 'drei Pillen im CSS');
+  for (const k of ['offen', 'geschuetzt', 'unbekannt']) assert(html.includes(`.mp-card .lic-${k}{`), 'Pille ' + k + ' schlägt .mp-card span');
+  assert(/class="tg">\$\{esc\(/.test(block(/function mpOpen\(qs\)[\s\S]*?\n  \}/)), 'Vorauswahl maskiert');
   const v = rootVars();
   for (const k of ['offen', 'geschuetzt', 'unbekannt']) for (const bg of [v['lic-' + k], v['paper'], v['card']]) {
     assert(contrast(v['lic-' + k + '-x'], bg) >= 4.5, `Pille ${k}: ${v['lic-' + k + '-x']} auf ${bg}`);
