@@ -87,6 +87,8 @@ Die Nachbauten sind erkennbar Rekonstruktionen echter Seiten: der Materialpool m
 
 ## Datenschicht: Nostr-Vokabular, Schnappschüsse, Editoren
 
+*Stand November 2026:* Der Prototyp liest inzwischen live von den Relays und nutzt den eingebetteten Schnappschuss als Rückfall (siehe [daten.md](daten.md)); die folgende Beschreibung („keine Netzverbindung“, Schnappschuss-Stand 26.10.2026) gilt für den Ursprungsstand. Neben der Steuerkonsole gibt es ein zweites Navigationselement, die Leiste unten links (siehe [leiste.md](leiste.md)).
+
 Der Prototyp hat keine Netzverbindung, spricht aber durchgehend die Sprache des edufeed-Datenraums. Das ist eine bewusste Konstruktionsentscheidung: die Oberfläche soll zeigen, wie es aussieht, wenn alle Instanzen aus denselben signierten Ereignissen lesen.
 
 | Objekt | Nostr-Form im Prototyp | Woher die Daten | Wo sie erscheinen |

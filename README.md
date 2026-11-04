@@ -2,13 +2,21 @@
 
 **Aktuelle Fassung zum Ausprobieren:** https://hub.rpi-virtuell.net. Quelle ist dieses Repo auf gitworkshop.dev; ausgeliefert wird der Stand von `main` aus der Forgejo-Arbeitskopie.
 
-Prototyp des reli_hub: eine einzelne HTML-Datei ohne Build und ohne Framework (`index.html`). Alle Ansichten sind Blöcke in einer Seite, umgeschaltet per Hash-Routing; die Steuerkonsole ist als Web Component angelegt. Leiste unten links (Orte) und Steuerkonsole (Tätigkeiten) sind zwei getrennte Elemente: siehe [docs/leiste.md](docs/leiste.md); Begriffe, Farben und Ziele von Startseite, Konsole und Leiste stehen in [docs/navigation.md](docs/navigation.md). Die Datei kann direkt im Browser geöffnet werden.
+Prototyp des reli_hub: eine einzelne HTML-Datei ohne Build und ohne Framework (`index.html`). Alle Ansichten sind Blöcke in einer Seite, umgeschaltet per Hash-Routing; dazu gehören die Nachbauten Materialpool, relilab und relidesk sowie rpi-virtuell als eigene Instanz (Material, Fortbildungen, News); die Steuerkonsole ist als Web Component angelegt. Leiste unten links (Orte) und Steuerkonsole (Tätigkeiten) sind zwei getrennte Elemente: siehe [docs/leiste.md](docs/leiste.md); Begriffe, Farben und Ziele von Startseite, Konsole und Leiste stehen in [docs/navigation.md](docs/navigation.md). Die Datei kann direkt im Browser geöffnet werden.
 
 **Herkunft:** Entwurf von Jens Dechow (`npub17z39pld9w3z7w872zx0a6cte4s7ezhcy8w69jjzku7d8xv295q8s6dmu40`), Prototyp 5 vom 26.10.2026, geschenkt zum Start des reli_hub-Repos im Oktober 2026. Die Konstruktionsbeschreibung in `docs/konstruktion.md` ist aus der Datei rekonstruiert (Jörg Lohrer) und beschreibt Leitidee, Funktionsmodell und Bauweise.
 
 **Arbeitsweise:** Zuerst wird dieser HTML-Entwurf ausgefeilt, danach kommt der Svelte-Stack obendrauf. Änderungen kommen als Pull Requests über Nostr (`pr/`-Branches, gitworkshop.dev); Maintainer mergen nach `main`.
 
 **Lizenz:** Inhalte und Code unter CC BY 4.0, Urheber Jens Dechow und Comenius-Institut (FOERBICO/rpi-virtuell).
+
+## Dokumentation
+
+- [docs/konstruktion.md](docs/konstruktion.md): Leitidee, Funktionsmodell, Bauweise
+- [docs/navigation.md](docs/navigation.md): Begriffe, Farben und Ziele von Startseite, Konsole und Leiste
+- [docs/leiste.md](docs/leiste.md): die Leiste unten links als eigenständiges Widget
+- [docs/daten.md](docs/daten.md): Live-Abfrage, Schnappschuss, Datenstand je Ansicht
+- [docs/betrieb.md](docs/betrieb.md): Auslieferung und laufender Betrieb
 
 ## Grundentscheidungen
 
