@@ -38,3 +38,11 @@ Deno.test('Konsole: Aktivieren meldet sich sofort', () => {
   assert(/registerContext\('hub-start',\s*\{[\s\S]*?onActivate:/.test(s), 'hub-start nutzt onActivate nicht');
   assert(/_touchAct = true/.test(c), 'Touch-Regel verloren');
 });
+
+Deno.test('Konsole: ganze Knospe samt Wort ist Trefferfläche', () => {
+  const c = consoleScript();
+  assert(/\.out\{[^}]*pointer-events:auto[^}]*cursor:pointer/.test(c), '.out nicht klickbar');
+  assert(/\.lbl\{[^}]*pointer-events:none/.test(c), '.lbl verändert');
+  assert(/const HIT = 44/.test(c) && /el\('circle', \{ class: 'hit', r: HIT, fill: 'transparent' \}, bud\)/.test(c), 'Treffer-Kreis fehlt');
+  assert(/\.bud circle:not\(\.hit\)\{transition/.test(c) && /\.bud:hover circle:not\(\.hit\),\.bud\.kbd circle:not\(\.hit\)\{fill/.test(c) && /\.kbd>circle:not\(\.hit\)/.test(c), 'Treffer-Kreis nicht von Füllung/Fokusring ausgenommen');
+});
