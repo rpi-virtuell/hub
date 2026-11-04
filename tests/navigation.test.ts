@@ -46,3 +46,15 @@ Deno.test('Konsole: ganze Knospe samt Wort ist Trefferfläche', () => {
   assert(/const HIT = 44/.test(c) && /el\('circle', \{ class: 'hit', r: HIT, fill: 'transparent' \}, bud\)/.test(c), 'Treffer-Kreis fehlt');
   assert(/\.bud circle:not\(\.hit\)\{transition/.test(c) && /\.bud:hover circle:not\(\.hit\),\.bud\.kbd circle:not\(\.hit\)\{fill/.test(c) && /\.kbd>circle:not\(\.hit\)/.test(c), 'Treffer-Kreis nicht von Füllung/Fokusring ausgenommen');
 });
+
+Deno.test('Konsole: Tutorial- und Direktmodus, eine Standardkette', () => {
+  const s = appScript();
+  assert(/function speicher\(key, value\)/.test(s) && /try\s*\{[^}]*localStorage/.test(block(/function speicher[\s\S]*?\n  \}/)), 'speicher() fängt Ausnahmen');
+  assert(/'relihub-modus'/.test(s) && /function setModus\(m\)/.test(s), 'Modus');
+  assert(/function standardAktion\(d, ctx\)/.test(s), 'standardAktion fehlt');
+  assert((s.match(/later\(d\); return false;/g) || []).length === 1, 'later() nur in standardAktion');
+  assert((s.match(/return standardAktion\(d,/g) || []).length >= 8, 'nicht alle Kontexte enden in der Standardkette');
+  assert(/MODUS === 'direkt'/.test(block(/registerContext\('hub-start'[\s\S]*?\n  \}\);/)), 'hub-start kennt den Direktmodus nicht');
+  assert(html.includes('href="#hilfe"') && /data-modus="direkt"/.test(s) && /data-modus="tutorial"/.test(s), 'Umschalter');
+  assert(/view === 'hilfe'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'route kennt hilfe nicht');
+});
