@@ -58,3 +58,11 @@ Deno.test('Konsole: Tutorial- und Direktmodus, eine Standardkette', () => {
   assert(html.includes('href="#hilfe"') && /data-modus="direkt"/.test(s) && /data-modus="tutorial"/.test(s), 'Umschalter');
   assert(/view === 'hilfe'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'route kennt hilfe nicht');
 });
+
+Deno.test('Konsole mobil: Sheet statt Sprung, Toleranz beim Tippen', () => {
+  const c = consoleScript(), s = appScript();
+  assert(/@media \(max-width:640px\)\{[\s\S]*?\.explain\.sheet\{[^}]*position:fixed/.test(html), 'Sheet-Regel fehlt');
+  assert(/function kleinerSchirm\(\)/.test(s) && /data-sheet-close/.test(s), 'Sheet-Logik fehlt');
+  assert(/const TOUCH_SLACK = 18/.test(c) && /nearest\(p, slack\)/.test(c) && /this\.exclusive\(p\) \|\| this\.nearest\(p, TOUCH_SLACK\)/.test(c), 'Toleranz fehlt');
+  assert(/function explainDefault\(\) \{\s*exEl\.classList\.remove\('sheet'\)/.test(s) && /function route\(\) \{\s*exEl\.classList\.remove\('sheet'\)/.test(s), 'Sheet wird bei Routenwechsel nicht geschlossen');
+});

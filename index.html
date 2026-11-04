@@ -740,6 +740,8 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
   .mp-hub{margin-left:2px;padding-left:8px}
   .mp-hub .back{width:40px;height:40px}
   .panel h2 .more{margin-left:40px;width:100%}
+  .explain.sheet{position:fixed;left:0;right:0;bottom:0;max-height:60vh;overflow:auto;z-index:9500;border-radius:18px 18px 0 0;margin:0;max-width:none;box-shadow:0 -8px 30px rgba(0,0,0,.18)}
+  .sheet-x{position:absolute;top:10px;right:12px;width:36px;height:36px;border:0;border-radius:50%;background:transparent;font-size:18px;color:var(--muted);cursor:pointer}
   .proto{left:10px;bottom:12px;font-size:12px;padding:4px 5px 4px 10px}
   .proto a{padding:4px 7px}
   .proto .plbl{display:none}
@@ -1214,6 +1216,7 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
   const POP = 16;         // so weit springt ein Kreis heraus
   const SC = 1.05;        // und so stark wächst er dabei
   const HIT = 44;         // Radius der unsichtbaren Trefferfläche je Knospe (Finger)
+  const TOUCH_SLACK = 18; // so weit neben dem Kreisrand zählt ein Fingertipp noch (nur Touch)
   const VB = R + D + 6;   // halbe Kantenlänge der viewBox
   const CLOSE_DELAY = 280;
 
@@ -1463,6 +1466,11 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       const inside = FUNCS.filter(f => Math.hypot(p.x - f.cx, p.y - f.cy) <= R);
       return inside.length === 1 ? inside[0] : null;
     }
+    // Kreis, dessen Rand höchstens slack entfernt ist – nur wenn genau einer in Frage kommt
+    nearest(p, slack) {
+      const near = FUNCS.filter(f => Math.hypot(p.x - f.cx, p.y - f.cy) - R <= slack);
+      return near.length === 1 ? near[0] : null;
+    }
     onMove(e) {
       if (e.pointerType === 'touch') return;
       if (this.ov.contains(e.target)) { this.cancelClose(); return; }
@@ -1474,7 +1482,8 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     onDown(e) {
       this._touchAct = false;
       if (e.pointerType === 'mouse' || this.ov.contains(e.target)) return;
-      const hit = this.exclusive(this.pt(e));
+      const p = this.pt(e);
+      const hit = this.exclusive(p) || this.nearest(p, TOUCH_SLACK);
       if (hit && hit !== this.active) { this.activate(hit); this._touchAct = true; }
       else if (!hit) this.deactivate();
     }
@@ -1740,7 +1749,10 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       return `<circle cx="${(98*Math.cos(a)).toFixed(1)}" cy="${(98*Math.sin(a)).toFixed(1)}" r="100" fill="${C[k]}" opacity="${k===only?.95:.13}"/>`;
     }).join('')}</svg>`;
   }
+  // Kleiner Schirm: Erklärkarte als Sheet am unteren Rand, die Seite bleibt stehen
+  function kleinerSchirm() { return window.matchMedia('(max-width:640px)').matches; }
   function explainDefault() {
+    exEl.classList.remove('sheet');
     exEl.style.borderColor = '';
     const direkt = MODUS === 'direkt';
     const kopf = direkt ? `<h2>Die Konsole führt dich direkt zur Aktion</h2><p>Ein Klick auf eine Knospe öffnet sofort, was dahintersteht. Unter „Hilfe“ zeigt dir die Konsole die Erklärungen wieder.</p>`
@@ -1756,8 +1768,14 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     const SUBL = { 'hub.profil':'mein Profil', 'hub.home':'Home', 'veroeffentlichen.lerninhalte':'Lerninhalte', 'veroeffentlichen.termin':'Termin', 'veroeffentlichen.beitrag':'Beitrag', 'finden.material':'Material', 'finden.fortbildungen':'Fortbildungen', 'finden.beitraege':'Beiträge', 'erstellen.schreibtisch':'Schreibtisch', 'erstellen.labor':'Labor', 'kooperieren.communities':'Communities', 'kooperieren.personen':'Personen' };
     const go = e.subs ? `<span class="hint">Weiter zu:</span>` + e.subs.map(x => `<button type="button" class="btn btn-ghost" data-ex="${x}" style="border-color:${col};color:${col}">${SUBL[x]} ›</button>`).join('') : e.go[1] && e.go[1][0] === '@' ? `<button type="button" class="btn" style="${btnStyle}" data-open="${e.go[1].slice(1)}">${e.go[0]} ›</button>` : e.go[1] ? `<a class="btn" style="${btnStyle}" href="${e.go[1]}">${e.go[0]} ›</a>` : `<a class="btn" style="${btnStyle}" href="#" data-todo="${e.go[0]}">${e.go[0]} ›</a>`;
     exEl.innerHTML = `${icon(action)}<div><p class="fn" style="color:${col}">${e.fn}</p><h2>${e.t}</h2><p>${e.p}</p><div class="acts">${go}${e.lock ? '<span class="badge-lock">● mit Profil</span>' : ''}</div></div>`;
+    if (exEl.classList.contains('sheet')) exEl.insertAdjacentHTML('afterbegin', '<button type="button" class="sheet-x" data-sheet-close aria-label="Schließen">✕</button>');
     exEl.classList.remove('anim'); void exEl.offsetWidth; exEl.classList.add('anim');
   }
+  // Sheet schließen: ✕ oder Tipp außerhalb von Karte und Konsole
+  document.addEventListener('click', e => {
+    if (!exEl.classList.contains('sheet')) return;
+    if (e.target.closest('[data-sheet-close]') || e.target.closest('#explain a[href], #explain [data-open]') || !(e.target.closest('#explain') || e.target.closest('relihub-steuerkonsole'))) exEl.classList.remove('sheet');
+  });
   explainDefault();
   document.getElementById('logout').addEventListener('click', () => { LOGGED = false; });
   document.addEventListener('click', e => {
@@ -2575,7 +2593,8 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     onActivate: d => explain(d.action),
     handler: d => {
       if (MODUS === 'direkt' && d.action.includes('.')) return standardAktion(d, 'hub');
-      explain(d.action); exEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); return false;
+      if (kleinerSchirm()) { exEl.classList.add('sheet'); explain(d.action); } else { explain(d.action); exEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+      return false;
     }
   });
   RelihubSteuerkonsole.registerContext('hub-profil', {
@@ -2650,6 +2669,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     if (a && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); go(a.dataset.go); }
   });
   function route() {
+    exEl.classList.remove('sheet');   // jeder Routenwechsel schließt das Sheet
     const raw = CUR;
     const [view, qs] = raw.split('?');
     const v = ['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity'].includes(view) ? view : (view === 'partner' || view === 'hilfe' ? 'start' : 'start');
