@@ -120,3 +120,13 @@ Deno.test('Konsole auf der Startseite verankert', () => {
   assert(/registerContext\('hub-start-float'/.test(s) && /MODUS === 'direkt'/.test(block(/registerContext\('hub-start-float'[\s\S]*?\n  \}\);/)), 'Kontext fehlt');
   assert(/unten rechts/.test(block(/function explainDefault[\s\S]*?\n  \}/)), 'Hinweissatz fehlt');
 });
+
+Deno.test('Startseite erzählt die Haltung', () => {
+  const start = hblock(/id="v-start"[\s\S]*?<!-- =+ Ansicht 2/);
+  assert(!/Startplatz/.test(html), 'Slogan noch da');
+  const n = (start.match(/<section class="narrativ">[\s\S]*?<\/section>/) || [''])[0];
+  assert(n && (n.match(/<p>/g) || []).length >= 3, 'drei Absätze fehlen');
+  assert(/class="einladung"[\s\S]*href="#profil"[\s\S]*data-open="lerninhalt"[\s\S]*data-open="termin"/.test(n), 'Einladung mit drei Wegen fehlt');
+  assert(/<small>offen · vernetzt · digital<\/small>/.test(start) && !/class="eyebrow"/.test(start), 'Marke und Eyebrow');
+  assert(/offen lizenziert/.test(n) && /Institute/.test(n) && /mitmachen/.test(n), 'Kernaussagen fehlen');
+});
