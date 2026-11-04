@@ -1,6 +1,6 @@
 # reli_hub
 
-**Aktuelle Fassung zum Ausprobieren:** https://rpi-virtuell.github.io/hub/ (später hub.rpi-virtuell.net). Quelle ist dieses Repo auf gitworkshop.dev; der Stand dort und die ausgelieferte Seite sind identisch, sobald der Spiegel gelaufen ist.
+**Aktuelle Fassung zum Ausprobieren:** https://hub.rpi-virtuell.net. Quelle ist dieses Repo auf gitworkshop.dev; ausgeliefert wird der Stand von `main` aus der Forgejo-Arbeitskopie.
 
 Prototyp des reli_hub: eine einzelne HTML-Datei ohne Build und ohne Framework (`index.html`). Alle Ansichten sind Blöcke in einer Seite, umgeschaltet per Hash-Routing; die Steuerkonsole ist als Web Component angelegt. Die Datei kann direkt im Browser geöffnet werden.
 
@@ -25,4 +25,4 @@ Die Grundentscheidungen des Prototyps stehen als ADRs in `docs/adr/` (Vorlage un
 
 **Prüfungen:** `deno task test` führt textbasierte Prüfungen über `index.html` aus (Syntax beider Inline-Skripte, Farbkontraste aus den Variablen, Struktur der Ansichten, ADRs). Kein Build; die Datei bleibt direkt im Browser lauffähig.
 
-**Betrieb:** Forgejo-Arbeitskopie `Comenius-Institut/hub`, GitHub-Spiegel `rpi-virtuell/hub`, Auslieferung über GitHub Pages (`rpi-virtuell.github.io/hub`, später `hub.rpi-virtuell.net`): siehe [docs/betrieb.md](docs/betrieb.md).
+**Betrieb:** Forgejo-Arbeitskopie `Comenius-Institut/hub`, Auslieferung unter `hub.rpi-virtuell.net` (seit 04.11.2026 ohne GitHub Pages): siehe [docs/betrieb.md](docs/betrieb.md).
