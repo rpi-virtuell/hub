@@ -54,11 +54,14 @@ Deno.test('coLaden: ein REQ je Community, h-Tag statt Autoren, Listen und Labels
   const k = fn('coLaden');
   assert(/hubFetch\('community:' \+ hex, \[/.test(k) && /kinds: \[30142, 30023, 31923\], '#h': \[hex\]/.test(k) && /kinds: \[6, 16\], '#h': \[hex\]/.test(k), 'Inhalt und Reposts über h');
   assert(/kinds: \[30004\], authors: \[hex\]/.test(k) && /kinds: \[1985\], '#h': \[hex\], '#L': \['communikey\.moderation'\], authors: \[hex\]/.test(k), 'Listen und Labels nur vom Schlüssel');
+  assert(/kinds: \[0\], authors: \[hex\], limit: 1/.test(k), 'fünfter Filter: Gesundheitsblick (kind 0 des Community-Schlüssels)');
+  assert(/direkt: neueste\(events\.filter\(ev => \[30142, 30023, 31923\]\.includes\(ev\.kind\)\)\)/.test(k), 'kind 0 zählt nicht als Inhalt');
   assert(/istHex64\(/.test(k), 'Schlüssel aus Reposts nur als 64-Hex');
   assert(/eigene/.test(k) && /ocLaden\(\)/.test(k), 'Schaufenster ohne Community aus ocDaten');
   assert(!/kinds: \[30004\] \}/.test(k) && !/groups\.edufeed\.org/.test(html), 'nie global, nie das Gruppen-Relay');
   const e = fn('eintraegeAufloesen');
   assert(/mpDaten/.test(e) && /ocDaten/.test(e) && e.indexOf('mpDaten') < e.indexOf('hubFetch') && (e.match(/hubFetch\(/g) || []).length === 1, 'Cache vor Netz, eine Nachfrage');
+  assert(/kurzHash\(/.test(e) && !/\.slice\(0, 200\)/.test(e), 'Cache-Schlüssel über den Hash der ganzen Adressliste');
   assert(/istHex64\(/.test(e), 'Treffer nur mit gültigem Schlüssel');
   assert(/kinds: \[30142, 30023, 31923\]/.test(e) && /'#d'/.test(e) && /ids: /.test(e), 'Obermenge nach Kind, Autor, d und ids');
 });
@@ -94,7 +97,7 @@ Deno.test('Sammlung: Ansicht, Route, keine eigene Abfrage, drei Ausgänge', asyn
   assert(/mpLaden\(\)/.test(o) && /coLaden\(/.test(o) && /f\.c/.test(o) && !/hubFetch\(/.test(o), 'nur Caches, Community nur bei Filter, keine eigene Abfrage');
   assert(/id="saEinbetten"/.test(o) && /id="saAbo"/.test(o) && /Als Nostr-Liste speichern/.test(o) && /disabled aria-disabled="true"/.test(o) && /braucht einen Server/.test(o), 'Ausgänge ehrlich');
   assert(/Sammlung zusammenstellen/.test(html), 'Knopf im Materialpool');
-  assert(/go\('finden\/sammlung\?q=/.test(block(/function lizenzAktionen\(stand, m\)[\s\S]*?\n  \}/)), 'In Sammlung aufnehmen führt zur Sammlung');
+  assert(/go\('finden\/sammlung\?q=/.test(block(/function lizenzAktionen\(stand, m\)[\s\S]*?\n  \}/)), 'In der Sammlung zeigen führt zur Sammlung');
   assert(/Sammlung/.test(await Deno.readTextFile(new URL('../docs/navigation.md', import.meta.url))), 'docs/navigation.md');
 });
 
@@ -109,4 +112,41 @@ Deno.test('Katalog-Tab: Route, zwei Schichten, drei Zustände, Titel maskiert, P
   assert(/'katalog'/.test(fn('crRender')), 'Navigationseintrag im Raum');
   assert(/zu=katalog/.test(block(/function cyCards\([\s\S]*?\n  \}/)), 'Link auf der Kachel');
   assert(html.includes('id="v-community" data-stand="nachbau:Beispielinhalte"'), 'Startwert der Ansicht bleibt Nachbau');
+});
+
+Deno.test('coLaden: leere Antwort bleibt „keine Antwort“, ein kind-0-Gesundheitsblick belegt Antwort ohne Inhalt', async () => {
+  const hex = 'ee'.repeat(32), anfragen: any[] = [];
+  (globalThis as any).__anfragen = anfragen;
+  const lauf = (events: any[]) => {
+    const extra = `const CO_SCHLUESSEL = [{ hex: '${hex}' }]; const coDaten = new Map(); const ocLaden = () => Promise.resolve({ seiten: new Map(), beitraege: [], termine: [] });
+      const listeEintraege = () => ({}); const entferntAus = () => new Set();
+      const hubFetch = (name, filter) => { globalThis.__anfragen.push(filter); return Promise.resolve(EVENTS); };`.replace('EVENTS', JSON.stringify(events));
+    return bau('coLaden', extra)(hex);
+  };
+  const leer = await lauf([]);
+  assertEquals(leer.antwort, false, 'leere Antwort = keine Antwort');
+  assertEquals(anfragen[0].length, 5); assertEquals(anfragen[0][4], { kinds: [0], authors: [hex], limit: 1 });
+  const profil = await lauf([{ id: 'p', kind: 0, pubkey: hex, created_at: 1, tags: [], content: '{}' }]);
+  assertEquals(profil.antwort, true, 'kind 0 belegt: Relays haben geantwortet');
+  assertEquals(profil.direkt.length, 0); assertEquals(profil.reposts.length, 0);
+  assertEquals(bau('coEintraege', fn('aTagLesen') + fn('repostZiel'))(profil).length, 0, 'kind 0 ergibt keinen Eintrag');
+});
+
+Deno.test('kurzHash: stabil, 8 Hex-Zeichen, unterscheidet auch nach Stelle 200', () => {
+  const h = bau('kurzHash'), basis = 'a'.repeat(300);
+  assertEquals(h('x'), h('x')); assert(/^[0-9a-f]{8}$/.test(h('')) && /^[0-9a-f]{8}$/.test(h(basis)), 'Format');
+  assert(h(basis + '1') !== h(basis + '2') && h(basis.slice(0, 250) + 'b' + basis.slice(251)) !== h(basis), 'Unterschied nach Position 200');
+});
+
+Deno.test('prRender: Funkloch heißt „Relays nicht erreichbar“, nicht „kein Profil“', () => {
+  const aus: any = { innerHTML: '' }, stand: string[][] = [];
+  (globalThis as any).__stand = stand;
+  const extra = `const document = { getElementById: () => globalThis.__aus }; const datenstand = (...a) => globalThis.__stand.push(a);`;
+  (globalThis as any).__aus = aus;
+  const render = bau('prRender', extra);
+  render({ fehler: 'Die Relays antworten gerade nicht.', stumm: true });
+  assert(aus.innerHTML.includes('Die Relays antworten gerade nicht.') && aus.innerHTML.includes('#kooperieren/personen'), 'Meldung mit Weg zurück');
+  assertEquals(stand.at(-1), ['v-person', 'nachbau', 'Relays nicht erreichbar']);
+  render({ fehler: 'Kein gültiges Profil in der Adresse.' });
+  assertEquals(stand.at(-1), ['v-person', 'nachbau', 'Profil nicht gefunden']);
 });

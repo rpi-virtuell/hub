@@ -34,7 +34,11 @@ Jede Ansicht außer der Startseite trägt direkt unter ihrer Kopfzeile eine Stan
 | `v-relidesk` | Nachbau · relidesk ohne Datenquelle | keine |
 | `v-oercommunity` | Stand vom `OC_STAND` → live | Schnappschuss der Beiträge, dann `ocLaden()` |
 | `v-rpi-virtuell` | Nachbau · Termine und News laden → live | `kalLaden()` (Abfrage `kalender`) und `hubFetch('rpi-virtuell-news', …)`, kein eigener Schnappschuss |
-| `v-fortbildungen` | Stand vom `RT_STAND` → live | Schnappschuss (`RT_RAW`), dann `kalLaden()` |
+| `v-fortbildungen` | Stand vom `RT_STAND` (beim Laden aus der Konstante gesetzt) → live | Schnappschuss (`RT_RAW`), dann `kalLaden()` |
+| `v-sammlung` | Nachbau · Materialien laden → live | `mpLaden()` und, bei gesetztem Community-Filter, `coLaden(hex)`; keine eigene Abfrage |
+| `v-personen` | Stand vom 04.11.2026 · Teamseite, Personen-Liste fehlt → live | `peLaden()` (Abfrage `personen`, dann `personen:profile`) |
+| `v-person` | Nachbau · Profil laden → live | `prOpen(qs)` (Abfrage `person:<hex>`); ohne Relay-Antwort „Nachbau · Relays nicht erreichbar“ |
+| `v-community`, Tab Katalog | Nachbau · Beispielinhalte → live (nur im Tab Katalog) | `coLaden(hex)`; „live · <n> geteilt · <k> Listen“, „noch nichts geteilt“ oder „Nachbau · Relays nicht erreichbar“ |
 
 Drei Zustände: **live** (Relay-Daten sind angekommen), **Stand vom …** (eingebetteter Schnappschuss, auch wenn das Relay schweigt, abweist oder nichts liefert), **Nachbau** (Ansicht ohne Datenquelle). Nichts wird als live ausgegeben, was nicht vom Relay kam.
 
@@ -90,14 +94,17 @@ Die fünf Hub-Communities (`CO_SCHLUESSEL`: rpi-virtuell, relilab, reliGlobal, A
 | 2 | `{ kinds: [6, 16], '#h': [hex], limit: 150 }` | Reposts: was die Community von anderen übernommen hat |
 | 3 | `{ kinds: [30004], authors: [hex], limit: 20 }` | Kuratierungslisten der Community |
 | 4 | `{ kinds: [1985], '#h': [hex], '#L': ['communikey.moderation'], authors: [hex], limit: 100 }` | Entfernen-Labels des Community-Schlüssels |
+| 5 | `{ kinds: [0], authors: [hex], limit: 1 }` | Gesundheitsblick: das Profil des Community-Schlüssels belegt, dass die Relays geantwortet haben; es zählt nie als Inhalt. Eine leere Gesamtantwort heißt „keine Antwort“, eine Antwort nur mit dem Profil „noch nichts geteilt“ |
 
 Der Schaufenster-Schlüssel (`eigene: true`) hat keine Community: seine Grundschicht sind die eigenen Events aus `ocLaden()` (Seiten, Beiträge, Termine); nur seine Listen holt `coLaden` mit einem eigenen Aufruf bei den zwei Relays des Schaufensters (`{ kinds: [30004], authors: [hex], limit: 20 }`).
+
+**Entfernen-Labels (Annahme):** Die Labels (`kind:1985`, `l=remove`) tragen `h`- und `L`-Tags, wie im edufeed-Wikiartikel „Sharing and reading community content“ beschrieben. Tragen sie sie nicht, fragt Filter 4 sie nie ab und Entfernungen wirken nie.
 
 **Konvention für Kataloge:** Eine Liste (`kind:30004`) mit `d=katalog` oder `d=katalog-<thema>` ist ein Katalog der Community; `katalog` steht zuerst, die übrigen nach `created_at` absteigend. `listeEintraege(ev)` liest Titel (`title`, sonst `d`), Beschreibung, Bild (über `sichereUrl`) und die `a`-Tags in Reihenfolge ohne Duplikate; ungültige Adressen (`aTagLesen` verlangt `kind:64-Hex:d`) werden nur gezählt (`unaufloesbar`). Je Adresse (`kind:pubkey:d`) gilt das Event mit dem neuesten `created_at`.
 
 **Einträge und Reposts:** `coEintraege(daten)` führt direkte Events und Repost-Ziele zusammen (`repostZiel`: zuerst der erste gültige `a`-Tag, sonst der erste `e`-Tag mit 64 Hex), je Adresse ein Eintrag mit dem neuesten Zeitpunkt, neueste zuerst. Ein Repost-Ziel hat zunächst kein Event (`ev` ist `null`).
 
-**Auflösung, Cache vor Netz:** `eintraegeAufloesen(eintraege)` sucht fehlende Ziele zuerst in `mpDaten` und `ocDaten`; was dann noch fehlt, geht in **einer** Abfrage (`aufloesen:…`) an die Relays: ein Filter nach Kind, Autoren und `#d` (eine Obermenge, die danach exakt auf die Adressen gefiltert wird, `limit` = Zahl der Adressen plus 10) und, bei `e`-Zielen, ein Filter mit `ids`. Je Eintrag gibt es keinen zweiten Aufruf. Was nicht gefunden wird, zeigt `eintragKarte` als „nicht auflösbar“, ohne Link.
+**Auflösung, Cache vor Netz:** `eintraegeAufloesen(eintraege)` sucht fehlende Ziele zuerst in `mpDaten` und `ocDaten`; was dann noch fehlt, geht in **einer** Abfrage (`aufloesen:<kurzHash>`, ein FNV-1a-Hash über die sortierte, vollständige Adressliste, damit verschiedene Listen nie denselben Cache-Schlüssel teilen) an die Relays: ein Filter nach Kind, Autoren und `#d` (eine Obermenge, die danach exakt auf die Adressen gefiltert wird, `limit` = Zahl der Adressen plus 10) und, bei `e`-Zielen, ein Filter mit `ids`. Je Eintrag gibt es keinen zweiten Aufruf. Was nicht gefunden wird, zeigt `eintragKarte` als „nicht auflösbar“, ohne Link.
 
 **Regel ohne Rollenprüfung:** Die Rollen der Moderation stehen auf dem Gruppen-Relay, das der Hub nie liest. Deshalb zeigt der Hub, was mit dem `h`-Tag der Community geteilt wurde, und lässt nur weg, was der Community-Schlüssel selbst per `kind:1985` (`['l','remove','communikey.moderation']`, Ziel als `e`- oder `a`-Tag) entfernt hat (`entferntAus`); Labels anderer Absender zählen nicht.
 
@@ -127,7 +134,8 @@ Abfrage `kalender` (`kalLaden()`, einmal je Sitzung, ein `REQ` je Relay an `rela
 |---|---|---|
 | 1 | `{ kinds: [31923], authors: [<Labor-Quellen>], since: <jetzt − 120 Tage>, limit: 500 }` | Termine der Labor-Quellen (relilab); kürzeres Fenster, weil der Bot viele Termine anlegt, ältere bevorstehende trägt der Schnappschuss |
 | 2 | `{ kinds: [31923], authors: [<übrige Quellen aus KAL_QUELLEN>], since: <jetzt − 365 Tage>, limit: 500 }` | Termine der Institute und Communities; eigene Grenze, damit das dichte Labor sie nicht verdrängt |
-| 3 | `{ kinds: [31923], '#h': [<Schlüssel der Hub-Communities>], limit: 200 }` | Termine, die einer Hub-Community zugeordnet sind (so kommen auch Termine unter persönlichen Schlüsseln, etwa die ptz-Termine, sobald sie einen `h`-Tag tragen) |
+| 3 | `{ kinds: [31923], authors: [<bildung-kirchen.de>], since: <jetzt − 365 Tage>, limit: 50 }` | der Import dieser Quelle steht still; eigener kleiner Filter, nur zur Vollständigkeit |
+| 4 | `{ kinds: [31923], '#h': [<Schlüssel der Hub-Communities>], limit: 200 }` | Termine, die einer Hub-Community zugeordnet sind (so kommen auch Termine unter persönlichen Schlüsseln, etwa die ptz-Termine, sobald sie einen `h`-Tag tragen) |
 
 Die Antwort wird je Adresse (`pubkey:d`) mit dem Schnappschuss gemischt, das neuere `created_at` gewinnt; Ergebnis sind rohe Events. Ohne Antwort bleibt `Stand vom <RT_STAND>` stehen, und die nächste Öffnung versucht es erneut. Mit Antwort: `live · <n> Termine · <k> Quellen` (`n` = bevorstehende Termine nach dem Mischen, `k` = Zahl verschiedener Absender in der Relay-Antwort). Der Schlüssel der ptz-Termine ist kein Eintrag in `KAL_QUELLEN` (persönlicher Schlüssel).
 
@@ -152,7 +160,7 @@ Drei Ausgänge: **Teilen** kopiert die Adresse mit dem Filter. **Einbetten** erz
 `#community?c=<id>&zu=katalog` (Alias `tab=katalog`, `zu` gewinnt) öffnet im Community-Raum den Tab „Katalog“; er steht auch im eingebetteten Raum der Instanzen. `katRender(c)` füllt den Platzhalter `#katRoot` und zeichnet zwei Schichten:
 
 1. **In der Community geteilt** (Grundschicht): `coLaden(hex)` und `coEintraege` liefern die Einträge, `eintraegeAufloesen` holt die Ziele, `eintragKarte` zeichnet sie. Gruppiert nach Material (30142), Beiträge (30023) und Termine (31923); je Gruppe die neuesten zwölf Karten, der Knopf „mehr“ klappt den Rest auf. Termine zeigen nur bevorstehende, vergangene stehen als Zahl. Die Zeile „zuletzt geteilt am …“ nennt das Datum des neuesten Eintrags und die Grenze „ohne Rollenprüfung“.
-2. **Vom Redaktionskreis zusammengestellt** (Kuratierung): je `kind 30004` des Community-Schlüssels mit `d = katalog` oder `katalog-<name>` ein Abschnitt mit Titel, Beschreibung, Bild (nur `https`), „Stand vom <created_at>“, Zahl der Einträge, bei Bedarf „<u> nicht auflösbar“ (ungültige Adressen plus Ziele, die auf keinem Relay liegen) und eine Karte je Eintrag. „Teilen“ kopiert `nostr:naddr…` der Liste. Fehlt jede Liste, entfällt die Schicht.
+2. **Vom Redaktionskreis zusammengestellt** (Kuratierung): je `kind 30004` des Community-Schlüssels mit `d = katalog` oder `katalog-<name>` ein Abschnitt mit Titel, Beschreibung, Bild (nur `http(s)`), „Stand vom <created_at>“, Zahl der Einträge, bei Bedarf „<u> nicht auflösbar“ (ungültige Adressen plus Ziele, die auf keinem Relay liegen) und eine Karte je Eintrag. „Teilen“ kopiert `nostr:naddr…` der Liste. Fehlt jede Liste, entfällt die Schicht.
 
 Zustände: Lädt, noch nichts geteilt (mit Einladung und Link `https://edufeed.org/c/<npub>`), Relays antworten nicht (gleicher Link, Stand-Zeile „Nachbau · Relays nicht erreichbar“), Katalog mit Einträgen (Stand-Zeile „live · <n> geteilt · <k> Listen · ohne Rollenprüfung“). Communities ohne Eintrag in `CO_SCHLUESSEL` zeigen nur den Hinweis, dass Kataloge Communities mit eigenem Schlüssel vorbehalten sind. Auf allen anderen Tabs steht die Stand-Zeile wieder auf „Nachbau · Beispielinhalte“. Das Ergebnis wird je Community einmal je Sitzung gehalten, damit Neuzeichnen keine zweite Abfrage auslöst.
 
@@ -168,7 +176,7 @@ Grenze der Rollenprüfung: Der Katalog zeigt, was mit der Community geteilt wurd
 
 Die Felder Fach, Bildungsstufe, Art und Zielgruppe kommen aus `ambWerte(ev, feld)` (`feld:id` plus folgendes `feld:prefLabel:de`, ältere Events mit bloßem `feld`), je Wert ein Chip, der auf die Kennung im Vokabular verweist (`sichereUrl`, sonst ohne Link). Der Bildnachweis erscheint nur mit `image:license:id` oder `image:creator:name`.
 
-Lizenzstand-Regel (`lizenzStand`, Aktionen aus `lizenzAktionen(stand, m)`): bei `offen` gehen alle sechs Aktionen (auf den Schreibtisch holen, in der Community weiterbearbeiten, in Sammlung aufnehmen, ansehen, Link kopieren, empfehlen); bei `geschuetzt` und `unbekannt` (gilt als geschützt) gehen nur die letzten drei, die ersten drei bleiben sichtbar und ausgegraut („nur mit offener Lizenz“).
+Lizenzstand-Regel (`lizenzStand`, Aktionen aus `lizenzAktionen(stand, m)`): bei `offen` gehen alle sechs Aktionen (auf den Schreibtisch holen, in der Community weiterbearbeiten, in der Sammlung zeigen, ansehen, Link kopieren, empfehlen); bei `geschuetzt` und `unbekannt` (gilt als geschützt) gehen nur die letzten drei, die ersten drei bleiben sichtbar und ausgegraut („nur mit offener Lizenz“).
 
 Rohdaten: `ambJsonLd(ev)` bildet das AMB-Objekt allein aus den Tags (Kontext `https://w3id.org/kim/amb/context.jsonld`); ein neues Objekt je Feld beginnt bei `feld:id`, bei `feld:name` oder `feld:type`, wenn das aktuelle Objekt den Schlüssel schon hat; `feld:prefLabel:<sprache>` wird zu `prefLabel: { <sprache>: … }`. Fehlende Felder fehlen, nichts wird ergänzt.
 
@@ -186,7 +194,7 @@ Rückfall: Fehlt die Liste, zeigt die Seite die Teamseite aus dem Schaufenster (
 
 ### Verbraucher: Person
 
-`#person?p=<npub>` zeigt Profil, Mitgliedschaften und Veröffentlichungen eines Schlüssels. `prOpen(qs)` prüft den npub (`npubToHex`, Rückprobe mit `bech32`; sonst „Kein gültiges Profil in der Adresse.“ mit Rückweg) und fragt in einer Abfrage je Relay `{kinds:[30142, 30023, 31923], authors:[<hex>], limit:30}`, bei nicht zwischengespeichertem Profil zusätzlich `kind:0` und `kind:30000` mit `d=communities` des Schlüssels. Liegt das Profil schon im Cache von `peLaden()`, entfällt der zweite und dritte Filter. Die Veröffentlichungen laufen über `eintragKarte` (neueste 10 je Abschnitt Materialien, Beiträge, Termine; leere Abschnitte sagen „noch nichts veröffentlicht“). Stand-Zeile: `live · Profil vom <Datum>` oder `Nachbau · Profil nicht gefunden`. Die Persona-Ansicht `#profil` bleibt Nachbau und verweist auf die Personen.
+`#person?p=<npub>` zeigt Profil, Mitgliedschaften und Veröffentlichungen eines Schlüssels. `prOpen(qs)` prüft den npub (`npubToHex`, Rückprobe mit `bech32`; sonst „Kein gültiges Profil in der Adresse.“ mit Rückweg) und fragt in einer Abfrage je Relay `{kinds:[30142, 30023, 31923], authors:[<hex>], limit:30}`, bei nicht zwischengespeichertem Profil zusätzlich `kind:0` und `kind:30000` mit `d=communities` des Schlüssels. Ein weiterer Filter `{kinds:[0], authors:[<Schaufenster-Schlüssel>], limit:1}` ist der Gesundheitsblick. Liegt das Profil schon im Cache von `peLaden()`, entfallen die beiden Filter für `kind:0` und `kind:30000` des Schlüssels (der Gesundheitsblick bleibt). Die Veröffentlichungen laufen über `eintragKarte` (neueste 10 je Abschnitt Materialien, Beiträge, Termine; leere Abschnitte sagen „noch nichts veröffentlicht“). Antwort leer (auch der Gesundheitsblick fehlt): „Die Relays antworten gerade nicht.“ mit Rückweg, Stand-Zeile `Nachbau · Relays nicht erreichbar`; Gesundheitsblick da, aber kein Profil der Person: „Zu diesem Schlüssel liegt kein Profil vor.“. Stand-Zeile: `live · Profil vom <Datum>` oder `Nachbau · Profil nicht gefunden`. Die Persona-Ansicht `#profil` bleibt Nachbau und verweist auf die Personen.
 
 Offen: Der Link „Bei edufeed ansehen“ (`https://edufeed.org/<npub>`) steht nur als Text, bis die Route der App für Profile geklärt ist.
 
@@ -196,13 +204,13 @@ Offen: Der Link „Bei edufeed ansehen“ (`https://edufeed.org/<npub>`) steht n
 deno task schnappschuss
 ```
 
-`tools/schnappschuss.ts` sendet ein `REQ` mit `{"kinds":[31923],"authors":[…14 Hex-Schlüssel…]}` (die Konstante `ABSENDER` spiegelt `KAL_QUELLEN` in `index.html`; beide gemeinsam ändern) an `relay.edufeed.org`, wartet bis `EOSE` (höchstens 25 s), behält Termine, die noch laufen oder höchstens 30 Tage vorbei sind, kürzt die Events auf `id, pubkey, created_at, kind, tags, content` (`content` leer, wenn ein `summary`-Tag da ist), maskiert `<` als `\u003c` (damit kein `</script>` aus Relay-Inhalten das Skript beendet), sortiert nach `created_at`, dedupliziert nach `id` und schreibt den Block zwischen `/* schnappschuss:termine */` und `/* /schnappschuss:termine */` in `index.html` neu (`RT_RAW` und `RT_STAND` mit dem heutigen Datum). Ausgabe: `<n> Termine, Stand <Datum>`. Liefert das Relay nichts, bleibt die Datei unverändert und das Skript endet mit Code 1.
+`tools/schnappschuss.ts` sendet die Termin-Abfrage in drei `REQ` nacheinander (3 s Pause) an `relay.edufeed.org`: (a) die drei relilab-Schlüssel, (b) die übrigen Quellen außer bildung-kirchen.de, (c) bildung-kirchen.de mit `limit: 50`, je `{"kinds":[31923],"authors":[…Hex-Schlüssel…]}` (die Konstante `ABSENDER` mit den 14 Quellen spiegelt `KAL_QUELLEN` in `index.html`; beide gemeinsam ändern); je Gruppe wartet es bis `EOSE` (höchstens 25 s) und gibt Zahl und bei 500 Events „Grenze erreicht“ aus, führt alles zusammen, behält Termine, die noch laufen oder höchstens 30 Tage vorbei sind, kürzt die Events auf `id, pubkey, created_at, kind, tags, content` (`content` leer, wenn ein `summary`-Tag da ist), maskiert `<` als `\u003c` (damit kein `</script>` aus Relay-Inhalten das Skript beendet), sortiert nach `created_at`, dedupliziert nach `id` und schreibt den Block zwischen `/* schnappschuss:termine */` und `/* /schnappschuss:termine */` in `index.html` neu (`RT_RAW` und `RT_STAND` mit dem heutigen Datum). Ausgabe: `<n> Termine, Stand <Datum>`. Liefert das Relay nichts, bleibt die Datei unverändert und das Skript endet mit Code 1.
 
-Vor jeder Vorführung erneuern, damit der Rückfall nicht veraltet. Nicht in schneller Folge wiederholen (Adresssperre der Relays).
+Vor jeder Vorführung erneuern, damit der Rückfall nicht veraltet. Der Schnappschuss ist spätestens alle 120 Tage zu erneuern, sonst fehlen Labortermine, die älter als das Live-Fenster sind. Nicht in schneller Folge wiederholen (Adresssperre der Relays).
 
 ## Grenzen
 
-- Das Relay liefert je `REQ` höchstens etwa 500 Events (neueste zuerst). Das Skript meldet, wenn die Grenze erreicht ist; früher angelegte Termine können dann fehlen.
+- Das Relay liefert je `REQ` höchstens etwa 500 Events (neueste zuerst). Das Skript meldet je Gruppe „Grenze erreicht“; früher angelegte Termine können dann fehlen.
 - Die Live-Abfrage der relilab-Termine holt nur in den letzten 30 Tagen angelegte Termine; ältere kommen aus dem Schnappschuss. Der Fortbildungskalender fragt für die Institute 365 Tage zurück, für die Labor-Quellen 120 Tage (ältere bevorstehende Labortermine kommen aus dem Schnappschuss), in zwei Gruppen mit je höchstens 500 Events; der stillstehende Import bildung-kirchen.de hat einen eigenen Filter mit höchstens 50. Erreicht eine Gruppe die 500 in der Antwort, hängt die Stand-Zeile „· Relay-Grenze erreicht, ältere Termine können fehlen“ an.
 - Löschungen (kind 5) werden nicht ausgewertet; ein gelöschter Termin bleibt bis zum nächsten Schnappschuss sichtbar.
 - Live sind bisher die relilab-Termine, der Fortbildungskalender und die Ansicht rpi-virtuell (Fortbildungen, News). Die übrigen Ansichten zeigen ihren eingebetteten Stand oder sind als Nachbau gekennzeichnet.

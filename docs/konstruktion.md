@@ -4,7 +4,7 @@ Oct 26, 2026 · @Joerg
 
 ## Lesart
 
-Die Prompts in diesem Dokument sind aus der Datei `relihub-prototyp_5.html` (264 KB, Stand der Termindaten 26.10.2026) zurückgerechnet, nicht Jens’ Originale. Die Datei enthält keine Prompt-Historie; sie enthält aber sehr sprechende Kommentare, Datenstrukturen und eine eingebaute Dokumentation der Steuerkonsole, aus denen sich die Konstruktionslogik Schicht für Schicht ablesen lässt. Abschnitte 2–8 beschreiben diese Logik als Konzept, Abschnitt 9 formuliert daraus eine plausible Prompt-Sequenz, Abschnitt 10 abstrahiert sie zu Regeln, die du für neue Instanzen weiterschreiben kannst.
+Die Prompts in diesem Dokument sind aus der Datei `relihub-prototyp_5.html` (264 KB, Stand der Termindaten 26.10.2026) zurückgerechnet, nicht die Originale von Jens Dechow. Die Datei enthält keine Prompt-Historie; sie enthält aber sehr sprechende Kommentare, Datenstrukturen und eine eingebaute Dokumentation der Steuerkonsole, aus denen sich die Konstruktionslogik Schicht für Schicht ablesen lässt. Abschnitte 2–8 beschreiben diese Logik als Konzept, Abschnitt 9 formuliert daraus eine plausible Prompt-Sequenz, Abschnitt 10 abstrahiert sie zu Regeln, die du für neue Instanzen weiterschreiben kannst.
 
 Drei Lesehilfen vorab:
 
@@ -260,4 +260,4 @@ Der Prototyp markiert selbst, wo er aufhört. Diese Stellen sind zugleich die Pu
 | Community gründen, Interessen bearbeiten, Merkliste | data-todo | Nostr-Entsprechungen (Gruppen, Listen) und wo sie im Hub erscheinen |
 | Partner ohne Nachbau | relimentar, narrt, reliGlobal, Konfi-Arbeit, Friedensarbeit EKD, InkRV, CI, edufeed nur als Kacheln | je Partner das Template aus dem vorigen Abschnitt ausfüllen; reliGlobal und KuRU sind als Communities bereits angelegt |
 
-Für ein Gespräch mit Jens wären drei Fragen am ergiebigsten: ob die Konsole tatsächlich als eigenständige Datei `relihub-steuerkonsole.js` geplant ist (der Kopf deutet es an), ob die Editoren Wrapper um die echten edufeed-Editoren werden sollen oder eigene Implementierungen, und welche Instanz als erste echte Einbindung dient.
+Für ein Gespräch mit Jens Dechow wären drei Fragen am ergiebigsten: ob die Konsole tatsächlich als eigenständige Datei `relihub-steuerkonsole.js` geplant ist (der Kopf deutet es an), ob die Editoren Wrapper um die echten edufeed-Editoren werden sollen oder eigene Implementierungen, und welche Instanz als erste echte Einbindung dient.

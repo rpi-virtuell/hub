@@ -1,5 +1,6 @@
 // Erneuert den eingebetteten Schnappschuss der Fortbildungstermine (alle Quellen des Kalenders) in index.html (ADR-0006).
-// Aufruf: deno task schnappschuss — eine Abfrage an relay.edufeed.org, ein REQ, bis EOSE oder 25 s.
+// Aufruf: deno task schnappschuss — drei Termin-Abfragen (Labor, übrige Quellen, bildung-kirchen.de) nacheinander mit 3 s Pause
+// und eine Beitrags-Abfrage an relay.edufeed.org, je ein REQ bis EOSE oder 25 s.
 // Schreibt den Block zwischen /* schnappschuss:termine */ und /* /schnappschuss:termine */ neu.
 // Holt dazu mit einer zweiten Abfrage die sechs neuesten Beiträge des Schaufenster-Schlüssels und schreibt
 // den Block zwischen /* schnappschuss:beitraege */ und /* /schnappschuss:beitraege */ neu.
@@ -60,7 +61,22 @@ function holen(filter: Record<string, unknown>): Promise<Ev[]> {
   });
 }
 
-const roh = await holen({ kinds: [31923], authors: ABSENDER.map(npubToHex) });
+// Drei Gruppen, damit das dichte Labor (Bot) die älteren, noch bevorstehenden Termine der anderen nicht über die Relay-Grenze von 500 verdrängt.
+const LABOR = ABSENDER.slice(0, 3);   // relilab.org, relilab-impuls, relilab (logik labor in KAL_QUELLEN)
+const BILDUNG_KIRCHEN = 'npub12g780vegprsdangl7ypfhjqf7rytwuws5ka4wwd6trexcjea007qqlu3mw';   // Import steht still
+const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const gruppen: [string, Record<string, unknown>][] = [
+  ['Labor', { kinds: [31923], authors: LABOR.map(npubToHex) }],
+  ['übrige Quellen', { kinds: [31923], authors: ABSENDER.filter((a) => !LABOR.includes(a) && a !== BILDUNG_KIRCHEN).map(npubToHex) }],
+  ['bildung-kirchen.de', { kinds: [31923], authors: [npubToHex(BILDUNG_KIRCHEN)], limit: 50 }],
+];
+const roh: Ev[] = [];
+for (const [i, [name, filter]] of gruppen.entries()) {
+  if (i) await pause(3000);   // Abstand zwischen den Abfragen (Adresssperre der Relays)
+  const antwort = await holen(filter);
+  console.log(`${name}: ${antwort.length} Events${antwort.length >= 500 ? ' (Grenze erreicht)' : ''}`);
+  roh.push(...antwort);
+}
 // Nur Termine, die noch laufen oder höchstens 30 Tage vorbei sind (das Relay liefert sonst Hunderte vergangene).
 const ab = Date.now() / 1000 - 30 * 86400;
 const tag = (e: Ev, k: string) => +((e.tags.find((t) => t[0] === k) || [])[1] || 0);
@@ -104,4 +120,3 @@ if (beitraege.length) {
 if (!anzahlTermine && !beitraege.length) Deno.exit(1);
 await Deno.writeTextFile(DATEI, html);
 console.log(`${anzahlTermine} Termine, ${beitraege.length} Beiträge, Stand ${stand}`);
-if (roh.length >= 500) console.error(`Hinweis: ${roh.length} Events empfangen, das Relay kappt vermutlich bei 500; früher angelegte Termine fehlen dann.`);
