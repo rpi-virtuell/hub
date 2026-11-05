@@ -94,6 +94,6 @@ Deno.test('Sammlung: Ansicht, Route, keine eigene Abfrage, drei Ausgänge', asyn
   assert(/mpLaden\(\)/.test(o) && /coLaden\(/.test(o) && /f\.c/.test(o) && !/hubFetch\(/.test(o), 'nur Caches, Community nur bei Filter, keine eigene Abfrage');
   assert(/id="saEinbetten"/.test(o) && /id="saAbo"/.test(o) && /Als Nostr-Liste speichern/.test(o) && /disabled aria-disabled="true"/.test(o) && /braucht einen Server/.test(o), 'Ausgänge ehrlich');
   assert(/Sammlung zusammenstellen/.test(html), 'Knopf im Materialpool');
-  assert(/#finden\/sammlung/.test(block(/function lizenzAktionen\(stand, m\)[\s\S]*?\n  \}/)), 'In Sammlung aufnehmen führt zur Sammlung');
+  assert(/go\('finden\/sammlung\?q=/.test(block(/function lizenzAktionen\(stand, m\)[\s\S]*?\n  \}/)), 'In Sammlung aufnehmen führt zur Sammlung');
   assert(/Sammlung/.test(await Deno.readTextFile(new URL('../docs/navigation.md', import.meta.url))), 'docs/navigation.md');
 });

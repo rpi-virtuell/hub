@@ -2587,7 +2587,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   }
   /** Was der Lizenzstand erlaubt: sechs Aktionen in fester Reihenfolge; ohne offene Lizenz gehen die ersten drei nicht (sie bleiben sichtbar, Issue 15). `m` wird erst beim Auslösen gelesen. */
   function lizenzAktionen(stand, m) {
-    const offen = stand === 'offen';   // „In Sammlung aufnehmen“ führt nach #finden/sammlung mit dem Titel als Suchbegriff
+    const offen = stand === 'offen';
     return [
       { label: 'Auf den Schreibtisch holen', geht: offen, tu: () => go('relidesk?tab=schreibtisch') },
       { label: 'In der Community weiterbearbeiten', geht: offen, tu: () => openChooser('materialpool') },
@@ -2769,7 +2769,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       sammlung: { community: k ? k.npub : null, fach: f.fach, stufe: f.stufe, lizenz: f.lizenz, q: f.q, relays: RELAYS }
     }, null, 2);
   }
-  let saF = sammlungFilter(''), saLauf = 0, saCo = null, saExtra = [], saFehlt = 0, saZahlen = {}, saAusgaben = {}, saStand = 'laden';   // Filter, Lauf-Zähler, Adressen der Community, Zahlen je Community, Schnipsel, Ladezustand
+  let saF = sammlungFilter(''), saLauf = 0, saCo = null, saExtra = [], saFehlt = 0, saCoFehler = '', saZahlen = {}, saAusgaben = {}, saStand = 'laden';   // Filter, Lauf-Zähler, Adressen der Community, Zahlen je Community, Schnipsel, Ladezustand
   const saHex = id => (CO_SCHLUESSEL.find(k => k.id === id) || {}).hex;
   /** Filter in die Adresszeile schreiben (ohne neuen Verlaufseintrag) */
   function saSchreibe() {
@@ -2796,8 +2796,10 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     document.getElementById('saFach').innerHTML = opt(sammle('about', saF.fach), saF.fach[0], 'Alle Fächer');
     document.getElementById('saStufe').innerHTML = opt(sammle('educationalLevel', saF.stufe), saF.stufe[0], 'Alle Stufen');
     const q = document.getElementById('saQ'); if (document.activeElement !== q) q.value = saF.q.join(' ');
-    document.getElementById('saLic').innerHTML = '<legend>Lizenz</legend>' + [['', 'alle', 'Alle'], ['offen', 'offen', 'Offen'], ['geschuetzt', 'geschuetzt', 'Geschützt'], ['unbekannt', 'unbekannt', 'Unbekannt']]
-      .map(([wert, klasse, text]) => `<button type="button" class="lic-${klasse}" data-sa-lic="${wert}" aria-pressed="${saF.lizenz === wert}">${text}</button>`).join('');
+    const lic = document.getElementById('saLic');
+    if (!lic.querySelector('button')) lic.innerHTML = '<legend>Lizenz</legend>' + [['', 'alle', 'Alle'], ['offen', 'offen', 'Offen'], ['geschuetzt', 'geschuetzt', 'Geschützt'], ['unbekannt', 'unbekannt', 'Unbekannt']]
+      .map(([wert, klasse, text]) => `<button type="button" class="lic-${klasse}" data-sa-lic="${wert}" aria-pressed="false">${text}</button>`).join('');
+    lic.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.saLic === saF.lizenz)));   // nur der Zustand ändert sich, der Fokus bleibt
   }
   /** Liste, Stand-Zeile und die drei Ausgänge (teilen, einbetten, abonnieren) neu zeichnen; kein Netz */
   function saRender() {
@@ -2805,11 +2807,11 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const hex = saF.c ? saHex(saF.c) : null;
     const treffer = liste.filter(m => sammlungPasst(m, saF, saCo)).sort((a, b) => b.datum - a.datum);
     if (!liste.length) datenstand('v-sammlung', 'nachbau', saStand === 'fehler' ? 'Relays nicht erreichbar' : 'Materialien laden');
-    else datenstand('v-sammlung', 'live', `${treffer.length} von ${liste.length} Materialien · abgefragt bei ${RELAYS.length} Relays${saF.c && saFehlt ? ` · ${saFehlt} geteilt, aber nicht auffindbar` : ''}`);
+    else datenstand('v-sammlung', 'live', `${treffer.length} von ${liste.length} Materialien · abgefragt bei ${RELAYS.length} Relays${saF.c && saCoFehler ? ' · ' + saCoFehler : ''}${saF.c && saFehlt ? ` · ${saFehlt} geteilt, aber nicht auffindbar` : ''}`);
     document.getElementById('saListe').innerHTML = treffer.length ? treffer.map(m => {
       const zeile = [m.art, m.quelle, m.stufe].filter(Boolean).map(esc).join(' · ');
       return `<a class="mp-card" href="#materialpool?d=${encodeURIComponent(m.d)}&p=${m.pk}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand}">${esc(m.licLabel || 'Lizenz nicht angegeben')}</span></a>`;
-    }).join('') : `<p>${liste.length ? 'Nichts gefunden; Filter lockern.' : (saStand === 'fehler' ? 'Gerade keine Verbindung zu den Relays.' : 'Materialien werden geladen …')}</p>`;
+    }).join('') : `<p>${liste.length ? (saCoFehler ? 'Die Community antwortet gerade nicht; Filter „Community“ entfernen oder später erneut versuchen.' : 'Nichts gefunden; Filter lockern.') : (saStand === 'fehler' ? 'Gerade keine Verbindung zu den Relays.' : 'Materialien werden geladen …')}</p>`;
     // Kennungen der gewählten Begriffe aus den Materialien (für fixed_level und fixed_subject)
     const kennung = (feld, name) => { for (const m of liste) for (const w of ambWerte(m.ev, feld)) if (name && w.label.toLowerCase() === name.toLowerCase()) return w.id; return ''; };
     const fp = { ...saF, stufeId: kennung('educationalLevel', saF.stufe[0]), fachId: kennung('about', saF.fach[0]) };
@@ -2834,11 +2836,12 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   /** Ansicht #finden/sammlung (auch bei Wechsel der Community): Filter aus der Adresszeile, Filterleiste sofort, dann nur die Caches von mpLaden und coLaden (die Community nur bei gesetztem Filter), danach zeichnen */
   function saOpen(qs) {
     const f = saF = sammlungFilter(qs), lauf = ++saLauf, hex = f.c ? saHex(f.c) : null;
-    saCo = null; saExtra = []; saFehlt = 0; saStand = 'laden';
+    saCo = null; saExtra = []; saFehlt = 0; saCoFehler = ''; saStand = 'laden';
     saFelder(); saRender();
     Promise.all([mpLaden().catch(() => []), hex ? coLaden(hex).catch(() => null) : null]).then(([liste, co]) => {
       if (lauf !== saLauf) return;
       saStand = liste.length ? 'live' : 'fehler';
+      if (hex && !(co && co.antwort)) saCoFehler = 'Community gerade nicht erreichbar';
       if (co && co.antwort) {
         saCo = new Set(coEintraege(co).filter(e => e.kind === 30142).map(e => e.adr));
         saZahlen[saF.c] = saCo.size;
@@ -2853,7 +2856,11 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
             saFehlt = fehlend.length - saExtra.length;   // geteilt, aber auf keinem Relay (mehr) zu finden
             saZahlen[saF.c] = saCo.size - saFehlt;
             saFelder(); saRender();
-          }, () => {});
+          }, () => {
+            if (lauf !== saLauf) return;
+            saCoFehler = 'geteilte Materialien gerade nicht nachladbar';
+            saFelder(); saRender();
+          });
         }
       }
       saFelder(); saRender();
