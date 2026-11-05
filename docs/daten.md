@@ -122,6 +122,8 @@ Rückfall: Kommt keine Antwort, bleiben die sechs Karten, die Stand-Zeile „Sta
 
 Filterregel (`sammlungPasst`): `fach` und `stufe` treffen, wenn ein `about:prefLabel:de` beziehungsweise `educationalLevel:prefLabel:de` ohne Groß-/Kleinschreibung gleich ist; `lizenz` vergleicht mit dem Lizenzstand; `q` nutzt `mpPasst`. Die Community trifft, wenn der Herausgeber der Schlüssel der Community ist oder `30142:<pubkey>:<d>` unter den mit ihr geteilten Einträgen steht (`coEintraege`, Rollen unprüft, wie beim Parameter `community` des WordPress-Plugins).
 
+Bei gesetztem Community-Filter lädt die Sammlung geteilte Materialien, die nicht in der Pool-Liste stehen, einmal über `eintraegeAufloesen` nach (eine gebündelte Abfrage); sie landen nur in der Liste der Sammlung, `mpDaten` bleibt unverändert. Zähler und Treffer stimmen so überein; ein geteiltes Material, das auf keinem Relay mehr liegt, zählt nicht mit und steht in der Stand-Zeile („n geteilt, aber nicht auffindbar“).
+
 Drei Ausgänge: **Teilen** kopiert die Adresse mit dem Filter. **Einbetten** erzeugt den Schnipsel `[amb_nostr_search …]` für WordPress (`shortcodeAus`; `fixed_level` und `fixed_subject` mit den Vokabular-Kennungen der gewählten Begriffe; die Lizenz hat im Plugin kein Attribut und steht als Kommentarzeile) und ein Kontextprofil als JSON (`kontextprofilAus`) für die Steuerkonsole. **Abonnieren** zeigt den Nostr-Filter als `REQ` (kinds 30142, bei Community `#h`, bei Suchbegriffen `search`); Fach, Stufe und Lizenz prüft die Seite selbst. „Als Nostr-Liste speichern“ ist ausgegraut, bis die Anmeldung mit Schlüssel da ist. Ein Feed zu einem beliebigen Filter braucht einen Server; der Prototyp hat keinen.
 
 ### Verbraucher: Material-Detail

@@ -2769,7 +2769,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       sammlung: { community: k ? k.npub : null, fach: f.fach, stufe: f.stufe, lizenz: f.lizenz, q: f.q, relays: RELAYS }
     }, null, 2);
   }
-  let saF = sammlungFilter(''), saLauf = 0, saCo = null, saZahlen = {}, saAusgaben = {}, saStand = 'laden';   // Filter, Lauf-Zähler, Adressen der Community, Zahlen je Community, Schnipsel, Ladezustand
+  let saF = sammlungFilter(''), saLauf = 0, saCo = null, saExtra = [], saFehlt = 0, saZahlen = {}, saAusgaben = {}, saStand = 'laden';   // Filter, Lauf-Zähler, Adressen der Community, Zahlen je Community, Schnipsel, Ladezustand
   const saHex = id => (CO_SCHLUESSEL.find(k => k.id === id) || {}).hex;
   /** Filter in die Adresszeile schreiben (ohne neuen Verlaufseintrag) */
   function saSchreibe() {
@@ -2801,11 +2801,11 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   }
   /** Liste, Stand-Zeile und die drei Ausgänge (teilen, einbetten, abonnieren) neu zeichnen; kein Netz */
   function saRender() {
-    const liste = mpDaten || [];
+    const liste = (mpDaten || []).concat(saExtra);   // saExtra: mit der Community geteilte Materialien außerhalb der Pool-Liste (mpDaten bleibt unberührt)
     const hex = saF.c ? saHex(saF.c) : null;
     const treffer = liste.filter(m => sammlungPasst(m, saF, saCo)).sort((a, b) => b.datum - a.datum);
     if (!liste.length) datenstand('v-sammlung', 'nachbau', saStand === 'fehler' ? 'Relays nicht erreichbar' : 'Materialien laden');
-    else datenstand('v-sammlung', 'live', `${treffer.length} von ${liste.length} Materialien · abgefragt bei ${RELAYS.length} Relays`);
+    else datenstand('v-sammlung', 'live', `${treffer.length} von ${liste.length} Materialien · abgefragt bei ${RELAYS.length} Relays${saF.c && saFehlt ? ` · ${saFehlt} geteilt, aber nicht auffindbar` : ''}`);
     document.getElementById('saListe').innerHTML = treffer.length ? treffer.map(m => {
       const zeile = [m.art, m.quelle, m.stufe].filter(Boolean).map(esc).join(' · ');
       return `<a class="mp-card" href="#materialpool?d=${encodeURIComponent(m.d)}&p=${m.pk}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand}">${esc(m.licLabel || 'Lizenz nicht angegeben')}</span></a>`;
@@ -2834,7 +2834,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   /** Ansicht #finden/sammlung (auch bei Wechsel der Community): Filter aus der Adresszeile, Filterleiste sofort, dann nur die Caches von mpLaden und coLaden (die Community nur bei gesetztem Filter), danach zeichnen */
   function saOpen(qs) {
     const f = saF = sammlungFilter(qs), lauf = ++saLauf, hex = f.c ? saHex(f.c) : null;
-    saCo = null; saStand = 'laden';
+    saCo = null; saExtra = []; saFehlt = 0; saStand = 'laden';
     saFelder(); saRender();
     Promise.all([mpLaden().catch(() => []), hex ? coLaden(hex).catch(() => null) : null]).then(([liste, co]) => {
       if (lauf !== saLauf) return;
@@ -2842,6 +2842,19 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       if (co && co.antwort) {
         saCo = new Set(coEintraege(co).filter(e => e.kind === 30142).map(e => e.adr));
         saZahlen[saF.c] = saCo.size;
+        // geteilte Materialien, die nicht in der Pool-Liste stehen, einmal nachladen (eintraegeAufloesen fragt gebündelt)
+        const bekannt = new Set((mpDaten || []).map(m => '30142:' + m.pk + ':' + m.d));
+        const fehlend = coEintraege(co).filter(e => e.kind === 30142 && !bekannt.has(e.adr));
+        if (fehlend.length) {
+          saFelder(); saRender();
+          return eintraegeAufloesen(fehlend).then(erg => {
+            if (lauf !== saLauf) return;
+            saExtra = [...erg.values()].filter(ev => ev.kind === 30142).map(mpMaterial);
+            saFehlt = fehlend.length - saExtra.length;   // geteilt, aber auf keinem Relay (mehr) zu finden
+            saZahlen[saF.c] = saCo.size - saFehlt;
+            saFelder(); saRender();
+          }, () => {});
+        }
       }
       saFelder(); saRender();
     });
