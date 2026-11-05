@@ -1,4 +1,4 @@
-// Erneuert den eingebetteten Schnappschuss der relilab-Termine in index.html (ADR-0006).
+// Erneuert den eingebetteten Schnappschuss der Fortbildungstermine (alle Quellen des Kalenders) in index.html (ADR-0006).
 // Aufruf: deno task schnappschuss — eine Abfrage an relay.edufeed.org, ein REQ, bis EOSE oder 25 s.
 // Schreibt den Block zwischen /* schnappschuss:termine */ und /* /schnappschuss:termine */ neu.
 // Holt dazu mit einer zweiten Abfrage die sechs neuesten Beiträge des Schaufenster-Schlüssels und schreibt
@@ -6,11 +6,23 @@
 
 const RELAY = 'wss://relay.edufeed.org';
 const WARTEN_MS = 25000;
-// Absender der Termine (NIP-52, kind 31923): relilab, relilab-impuls, relilab-Termine-Bot
+// Absender der Termine (NIP-52, kind 31923): die 14 Quellen des Fortbildungskalenders.
+// Die Liste spiegelt KAL_QUELLEN im Anwendungsskript von index.html; beide gemeinsam ändern.
 const ABSENDER = [
-  'npub1fpcxaz2wvjl90gjs60x37ny2pa5u4yqfx7fklz73rgfjnnfujl3sr2fxgk',
-  'npub1lde034983zllh2nhe48lt60q6p3a6lsxn0g90uemhg0906jsnzesh5vz8y',
   'npub17mq54dad6ewkrnunzx5xs4t4c0edur99gz7ymhu3dam0pz034fpsxjqk3d',
+  'npub1lde034983zllh2nhe48lt60q6p3a6lsxn0g90uemhg0906jsnzesh5vz8y',
+  'npub1fpcxaz2wvjl90gjs60x37ny2pa5u4yqfx7fklz73rgfjnnfujl3sr2fxgk',
+  'npub14esenw6rt4c2pmxwvyey4jqw0sjdahetq6qvh5lffxp7w4thg63ql480z2',
+  'npub12atlgghwe2qwkps9sgm9z4je825hskh47ef7kc28zzgn5tztgtyqyveeqs',
+  'npub10gyagq3eev0vcnqks69gewz22kvpe2989c5zua88huarjwwl04dqdzrmzr',
+  'npub1vkn99j7kufchmgcly98lg9uexfste9epxe6jhgdt20wn4adzrvpqxhac4w',
+  'npub1wak8hljj3szpe5g3fmak6jqspvhyn4867flrq8anlq7xfg5xjn6qtmtpsw',
+  'npub10dxgwerwfmjsyu9lq97pxdu4q0w3efycykhv3a9j2ut7y5l4xhkqyclpt8',
+  'npub1jt62efpmw02uuj58fqzgss2nxe2wvsjx48x6etvdrpa4prtp8l2s0zld3w',
+  'npub1vsnck0crdcjdczggrlp7ng7tn6fawpdauts2wdwetsnh8s7dkcqsumc7zj',
+  'npub12g780vegprsdangl7ypfhjqf7rytwuws5ka4wwd6trexcjea007qqlu3mw',
+  'npub12j35qpeve33929kg64etvw9g9rzms4c8g5gnqta58yhjdc6wryfse3phmu',
+  'npub1tgftg8kptdrxxg0g3sm3hckuglv3j0uu3way4vylc5qyt0f44m0s3gun6e',
 ];
 // Schaufenster-Schlüssel oer.community (derselbe npub wie FO_NPUB in index.html)
 const FO = 'npub1tgftg8kptdrxxg0g3sm3hckuglv3j0uu3way4vylc5qyt0f44m0s3gun6e';
