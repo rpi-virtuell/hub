@@ -2141,7 +2141,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       ]).then(events => ({
         antwort: events.length > 0,
         direkt: neueste(events.filter(ev => [30142, 30023, 31923].includes(ev.kind))),
-        reposts: events.filter(ev => ev.kind === 6 || ev.kind === 16),
+        reposts: events.filter(ev => (ev.kind === 6 || ev.kind === 16) && istHex64(ev.pubkey)),
         listen: listenAus(neueste(events)),
         entfernt: entferntAus(events, hex)
       }));
@@ -2187,7 +2187,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     if (eZiele.length) filter.push({ ids: eZiele.map(e => e.adr.slice(2)) });
     return hubFetch('aufloesen:' + fehlend.map(e => e.adr).join(',').slice(0, 200), filter).then(events => {
       for (const e of fehlend) {
-        const treffer = events.filter(ev => e.pk ? ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd') === e.adr : 'e:' + ev.id === e.adr).sort((a, b) => b.created_at - a.created_at)[0];
+        const treffer = events.filter(ev => istHex64(ev.pubkey) && [30142, 30023, 31923].includes(ev.kind)).filter(ev => e.pk ? ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd') === e.adr : 'e:' + ev.id === e.adr).sort((a, b) => b.created_at - a.created_at)[0];
         if (treffer) { e.ev = treffer; ergebnis.set(e.adr, treffer); }
       }
       return ergebnis;
@@ -2195,13 +2195,13 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   }
   /** Karte eines aufgelösten Eintrags (HTML-String); alle Texte über esc, Adressen über sichereUrl oder Hub-Hash */
   function eintragKarte(e) {
-    const von = e.geteilt ? `<span class="kat-von">geteilt von ${esc((CO_SCHLUESSEL.find(c => c.hex === e.geteilt) || {}).n || bech32('npub', e.geteilt.match(/../g).map(h => parseInt(h, 16))).slice(0, 14) + '…')}</span>` : '';
+    const von = e.geteilt ? `<span class="kat-von">geteilt von ${esc((CO_SCHLUESSEL.find(c => c.hex === e.geteilt) || {}).n || (istHex64(e.geteilt) ? bech32('npub', e.geteilt.match(/../g).map(h => parseInt(h, 16))).slice(0, 14) + '…' : 'unbekannt'))}</span>` : '';
     const ev = e.ev;
     if (!ev) return `<div class="kat-card"><span>nicht auflösbar: ${esc(e.adr)}</span>${von}</div>`;
     const datum = sek => sek ? new Date(sek * 1000).toLocaleDateString('de-DE') : '';
     if (ev.kind === 30142) {
       const m = mpMaterial(ev), zeile = [m.art, m.quelle, m.stufe].filter(Boolean).map(esc).join(' · ');
-      return `<a class="mp-card" href="#materialpool?d=${encodeURIComponent(m.d)}&p=${m.pk}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand}">${esc(m.licLabel || 'Lizenz nicht angegeben')}</span>${von}</a>`;
+      return `<a class="mp-card" href="#materialpool?d=${encodeURIComponent(m.d)}${istHex64(m.pk) ? '&p=' + m.pk : ''}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand}">${esc(m.licLabel || 'Lizenz nicht angegeben')}</span>${von}</a>`;
     }
     if (ev.kind === 31923) {
       const t = evToTermin(ev);
