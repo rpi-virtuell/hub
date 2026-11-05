@@ -125,7 +125,7 @@ Abfrage `kalender` (`kalLaden()`, einmal je Sitzung, ein `REQ` je Relay an `rela
 
 | Filter | Wert | Zweck |
 |---|---|---|
-| 1 | `{ kinds: [31923], authors: [<Labor-Quellen>], since: <jetzt − 365 Tage>, limit: 500 }` | Termine der Labor-Quellen (relilab) |
+| 1 | `{ kinds: [31923], authors: [<Labor-Quellen>], since: <jetzt − 120 Tage>, limit: 500 }` | Termine der Labor-Quellen (relilab); kürzeres Fenster, weil der Bot viele Termine anlegt, ältere bevorstehende trägt der Schnappschuss |
 | 2 | `{ kinds: [31923], authors: [<übrige Quellen aus KAL_QUELLEN>], since: <jetzt − 365 Tage>, limit: 500 }` | Termine der Institute und Communities; eigene Grenze, damit das dichte Labor sie nicht verdrängt |
 | 3 | `{ kinds: [31923], '#h': [<Schlüssel der Hub-Communities>], limit: 200 }` | Termine, die einer Hub-Community zugeordnet sind (so kommen auch Termine unter persönlichen Schlüsseln, etwa die ptz-Termine, sobald sie einen `h`-Tag tragen) |
 
@@ -187,6 +187,6 @@ Vor jeder Vorführung erneuern, damit der Rückfall nicht veraltet. Nicht in sch
 ## Grenzen
 
 - Das Relay liefert je `REQ` höchstens etwa 500 Events (neueste zuerst). Das Skript meldet, wenn die Grenze erreicht ist; früher angelegte Termine können dann fehlen.
-- Die Live-Abfrage der relilab-Termine holt nur in den letzten 30 Tagen angelegte Termine; ältere kommen aus dem Schnappschuss. Der Fortbildungskalender fragt 365 Tage zurück, in zwei Gruppen (Labor-Quellen, übrige Quellen) mit je höchstens 500 Events. Erreicht eine Gruppe die 500 in der Antwort, hängt die Stand-Zeile „· Relay-Grenze erreicht, ältere Termine können fehlen“ an.
+- Die Live-Abfrage der relilab-Termine holt nur in den letzten 30 Tagen angelegte Termine; ältere kommen aus dem Schnappschuss. Der Fortbildungskalender fragt für die Institute 365 Tage zurück, für die Labor-Quellen 120 Tage (ältere bevorstehende Labortermine kommen aus dem Schnappschuss), in zwei Gruppen mit je höchstens 500 Events; der stillstehende Import bildung-kirchen.de hat einen eigenen Filter mit höchstens 50. Erreicht eine Gruppe die 500 in der Antwort, hängt die Stand-Zeile „· Relay-Grenze erreicht, ältere Termine können fehlen“ an.
 - Löschungen (kind 5) werden nicht ausgewertet; ein gelöschter Termin bleibt bis zum nächsten Schnappschuss sichtbar.
 - Live sind bisher die relilab-Termine, der Fortbildungskalender und die Ansicht rpi-virtuell (Fortbildungen, News). Die übrigen Ansichten zeigen ihren eingebetteten Stand oder sind als Nachbau gekennzeichnet.
