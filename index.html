@@ -3806,11 +3806,12 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   /** Alle Termine der Quellen plus der Hub-Communities (h-Tag), gemischt mit dem Schnappschuss je Adresse (neuestes created_at gewinnt); rohe Events */
   function kalLaden() {
     if (kalDaten) return kalDaten;
-    const seit = Math.floor(Date.now() / 1000) - 365 * 86400, labor = [...KAL_HEX.keys()].filter(k => KAL_HEX.get(k).logik === 'labor'), andere = [...KAL_HEX.keys()].filter(k => KAL_HEX.get(k).logik !== 'labor');
+    const seit = Math.floor(Date.now() / 1000) - 365 * 86400, labor = [...KAL_HEX.keys()].filter(k => KAL_HEX.get(k).logik === 'labor'), BK_HEX = npubToHex('npub12g780vegprsdangl7ypfhjqf7rytwuws5ka4wwd6trexcjea007qqlu3mw'), andere = [...KAL_HEX.keys()].filter(k => KAL_HEX.get(k).logik !== 'labor' && k !== BK_HEX);   // bildung-kirchen.de: Import steht seit 21.01.2026 still
     // zwei Gruppen mit je eigener Grenze (limit 500), damit das dichte Labor die Institute nicht verdrängt
     kalDaten = hubFetch('kalender', [
       { kinds: [31923], authors: labor, since: seit, limit: 500 },
       { kinds: [31923], authors: andere, since: seit, limit: 500 },
+      { kinds: [31923], authors: [BK_HEX], since: seit, limit: 50 },   // Import steht still, nur noch zur Vollständigkeit der Quelle
       { kinds: [31923], '#h': CO_SCHLUESSEL.map(k => k.hex), limit: 200 }
     ], { relays: KAL_RELAYS }).then(evs => {
       const m = new Map();
