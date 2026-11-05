@@ -2059,6 +2059,158 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   /** Titelbild eines Beitrags; relative Bildnamen ergeben '' (Platzhalter mit Titel, ADR-0002 Punkt 3) */
   function beitragBild(ev) { return sichereUrl(tagWert(ev, 'image')); }
 
+  // ---------- Community-Inhalte und Listen (ADR-0008) ----------
+  // Die fünf Schlüssel der Hub-Communities; `hex` kommt beim Laden aus dem npub. `pool`: Katalog dieser Community ist zugleich der Materialpool,
+  // `eigene`: Schaufenster-Schlüssel ohne Community (Grundschicht sind seine eigenen Events aus ocDaten, nicht der h-Tag).
+  const CO_SCHLUESSEL = [
+    { id: 'rpi-virtuell', n: 'rpi-virtuell', npub: 'npub14esenw6rt4c2pmxwvyey4jqw0sjdahetq6qvh5lffxp7w4thg63ql480z2', pool: true },
+    { id: 'relilab', n: 'relilab', npub: 'npub1fpcxaz2wvjl90gjs60x37ny2pa5u4yqfx7fklz73rgfjnnfujl3sr2fxgk' },
+    { id: 'religlobal', n: 'reliGlobal', npub: 'npub12atlgghwe2qwkps9sgm9z4je825hskh47ef7kc28zzgn5tztgtyqyveeqs' },
+    { id: 'alpika-gs', n: 'ALPIKA Grundschule', npub: 'npub10gyagq3eev0vcnqks69gewz22kvpe2989c5zua88huarjwwl04dqdzrmzr' },
+    { id: 'oercommunity', n: 'FOERBICO', npub: 'npub1tgftg8kptdrxxg0g3sm3hckuglv3j0uu3way4vylc5qyt0f44m0s3gun6e', eigene: true }
+  ];
+  CO_SCHLUESSEL.forEach(c => { c.hex = npubToHex(c.npub); });
+  const coDaten = new Map();   // hex → Promise der Antwort, einmal je Sitzung (leere Antwort wird nicht gehalten)
+  /** Wert eines a-Tags `kind:pubkey:d` als Teile; alles andere (kein Hex-Schlüssel, leeres d) ergibt null */
+  function aTagLesen(wert) {
+    const m = /^(\d+):([0-9a-f]{64}):(.+)$/.exec(wert || '');
+    return m ? { kind: +m[1], pk: m[2], d: m[3] } : null;
+  }
+  /** Ziel eines Reposts (kind 6/16): zuerst der erste gültige a-Tag, sonst der erste e-Tag mit 64 Hex; sonst null */
+  function repostZiel(ev) {
+    const a = tagWerte(ev, 'a').map(aTagLesen).find(Boolean);
+    if (a) return { adr: a.kind + ':' + a.pk + ':' + a.d, kind: a.kind, pk: a.pk, d: a.d };
+    const id = tagWerte(ev, 'e').find(istHex64);
+    if (!id) return null;
+    return { adr: 'e:' + id, id, kind: +tagWert(ev, 'k') || 0 };
+  }
+  /** Kuratierungsliste (kind 30004) als flaches Objekt; a-Tags in Reihenfolge, Duplikate entfernt, Ungültiges nur gezählt */
+  function listeEintraege(ev) {
+    const gesehen = new Set(), eintraege = [];
+    let unaufloesbar = 0;
+    for (const w of tagWerte(ev, 'a')) {
+      const a = aTagLesen(w);
+      if (!a) { unaufloesbar++; continue; }
+      if (gesehen.has(w)) continue;
+      gesehen.add(w);
+      eintraege.push({ adr: w, kind: a.kind, pk: a.pk, d: a.d });
+    }
+    const d = tagWert(ev, 'd');
+    return { d, titel: tagWert(ev, 'title') || d, beschreibung: tagWert(ev, 'description'), bild: sichereUrl(tagWert(ev, 'image')), stand: ev.created_at, eintraege, unaufloesbar };
+  }
+  /** Entfernt-Menge: e- (als `e:<id>`) und a-Tags der Labels `remove` aus `communikey.moderation`, nur von Events, die der Community-Schlüssel selbst signiert hat */
+  function entferntAus(labels, hex) {
+    const weg = new Set();
+    for (const ev of labels) {
+      if (ev.kind !== 1985 || ev.pubkey !== hex) continue;
+      if (!ev.tags.some(t => t[0] === 'l' && t[1] === 'remove' && t[2] === 'communikey.moderation')) continue;
+      for (const t of ev.tags) {
+        if (t[0] === 'e' && t[1]) weg.add('e:' + t[1]);
+        else if (t[0] === 'a' && t[1]) weg.add(t[1]);
+      }
+    }
+    return weg;
+  }
+  /** Inhalte, Reposts, Kuratierungslisten und Entfernen-Labels einer Community in einer Abfrage je Relay; einmal je Sitzung */
+  function coLaden(hex) {
+    if (coDaten.has(hex)) return coDaten.get(hex);
+    const eigene = (CO_SCHLUESSEL.find(c => c.hex === hex) || {}).eigene;
+    const neueste = events => {
+      const neu = new Map();
+      for (const ev of events) {
+        if (!istHex64(ev.pubkey)) continue;
+        const k = ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd'), alt = neu.get(k);
+        if (!alt || ev.created_at > alt.created_at) neu.set(k, ev);
+      }
+      return [...neu.values()];
+    };
+    const listenAus = evs => evs.filter(ev => ev.kind === 30004 && (tagWert(ev, 'd') === 'katalog' || tagWert(ev, 'd').startsWith('katalog-')))
+      .map(listeEintraege).sort((a, b) => (b.d === 'katalog') - (a.d === 'katalog') || b.stand - a.stand);
+    let lauf;
+    if (eigene) {
+      lauf = ocLaden().then(oc => hubFetch('community:' + hex, [{ kinds: [30004], authors: [hex], limit: 20 }], { relays: ['wss://relay-rpi.edufeed.org', 'wss://relay.edufeed.org'] }).then(listen => {
+        const direkt = [...oc.seiten.values(), ...oc.beitraege, ...oc.termine];
+        return { antwort: direkt.length > 0 || listen.length > 0, direkt, reposts: [], listen: listenAus(neueste(listen)), entfernt: new Set() };
+      }));
+    } else {
+      lauf = hubFetch('community:' + hex, [
+        { kinds: [30142, 30023, 31923], '#h': [hex], limit: 150 },
+        { kinds: [6, 16], '#h': [hex], limit: 150 },
+        { kinds: [30004], authors: [hex], limit: 20 },
+        { kinds: [1985], '#h': [hex], '#L': ['communikey.moderation'], authors: [hex], limit: 100 }
+      ]).then(events => ({
+        antwort: events.length > 0,
+        direkt: neueste(events.filter(ev => [30142, 30023, 31923].includes(ev.kind))),
+        reposts: events.filter(ev => ev.kind === 6 || ev.kind === 16),
+        listen: listenAus(neueste(events)),
+        entfernt: entferntAus(events, hex)
+      }));
+    }
+    coDaten.set(hex, lauf);
+    lauf.then(d => { if (!d.antwort) coDaten.delete(hex); }, () => coDaten.delete(hex));
+    return lauf;
+  }
+  /** Einträge einer Community: direkte Events und Repost-Ziele, je Adresse der neueste, ohne die vom Community-Schlüssel entfernten; neueste zuerst. Ohne Rollenprüfung. */
+  function coEintraege(daten) {
+    const je = new Map();
+    const nimm = e => {
+      if (daten.entfernt.has(e.adr)) return;
+      const alt = je.get(e.adr);
+      if (!alt || e.zeit > alt.zeit) je.set(e.adr, alt && !e.ev ? { ...e, ev: alt.ev } : e);
+    };
+    for (const ev of daten.direkt) {
+      if (daten.entfernt.has('e:' + ev.id)) continue;
+      const d = tagWert(ev, 'd');
+      nimm({ adr: ev.kind + ':' + ev.pubkey + ':' + d, kind: ev.kind, pk: ev.pubkey, d, ev, geteilt: null, zeit: ev.created_at });
+    }
+    for (const r of daten.reposts) {
+      const z = repostZiel(r);
+      if (!z) continue;
+      nimm({ adr: z.adr, kind: z.kind, pk: z.pk || null, d: z.d || null, ev: null, geteilt: r.pubkey, zeit: r.created_at });
+    }
+    return [...je.values()].sort((a, b) => b.zeit - a.zeit);
+  }
+  /** Fehlende Ziele erst aus mpDaten und ocDaten holen, den Rest in einer einzigen Nachfrage (Obermenge, danach exakt gefiltert); setzt e.ev */
+  function eintraegeAufloesen(eintraege) {
+    const ergebnis = new Map(), cache = new Map();
+    for (const m of (mpDaten || [])) if (m.ev) cache.set('30142:' + m.pk + ':' + m.d, m.ev);
+    if (ocDaten) for (const ev of [...ocDaten.seiten.values(), ...ocDaten.beitraege, ...ocDaten.termine]) cache.set(ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd'), ev);
+    const fehlend = [];
+    for (const e of eintraege) {
+      const ev = e.ev || cache.get(e.adr);
+      if (ev) { e.ev = ev; ergebnis.set(e.adr, ev); } else fehlend.push(e);
+    }
+    if (!fehlend.length) return Promise.resolve(ergebnis);
+    const aZiele = fehlend.filter(e => e.pk), eZiele = fehlend.filter(e => !e.pk && e.adr.startsWith('e:'));
+    const filter = [];
+    if (aZiele.length) filter.push({ kinds: [30142, 30023, 31923], authors: [...new Set(aZiele.map(e => e.pk))], '#d': [...new Set(aZiele.map(e => e.d))], limit: aZiele.length + 10 });
+    if (eZiele.length) filter.push({ ids: eZiele.map(e => e.adr.slice(2)) });
+    return hubFetch('aufloesen:' + fehlend.map(e => e.adr).join(',').slice(0, 200), filter).then(events => {
+      for (const e of fehlend) {
+        const treffer = events.filter(ev => e.pk ? ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd') === e.adr : 'e:' + ev.id === e.adr).sort((a, b) => b.created_at - a.created_at)[0];
+        if (treffer) { e.ev = treffer; ergebnis.set(e.adr, treffer); }
+      }
+      return ergebnis;
+    });
+  }
+  /** Karte eines aufgelösten Eintrags (HTML-String); alle Texte über esc, Adressen über sichereUrl oder Hub-Hash */
+  function eintragKarte(e) {
+    const von = e.geteilt ? `<span class="kat-von">geteilt von ${esc((CO_SCHLUESSEL.find(c => c.hex === e.geteilt) || {}).n || bech32('npub', e.geteilt.match(/../g).map(h => parseInt(h, 16))).slice(0, 14) + '…')}</span>` : '';
+    const ev = e.ev;
+    if (!ev) return `<div class="kat-card"><span>nicht auflösbar: ${esc(e.adr)}</span>${von}</div>`;
+    const datum = sek => sek ? new Date(sek * 1000).toLocaleDateString('de-DE') : '';
+    if (ev.kind === 30142) {
+      const m = mpMaterial(ev), zeile = [m.art, m.quelle, m.stufe].filter(Boolean).map(esc).join(' · ');
+      return `<a class="mp-card" href="#materialpool?d=${encodeURIComponent(m.d)}&p=${m.pk}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand}">${esc(m.licLabel || 'Lizenz nicht angegeben')}</span>${von}</a>`;
+    }
+    if (ev.kind === 31923) {
+      const t = evToTermin(ev);
+      return `<a class="kat-card" href="${esc(sichereUrl(t.u))}"><b>${esc(t.t || t.id)}</b><span>${esc(datum(t.s))}</span>${von}</a>`;
+    }
+    const d = tagWert(ev, 'd'), href = ev.pubkey === FO_HEX ? beitragUrl(ev) : 'https://edufeed.org/' + naddr(d, ev.pubkey, ev.kind);
+    return `<a class="kat-card" href="${esc(sichereUrl(href))}"><b>${esc(tagWert(ev, 'title') || d)}</b><span>${esc(datum(+tagWert(ev, 'published_at') || ev.created_at))}</span>${von}</a>`;
+  }
+
   // ---------- kleine Symbole der Steuerkonsole (Logo, Abschnittssymbole) ----------
   const ORDER = ['hub','finden','erstellen','kooperieren','veroeffentlichen'];
   function petals(svg, only) {
@@ -2827,6 +2979,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     { id: 'interrel', n: 'relilab|interreligiös', ab: 'ir', col: C.kooperieren, ty: 'thema', rl: 1, bio: 'Christentum und Islam im Klassenzimmer.', back: 'ptz und ZSL Baden-Württemberg entwickeln kreative digitale Ideen zu Themen, die Christentum und Islam gleichermaßen betreffen – für Klassen mit Schüler:innen verschiedener Religionen.', inst: ['relilab', 'relilab'], m: 33, series: [['relilab|interreligiös', 'mit Anmeldung, im geschützten Moodle-Raum']] },
     { id: 'makerspace', n: 'Makerspace asynchrone Lernressourcen', ab: 'MS', col: C.erstellen, tx: '#2B1A00', ty: 'thema', rl: 1, bio: 'Wie lassen sich asynchrone Lernressourcen didaktisch gestalten?', back: 'Im Makerspace geht es um die Frage, wie asynchrone Lernressourcen didaktisch gestaltet werden können – einmal im Monat, praktisch und gemeinsam.', inst: ['relilab', 'relilab'], m: 27, series: [['Makerspace „asynchrone Lernressourcen“', 'einmal im Monat']] },
     { id: 'frieden', n: 'Friedenspädagogik', ab: 'FP', col: C.kooperieren, ty: 'thema', mine: 'Mitglied', bio: 'Frieden lernen – in Schule und Gemeinde.', back: 'Lehrkräfte, Gemeindepädagog:innen und Engagierte aus der Friedensarbeit teilen Material und Erfahrungen zur Friedensbildung.', inst: ['Friedensarbeit EKD', null], m: 49 },
+    { id: 'alpika-gs', n: 'ALPIKA Grundschule', ab: 'AG', col: C.kooperieren, ty: 'netz', bio: 'Arbeitsgruppe der religionspädagogischen Institute für die Grundschule.', back: 'Dozentinnen und Dozenten der Pädagogischen Institute und Zentren arbeiten hier an Material und Vokabular für den Religionsunterricht in der Grundschule.', m: 6 },
     { id: 'rpi-virtuell', n: 'rpi-virtuell', ab: 'rv', col: C.finden, ty: 'netz', bio: 'Redaktionskreis und Institute hinter Materialpool, Fortbildungskalender und Bildungsnews.', back: 'Der Redaktionskreis von rpi-virtuell und die religionspädagogischen Institute, die Material sichten, Fortbildungen in den gemeinsamen Kalender stellen und die Bildungsnews schreiben: die Menschen hinter den rezeptiven Angeboten.', inst: ['rpi-virtuell', 'rpi-virtuell'], m: 35 },
     { id: 'oercommunity', n: 'OER-Community', ab: 'OC', col: C.hub, ty: 'netz', ver: true, mine: 'folge ich', bio: 'Community of Communities des Projekts FOERBICO: Vernetzung religionsbezogener OER-Communities, gemeinsame Qualitätskriterien und Metadatenstandards.', back: 'Wer selbst offene Materialien erstellt oder in einem Netzwerk daran mitarbeitet, findet hier Austausch, Tagungen und Wissensgrundlagen zu OER.', inst: ['OER-Community', 'oercommunity'], m: 9, series: [] }
   ];
