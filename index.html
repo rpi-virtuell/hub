@@ -3488,7 +3488,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   function crMain(c) {
     // Der Katalog braucht keine Beispieldaten (crData): er läuft auch für Communities, die nur im Datenraum existieren
     if (crTab === 'katalog') return `<div class="cr-cols one"><section class="kat" id="katRoot" aria-live="polite"></section></div>`;
-    const D = crData(c), mem = crMember[c.id], lock = (what) => `<div class="cr-lock"><b>${what} nur für Mitglieder</b>Tritt der Community bei, um ${what === 'Kalender' ? 'alle Termine zu sehen und eigene anzulegen' : 'die Einstellungen zu verwalten'}.<div style="margin-top:14px"><button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button></div></div>`;
+    const D0 = crData(c), D = { act: [], ev: [], ...D0 }, mem = crMember[c.id], lock = (what) => `<div class="cr-lock"><b>${what} nur für Mitglieder</b>Tritt der Community bei, um ${what === 'Kalender' ? 'alle Termine zu sehen und eigene anzulegen' : 'die Einstellungen zu verwalten'}.<div style="margin-top:14px"><button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button></div></div>`;
     const evList = D.ev.map(([d, t]) => `<button type="button" class="cr-ev" data-todo="Termin „${t}“"><small>${d}</small><b>${t}</b></button>`).join('');
     if (crTab === 'home') return `<div class="cr-cols"><section><h2 class="cr-h">Kürzliche Aktivität</h2>${D.act.map(i => crItem(i, c)).join('')}</section><aside><h2 class="cr-h"><span>Kommende Veranstaltungen ›</span></h2>${evList}</aside></div>`;
     if (crTab === 'art' || crTab === 'lern') {
@@ -3523,7 +3523,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
         ${crMain(c)}
       </main>`;
     if (crTab === 'katalog') katRender(c);
-    else if (crRootEl.id === 'crRoot') datenstand('v-community', 'nachbau', 'Beispielinhalte');
+    else { katLauf++; if (crRootEl.id === 'crRoot') datenstand('v-community', 'nachbau', 'Beispielinhalte'); }
   }
   // ---------- Katalog je Community: geteilte Inhalte als Grundschicht, Kuratierung darüber ----------
   let katLauf = 0;   // Lauf-Zähler gegen späte Antworten nach Tab- oder Community-Wechsel
@@ -3531,7 +3531,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   const fKatD = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
   function katRender(c) {
     const wurzel = crRootEl.querySelector('#katRoot'); if (!wurzel) return;
-    const lauf = ++katLauf, k = CO_SCHLUESSEL.find(x => x.id === c.id), standSetzen = (z, i) => { if (crRootEl.id === 'crRoot') datenstand('v-community', z, i); };
+    const lauf = ++katLauf, k = CO_SCHLUESSEL.find(x => x.id === c.id), standSetzen = (z, i) => { if (crRootEl.id === 'crRoot' && crTab === 'katalog' && crId === c.id) datenstand('v-community', z, i); };
     const kopf = `<div class="kat-kopf"><h2>Katalog von ${esc(c.n)}</h2><p>Was diese Community aus dem gemeinsamen Datenraum teilt und zusammenstellt.</p></div>`;
     if (!k) { wurzel.innerHTML = kopf + `<p class="kat-leer">Kataloge gibt es für Communities mit eigenem Schlüssel im Datenraum. <a href="#communities">Zu den Communities ›</a></p>`; standSetzen('nachbau', 'Beispielinhalte'); return; }
     const appLink = `<a href="${esc(sichereUrl('https://edufeed.org/c/' + k.npub))}" target="_blank" rel="noopener">In der edufeed-App öffnen ›</a>`;
@@ -3604,7 +3604,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   // Ein Community-Raum kann im reli_hub oder eingebettet in einer Instanz (z. B. relilab) erscheinen
   function crOpen(id, tab, rootId) {
     ['crRoot', 'rlCrRoot'].forEach(x => { if (x !== (rootId || 'crRoot')) document.getElementById(x).innerHTML = ''; });
-    crRootEl = document.getElementById(rootId || 'crRoot'); crId = id; crTab = tab || 'home'; crRender();
+    katLauf++; crRootEl = document.getElementById(rootId || 'crRoot'); crId = id; crTab = tab || 'home'; crRender();
   }
   // relilab: nur die Communities, die im relilab aktiv sind – der Kopf bleibt relilab
   function rlCommRender() {
