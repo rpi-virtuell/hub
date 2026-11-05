@@ -125,8 +125,9 @@ Abfrage `kalender` (`kalLaden()`, einmal je Sitzung, ein `REQ` je Relay an `rela
 
 | Filter | Wert | Zweck |
 |---|---|---|
-| 1 | `{ kinds: [31923], authors: [<14 Hex aus KAL_QUELLEN>], since: <jetzt − 365 Tage>, limit: 500 }` | Termine der festen Quellen (relilab, Institute, Communities) |
-| 2 | `{ kinds: [31923], '#h': [<Schlüssel der Hub-Communities>], limit: 200 }` | Termine, die einer Hub-Community zugeordnet sind (so kommen auch Termine unter persönlichen Schlüsseln, etwa die ptz-Termine, sobald sie einen `h`-Tag tragen) |
+| 1 | `{ kinds: [31923], authors: [<Labor-Quellen>], since: <jetzt − 365 Tage>, limit: 500 }` | Termine der Labor-Quellen (relilab) |
+| 2 | `{ kinds: [31923], authors: [<übrige Quellen aus KAL_QUELLEN>], since: <jetzt − 365 Tage>, limit: 500 }` | Termine der Institute und Communities; eigene Grenze, damit das dichte Labor sie nicht verdrängt |
+| 3 | `{ kinds: [31923], '#h': [<Schlüssel der Hub-Communities>], limit: 200 }` | Termine, die einer Hub-Community zugeordnet sind (so kommen auch Termine unter persönlichen Schlüsseln, etwa die ptz-Termine, sobald sie einen `h`-Tag tragen) |
 
 Die Antwort wird je Adresse (`pubkey:d`) mit dem Schnappschuss gemischt, das neuere `created_at` gewinnt; Ergebnis sind rohe Events. Ohne Antwort bleibt `Stand vom <RT_STAND>` stehen, und die nächste Öffnung versucht es erneut. Mit Antwort: `live · <n> Termine · <k> Quellen` (`n` = bevorstehende Termine nach dem Mischen, `k` = Zahl verschiedener Absender in der Relay-Antwort). Der Schlüssel der ptz-Termine ist kein Eintrag in `KAL_QUELLEN` (persönlicher Schlüssel).
 
@@ -186,6 +187,6 @@ Vor jeder Vorführung erneuern, damit der Rückfall nicht veraltet. Nicht in sch
 ## Grenzen
 
 - Das Relay liefert je `REQ` höchstens etwa 500 Events (neueste zuerst). Das Skript meldet, wenn die Grenze erreicht ist; früher angelegte Termine können dann fehlen.
-- Die Live-Abfrage holt nur in den letzten 30 Tagen angelegte Termine; ältere kommen aus dem Schnappschuss.
+- Die Live-Abfrage der relilab-Termine holt nur in den letzten 30 Tagen angelegte Termine; ältere kommen aus dem Schnappschuss. Der Fortbildungskalender fragt 365 Tage zurück, in zwei Gruppen (Labor-Quellen, übrige Quellen) mit je höchstens 500 Events. Erreicht eine Gruppe die 500 in der Antwort, hängt die Stand-Zeile „· Relay-Grenze erreicht, ältere Termine können fehlen“ an.
 - Löschungen (kind 5) werden nicht ausgewertet; ein gelöschter Termin bleibt bis zum nächsten Schnappschuss sichtbar.
-- Live sind bisher die relilab-Termine und die Ansicht rpi-virtuell (Fortbildungen, News). Die übrigen Ansichten zeigen ihren eingebetteten Stand oder sind als Nachbau gekennzeichnet.
+- Live sind bisher die relilab-Termine, der Fortbildungskalender und die Ansicht rpi-virtuell (Fortbildungen, News). Die übrigen Ansichten zeigen ihren eingebetteten Stand oder sind als Nachbau gekennzeichnet.

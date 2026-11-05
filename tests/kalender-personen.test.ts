@@ -29,8 +29,9 @@ Deno.test('kalLaden: eine Abfrage für Kalender und rpi-virtuell, feste Quellen'
   const q = block(/const KAL_QUELLEN = \[[\s\S]*?\n  \];/);
   assertEquals((q.match(/npub1[0-9a-z]{58}/g) || []).length, 14); assert(!/npub1f7jar/.test(q), 'kein persönlicher Schlüssel als Quelle');
   const k = block(/function kalLaden\(\)[\s\S]*?\n  \}/);
-  assert(/hubFetch\('kalender', \[/.test(k) && /authors: \[\.\.\.KAL_HEX\.keys\(\)\]/.test(k) && /'#h': CO_SCHLUESSEL\.map/.test(k) && /RT_RAW/.test(k), 'zwei Filter, Schnappschuss gemischt');
+  assert(/hubFetch\('kalender', \[/.test(k) && /logik === 'labor'/.test(k) && (k.match(/since:/g) || []).length === 2 && (k.match(/limit: 500/g) || []).length === 2 && /authors: labor/.test(k) && /authors: andere/.test(k) && /'#h': CO_SCHLUESSEL\.map/.test(k) && /RT_RAW/.test(k), 'zwei Filter, Schnappschuss gemischt');
   assert(!/amb-relay/.test(k) && !/groups\.edufeed\.org/.test(html));
+  assert(/Relay-Grenze erreicht/.test(fn('kaRender')), 'Grenze sichtbar');
   const rv = block(/function rvOpen\(qs\)[\s\S]*?\n  \}/);
   assert(/kalLaden\(\)/.test(rv) && !/kinds: \[31923\]/.test(rv) && /terminLogik\(/.test(rv) && /#finden\/fortbildungen/.test(rv), 'rpi-virtuell teilt die Abfrage');
   assert(/RT_RAW\.filter\(ev => RT_HEX\[ev\.pubkey\]\)/.test(s), 'relilab filtert den Schnappschuss');

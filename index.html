@@ -3802,17 +3802,20 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   const KAL_HEX = new Map(KAL_QUELLEN.map(q => [npubToHex(q.npub), q]));
   const RL_HEX = npubToHex('npub1fpcxaz2wvjl90gjs60x37ny2pa5u4yqfx7fklz73rgfjnnfujl3sr2fxgk');   // relilab
   const KAL_RELAYS = ['wss://relay.edufeed.org', 'wss://relay-rpi.edufeed.org'];
-  let kalDaten = null, kalStand = { live: 0, quellen: 0 };   // Promise der Abfrage (einmal je Sitzung); Zahl der Relay-Termine und ihrer Absender
+  let kalDaten = null, kalStand = { live: 0, quellen: 0, grenze: false };   // Promise der Abfrage (einmal je Sitzung); Zahl der Relay-Termine und ihrer Absender
   /** Alle Termine der Quellen plus der Hub-Communities (h-Tag), gemischt mit dem Schnappschuss je Adresse (neuestes created_at gewinnt); rohe Events */
   function kalLaden() {
     if (kalDaten) return kalDaten;
+    const seit = Math.floor(Date.now() / 1000) - 365 * 86400, labor = [...KAL_HEX.keys()].filter(k => KAL_HEX.get(k).logik === 'labor'), andere = [...KAL_HEX.keys()].filter(k => KAL_HEX.get(k).logik !== 'labor');
+    // zwei Gruppen mit je eigener Grenze (limit 500), damit das dichte Labor die Institute nicht verdrängt
     kalDaten = hubFetch('kalender', [
-      { kinds: [31923], authors: [...KAL_HEX.keys()], since: Math.floor(Date.now() / 1000) - 365 * 86400, limit: 500 },
+      { kinds: [31923], authors: labor, since: seit, limit: 500 },
+      { kinds: [31923], authors: andere, since: seit, limit: 500 },
       { kinds: [31923], '#h': CO_SCHLUESSEL.map(k => k.hex), limit: 200 }
     ], { relays: KAL_RELAYS }).then(evs => {
       const m = new Map();
       [...RT_RAW, ...evs].forEach(ev => { const a = ev.pubkey + ':' + tagWert(ev, 'd'), b = m.get(a); if (!b || ev.created_at >= b.created_at) m.set(a, ev); });
-      kalStand = { live: evs.length, quellen: new Set(evs.map(ev => ev.pubkey)).size };
+      kalStand = { live: evs.length, quellen: new Set(evs.map(ev => ev.pubkey)).size, grenze: [labor, andere].some(g => evs.filter(ev => g.includes(ev.pubkey)).length >= 500) };   // Gruppe an der Relay-Grenze
       if (!evs.length) kalDaten = null;   // ohne Antwort beim nächsten Öffnen erneut versuchen
       return [...m.values()];
     });
@@ -3927,7 +3930,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
         <div class="ka-act"><button type="button" data-kaics="${i}" aria-label="${rtEsc('Als Kalenderdatei: ' + e.t)}">.ics</button><button type="button" data-kan="${i}" aria-label="${rtEsc('Nostr-Adresse kopieren: ' + e.t)}">nostr:</button></div></div></article>`;
     });
     document.getElementById('kaListe').innerHTML = h || `<p>${alle.length ? 'Nichts gefunden; Filter lockern.' : 'Gerade keine bevorstehenden Termine.'}</p>`;
-    if (kalStand.live) datenstand('v-fortbildungen', 'live', `${alle.length} Termine · ${kalStand.quellen} Quellen`);
+    if (kalStand.live) datenstand('v-fortbildungen', 'live', `${alle.length} Termine · ${kalStand.quellen} Quellen${kalStand.grenze ? ' · Relay-Grenze erreicht, ältere Termine können fehlen' : ''}`);
     else datenstand('v-fortbildungen', 'stand', RT_STAND);
   }
   function kaOpen(qs) {
