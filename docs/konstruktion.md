@@ -33,11 +33,11 @@ Das Vokabular des gesamten Prototyps ist eine kleine, feste Ontologie: fünf Fun
 | reli\_hub | #233E99 (blau) | hub.profil | /profil | Ansicht Profil (setzt „angemeldet“) |
 |  |  | hub.home | / | Ansicht Start |
 | finden | #008C86 (türkis) | finden.material | /finden/materialpool | Ansicht Materialpool, mit Vorauswahl-Parametern |
-|  |  | finden.fortbildungen | /finden/fortbildungen | relilab-Termine (im relilab-Kontext), sonst „später“ |
+|  |  | finden.fortbildungen | /finden/fortbildungen | Fortbildungskalender über alle Quellen (Ansicht v-fortbildungen) |
 | erstellen | #F39200 (orange) | erstellen.schreibtisch | /erstellen/schreibtisch | Ansicht relidesk, Tab Schreibtisch |
 |  |  | erstellen.labor | /erstellen/labor | Ansicht relilab |
 | kooperieren | #D6336C (pink) | kooperieren.communities | /kooperieren/communities | Ansicht Communities |
-|  |  | kooperieren.personen | /kooperieren/personen | „später“ |
+|  |  | kooperieren.personen | /kooperieren/personen | Ansicht Personen (nur wer in der Personen-Liste steht) |
 | veröffentlichen | #7B4FB8 (violett) | veroeffentlichen.lerninhalte | /veroeffentlichen/lerninhalte | Editor Lerninhalt (Bereichswahl, dann 7 Schritte) |
 |  |  | veroeffentlichen.termin | /veroeffentlichen/termin | Editor Termin |
 |  |  | veroeffentlichen.beitrag | /veroeffentlichen/beitrag | Editor Beitrag (Markdown) |
@@ -117,6 +117,16 @@ Seit Etappe 3 kommen die redaktionellen Inhalte nicht mehr aus dem Code, sondern
 - **Materialien** (`kind:30142`) kommen von allen drei Relays; ein Material ist über `pubkey:d` bestimmt, die Detailansicht nimmt es aus dem Listen-Zwischenspeicher und baut das JSON-LD aus den Tags.
 - **Lizenzstand**: Aus `license:id` folgt offen, geschützt oder unbekannt (unbekannt gilt wie geschützt). Aktionen, die der Stand nicht erlaubt, bleiben sichtbar und sind deaktiviert; die Auswertung eines Prüf-Markers (`l=geprueft`, NIP-32) ist angelegt, bisher trägt kein Event das Label; wer prüfen darf, ist Stufe B.
 - Die Teamseite bleibt ein Schnappschuss mit Initialen (Porträts sind urheberrechtlich geschützt).
+
+### Community-Inhalte und Listen (Etappe 4)
+
+Seit Etappe 4 zeigt der Hub, was Communities teilen, und listet Termine und Personen (Begründung: [ADR-0008](adr/0008-community-inhalte-und-listen.md), Abfragen: [daten.md](daten.md)):
+
+- **Katalog je Community**: Tab „Katalog“ im Community-Raum, zwei Schichten. Grundschicht ist, was mit dem `h`-Tag der Community geteilt oder von ihr gereposted wurde, gelesen über `#h` auf die fünf bekannten Schlüssel; der Hub prüft keine Mitgliederrollen und sagt das in der Stand-Zeile. Weggelassen wird nur, was der Community-Schlüssel selbst per `kind:1985`-Label entfernt hat. Zweite Schicht sind Kuratierungslisten (`kind:30004`, `d=katalog` oder `d=katalog-<thema>`) des Community-Schlüssels. Der Materialpool steht zusätzlich als Katalog der Instanz rpi-virtuell.
+- **Sammlung** (`#finden/sammlung`): filtert die Materialien nach Community, Fach, Bildungsstufe, Lizenzstand und Suchbegriff, ohne eigene Abfrage. Ausgänge: Teilen, Einbetten als Shortcode und Kontextprofil, Abonnieren als kopierbarer Nostr-Filter.
+- **Fortbildungskalender** (`#finden/fortbildungen`): Termine fester Quellen plus die der Hub-Communities (`h`), nie global; Labor und Institut sind ein Merkmal, dazu online, Anmeldung und kostenfrei. Fehlende Angaben heißen „keine Angabe“; erreicht eine Gruppe die Relay-Grenze, steht das in der Stand-Zeile.
+- **Personen** (`#kooperieren/personen`) zeigt nur, wen die Personen-Liste (`kind:30000`, `d=personen`) nennt; die Liste ist das Einverständnis, Mitgliedschaft allein führt niemanden auf, Bots fehlen. Die Einzelseite `#person?p=<npub>` ist eine eigene Route und zeigt Profil, Mitgliedschaften und Veröffentlichungen; `#profil` bleibt die Persona. Fehlt die Liste, bleibt die Teamseite als Rückfall.
+- **Folgen, Speichern als Liste, Redaktionsoberfläche** sind sichtbar und deaktiviert, bis die Anmeldung mit Schlüssel da ist.
 
 ## Instanzen und Communities
 
@@ -240,8 +250,9 @@ Der Prototyp markiert selbst, wo er aufhört. Diese Stellen sind zugleich die Pu
 
 | Stelle | Stand im Prototyp | Was zu beschreiben wäre |
 | --- | --- | --- |
-| finden.fortbildungen außerhalb relilab | Toast „später“; Partnerkachel „rpi-virtuell Fortbildungskalender“ ohne Ziel | ein gemeinsamer Kalender über alle Quellen (NIP-52), analog zur relilab-Termine-Seite, als Hub-Ansicht |
-| kooperieren.personen | Toast „später“ | Personenprofile (kind 0), Folgen, Kontakt; Verhältnis zu Community-Mitgliedschaft |
+| Folgen | Knopf bei den Personen sichtbar, deaktiviert | braucht Signer und Anmeldung: Kontaktliste (NIP-02) des Nutzers, Rückmeldung in der Ansicht |
+| Abonnieren als Nostr-Liste | Sammlung zeigt nur den kopierbaren Filter, „Als Nostr-Liste speichern“ deaktiviert | Signer-Fluss, der die Liste (`kind:30004`) schreibt |
+| Redaktionsoberfläche für Kuratierungslisten | Listen pflegt das Team bis dahin in der edufeed-App | Oberfläche im Hub, sobald die Anmeldung steht (Stufe B) |
 | Anmeldung | „Mit Nostr-Schlüssel anmelden“ ist ein Link auf die Profilseite | Signer-Fluss (NIP-07/NIP-46), Profil aus kind 0, Interessen als Tags |
 | Materialdaten | eingebetteter Schnappschuss, Relay-Adressen nur im Fuß | Live-Abfrage über die genannten Relays; AMB-Felder, die das „warum“ der Empfehlungen speisen |
 | config-src | Attribut vorgesehen, nicht genutzt | Kontextprofile als JSON pro Partner, damit Einbindung ohne JavaScript-Kenntnis möglich ist |

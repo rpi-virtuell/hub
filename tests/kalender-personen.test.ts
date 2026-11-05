@@ -63,3 +63,11 @@ Deno.test('peLaden: zwei Abfragen, feste Autoren; Personen und Person: Rückfall
   assert(/id="v-personen" data-stand="stand:04\.11\.2026/.test(html) && /id="v-person" data-stand="nachbau:/.test(html), 'Ansichten mit Stand');
   assert(/'kooperieren\.personen': 'kooperieren\/personen'/.test(s) && /'person'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'Konsole und Route');
 });
+
+Deno.test('ADR-0008 und README nennen die Etappe', async () => {
+  const adr = await Deno.readTextFile(new URL('../docs/adr/0008-community-inhalte-und-listen.md', import.meta.url));
+  assert(/^# ADR-0008/.test(adr) && /## Status/.test(adr) && /## Entscheidung/.test(adr) && /b68eaaa5/.test(adr) && /693c69cc/.test(adr) && /d=personen/.test(adr) && /d=katalog/.test(adr) && /ohne Rollenprüfung|Mitgliederrollen/.test(adr));
+  assert(!/Arbeitspaket|Meilenstein|Förderkennzeichen|Projektträger|Zwischenbericht/.test(adr), 'Projektsprache');
+  const r = await Deno.readTextFile(new URL('../README.md', import.meta.url));
+  assert(/0008-community-inhalte-und-listen/.test(r) && /Sammlung/.test(r) && /Personen/.test(r), 'README');
+});
