@@ -60,6 +60,7 @@ Deno.test('peLaden: zwei Abfragen, feste Autoren; Personen und Person: Rückfall
   assert(/OC_TEAM/.test(r) && /noch nicht angelegt/.test(r) && /antworten gerade nicht/.test(r) && /disabled aria-disabled="true"/.test(r) && /\.bot/.test(r), 'Zustände, Teamseite, Folgen, Bots');
   const o = block(/function prOpen\(qs\)[\s\S]*?\n  \}/);
   assert(/npubToHex\(/.test(o) && /kinds: \[30142, 30023, 31923\]/.test(o) && /Kein gültiges Profil/.test(o), 'Profilseite');
+  assert(/kinds: \[0\], authors: \[FO_HEX\], limit: 1/.test(o) && /antworten gerade nicht/.test(o) && /!evs\.length/.test(o), 'Profilseite im Funkloch: Gesundheitsfilter, ehrliche Meldung');
   assert(/id="v-personen" data-stand="stand:04\.11\.2026/.test(html) && /id="v-person" data-stand="nachbau:/.test(html), 'Ansichten mit Stand');
   assert(/'kooperieren\.personen': 'kooperieren\/personen'/.test(s) && /'person'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'Konsole und Route');
 });

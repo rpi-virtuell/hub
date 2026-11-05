@@ -1213,13 +1213,13 @@ a.kat-card:hover{border-color:var(--c-koop)}
   </main>
   <footer class="mp-foot"><div class="in">
     <span>Die Auswahl entsteht aus den Materialien, die schon geladen sind.</span>
-    <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> Teil des reli_hub</span>
+    <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> ein Vorhaben von FOERBICO · Prototyp</span>
   </div></footer>
   <relihub-steuerkonsole id="saFlower" floating size="58" popover-size="210" context="sammlung"></relihub-steuerkonsole>
 </div>
 
 <!-- ===================== Ansicht: Fortbildungen (finden › Fortbildungen) ===================== -->
-<div class="view" id="v-fortbildungen" data-stand="stand:04.11.2026">
+<div class="view" id="v-fortbildungen" data-stand="stand:Schnappschuss">
   <header class="mp-head">
     <a class="mp-brand" href="#finden/fortbildungen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Fortbildungskalender</a>
     <span class="sp"></span>
@@ -1240,7 +1240,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
   </main>
   <footer class="mp-foot"><div class="in">
     <span>Quelle: relay.edufeed.org, relay-rpi.edufeed.org</span>
-    <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> Teil des reli_hub</span>
+    <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> ein Vorhaben von FOERBICO · Prototyp</span>
   </div></footer>
   <relihub-steuerkonsole id="kaFlower" floating size="58" popover-size="210" context="fortbildungen"></relihub-steuerkonsole>
 </div>
@@ -1260,7 +1260,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
   </main>
   <footer class="mp-foot"><div class="in">
     <span>Es erscheint nur, wer in der Personen-Liste des Teams steht.</span>
-    <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> Teil des reli_hub</span>
+    <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> ein Vorhaben von FOERBICO · Prototyp</span>
   </div></footer>
   <relihub-steuerkonsole id="peFlower" floating size="58" popover-size="210" context="personen"></relihub-steuerkonsole>
 </div>
@@ -1276,7 +1276,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
   <main class="pe-in" id="prAus"></main>
   <footer class="mp-foot"><div class="in">
     <span>Quelle: relay.edufeed.org, relay-rpi.edufeed.org, amb-relay.edufeed.org</span>
-    <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> Teil des reli_hub</span>
+    <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> ein Vorhaben von FOERBICO · Prototyp</span>
   </div></footer>
   <relihub-steuerkonsole id="prFlower" floating size="58" popover-size="210" context="personen"></relihub-steuerkonsole>
 </div>
@@ -2331,7 +2331,8 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     }
     return weg;
   }
-  /** Inhalte, Reposts, Kuratierungslisten und Entfernen-Labels einer Community in einer Abfrage je Relay; einmal je Sitzung */
+  /** Inhalte, Reposts, Kuratierungslisten und Entfernen-Labels einer Community in einer Abfrage je Relay; einmal je Sitzung.
+   *  Das kind-0-Profil des Schlüssels trennt „Relays antworten nicht“ (leere Antwort) von „noch nichts geteilt“; es landet in keiner der Ergebnislisten. */
   function coLaden(hex) {
     if (coDaten.has(hex)) return coDaten.get(hex);
     const eigene = (CO_SCHLUESSEL.find(c => c.hex === hex) || {}).eigene;
@@ -2357,7 +2358,8 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
         { kinds: [30142, 30023, 31923], '#h': [hex], limit: 150 },
         { kinds: [6, 16], '#h': [hex], limit: 150 },
         { kinds: [30004], authors: [hex], limit: 20 },
-        { kinds: [1985], '#h': [hex], '#L': ['communikey.moderation'], authors: [hex], limit: 100 }
+        { kinds: [1985], '#h': [hex], '#L': ['communikey.moderation'], authors: [hex], limit: 100 },
+        { kinds: [0], authors: [hex], limit: 1 }   // Gesundheitsblick: das Profil des Community-Schlüssels belegt, dass die Relays geantwortet haben; zählt nicht als Inhalt
       ]).then(events => ({
         antwort: events.length > 0,
         direkt: neueste(events.filter(ev => [30142, 30023, 31923].includes(ev.kind))),
@@ -2390,6 +2392,12 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     }
     return [...je.values()].sort((a, b) => b.zeit - a.zeit);
   }
+  /** Kurzer, stabiler Hash (FNV-1a, 32 Bit) als 8 Hex-Zeichen, für Cache-Schlüssel über lange Listen */
+  function kurzHash(text) {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < text.length; i++) { h ^= text.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+    return h.toString(16).padStart(8, '0');
+  }
   /** Fehlende Ziele erst aus mpDaten und ocDaten holen, den Rest in einer einzigen Nachfrage (Obermenge, danach exakt gefiltert); setzt e.ev */
   function eintraegeAufloesen(eintraege) {
     const ergebnis = new Map(), cache = new Map();
@@ -2405,7 +2413,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const filter = [];
     if (aZiele.length) filter.push({ kinds: [30142, 30023, 31923], authors: [...new Set(aZiele.map(e => e.pk))], '#d': [...new Set(aZiele.map(e => e.d))], limit: aZiele.length + 10 });
     if (eZiele.length) filter.push({ ids: eZiele.map(e => e.adr.slice(2)) });
-    return hubFetch('aufloesen:' + fehlend.map(e => e.adr).join(',').slice(0, 200), filter).then(events => {
+    return hubFetch('aufloesen:' + kurzHash(fehlend.map(e => e.adr).sort().join(',')), filter).then(events => {
       for (const e of fehlend) {
         const treffer = events.filter(ev => istHex64(ev.pubkey) && [30142, 30023, 31923].includes(ev.kind)).filter(ev => e.pk ? ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd') === e.adr : 'e:' + ev.id === e.adr).sort((a, b) => b.created_at - a.created_at)[0];
         if (treffer) { e.ev = treffer; ergebnis.set(e.adr, treffer); }
@@ -2608,6 +2616,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   let RT_EV = RT_RAW.filter(ev => RT_HEX[ev.pubkey]).map(evToTermin).filter(e => e.s).sort((a, b) => a.s - b.s);
   // Datenstand je Ansicht aus data-stand="zustand:info"; relilab-Termine tragen das Datum ihres Schnappschusses
   document.getElementById('v-oercommunity').dataset.stand = 'stand:' + OC_STAND;
+  document.getElementById('v-fortbildungen').dataset.stand = 'stand:' + RT_STAND;
   document.querySelectorAll('div.view[data-stand]').forEach(v => { const [z, ...i] = v.dataset.stand.split(':'); datenstand(v.id, z, i.join(':')); });
   datenstand('v-relilab', 'stand', RT_STAND);
   datenstand('v-fortbildungen', 'stand', RT_STAND);
@@ -2753,7 +2762,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     return [
       { label: 'Auf den Schreibtisch holen', geht: offen, tu: () => go('relidesk?tab=schreibtisch') },
       { label: 'In der Community weiterbearbeiten', geht: offen, tu: () => openChooser('materialpool') },
-      { label: 'In Sammlung aufnehmen', geht: offen, tu: () => go('finden/sammlung?q=' + encodeURIComponent(m.t)) },
+      { label: 'In der Sammlung zeigen', geht: offen, tu: () => go('finden/sammlung?q=' + encodeURIComponent(m.t)) },
       { label: 'Ansehen', geht: true, tu: () => { if (m.url) window.open(m.url, '_blank', 'noopener'); else toast('Keine Adresse hinterlegt.'); } },
       { label: 'Link kopieren', geht: true, tu: () => rtCopy(location.href, 'Link kopiert.') },
       { label: 'Empfehlen', geht: true, tu: () => toast('Teilen in Communities folgt.') }
@@ -4110,10 +4119,11 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     if (!istHex64(hex) || bech32('npub', hex.match(/../g).map(h => parseInt(h, 16))) !== p) { prRender({ fehler: 'Kein gültiges Profil in der Adresse.' }); return; }
     prRender({ hex, laden: true });
     const cp = peDaten && peDaten.profile.get(hex), cm = peDaten && peDaten.mitglied.get(hex);
-    const filter = [{ kinds: [30142, 30023, 31923], authors: [hex], limit: 30 }];
+    const filter = [{ kinds: [30142, 30023, 31923], authors: [hex], limit: 30 }, { kinds: [0], authors: [FO_HEX], limit: 1 }];   // zweiter Filter: Gesundheitsblick, belegt eine Relay-Antwort
     if (!cp) filter.push({ kinds: [0], authors: [hex], limit: 1 }, { kinds: [30000], authors: [hex], '#d': ['communities'], limit: 1 });
     hubFetch('person:' + hex + (cp ? ':veroeffentlicht' : ''), filter).then(evs => {
       if (lauf !== prLauf) return;
+      if (!cp && !evs.length) { prRender({ fehler: 'Die Relays antworten gerade nicht.', stumm: true }); return; }
       let profil = cp || null, mitglied = cm || [];
       if (!cp) {
         const k0 = peNeueste(evs.filter(e => e.kind === 0), [hex]).get(hex), km = peNeueste(evs.filter(e => e.kind === 30000 && tagWert(e, 'd') === 'communities'), [hex]).get(hex);
@@ -4127,13 +4137,13 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
         if (!alt || e.created_at > alt.ev.created_at) neu.set(adr, { adr, kind: e.kind, pk: e.pubkey, d: tagWert(e, 'd'), ev: e, geteilt: null, zeit: e.created_at });
       }
       prRender({ hex, profil, mitglied, eintraege: [...neu.values()].sort((a, b) => b.zeit - a.zeit) });
-    }, () => { if (lauf === prLauf) prRender({ hex, profil: cp || null, mitglied: cm || [], eintraege: [] }); });
+    }, () => { if (lauf !== prLauf) return; if (cp) prRender({ hex, profil: cp, mitglied: cm || [], eintraege: [] }); else prRender({ fehler: 'Die Relays antworten gerade nicht.', stumm: true }); });
   }
   function prRender(d) {
     const aus = document.getElementById('prAus'); if (!aus) return;
     if (d.fehler) {
       aus.innerHTML = '<h1>Profil</h1><p class="pe-satz">'+ esc(d.fehler) +'</p><p><a class="pe-btn" href="#kooperieren/personen">Zu den Personen ›</a></p>';
-      datenstand('v-person', 'nachbau', 'Profil nicht gefunden'); return;
+      datenstand('v-person', 'nachbau', d.stumm ? 'Relays nicht erreichbar' : 'Profil nicht gefunden'); return;
     }
     if (d.laden) {
       aus.innerHTML = '<h1>Profil</h1><p class="pe-satz">Profil wird geladen …</p>';
@@ -4362,7 +4372,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell', 'person'].includes(view) ? view : 'start');
     if (finden === null) toast('Diese Seite gibt es nicht.');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
-    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung · Materialpool Religion', fortbildungen: 'Fortbildungen · Fortbildungskalender', personen: 'Personen · reli_hub', person: 'Profil · reli_hub', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
+    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'Fortbildungen', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || 'relilab', pp.get('zu') === 'katalog' ? 'katalog' : pp.get('tab')); }
     leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v === 'fortbildungen' ? 'rpi-virtuell' : v);
     if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); }
