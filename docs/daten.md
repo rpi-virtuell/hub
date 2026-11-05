@@ -79,6 +79,29 @@ Der Bereich `#oercommunity/spielregeln` (Konstante `SPIELREGELN`) kennt vier Sei
 | `geschuetzt` | CC mit NC oder ND, Wikipedia-Urheberrecht, Unsplash, Pixabay, Canva | ansehen, verlinken |
 | `unbekannt` | leer oder nicht erkannt | gilt als geschützt: ansehen, verlinken |
 
+## Community-Inhalte und Listen
+
+Die fünf Hub-Communities (`CO_SCHLUESSEL`: rpi-virtuell, relilab, reliGlobal, ALPIKA Grundschule und der Schaufenster-Schlüssel FOERBICO) werden über `coLaden(hex)` geladen, einmal je Community und Sitzung (`coDaten`; eine leere Antwort wird nicht gehalten). `hex` ist der Community-Schlüssel, aus dem npub in der Konstante abgeleitet. Die Abfrage geht an alle drei Relays, je Relay ein REQ mit vier Filtern:
+
+| Filter | Wert | Zweck |
+|---|---|---|
+| 1 | `{ kinds: [30142, 30023, 31923], '#h': [hex], limit: 150 }` | geteilte Materialien, Beiträge, Termine |
+| 2 | `{ kinds: [6, 16], '#h': [hex], limit: 150 }` | Reposts: was die Community von anderen übernommen hat |
+| 3 | `{ kinds: [30004], authors: [hex], limit: 20 }` | Kuratierungslisten der Community |
+| 4 | `{ kinds: [1985], '#h': [hex], '#L': ['communikey.moderation'], authors: [hex], limit: 100 }` | Entfernen-Labels des Community-Schlüssels |
+
+Der Schaufenster-Schlüssel (`eigene: true`) hat keine Community: seine Grundschicht sind die eigenen Events aus `ocLaden()` (Seiten, Beiträge, Termine); nur seine Listen holt `coLaden` mit einem eigenen Aufruf bei den zwei Relays des Schaufensters (`{ kinds: [30004], authors: [hex], limit: 20 }`).
+
+**Konvention für Kataloge:** Eine Liste (`kind:30004`) mit `d=katalog` oder `d=katalog-<thema>` ist ein Katalog der Community; `katalog` steht zuerst, die übrigen nach `created_at` absteigend. `listeEintraege(ev)` liest Titel (`title`, sonst `d`), Beschreibung, Bild (über `sichereUrl`) und die `a`-Tags in Reihenfolge ohne Duplikate; ungültige Adressen (`aTagLesen` verlangt `kind:64-Hex:d`) werden nur gezählt (`unaufloesbar`). Je Adresse (`kind:pubkey:d`) gilt das Event mit dem neuesten `created_at`.
+
+**Einträge und Reposts:** `coEintraege(daten)` führt direkte Events und Repost-Ziele zusammen (`repostZiel`: zuerst der erste gültige `a`-Tag, sonst der erste `e`-Tag mit 64 Hex), je Adresse ein Eintrag mit dem neuesten Zeitpunkt, neueste zuerst. Ein Repost-Ziel hat zunächst kein Event (`ev` ist `null`).
+
+**Auflösung, Cache vor Netz:** `eintraegeAufloesen(eintraege)` sucht fehlende Ziele zuerst in `mpDaten` und `ocDaten`; was dann noch fehlt, geht in **einer** Abfrage (`aufloesen:…`) an die Relays: ein Filter nach Kind, Autoren und `#d` (eine Obermenge, die danach exakt auf die Adressen gefiltert wird, `limit` = Zahl der Adressen plus 10) und, bei `e`-Zielen, ein Filter mit `ids`. Je Eintrag gibt es keinen zweiten Aufruf. Was nicht gefunden wird, zeigt `eintragKarte` als „nicht auflösbar“, ohne Link.
+
+**Regel ohne Rollenprüfung:** Die Rollen der Moderation stehen auf dem Gruppen-Relay, das der Hub nie liest. Deshalb zeigt der Hub, was mit dem `h`-Tag der Community geteilt wurde, und lässt nur weg, was der Community-Schlüssel selbst per `kind:1985` (`['l','remove','communikey.moderation']`, Ziel als `e`- oder `a`-Tag) entfernt hat (`entferntAus`); Labels anderer Absender zählen nicht.
+
+**Grenze:** `limit` 150 je Art (Inhalt, Reposts) bei großen Communities; ältere Einträge fehlen dann in der Ansicht.
+
 ### Verbraucher: Schaufenster
 
 `#oercommunity` zeigt sofort den Schnappschuss (`ocRender(null)`: Beiträge aus `OC_RAW`/`OC_POSTS`, Tagungen und Team eingebettet) und rendert danach mit der Antwort von `ocLaden()` (`ocRender(daten)`); die Filter sind die von `ocLaden`, die Stand-Zeile wechselt auf „live · n Beiträge · m Seiten“, bei leerer Antwort bleibt sie beim Stand. Das Menü entsteht aus der Liste `navigation` (die `a`-Tags nennen `30023:<pubkey>:<d>`, Beschriftung ist der `title` der Seite, fehlende Seiten fallen weg), danach kommen Spielregeln, Blog und Team; die Fußzeile aus `fusszeile`. Ohne Liste bleiben die festen Knöpfe und Links. Die Route `#oercommunity/<d>` zeigt die Seite `d` als Artikel (`mdSeite`); fehlt eine bekannte Seite auf dem Relay, steht dort „in Vorbereitung“ mit Verweis auf oer.community; antworten die Relays gar nicht, steht „Die Relays antworten gerade nicht.“ mit demselben Verweis, ein unbekanntes `d` führt zum Schaufenster mit Hinweis. Der Block `/* schnappschuss:beitraege */` (`OC_RAW`, `OC_STAND`) enthält die sechs neuesten Beiträge ohne Text und wird wie der Terminblock mit `deno task schnappschuss` erneuert.
