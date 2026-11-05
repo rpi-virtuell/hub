@@ -242,7 +242,7 @@ Communities mit Bezug zu dieser Instanz: <Liste, Flag „aktiv in <name>“>
 <Liste der data-todo-Ziele mit späterer URL>
 ```
 
-Dasselbe Schema lässt sich für eine neue Hub-Ansicht (z. B. Personen, Fortbildungskalender) oder einen weiteren Editor verwenden; dort entfällt der Block „Eigenes Design“, weil Hub-Ansichten die reli\_hub-Gestaltung tragen.
+Dasselbe Schema lässt sich für eine neue Hub-Ansicht (z. B. Ökosystem-Karte, Servicepoint) oder einen weiteren Editor verwenden; dort entfällt der Block „Eigenes Design“, weil Hub-Ansichten die reli\_hub-Gestaltung tragen.
 
 ## Offene Stellen und Ansatzpunkte
 
