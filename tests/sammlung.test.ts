@@ -62,3 +62,38 @@ Deno.test('coLaden: ein REQ je Community, h-Tag statt Autoren, Listen und Labels
   assert(/istHex64\(/.test(e), 'Treffer nur mit gültigem Schlüssel');
   assert(/kinds: \[30142, 30023, 31923\]/.test(e) && /'#d'/.test(e) && /ids: /.test(e), 'Obermenge nach Kind, Autor, d und ids');
 });
+
+Deno.test('sammlungFilter und sammlungPasst', () => {
+  const KAT = block(/const CO_SCHLUESSEL = \[[\s\S]*?\n  \];/);
+  const sf = bau('sammlungFilter'), sp = bau('sammlungPasst', KAT + fn('mpPasst'));
+  const f = sf('c=religlobal&fach=Ethik&fach=Religion&stufe=Sekundarstufe%20I&lizenz=offen&q=Frieden%20Schule&lizenz=kaputt');
+  assertEquals(f.c, 'religlobal'); assertEquals(f.fach, ['Ethik', 'Religion']); assertEquals(f.stufe, ['Sekundarstufe I']); assertEquals(f.q, ['Frieden', 'Schule']);
+  assertEquals(sf('lizenz=kaputt').lizenz, '');
+  const pk = 'cd'.repeat(32), m = { t: 'Frieden in der Schule', x: '', fach: 'Religion', stufe: 'Sekundarstufe I', art: 'Arbeitsblatt', stand: 'offen', pk, d: 'm1', ev: { tags: [['about:prefLabel:de', 'Religion'], ['educationalLevel:prefLabel:de', 'Sekundarstufe I'], ['keywords', 'Frieden']] } };
+  assert(sp(m, { c: '', fach: ['religion'], stufe: [], lizenz: 'offen', q: ['frieden'] }, new Set()));
+  assert(!sp(m, { c: '', fach: ['Ethik'], stufe: [], lizenz: '', q: [] }, new Set()));
+  assert(!sp(m, { c: 'religlobal', fach: [], stufe: [], lizenz: '', q: [] }, new Set()), 'nicht geteilt und fremder Schlüssel: kein Treffer');
+  assert(sp(m, { c: 'religlobal', fach: [], stufe: [], lizenz: '', q: [] }, new Set([`30142:${pk}:m1`])), 'mit der Community geteilt: Treffer');
+});
+
+Deno.test('shortcodeAus und kontextprofilAus', () => {
+  const KAT = block(/const CO_SCHLUESSEL = \[[\s\S]*?\n  \];/);
+  const sc = bau('shortcodeAus', KAT), kp = bau('kontextprofilAus', KAT + "const RELAYS = ['wss://relay.edufeed.org'];");
+  assertEquals(sc({ c: '', fach: [], stufe: [], lizenz: '', q: [] }), '[amb_nostr limit="12"]');
+  const out = sc({ c: 'religlobal', fach: ['Ethik'], stufe: [], lizenz: 'offen', q: ['Frieden"x'] });
+  assert(/^\[amb_nostr_search /.test(out) && /community="npub12atlg/.test(out) && /search="Friedenx"/.test(out) && /Lizenzfilter: offen/.test(out) && !/fixed_level/.test(out));
+  const j = JSON.parse(kp({ c: '', fach: ['Ethik'], stufe: ['Primarstufe'], lizenz: '', q: ['Frieden'] }));
+  assertEquals(j.actions['finden.material'].params, { thema: ['Frieden'], stufe: ['Primarstufe'] }); assertEquals(j.sammlung.community, null);
+});
+
+Deno.test('Sammlung: Ansicht, Route, keine eigene Abfrage, drei Ausgänge', async () => {
+  assert(/id="v-sammlung" data-stand="nachbau:/.test(html), 'Ansicht mit Stand-Zeile');
+  const r = block(/function route\(\)[\s\S]*?window\.scrollTo/);
+  assert(/'finden'/.test(r) && /saOpen\(/.test(r), 'Route finden/sammlung');
+  const o = block(/function saOpen\(qs\)[\s\S]*?\n  \}/) + block(/function saRender\(\)[\s\S]*?\n  \}/);
+  assert(/mpLaden\(\)/.test(o) && /coLaden\(/.test(o) && /f\.c/.test(o) && !/hubFetch\(/.test(o), 'nur Caches, Community nur bei Filter, keine eigene Abfrage');
+  assert(/id="saEinbetten"/.test(o) && /id="saAbo"/.test(o) && /Als Nostr-Liste speichern/.test(o) && /disabled aria-disabled="true"/.test(o) && /braucht einen Server/.test(o), 'Ausgänge ehrlich');
+  assert(/Sammlung zusammenstellen/.test(html), 'Knopf im Materialpool');
+  assert(/go\('finden\/sammlung\?q=/.test(block(/function lizenzAktionen\(stand, m\)[\s\S]*?\n  \}/)), 'In Sammlung aufnehmen führt zur Sammlung');
+  assert(/Sammlung/.test(await Deno.readTextFile(new URL('../docs/navigation.md', import.meta.url))), 'docs/navigation.md');
+});
