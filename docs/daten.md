@@ -33,7 +33,8 @@ Jede Ansicht außer der Startseite trägt direkt unter ihrer Kopfzeile eine Stan
 | `v-relilab` | Stand vom `RT_STAND` → live | Schnappschuss, dann `hubFetch('relilab-termine', …)` |
 | `v-relidesk` | Nachbau · relidesk ohne Datenquelle | keine |
 | `v-oercommunity` | Stand vom `OC_STAND` → live | Schnappschuss der Beiträge, dann `ocLaden()` |
-| `v-rpi-virtuell` | Nachbau · Termine und News laden → live | `hubFetch('rpi-virtuell', …)`, kein Schnappschuss |
+| `v-rpi-virtuell` | Nachbau · Termine und News laden → live | `kalLaden()` (Abfrage `kalender`) und `hubFetch('rpi-virtuell-news', …)`, kein eigener Schnappschuss |
+| `v-fortbildungen` | Stand vom `RT_STAND` → live | Schnappschuss (`RT_RAW`), dann `kalLaden()` |
 
 Drei Zustände: **live** (Relay-Daten sind angekommen), **Stand vom …** (eingebetteter Schnappschuss, auch wenn das Relay schweigt, abweist oder nichts liefert), **Nachbau** (Ansicht ohne Datenquelle). Nichts wird als live ausgegeben, was nicht vom Relay kam.
 
@@ -43,16 +44,16 @@ Drei Zustände: **live** (Relay-Daten sind angekommen), **Stand vom …** (einge
 
 ## Zweiter Verbraucher: rpi-virtuell (Fortbildungen und News)
 
-`rvOpen(qs)` setzt den Tab (`?tab=material|fortbildungen|news`, unbekannte Werte fallen auf `material`) und fragt einmal je Sitzung beide Relays mit **einem** `REQ` je Relay:
+`rvOpen(qs)` setzt den Tab (`?tab=material|fortbildungen|news`, unbekannte Werte fallen auf `material`) und holt einmal je Sitzung zweierlei:
 
-| Filter | Wert | Zweck |
+| Quelle | Wert | Zweck |
 |---|---|---|
-| 1 | `{ kinds: [31923], since: <jetzt − 180 Tage>, limit: 300 }` | Termine aller Absender (globale Sicht des Fortbildungskalenders) |
-| 2 | `{ kinds: [30023], authors: [<Hex von npub12jguy…05rr6j>], limit: 10 }` | die zehn neuesten Beiträge der News-Redaktion rpi-virtuell (der Schlüssel hat kein Profil, der Name steht im Code) |
+| `kalLaden()` | Abfrage `kalender`, siehe „Verbraucher: Fortbildungskalender“ | Termine; der Tab zeigt nur die mit `terminLogik(ev) === 'institut'`, darunter steht der Link „Alle Fortbildungen, auch Laborformate ›“ (`#finden/fortbildungen`) |
+| `hubFetch('rpi-virtuell-news', …)` | `{ kinds: [30023], authors: [<Hex von npub12jguy…05rr6j>], limit: 10 }` | die zehn neuesten Beiträge der News-Redaktion rpi-virtuell (der Schlüssel hat kein Profil, der Name steht im Code) |
 
-Relays: `wss://relay.edufeed.org`, `wss://relay-rpi.edufeed.org` (nicht das AMB-Relay). Termine werden mit `evToTermin` umgesetzt, clientseitig auf `start ≥ jetzt` gefiltert, nach Start sortiert, die ersten 40 angezeigt; Absender ist der Name aus `RT_SRC` oder der gekürzte npub. News: Titel aus `title`, Datum aus `published_at` (sonst `created_at`), Zusammenfassung aus `summary`, Link `https://edufeed.org/<naddr>`.
+Relays: `wss://relay.edufeed.org`, `wss://relay-rpi.edufeed.org` (nicht das AMB-Relay). Die Termine teilen sich die Abfrage mit dem Fortbildungskalender: Wer zuerst öffnet, löst sie aus, der andere nutzt dasselbe Ergebnis. Termine werden mit `evToTermin` umgesetzt, clientseitig auf `start ≥ jetzt` gefiltert, nach Start sortiert, die ersten 40 angezeigt; Absender ist der Name aus `KAL_QUELLEN`, sonst der gekürzte npub. News: Titel aus `title`, Datum aus `published_at` (sonst `created_at`), Zusammenfassung aus `summary`, Link `https://edufeed.org/<naddr>`.
 
-Stand-Zeile: vor der Antwort `Nachbau · Termine und News laden`; mit Antwort `live · <n> Termine · <m> News` (`n` = bevorstehende Termine, `m` = News); ohne Antwort `Nachbau · Relay nicht erreichbar`, und die Tabs zeigen „Gerade keine Verbindung zu den Relays; die Termine stehen auch unter rpi-virtuell.de“ mit Link. Weil `since` auf `created_at` wirkt, fehlen Termine, die vor mehr als 180 Tagen angelegt und seitdem nicht geändert wurden.
+Stand-Zeile: vor der Antwort `Nachbau · Termine und News laden`; mit Antwort `live · <n> Termine · <m> News` (`n` = bevorstehende Termine der Institute, `m` = News); ohne Antwort `Nachbau · Relay nicht erreichbar`, und die Tabs zeigen „Gerade keine Verbindung zu den Relays; die Termine stehen auch unter rpi-virtuell.de“ mit Link. Weil `since` auf `created_at` wirkt, fehlen Termine, die vor mehr als 365 Tagen angelegt und seitdem nicht geändert wurden.
 
 ## Inhalte aus Events
 
@@ -116,6 +117,26 @@ Zählerregel: „n von m Materialien mit vollständigen Metadaten · abgefragt b
 
 Rückfall: Kommt keine Antwort, bleiben die sechs Karten, die Stand-Zeile „Stand vom 22.10.2026“ und die Fußzeile unverändert; eine leere Antwort wird nicht gehalten, der nächste Besuch fragt erneut.
 
+### Verbraucher: Fortbildungskalender
+
+`#finden/fortbildungen?logik=labor|institut&merkmal=online|praesenz|anmeldung|kostenfrei&q=<Begriffe>&quelle=<npub>` (`merkmal` mehrfach) zeigt die bevorstehenden Termine aller Quellen; `route()` bildet `finden/fortbildungen` auf die Ansicht `v-fortbildungen` ab, `kaOpen(qs)` liest den Filter, zeigt sofort den Schnappschuss (`RT_RAW`, `Stand vom <RT_STAND>`) und ruft `kalLaden()`.
+
+Abfrage `kalender` (`kalLaden()`, einmal je Sitzung, ein `REQ` je Relay an `relay.edufeed.org` und `relay-rpi.edufeed.org`, nie das AMB- oder Gruppen-Relay):
+
+| Filter | Wert | Zweck |
+|---|---|---|
+| 1 | `{ kinds: [31923], authors: [<Labor-Quellen>], since: <jetzt − 120 Tage>, limit: 500 }` | Termine der Labor-Quellen (relilab); kürzeres Fenster, weil der Bot viele Termine anlegt, ältere bevorstehende trägt der Schnappschuss |
+| 2 | `{ kinds: [31923], authors: [<übrige Quellen aus KAL_QUELLEN>], since: <jetzt − 365 Tage>, limit: 500 }` | Termine der Institute und Communities; eigene Grenze, damit das dichte Labor sie nicht verdrängt |
+| 3 | `{ kinds: [31923], '#h': [<Schlüssel der Hub-Communities>], limit: 200 }` | Termine, die einer Hub-Community zugeordnet sind (so kommen auch Termine unter persönlichen Schlüsseln, etwa die ptz-Termine, sobald sie einen `h`-Tag tragen) |
+
+Die Antwort wird je Adresse (`pubkey:d`) mit dem Schnappschuss gemischt, das neuere `created_at` gewinnt; Ergebnis sind rohe Events. Ohne Antwort bleibt `Stand vom <RT_STAND>` stehen, und die nächste Öffnung versucht es erneut. Mit Antwort: `live · <n> Termine · <k> Quellen` (`n` = bevorstehende Termine nach dem Mischen, `k` = Zahl verschiedener Absender in der Relay-Antwort). Der Schlüssel der ptz-Termine ist kein Eintrag in `KAL_QUELLEN` (persönlicher Schlüssel).
+
+Logikregel (`terminLogik`): `labor`, wenn die Quelle in `KAL_QUELLEN` die Logik `labor` trägt, ein `t`-Tag `relilab` (ohne Groß-/Kleinschreibung) da ist oder ein `h`-Tag dem relilab-Schlüssel gleicht; sonst `institut`, auch bei unbekannten Absendern, die über `h` kommen. Die Logik ist ein Merkmal, kein getrenntes Verzeichnis.
+
+Merkmalregel (`terminMerkmale`): `online` ist `true`, wenn `location` Zoom, online, einen http(s)-Link, Teams, BBB oder Jitsi nennt, `false` bei anderer nicht-leerer `location`, sonst `null`; `anmeldung` ist `true` bei `registrationUrl` mit http(s), sonst `null`; `kostenfrei` ist `true` bei `price` mit Betrag 0, `false` bei Betrag über 0, sonst `null`. Eine fehlende Angabe ist keine Aussage: Der Merkmal-Filter lässt nur Termine mit der Angabe durch, ohne gesetzten Filter fällt kein Termin heraus, und die Karte schreibt „keine Angabe“.
+
+Der Schnappschuss trägt alle Quellen; die relilab-Ansicht liest daraus nur ihre drei Schlüssel (`RT_RAW.filter(ev => RT_HEX[ev.pubkey])`), im Anfangszustand wie beim Mischen in `rtOpen`.
+
 ### Verbraucher: Sammlung
 
 `#finden/sammlung?c=<community-id>&fach=<Begriff>&stufe=<Begriff>&lizenz=offen|geschuetzt|unbekannt&q=<Begriffe>` filtert die Materialien aus `mpLaden()`; `route()` bildet `finden/<sub>` auf die Ansicht `v-<sub>` ab, `saOpen(qs)` liest den Filter (`sammlungFilter`). Die Sammlung stellt keine eigene Abfrage: sie nutzt den Cache von `mpLaden()` und nur bei gesetztem Community-Filter den von `coLaden(hex)`; ist der Materialpool schon geladen, öffnet sie keine weitere Verbindung.
@@ -159,13 +180,13 @@ Prüf-Marker (Stufe B): Trägt das Event ein Tag `l` mit dem Wert `geprueft`, st
 deno task schnappschuss
 ```
 
-`tools/schnappschuss.ts` sendet ein `REQ` mit `{"kinds":[31923],"authors":[…drei Hex-Schlüssel…]}` an `relay.edufeed.org`, wartet bis `EOSE` (höchstens 25 s), behält Termine, die noch laufen oder höchstens 30 Tage vorbei sind, kürzt die Events auf `id, pubkey, created_at, kind, tags, content` (`content` leer, wenn ein `summary`-Tag da ist), maskiert `<` als `\u003c` (damit kein `</script>` aus Relay-Inhalten das Skript beendet), sortiert nach `created_at`, dedupliziert nach `id` und schreibt den Block zwischen `/* schnappschuss:termine */` und `/* /schnappschuss:termine */` in `index.html` neu (`RT_RAW` und `RT_STAND` mit dem heutigen Datum). Ausgabe: `<n> Termine, Stand <Datum>`. Liefert das Relay nichts, bleibt die Datei unverändert und das Skript endet mit Code 1.
+`tools/schnappschuss.ts` sendet ein `REQ` mit `{"kinds":[31923],"authors":[…14 Hex-Schlüssel…]}` (die Konstante `ABSENDER` spiegelt `KAL_QUELLEN` in `index.html`; beide gemeinsam ändern) an `relay.edufeed.org`, wartet bis `EOSE` (höchstens 25 s), behält Termine, die noch laufen oder höchstens 30 Tage vorbei sind, kürzt die Events auf `id, pubkey, created_at, kind, tags, content` (`content` leer, wenn ein `summary`-Tag da ist), maskiert `<` als `\u003c` (damit kein `</script>` aus Relay-Inhalten das Skript beendet), sortiert nach `created_at`, dedupliziert nach `id` und schreibt den Block zwischen `/* schnappschuss:termine */` und `/* /schnappschuss:termine */` in `index.html` neu (`RT_RAW` und `RT_STAND` mit dem heutigen Datum). Ausgabe: `<n> Termine, Stand <Datum>`. Liefert das Relay nichts, bleibt die Datei unverändert und das Skript endet mit Code 1.
 
 Vor jeder Vorführung erneuern, damit der Rückfall nicht veraltet. Nicht in schneller Folge wiederholen (Adresssperre der Relays).
 
 ## Grenzen
 
 - Das Relay liefert je `REQ` höchstens etwa 500 Events (neueste zuerst). Das Skript meldet, wenn die Grenze erreicht ist; früher angelegte Termine können dann fehlen.
-- Die Live-Abfrage holt nur in den letzten 30 Tagen angelegte Termine; ältere kommen aus dem Schnappschuss.
+- Die Live-Abfrage der relilab-Termine holt nur in den letzten 30 Tagen angelegte Termine; ältere kommen aus dem Schnappschuss. Der Fortbildungskalender fragt für die Institute 365 Tage zurück, für die Labor-Quellen 120 Tage (ältere bevorstehende Labortermine kommen aus dem Schnappschuss), in zwei Gruppen mit je höchstens 500 Events; der stillstehende Import bildung-kirchen.de hat einen eigenen Filter mit höchstens 50. Erreicht eine Gruppe die 500 in der Antwort, hängt die Stand-Zeile „· Relay-Grenze erreicht, ältere Termine können fehlen“ an.
 - Löschungen (kind 5) werden nicht ausgewertet; ein gelöschter Termin bleibt bis zum nächsten Schnappschuss sichtbar.
-- Live sind bisher die relilab-Termine und die Ansicht rpi-virtuell (Fortbildungen, News). Die übrigen Ansichten zeigen ihren eingebetteten Stand oder sind als Nachbau gekennzeichnet.
+- Live sind bisher die relilab-Termine, der Fortbildungskalender und die Ansicht rpi-virtuell (Fortbildungen, News). Die übrigen Ansichten zeigen ihren eingebetteten Stand oder sind als Nachbau gekennzeichnet.

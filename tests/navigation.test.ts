@@ -13,7 +13,7 @@ Deno.test('Datenschicht: Grenzen und Rückfall', () => {
   assert(/function datenstand\(viewId, zustand, info\)/.test(s) && /function npubToHex\(/.test(s) && /function evToTermin\(/.test(s), 'Signaturen');
   assert((html.match(/<div class="view"/g) || []).length - 1 === (html.match(/class="stand"/g) || []).length, 'jede Ansicht außer Start hat eine Stand-Zeile');
   assert(/schnappschuss:termine \*\/[\s\S]*let RT_RAW = \[[\s\S]*let RT_STAND = '\d\d\.\d\d\.\d{4}'[\s\S]*\/schnappschuss:termine/.test(s), 'Schnappschuss-Block');
-  assert(/RT_EV = RT_RAW\.map\(evToTermin\)/.test(s), 'RT_EV aus RT_RAW');
+  assert(/RT_EV = RT_RAW\.filter\(ev => RT_HEX\[ev\.pubkey\]\)\.map\(evToTermin\)/.test(s), 'RT_EV aus RT_RAW');
   assert(/hubFetch\('relilab-termine'/.test(block(/function rtOpen[\s\S]*?\n  \}/)), 'relilab-Termine nutzen die Datenschicht');
   assert(/vom Relay · \$\{/.test(block(/function rtOpen[\s\S]*?\n  \}/)), 'Live-Kennzeichnung nennt die Zahl vom Relay');
   assert(!/Arbeitspaket|Meilenstein|Förderkennzeichen|Projektträger|Zwischenbericht/.test(html), 'Projektsprache in index.html');
@@ -91,9 +91,9 @@ Deno.test('rpi-virtuell: eigene Instanz in Leiste, Kachel, Konsole und Community
   assert(/id: 'rpi-virtuell', label: 'rpi-virtuell'/.test(block(/const LEISTE = \[[\s\S]*?\n  \];/)), 'Leisten-Eintrag');
   assert(/\['rpi-virtuell', 'Materialpool, Fortbildungen, News', 'finden', 'rv', '#rpi-virtuell'/.test(s) && !/'FK', null/.test(s), 'Partner-Kachel');
   assert(/id: 'rpi-virtuell'[^}]*inst: \['rpi-virtuell', 'rpi-virtuell'\]/.test(block(/const CY = \[[\s\S]*?\n  \];/)), 'Community-Bezug');
-  assert(/'finden\.fortbildungen': 'rpi-virtuell\?tab=fortbildungen'/.test(s) && /'#rpi-virtuell\?tab=fortbildungen'/.test(s), 'Fortbildungen haben ein Ziel');
-  const rv = block(/function rvOpen[\s\S]*?hubFetch\('rpi-virtuell'[\s\S]*?\]\s*\)/);
-  assert(/kinds: \[31923\]/.test(rv) && /kinds: \[30023\]/.test(rv) && /npubToHex\('npub12jguy/.test(rv) && !/amb-relay/.test(rv), 'Filter der Ansicht');
+  assert(/'finden\.fortbildungen': 'finden\/fortbildungen'/.test(s) && /'#finden\/fortbildungen'/.test(s), 'Fortbildungen haben ein Ziel');
+  const rv = block(/function rvOpen[\s\S]*?hubFetch\('rpi-virtuell-news'[\s\S]*?\.then/);
+  assert(/kalLaden\(\)/.test(rv) && /kinds: \[30023\]/.test(rv) && /npubToHex\(RV_NEWS\)/.test(rv) && /RV_NEWS = 'npub12jguy/.test(s) && !/amb-relay/.test(rv), 'Filter der Ansicht');
   assert(/mit Teilnahmebescheinigung/.test(view) && /href="#relilab"/.test(view), 'Institutslogik und Verweis auf das relilab');
 });
 

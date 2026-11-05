@@ -8,7 +8,7 @@ Die Startseite erklärt mit Erklärkarte und Narrativ, was der Hub kann. Die Kon
 |---|---|---|---|---|---|---|
 | Material | Material | `finden.material` | `#materialpool` | Materialpool | finden | gebaut |
 | Sammlung | – | – (über Materialpool und Erklärkarte) | `#finden/sammlung` | – | finden | gebaut |
-| Fortbildungen | Fortbildungen | `finden.fortbildungen` | `#rpi-virtuell?tab=fortbildungen` | rpi-virtuell | finden | gebaut |
+| Fortbildungen | Fortbildungen | `finden.fortbildungen` | `#finden/fortbildungen` (im Kontext rpi-virtuell der Tab, im relilab die Termine) | rpi-virtuell (Institute) | finden | gebaut |
 | Beiträge | Artikel und Nachrichten | `finden.beitraege` | `#profil?zu=artikel` | – | finden | gebaut |
 | Schreibtisch | Mein Schreibtisch | `erstellen.schreibtisch` | `#relidesk?tab=schreibtisch` | relidesk | erstellen | gebaut |
 | Labor | Unser Labor | `erstellen.labor` | `#relilab` | relilab | erstellen | gebaut |
