@@ -97,3 +97,16 @@ Deno.test('Sammlung: Ansicht, Route, keine eigene Abfrage, drei Ausgänge', asyn
   assert(/go\('finden\/sammlung\?q=/.test(block(/function lizenzAktionen\(stand, m\)[\s\S]*?\n  \}/)), 'In Sammlung aufnehmen führt zur Sammlung');
   assert(/Sammlung/.test(await Deno.readTextFile(new URL('../docs/navigation.md', import.meta.url))), 'docs/navigation.md');
 });
+
+Deno.test('Katalog-Tab: Route, zwei Schichten, drei Zustände, Titel maskiert, Pool', () => {
+  assert(/zu=katalog|'zu'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'zu=katalog');
+  const k = fn('katRender');
+  assert(/coLaden\(/.test(k) && /coEintraege\(/.test(k) && /eintraegeAufloesen\(/.test(k) && /eintragKarte\(/.test(k), 'Grundschicht aus geteilten Inhalten');
+  assert(/In der Community geteilt/.test(k) && /zusammengestellt/.test(k) && /ohne Rollenprüfung/.test(k), 'zwei Schichten, Grenze benannt');
+  assert(/noch nichts geteilt/.test(k) && /antworten gerade nicht/.test(k) && /Stand vom/.test(k) && /nicht auflösbar/.test(k), 'Zustände');
+  assert(/esc\(l\.titel\)|esc\(liste\.titel\)/.test(k) && /naddr\([^)]*30004\)/.test(k) && /shortcodeAus\(/.test(k), 'maskiert, Teilen, Einbetten');
+  assert(/pool/.test(k) && /#materialpool/.test(k), 'Materialpool als Katalog der Instanz rpi-virtuell');
+  assert(/'katalog'/.test(fn('crRender')), 'Navigationseintrag im Raum');
+  assert(/zu=katalog/.test(block(/function cyCards\([\s\S]*?\n  \}/)), 'Link auf der Kachel');
+  assert(html.includes('id="v-community" data-stand="nachbau:Beispielinhalte"'), 'Startwert der Ansicht bleibt Nachbau');
+});

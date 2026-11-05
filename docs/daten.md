@@ -126,6 +126,21 @@ Bei gesetztem Community-Filter lädt die Sammlung geteilte Materialien, die nich
 
 Drei Ausgänge: **Teilen** kopiert die Adresse mit dem Filter. **Einbetten** erzeugt den Schnipsel `[amb_nostr_search …]` für WordPress (`shortcodeAus`; `fixed_level` und `fixed_subject` mit den Vokabular-Kennungen der gewählten Begriffe; die Lizenz hat im Plugin kein Attribut und steht als Kommentarzeile) und ein Kontextprofil als JSON (`kontextprofilAus`) für die Steuerkonsole. **Abonnieren** zeigt den Nostr-Filter als `REQ` (kinds 30142, bei Community `#h`, bei Suchbegriffen `search`); Fach, Stufe und Lizenz prüft die Seite selbst. „Als Nostr-Liste speichern“ ist ausgegraut, bis die Anmeldung mit Schlüssel da ist. Ein Feed zu einem beliebigen Filter braucht einen Server; der Prototyp hat keinen.
 
+### Verbraucher: Katalog je Community
+
+`#community?c=<id>&zu=katalog` (Alias `tab=katalog`, `zu` gewinnt) öffnet im Community-Raum den Tab „Katalog“; er steht auch im eingebetteten Raum der Instanzen. `katRender(c)` füllt den Platzhalter `#katRoot` und zeichnet zwei Schichten:
+
+1. **In der Community geteilt** (Grundschicht): `coLaden(hex)` und `coEintraege` liefern die Einträge, `eintraegeAufloesen` holt die Ziele, `eintragKarte` zeichnet sie. Gruppiert nach Material (30142), Beiträge (30023) und Termine (31923); je Gruppe die neuesten zwölf Karten, der Knopf „mehr“ klappt den Rest auf. Termine zeigen nur bevorstehende, vergangene stehen als Zahl. Die Zeile „zuletzt geteilt am …“ nennt das Datum des neuesten Eintrags und die Grenze „ohne Rollenprüfung“.
+2. **Vom Redaktionskreis zusammengestellt** (Kuratierung): je `kind 30004` des Community-Schlüssels mit `d = katalog` oder `katalog-<name>` ein Abschnitt mit Titel, Beschreibung, Bild (nur `https`), „Stand vom <created_at>“, Zahl der Einträge, bei Bedarf „<u> nicht auflösbar“ (ungültige Adressen plus Ziele, die auf keinem Relay liegen) und eine Karte je Eintrag. „Teilen“ kopiert `nostr:naddr…` der Liste. Fehlt jede Liste, entfällt die Schicht.
+
+Zustände: Lädt, noch nichts geteilt (mit Einladung und Link `https://edufeed.org/c/<npub>`), Relays antworten nicht (gleicher Link, Stand-Zeile „Nachbau · Relays nicht erreichbar“), Katalog mit Einträgen (Stand-Zeile „live · <n> geteilt · <k> Listen · ohne Rollenprüfung“). Communities ohne Eintrag in `CO_SCHLUESSEL` zeigen nur den Hinweis, dass Kataloge Communities mit eigenem Schlüssel vorbehalten sind. Auf allen anderen Tabs steht die Stand-Zeile wieder auf „Nachbau · Beispielinhalte“. Das Ergebnis wird je Community einmal je Sitzung gehalten, damit Neuzeichnen keine zweite Abfrage auslöst.
+
+Konvention: Die Karte eines Materials führt zum Detail im Materialpool, Beiträge und Termine zur edufeed-App (Beiträge des Schaufenster-Schlüssels auf die eigene Seite). „Teilen“ kopiert die Adresse des Katalogs, „Einbetten“ den Shortcode `[amb_nostr_search community="<npub>"]` (`shortcodeAus`), der dieselben geteilten Materialien auf einer WordPress-Seite zeigt.
+
+Materialpool: Für Communities mit `pool: true` (rpi-virtuell) steht zusätzlich der Abschnitt „Der Materialpool als Katalog der Instanz“ mit dem Zähler aus `mpLaden()` („<m> Materialien bei 3 Relays“) und dem Link `#materialpool`. Der Zähler kommt ohne eigene Abfrage aus der Pool-Liste.
+
+Grenze der Rollenprüfung: Der Katalog zeigt, was mit der Community geteilt wurde (Tag `h` oder Repost mit `h`), ohne zu prüfen, ob der Teilende Mitglied oder Moderator ist. Weggelassen ist nur, was der Community-Schlüssel selbst per Label `remove` (kind 1985) entfernt hat. Eine Rollenprüfung kommt, sobald die Community-Konvention sie verbindlich festlegt.
+
 ### Verbraucher: Material-Detail
 
 `#materialpool?d=<d>&p=<pubkey>` (`mpOpen` ruft `mpDetail(d, p)`, `p` nur bei 64 Hex-Zeichen, sonst `null`) blendet Hero und Abschnitte aus und zeigt ein Material. Cache vor Netz: `mpDetail` sucht zuerst in `mpDaten`, der Liste der Sitzung (läuft deren Abfrage noch, wird sie abgewartet); nur bei Fehlen folgt eine gezielte Abfrage `hubFetch('material:' + d + ':' + p, [{ kinds: [30142], '#d': [d], authors: [p], limit: 2 }])` (ohne `p` ohne `authors`), das neueste Event gilt; fehlt auch das, steht dort „Material nicht gefunden.“, wenn die Liste geantwortet hat, sonst „Gerade keine Verbindung zu den Relays oder Material nicht vorhanden.“, jeweils mit Weg zurück. Es gibt keine Subscription je Eintrag.

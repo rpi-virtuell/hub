@@ -675,6 +675,7 @@ relihub-steuerkonsole[hidden]{display:none}
 .rt-nl li{flex-direction:column;align-items:flex-start;gap:2px}.rt-nl li a{color:#1F1F25;font-weight:600}.rt-nl small{display:block;margin-top:6px;color:#5F6670}
 .cy-rel{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#7A1A3E;background:#fff;border:1px solid #F0C7D6;border-radius:999px;padding:2px 10px;margin-top:10px;text-decoration:none}
 .cy-follow{margin-top:8px;align-self:center;border:0;border-radius:999px;background:var(--c-koop);color:#fff;font:inherit;font-size:15px;font-weight:600;padding:9px 24px;cursor:pointer}
+.cy-katalog{align-self:center;margin-top:6px;font-weight:600;color:var(--x-koop)}
 .cy-follow.on{background:transparent;color:var(--x-koop);box-shadow:inset 0 0 0 1.5px var(--c-koop)}
 .cy-back .cy-follow.on{background:#fff}
 .cy-back small{font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--x-koop)}
@@ -841,6 +842,32 @@ relihub-steuerkonsole[hidden]{display:none}
   .cr-item{padding:14px 12px;gap:10px}
   .cr-name h1{font-size:30px}
 }
+
+/* ---------- Katalog je Community ---------- */
+.kat h2{font-family:"Barlow Condensed",sans-serif;font-size:26px;font-weight:600;margin:28px 0 8px}
+.kat h3{font-family:"Space Grotesk",sans-serif;font-size:18px;font-weight:600;margin:20px 0 8px}
+.kat-kopf h2{margin-top:0}
+.kat p{margin:0 0 10px}
+.kat-meta{font-size:14px;color:var(--muted)}
+.kat-aktion{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;margin:12px 0}
+.kat-aktion .cr-pill{font-size:15px;padding:8px 16px}
+.kat-embed{flex:1 1 260px;border:1px solid var(--line);border-radius:12px;padding:8px 14px;background:var(--card)}
+.kat-embed summary{cursor:pointer;font-weight:600}
+.kat-embed code{display:block;overflow-wrap:anywhere;margin:8px 0;font-size:14px}
+.kat-card{display:block;border:1px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--card);color:inherit;text-decoration:none;overflow-wrap:anywhere}
+a.kat-card:hover{border-color:var(--c-koop)}
+.kat-card b{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:18px;line-height:1.3;color:var(--ink);margin-bottom:6px}
+.kat-card span,.kat-von{display:block;font-size:14px;color:var(--muted)}
+.kat-von{margin-top:8px}
+.kat-mehr[hidden]{display:none}
+.kat-mehr-knopf{margin-top:12px}
+.kat-liste{margin:18px 0;padding:16px 18px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.kat-liste h3{margin-top:0}
+.kat-bild{display:block;max-width:100%;max-height:180px;border-radius:12px;margin:0 0 10px;object-fit:cover}
+.kat-leer{padding:20px;border:1px dashed var(--line);border-radius:12px;background:var(--card)}
+.kat-pool{margin-top:24px;padding:16px 18px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.kat-hinweis{margin-top:26px;font-size:14px;color:var(--muted)}
+@media (max-width:480px){.kat .mp-list{grid-template-columns:1fr}}
 
 /* ---------- Prototyp-Leiste und Hinweis ---------- */
 .leiste-cfg{position:fixed;left:14px;bottom:64px;z-index:9100;background:var(--card);color:var(--ink);border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.2);min-width:220px}
@@ -1143,6 +1170,7 @@ relihub-steuerkonsole[hidden]{display:none}
         <p>Der Materialpool ist der Katalog von rpi-virtuell: geprüftes, offen lizenziertes Material für Schule, Kita, Gemeinde und Bildungsarbeit.</p>
         <a href="#materialpool">Zum Materialpool ›</a>
       </div>
+      <p>Was die Community rpi-virtuell teilt, steht in ihrem <a href="#community?c=rpi-virtuell&amp;zu=katalog">Katalog ›</a></p>
     </section>
     <section data-rvtab="fortbildungen">
       <h2>Fortbildungen</h2>
@@ -3221,7 +3249,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   function cyCards(list, ctxRel) { return list.map(c => `<div class="cy-card" ${ctxRel ? `id="cy-${c.id}"` : `data-rid="cy-${c.id}"`} tabindex="0" aria-label="${c.n}">
       <div class="cy-in">
         <div class="cy-f">${cyAv(c)}<h3>${c.n}${c.ver ? SHIELD : ''}</h3><p class="cy-bio">${c.bio}</p>${c.series ? `<div class="cy-ser">${c.series.map(x => `<span>Serie: ${x[0]}</span>`).join('')}</div>` : ''}${c.nl ? `<div class="cy-nl">${c.nl.map(x => `<span>Newsletter: ${x[0]}</span>`).join('')}</div>` : ''}${ctxRel ? cyRel(c) : ''}<span style="flex:1"></span>${cyBtn(c)}</div>
-        <div class="cy-f cy-back"><small>Über die Community</small><h3>${c.n}</h3><p>${c.back}</p><div class="meta">${c.m} Mitglieder${c.series ? ' · ' + c.series.map(x => x[1]).filter(Boolean)[0] : ''}</div>${ctxRel ? cyRel(c) : ''}<span style="flex:1"></span><button type="button" class="cy-follow open" data-cyopen="${c.id}">Community-Raum öffnen ›</button>${cyBtn(c)}</div>
+        <div class="cy-f cy-back"><small>Über die Community</small><h3>${c.n}</h3><p>${c.back}</p><div class="meta">${c.m} Mitglieder${c.series ? ' · ' + c.series.map(x => x[1]).filter(Boolean)[0] : ''}</div>${ctxRel ? cyRel(c) : ''}<span style="flex:1"></span><button type="button" class="cy-follow open" data-cyopen="${c.id}">Community-Raum öffnen ›</button>${CO_SCHLUESSEL.some(x => x.id === c.id) ? `<a class="cy-katalog" href="#community?c=${c.id}&zu=katalog">Katalog ›</a>` : ''}${cyBtn(c)}</div>
       </div></div>`).join('') || '<p class="cy-empty">Keine Community gefunden.</p>'; }
   function cyRender() {
     const list = CY.filter(c => (cyFilter === 'alle' || (cyFilter === 'meine' ? cyFollow.has(c.id) : c.ty === cyFilter)) && c.n.toLowerCase().includes(cyQ));
@@ -3458,7 +3486,9 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       <div class="cr-tags">${(it.tags || []).map(t => `<span>${t}</span>`).join('')}</div></div></article>`;
   }
   function crMain(c) {
-    const D = crData(c), mem = crMember[c.id], lock = (what) => `<div class="cr-lock"><b>${what} nur für Mitglieder</b>Tritt der Community bei, um ${what === 'Kalender' ? 'alle Termine zu sehen und eigene anzulegen' : 'die Einstellungen zu verwalten'}.<div style="margin-top:14px"><button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button></div></div>`;
+    // Der Katalog braucht keine Beispieldaten (crData): er läuft auch für Communities, die nur im Datenraum existieren
+    if (crTab === 'katalog') return `<div class="cr-cols one"><section class="kat" id="katRoot" aria-live="polite"></section></div>`;
+    const D0 = crData(c), D = { act: [], ev: [], ...D0 }, mem = crMember[c.id], lock = (what) => `<div class="cr-lock"><b>${what} nur für Mitglieder</b>Tritt der Community bei, um ${what === 'Kalender' ? 'alle Termine zu sehen und eigene anzulegen' : 'die Einstellungen zu verwalten'}.<div style="margin-top:14px"><button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button></div></div>`;
     const evList = D.ev.map(([d, t]) => `<button type="button" class="cr-ev" data-todo="Termin „${t}“"><small>${d}</small><b>${t}</b></button>`).join('');
     if (crTab === 'home') return `<div class="cr-cols"><section><h2 class="cr-h">Kürzliche Aktivität</h2>${D.act.map(i => crItem(i, c)).join('')}</section><aside><h2 class="cr-h"><span>Kommende Veranstaltungen ›</span></h2>${evList}</aside></div>`;
     if (crTab === 'art' || crTab === 'lern') {
@@ -3484,7 +3514,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const nav = (k, ic, l, extra) => `<button type="button" data-crtab="${k}" class="${crTab === k ? 'on' : ''}">${ic}${l}${extra || ''}</button>`;
     crRootEl.innerHTML = `
       <aside class="cr-side"><div class="cr-sh" style="--sht:color-mix(in srgb, ${c.col} 13%, white)">${cyAv(c)}<span>${c.n}</span></div>
-        <nav class="cr-nav" aria-label="Community-Raum">${nav('home', CR_ICON.home, 'Übersicht')}<div class="cr-sec">Inhalte</div>${nav('art', CR_ICON.art, 'Artikel')}${nav('lern', CR_ICON.lern, 'Lernen')}${nav('kal', CR_ICON.kal, 'Kalender', mem ? '' : '<span class="lk">🔒</span>')}<div class="cr-sec">Kanäle</div>${nav('chat', '<span style="width:20px;text-align:center;font-weight:600">#</span>', 'Allgemein', '<span class="gl" title="öffentlich"></span>')}
+        <nav class="cr-nav" aria-label="Community-Raum">${nav('home', CR_ICON.home, 'Übersicht')}<div class="cr-sec">Inhalte</div>${nav('art', CR_ICON.art, 'Artikel')}${nav('lern', CR_ICON.lern, 'Lernen')}${nav('katalog', CR_ICON.art, 'Katalog')}${nav('kal', CR_ICON.kal, 'Kalender', mem ? '' : '<span class="lk">🔒</span>')}<div class="cr-sec">Kanäle</div>${nav('chat', '<span style="width:20px;text-align:center;font-weight:600">#</span>', 'Allgemein', '<span class="gl" title="öffentlich"></span>')}
           <div class="cr-bottom">${nav('mem', CR_ICON.mem, 'Mitglieder')}${nav('set', CR_ICON.set, 'Einstellungen')}</div></nav></aside>
       <main>
         <div class="cr-top"><span class="ring" style="width:240px;height:240px;background:${c.col};right:-50px;top:-120px"></span><span class="ring" style="width:170px;height:170px;background:var(--c-koop);right:130px;bottom:-120px"></span><div class="cr-id"><div class="cr-name">${crAv(c, 64)}<h1>${c.n}</h1><button type="button" class="cr-fol${fol ? '' : ' off'}" data-cract="follow">${fol ? '✓ Folge ich' : '+ Folgen'}</button></div>
@@ -3492,9 +3522,68 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
           <div class="cr-act">${mem ? '<span class="cr-badge">✓ Mitglied</span>' : req ? '<span class="cr-badge">Anfrage gesendet</span>' : '<button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button>'}${mem ? '' : '<a data-cract="code">Einladungscode einlösen</a><div class="cr-code" id="crCode" hidden><input placeholder="Code eingeben" aria-label="Einladungscode"><button type="button" class="cr-pill" data-cract="redeem">Einlösen</button></div>'}</div></div>
         ${crMain(c)}
       </main>`;
+    if (crTab === 'katalog') katRender(c);
+    else { katLauf++; if (crRootEl.id === 'crRoot') datenstand('v-community', 'nachbau', 'Beispielinhalte'); }
+  }
+  // ---------- Katalog je Community: geteilte Inhalte als Grundschicht, Kuratierung darüber ----------
+  let katLauf = 0;   // Lauf-Zähler gegen späte Antworten nach Tab- oder Community-Wechsel
+  const katCache = new Map();   // Community → fertiger Katalog samt Stand-Zeile, einmal je Sitzung (kein zweites Auflösen beim Neuzeichnen)
+  const fKatD = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  function katRender(c) {
+    const wurzel = crRootEl.querySelector('#katRoot'); if (!wurzel) return;
+    const lauf = ++katLauf, k = CO_SCHLUESSEL.find(x => x.id === c.id), standSetzen = (z, i) => { if (crRootEl.id === 'crRoot' && crTab === 'katalog' && crId === c.id) datenstand('v-community', z, i); };
+    const kopf = `<div class="kat-kopf"><h2>Katalog von ${esc(c.n)}</h2><p>Was diese Community aus dem gemeinsamen Datenraum teilt und zusammenstellt.</p></div>`;
+    if (!k) { wurzel.innerHTML = kopf + `<p class="kat-leer">Kataloge gibt es für Communities mit eigenem Schlüssel im Datenraum. <a href="#communities">Zu den Communities ›</a></p>`; standSetzen('nachbau', 'Beispielinhalte'); return; }
+    const appLink = `<a href="${esc(sichereUrl('https://edufeed.org/c/' + k.npub))}" target="_blank" rel="noopener">In der edufeed-App öffnen ›</a>`;
+    const pool = k.pool ? `<section class="kat-pool"><h2>Der Materialpool als Katalog der Instanz</h2><p>Der Materialpool von rpi-virtuell ist der offene Katalog der Instanz. <span class="kat-poolzahl"></span></p><a href="#materialpool">Zum Materialpool ›</a></section>` : '';
+    const fertig = (html, z, i) => {
+      katCache.set(c.id, { html, z, i });
+      wurzel.innerHTML = html; standSetzen(z, i);
+      if (k.pool) mpLaden().then(m => { if (lauf !== katLauf) return; const el = wurzel.querySelector('.kat-poolzahl'); if (el) el.textContent = `${m.length} Materialien bei 3 Relays.`; const ca = katCache.get(c.id); if (ca) ca.html = wurzel.innerHTML; }, () => {});
+    };
+    const cached = katCache.get(c.id);
+    if (cached) { wurzel.innerHTML = cached.html; standSetzen(cached.z, cached.i); return; }
+    wurzel.innerHTML = kopf + '<p class="kat-meta">Katalog wird geladen …</p>';
+    standSetzen('nachbau', 'Katalog wird geladen');
+    coLaden(k.hex).then(daten => {
+      if (lauf !== katLauf) return;
+      if (!daten.antwort) { wurzel.innerHTML = kopf + `<p class="kat-leer">Die Relays antworten gerade nicht. ${appLink}</p>` + pool; standSetzen('nachbau', 'Relays nicht erreichbar'); if (k.pool) mpLaden().then(m => { const el = wurzel.querySelector('.kat-poolzahl'); if (lauf === katLauf && el) el.textContent = `${m.length} Materialien bei 3 Relays.`; }, () => {}); return; }
+      const eintraege = coEintraege(daten);
+      const listen = daten.listen.map(l => ({ l, es: l.eintraege.map(e => ({ ...e, ev: null, geteilt: null, zeit: 0 })) }));
+      if (!eintraege.length && !listen.length) {
+        const leer = kopf + `<div class="kat-leer"><p><b>In dieser Community wurde noch nichts geteilt.</b></p><p>Teile Material, Beiträge oder Termine in der edufeed-App in diese Community; sie erscheinen hier ohne Umweg. ${appLink}</p></div>` + pool;
+        fertig(leer, 'live', 'noch nichts geteilt'); return;
+      }
+      return eintraegeAufloesen([...eintraege, ...listen.flatMap(x => x.es)]).then(() => {
+        if (lauf !== katLauf) return;
+        const jetzt = Date.now() / 1000, istTermin = e => e.kind === 31923;
+        const gruppe = (titel, es, extra) => {
+          if (!es.length && !extra) return '';
+          const karten = es.map(e => eintragKarte(e)), sicht = karten.slice(0, 12).join(''), rest = karten.slice(12);
+          return `<h3>${titel}</h3>` + (es.length ? `<div class="mp-list">${sicht}</div>` + (rest.length ? `<div class="mp-list kat-mehr" hidden>${rest.join('')}</div><button type="button" class="cr-pill ghost kat-mehr-knopf" data-katmehr>mehr (${rest.length})</button>` : '') : '') + (extra ? `<p class="kat-meta">${extra}</p>` : '');
+        };
+        const termine = eintraege.filter(istTermin), kommend = termine.filter(e => !e.ev || (evToTermin(e.ev).e || evToTermin(e.ev).s) >= jetzt).sort((a, b) => (a.ev ? evToTermin(a.ev).s : 0) - (b.ev ? evToTermin(b.ev).s : 0)), vergangen = termine.length - kommend.length;
+        const geteilt = eintraege.length ? gruppe('Material', eintraege.filter(e => e.kind === 30142)) + gruppe('Beiträge', eintraege.filter(e => e.kind === 30023)) + gruppe('Termine', kommend, vergangen ? `und ${vergangen} vergangene` : '') : `<p class="kat-meta">Hier wurde noch nichts geteilt.</p>`;
+        const zuletzt = eintraege.length ? `<p class="kat-meta">zuletzt geteilt am ${fKatD.format(eintraege[0].zeit * 1000)} · ohne Rollenprüfung</p>` : '';
+        const seitenLink = location.href.split('#')[0] + '#community?c=' + c.id + '&zu=katalog';
+        const einbetten = shortcodeAus({ c: c.id, fach: [], stufe: [], lizenz: '', q: [] });
+        const aktionen = `<div class="kat-aktion"><button type="button" class="cr-pill ghost" data-katcopy="${esc(seitenLink)}" data-katmsg="Link zum Katalog kopiert.">Teilen</button><details class="kat-embed"><summary>Einbetten</summary><p>Der Shortcode zeigt dieselben geteilten Materialien auf einer WordPress-Seite.</p><code>${esc(einbetten)}</code><button type="button" class="cr-pill ghost" data-katcopy="${esc(einbetten)}" data-katmsg="Shortcode kopiert.">Shortcode kopieren</button></details></div>`;
+        const kuratiert = listen.length ? `<h2>Vom Redaktionskreis zusammengestellt</h2>` + listen.map(({ l, es }) => {
+          const aufgeloest = es.filter(e => e.ev).length, u = l.unaufloesbar + es.length - aufgeloest, bild = sichereUrl(l.bild);
+          return `<section class="kat-liste">${bild ? `<img class="kat-bild" src="${esc(bild)}" alt="" loading="lazy">` : ''}<h3>${esc(l.titel)}</h3>${l.beschreibung ? `<p>${esc(l.beschreibung)}</p>` : ''}<p class="kat-meta">Stand vom ${fKatD.format(l.stand * 1000)} · ${aufgeloest} Einträge${u > 0 ? ` · ${u} nicht auflösbar` : ''}</p><div class="mp-list">${es.map(e => eintragKarte(e)).join('')}</div><div class="kat-aktion"><button type="button" class="cr-pill ghost" data-katcopy="${esc('nostr:' + naddr(l.d, k.hex, 30004))}" data-katmsg="Adresse der Liste kopiert.">Teilen</button></div></section>`;
+        }).join('') : '';
+        const hinweis = `<p class="kat-hinweis">Gezeigt wird, was mit dieser Community geteilt wurde, ohne Prüfung der Mitgliederrollen; weggelassen ist nur, was die Community selbst entfernt hat.</p>`;
+        fertig(kopf + aktionen + `<h2>In der Community geteilt</h2>` + zuletzt + geteilt + kuratiert + pool + hinweis, 'live', `${eintraege.length} geteilt · ${listen.length} Listen · ohne Rollenprüfung`);
+      });
+    }).catch(() => {
+      if (lauf !== katLauf) return;
+      wurzel.innerHTML = kopf + `<p class="kat-leer">Die Relays antworten gerade nicht. ${appLink}</p>` + pool; standSetzen('nachbau', 'Relays nicht erreichbar');
+    });
   }
   function crClick(e) {
     const t = e.target.closest('[data-crtab]'); if (t) { crTab = t.dataset.crtab; crRender(); return; }
+    const kc = e.target.closest('[data-katcopy]'); if (kc) { rtCopy(kc.dataset.katcopy, kc.dataset.katmsg); return; }
+    const km = e.target.closest('[data-katmehr]'); if (km) { const rest = km.previousElementSibling; rest.hidden = false; km.remove(); const f = rest.querySelector('a, button'); if (f) f.focus(); return; }
     const a = e.target.closest('[data-cract]'); if (!a) return;
     const k = a.dataset.cract, c = CY.find(x => x.id === crId);
     if (k === 'follow') { cyFollow.has(crId) ? cyFollow.delete(crId) : cyFollow.add(crId); cyRender(); crRender(); }
@@ -3515,7 +3604,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   // Ein Community-Raum kann im reli_hub oder eingebettet in einer Instanz (z. B. relilab) erscheinen
   function crOpen(id, tab, rootId) {
     ['crRoot', 'rlCrRoot'].forEach(x => { if (x !== (rootId || 'crRoot')) document.getElementById(x).innerHTML = ''; });
-    crRootEl = document.getElementById(rootId || 'crRoot'); crId = id; crTab = tab || 'home'; crRender();
+    katLauf++; crRootEl = document.getElementById(rootId || 'crRoot'); crId = id; crTab = tab || 'home'; crRender();
   }
   // relilab: nur die Communities, die im relilab aktiv sind – der Kopf bleibt relilab
   function rlCommRender() {
@@ -3878,7 +3967,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     if (finden === null) toast('Diese Seite gibt es nicht.');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
     document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung · Materialpool Religion', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
-    if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || 'relilab', pp.get('tab')); }
+    if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || 'relilab', pp.get('zu') === 'katalog' ? 'katalog' : pp.get('tab')); }
     leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v);
     if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); }
     if (v === 'oercommunity') ocOpen(sub);
