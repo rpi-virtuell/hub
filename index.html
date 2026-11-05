@@ -263,6 +263,35 @@ a.mp-card:hover{border-color:var(--mp)}
 .mp-card .lic-offen{background:var(--lic-offen);color:var(--lic-offen-x)}
 .mp-card .lic-geschuetzt{background:var(--lic-geschuetzt);color:var(--lic-geschuetzt-x)}
 .mp-card .lic-unbekannt{background:var(--lic-unbekannt);color:var(--lic-unbekannt-x)}
+/* Sammlung */
+#v-sammlung{font-family:Inter,system-ui,sans-serif;background:#fff;color:#1B2B2A;font-size:16px}
+#v-sammlung .stand{color:#5A6B69}
+.sa-in{max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+.sa-in h1{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:clamp(30px,4.5vw,44px);line-height:1.1;margin:18px 0 8px;color:var(--c-finden)}
+.sa-in .sub{margin:0 0 22px;color:#36504D;max-width:62ch}
+.sa-filter{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px;margin:0 0 20px}
+.sa-filter label{display:flex;flex-direction:column;gap:4px;font-size:14px;font-weight:600;color:#36504D}
+.sa-filter select,.sa-filter input{font:inherit;font-weight:400;color:#1B2B2A;background:var(--card);border:1px solid #9DB8B5;border-radius:8px;padding:9px 10px;min-height:44px}
+.sa-filter select:focus-visible,.sa-filter input:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.sa-lic{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 20px;padding:0;border:0}
+.sa-lic legend{font-size:14px;font-weight:600;color:#36504D;padding:0;margin-bottom:6px}
+.sa-lic button{font:inherit;font-size:13px;font-weight:600;border:2px solid transparent;border-radius:999px;padding:6px 14px;min-height:36px;cursor:pointer}
+.sa-lic button.lic-offen{background:var(--lic-offen);color:var(--lic-offen-x)}
+.sa-lic button.lic-geschuetzt{background:var(--lic-geschuetzt);color:var(--lic-geschuetzt-x)}
+.sa-lic button.lic-unbekannt{background:var(--lic-unbekannt);color:var(--lic-unbekannt-x)}
+.sa-lic button.lic-alle{background:var(--card);color:#1B2B2A;border-color:#9DB8B5}
+.sa-lic button[aria-pressed="true"]{border-color:var(--c-finden);box-shadow:0 0 0 2px var(--c-finden)}
+.sa-lic button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.sa-aus{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 14px}
+.sa-aus button,.sa-copy{font:inherit;font-weight:600;font-size:15px;color:#fff;background:var(--c-finden);border:0;border-radius:8px;padding:9px 16px;min-height:44px;cursor:pointer}
+.sa-aus button:focus-visible,.sa-copy:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.sa-aus button:disabled,.sa-abo button:disabled{background:#D9DEDD;color:#4A5A58;cursor:not-allowed}
+.sa-box{border:1px solid #D8E6E4;border-radius:12px;padding:14px 18px;margin:0 0 14px;background:var(--card)}
+.sa-box summary{cursor:pointer;font-weight:600;color:var(--c-finden)}
+.sa-box summary:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.sa-box pre{white-space:pre-wrap;word-break:break-word;background:#F3F7F6;border-radius:8px;padding:10px 12px;font-size:13px;margin:8px 0}
+.sa-box p{margin:8px 0;color:#36504D;font-size:14px}
+.mp-zu-sa{display:inline-block;margin-top:16px;color:#fff;font-weight:600;text-decoration:underline}
 .mp-card b{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:18px;line-height:1.3;color:var(--mp-dark);margin-bottom:6px}
 .mp-card span{font-size:14px;color:#5A6B69}
 .mp-detail{max-width:900px;margin:0 auto;padding:24px clamp(16px,4vw,40px) 40px}
@@ -834,6 +863,7 @@ relihub-steuerkonsole[hidden]{display:none}
   .brand small{display:none}
   .flower-wrap{padding:64px 0 60px}
   .mp-head{gap:4px}
+  .sa-filter{grid-template-columns:1fr}
   .mp-brand{font-size:18px}
   .mp-brand svg{width:20px;height:20px}
   .mp-nav a{padding:8px 6px}
@@ -1022,6 +1052,7 @@ relihub-steuerkonsole[hidden]{display:none}
         <input type="search" placeholder="z.B. Pfingsten – oder: Video" aria-label="Suchen">
         <button type="submit">Suchen</button>
       </form>
+      <a class="mp-zu-sa" href="#finden/sammlung">Sammlung zusammenstellen ›</a>
       <p class="mp-label">Beliebte Themen</p>
       <div class="mp-tags">
         <a href="#materialpool?thema=Sch%C3%B6pfung">Schöpfung</a><a href="#materialpool?thema=Erntedank">Erntedank</a><a href="#materialpool?thema=reformation">reformation</a><a href="#materialpool?thema=Reformation">Reformation</a><a href="#materialpool?thema=Sch%C3%B6pfungserz%C3%A4hlung">Schöpfungserzählung</a><a href="#materialpool?thema=Community">Community</a>
@@ -1062,6 +1093,34 @@ relihub-steuerkonsole[hidden]{display:none}
     <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> Teil des reli_hub</span>
   </div></footer>
   <relihub-steuerkonsole id="mpFlower" floating size="58" popover-size="210" context="rpi-materialpool"></relihub-steuerkonsole>
+</div>
+
+<!-- ===================== Ansicht: Sammlung (finden › Material › Sammlung) ===================== -->
+<div class="view" id="v-sammlung" data-stand="nachbau:Materialien laden">
+  <header class="mp-head">
+    <a class="mp-brand" href="#materialpool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h3v16H4zM9 4h3v16H9zM14.5 5.2l2.9-.8 3.6 14.6-2.9.8z"/></svg>Materialpool Religion</a>
+    <span class="sp"></span>
+    <nav class="mp-nav"><a href="#materialpool"><span>Zum Materialpool</span></a><a href="#profil"><span>Mein Profil</span></a></nav>
+  </header>
+  <p class="stand" aria-live="polite"></p>
+  <main class="sa-in">
+    <h1>Sammlung</h1>
+    <p class="sub">Stelle dir aus den Materialien der Communities eine Auswahl zusammen und nimm sie mit auf deine Seite.</p>
+    <form class="sa-filter" onsubmit="return false" aria-label="Filter">
+      <label>Community<select id="saC"></select></label>
+      <label>Fach<select id="saFach"></select></label>
+      <label>Stufe<select id="saStufe"></select></label>
+      <label>Suche<input type="search" id="saQ" placeholder="z.B. Frieden"></label>
+    </form>
+    <fieldset class="sa-lic" id="saLic"><legend>Lizenz</legend></fieldset>
+    <div id="saAus"></div>
+    <div class="mp-list" id="saListe"></div>
+  </main>
+  <footer class="mp-foot"><div class="in">
+    <span>Die Auswahl entsteht aus den Materialien, die schon geladen sind.</span>
+    <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> Teil des reli_hub</span>
+  </div></footer>
+  <relihub-steuerkonsole id="saFlower" floating size="58" popover-size="210" context="sammlung"></relihub-steuerkonsole>
 </div>
 
 <!-- ===================== Ansicht 9: rpi-virtuell (Nachbau rpi-virtuell.de) ===================== -->
@@ -2229,7 +2288,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     'hub.profil': { fn:'reli_hub › mein Profil', t:'Mein Profil', p:'Mit deinem Profil wird der reli_hub zu deinem persönlichen Ausgangspunkt: deine Communities, neue Materialien zu deinen Themen und passende Veranstaltungen. Ein Schlüssel öffnet alle angeschlossenen Seiten.', go:['Mit Nostr-Schlüssel anmelden','#profil'] },
     'hub.home': { fn:'reli_hub › Home', t:'Home', p:'Die Startseite des reli_hub – ohne Anmeldung. Hier erfährst du, was der Hub ist und welche Seiten zu ihm gehören.', go:['Zum Ökosystem','#partner'] },
     'finden': { fn:'finden', t:'Material, Fortbildungen und Beiträge', p:'Geprüftes, offen lizenziertes Material, digitale Fortbildungen und Artikel aus deinen Communities – an einem Ort auffindbar. Lehr- und Lerninhalte liegen im Materialpool, Beiträge kommen aus Communities und Instanzen.', subs:['finden.material','finden.fortbildungen','finden.beitraege'] },
-    'finden.material': { fn:'finden › Material', t:'Material', p:'Finde aktuelles, redaktionell geprüftes Material zu deinen Themen und deiner Zielgruppe.', go:['Zum Materialpool','#materialpool'] },
+    'finden.material': { fn:'finden › Material', t:'Material', p:'Finde aktuelles, redaktionell geprüftes Material zu deinen Themen und deiner Zielgruppe.', go:['Zum Materialpool','#materialpool'], p2:'Du kannst dir daraus auch eine Sammlung zusammenstellen und mitnehmen.', go2:['Sammlung zusammenstellen','#finden/sammlung'] },
     'finden.beitraege': { fn:'finden › Beiträge', t:'Artikel und Nachrichten', p:'Artikel und Nachrichten aus deinen Communities und Instanzen. Lehr- und Lerninhalte findest du im Materialpool.', go:['Zu den Artikeln','#profil?zu=artikel'] },
     'finden.fortbildungen': { fn:'finden › Fortbildungen', t:'Fortbildungen', p:'Entdecke digitale Fortbildungen religionspädagogischer Institute und Communities – deutschlandweit, meist online, in einem gemeinsamen Kalender.', go:['Zum Fortbildungskalender','#rpi-virtuell?tab=fortbildungen'] },
     'erstellen': { fn:'erstellen', t:'Unterricht vorbereiten, Material entwickeln', p:'Allein am eigenen Schreibtisch oder gemeinsam im Labor: Hier wird aus Material Unterricht – und aus Ideen neues Material.', lock:true, subs:['erstellen.schreibtisch','erstellen.labor'] },
@@ -2280,7 +2339,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const btnStyle = `background:${col};color:${T[key]}`;
     const SUBL = { 'hub.profil':'mein Profil', 'hub.home':'Home', 'veroeffentlichen.lerninhalte':'Lerninhalte', 'veroeffentlichen.termin':'Termin', 'veroeffentlichen.beitrag':'Beitrag', 'finden.material':'Material', 'finden.fortbildungen':'Fortbildungen', 'finden.beitraege':'Beiträge', 'erstellen.schreibtisch':'Schreibtisch', 'erstellen.labor':'Labor', 'kooperieren.communities':'Communities', 'kooperieren.personen':'Personen' };
     const go = e.subs ? `<span class="hint">Weiter zu:</span>` + e.subs.map(x => `<button type="button" class="btn btn-ghost" data-ex="${x}" style="border-color:${col};color:${col}">${SUBL[x]} ›</button>`).join('') : e.go[1] && e.go[1][0] === '@' ? `<button type="button" class="btn" style="${btnStyle}" data-open="${e.go[1].slice(1)}">${e.go[0]} ›</button>` : e.go[1] ? `<a class="btn" style="${btnStyle}" href="${e.go[1]}">${e.go[0]} ›</a>` : `<a class="btn" style="${btnStyle}" href="#" data-todo="${e.go[0]}">${e.go[0]} ›</a>`;
-    exEl.innerHTML = `${icon(action)}<div><p class="fn" style="color:${col}">${e.fn}</p><h2>${e.t}</h2><p>${e.p}</p><div class="acts">${go}${e.lock ? '<span class="badge-lock">● mit Profil</span>' : ''}</div></div>`;
+    exEl.innerHTML = `${icon(action)}<div><p class="fn" style="color:${col}">${e.fn}</p><h2>${e.t}</h2><p>${e.p}${e.p2 ? ` ${e.p2.replace(/Sammlung zusammenstellen/, `<a href="${e.go2[1]}" style="color:${col}">${e.go2[0]}</a>`)}` : ''}</p><div class="acts">${go}${e.lock ? '<span class="badge-lock">● mit Profil</span>' : ''}</div></div>`;
     if (exEl.classList.contains('sheet')) exEl.insertAdjacentHTML('afterbegin', '<button type="button" class="sheet-x" data-sheet-close aria-label="Schließen">✕</button>');
     exEl.classList.remove('anim'); void exEl.offsetWidth; exEl.classList.add('anim');
   }
@@ -2528,11 +2587,11 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   }
   /** Was der Lizenzstand erlaubt: sechs Aktionen in fester Reihenfolge; ohne offene Lizenz gehen die ersten drei nicht (sie bleiben sichtbar, Issue 15). `m` wird erst beim Auslösen gelesen. */
   function lizenzAktionen(stand, m) {
-    const offen = stand === 'offen';
+    const offen = stand === 'offen';   // „In Sammlung aufnehmen“ führt nach #finden/sammlung mit dem Titel als Suchbegriff
     return [
       { label: 'Auf den Schreibtisch holen', geht: offen, tu: () => go('relidesk?tab=schreibtisch') },
       { label: 'In der Community weiterbearbeiten', geht: offen, tu: () => openChooser('materialpool') },
-      { label: 'In Sammlung aufnehmen', geht: offen, tu: () => toast('Sammlungen kommen in der nächsten Etappe.') },
+      { label: 'In Sammlung aufnehmen', geht: offen, tu: () => go('finden/sammlung?q=' + encodeURIComponent(m.t)) },
       { label: 'Ansehen', geht: true, tu: () => { if (m.url) window.open(m.url, '_blank', 'noopener'); else toast('Keine Adresse hinterlegt.'); } },
       { label: 'Link kopieren', geht: true, tu: () => rtCopy(location.href, 'Link kopiert.') },
       { label: 'Empfehlen', geht: true, tu: () => toast('Teilen in Communities folgt.') }
@@ -2661,6 +2720,149 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   const ROT = ['für die Schule', 'für die Kita', 'für die Gemeinde', 'für die Jugendarbeit', 'für die Erwachsenenbildung'];
   let ri = 4; const rot = document.getElementById('mpRot');
   setInterval(() => { rot.style.opacity = 0; setTimeout(() => { ri = (ri + 1) % ROT.length; rot.textContent = ROT[ri]; rot.style.opacity = 1; }, 350); }, 2800);
+
+  // ---------- Sammlung: Filter über die schon geladenen Materialien, drei Ausgänge ----------
+  /** Filter aus der Adresszeile: c (Community-Kennung), fach und stufe (mehrfach), lizenz (offen, geschuetzt, unbekannt), q (Begriffe) */
+  function sammlungFilter(qs) {
+    const p = new URLSearchParams(qs || ''), lizenz = p.get('lizenz') || '';
+    return {
+      c: p.get('c') || '',
+      fach: p.getAll('fach').filter(Boolean),
+      stufe: p.getAll('stufe').filter(Boolean),
+      lizenz: ['offen', 'geschuetzt', 'unbekannt'].includes(lizenz) ? lizenz : '',
+      q: (p.get('q') || '').split(/\s+/).filter(Boolean)
+    };
+  }
+  /** Trifft das Material den Filter? Community: eigener Schlüssel oder mit der Community geteilt (coAdressen = Adressen der geteilten Materialien) */
+  function sammlungPasst(m, f, coAdressen) {
+    const gleich = (liste, wert) => !liste.length || liste.some(x => wert.some(w => w.toLowerCase() === x.toLowerCase()));
+    if (!gleich(f.fach, tagWerte(m.ev, 'about:prefLabel:de').concat(tagWerte(m.ev, 'about:prefLabel')))) return false;
+    if (!gleich(f.stufe, tagWerte(m.ev, 'educationalLevel:prefLabel:de').concat(tagWerte(m.ev, 'educationalLevel:prefLabel')))) return false;
+    if (f.lizenz && m.stand !== f.lizenz) return false;
+    if (!mpPasst(m, f.q)) return false;
+    if (f.c) {
+      const k = CO_SCHLUESSEL.find(x => x.id === f.c);
+      if (!k) return false;
+      if (!((k.hex && m.pk === k.hex) || (coAdressen && coAdressen.has('30142:' + m.pk + ':' + m.d)))) return false;
+    }
+    return true;
+  }
+  /** WordPress-Schnipsel für das Plugin; fixed_level und fixed_subject nur, wenn saRender die Kennungen (stufeId, fachId) mitgibt */
+  function shortcodeAus(f) {
+    const w = x => String(x).replace(/"/g, '');
+    const k = f.c ? CO_SCHLUESSEL.find(x => x.id === f.c) : null;
+    const attr = [];
+    if (k) attr.push(`community="${w(k.npub)}"`);
+    if (f.q.length) attr.push(`search="${w(f.q.join(' '))}"`);
+    if (f.stufeId) attr.push(`fixed_level="${w(f.stufeId)}"`);
+    if (f.fachId) attr.push(`fixed_subject="${w(f.fachId)}"`);
+    const hinweis = f.lizenz ? `\n<!-- Lizenzfilter: ${w(f.lizenz)}; das Plugin zeigt die Lizenz je Treffer -->` : '';
+    if (!attr.length && !f.lizenz && !f.fach.length && !f.stufe.length) return '[amb_nostr limit="12"]';
+    return `[amb_nostr_search ${attr.concat(['limit="12"', 'button="Suchen"']).join(' ')}]` + hinweis;
+  }
+  /** Kontextprofil für die Steuerkonsole als JSON-Text */
+  function kontextprofilAus(f) {
+    const k = f.c ? CO_SCHLUESSEL.find(x => x.id === f.c) : null;
+    return JSON.stringify({
+      name: 'Sammlung', version: 1,
+      actions: { 'finden.material': { params: { thema: f.q, stufe: f.stufe } } },
+      sammlung: { community: k ? k.npub : null, fach: f.fach, stufe: f.stufe, lizenz: f.lizenz, q: f.q, relays: RELAYS }
+    }, null, 2);
+  }
+  let saF = sammlungFilter(''), saLauf = 0, saCo = null, saZahlen = {}, saAusgaben = {}, saStand = 'laden';   // Filter, Lauf-Zähler, Adressen der Community, Zahlen je Community, Schnipsel, Ladezustand
+  const saHex = id => (CO_SCHLUESSEL.find(k => k.id === id) || {}).hex;
+  /** Filter in die Adresszeile schreiben (ohne neuen Verlaufseintrag) */
+  function saSchreibe() {
+    const p = new URLSearchParams();
+    if (saF.c) p.set('c', saF.c);
+    saF.fach.forEach(x => p.append('fach', x));
+    saF.stufe.forEach(x => p.append('stufe', x));
+    if (saF.lizenz) p.set('lizenz', saF.lizenz);
+    if (saF.q.length) p.set('q', saF.q.join(' '));
+    const qs = p.toString();
+    CUR = 'finden/sammlung' + (qs ? '?' + qs : '');
+    try { history.replaceState(null, '', '#' + CUR); } catch (e) {}
+  }
+  /** Auswahlfelder füllen: Fach und Stufe aus den vorhandenen Materialien, alphabetisch; gewählte, aber unbekannte Werte bleiben sichtbar */
+  function saFelder() {
+    const sammle = (feld, gewaehlt) => {
+      const m = new Map();
+      for (const x of (mpDaten || [])) for (const w of ambWerte(x.ev, feld)) if (w.label && !m.has(w.label.toLowerCase())) m.set(w.label.toLowerCase(), w.label);
+      for (const g of gewaehlt) if (!m.has(g.toLowerCase())) m.set(g.toLowerCase(), g);
+      return [...m.values()].sort((a, b) => a.localeCompare(b, 'de'));
+    };
+    const opt = (liste, wert, alle) => `<option value="">${alle}</option>` + liste.map(x => `<option value="${esc(x)}"${x.toLowerCase() === String(wert || '').toLowerCase() ? ' selected' : ''}>${esc(x)}</option>`).join('');
+    document.getElementById('saC').innerHTML = '<option value="">Alle Communities</option>' + CO_SCHLUESSEL.map(k => `<option value="${esc(k.id)}"${k.id === saF.c ? ' selected' : ''}>${esc(k.n)}${saZahlen[k.id] != null ? ' (' + saZahlen[k.id] + ')' : ''}</option>`).join('');
+    document.getElementById('saFach').innerHTML = opt(sammle('about', saF.fach), saF.fach[0], 'Alle Fächer');
+    document.getElementById('saStufe').innerHTML = opt(sammle('educationalLevel', saF.stufe), saF.stufe[0], 'Alle Stufen');
+    const q = document.getElementById('saQ'); if (document.activeElement !== q) q.value = saF.q.join(' ');
+    document.getElementById('saLic').innerHTML = '<legend>Lizenz</legend>' + [['', 'alle', 'Alle'], ['offen', 'offen', 'Offen'], ['geschuetzt', 'geschuetzt', 'Geschützt'], ['unbekannt', 'unbekannt', 'Unbekannt']]
+      .map(([wert, klasse, text]) => `<button type="button" class="lic-${klasse}" data-sa-lic="${wert}" aria-pressed="${saF.lizenz === wert}">${text}</button>`).join('');
+  }
+  /** Liste, Stand-Zeile und die drei Ausgänge (teilen, einbetten, abonnieren) neu zeichnen; kein Netz */
+  function saRender() {
+    const liste = mpDaten || [];
+    const hex = saF.c ? saHex(saF.c) : null;
+    const treffer = liste.filter(m => sammlungPasst(m, saF, saCo)).sort((a, b) => b.datum - a.datum);
+    if (!liste.length) datenstand('v-sammlung', 'nachbau', saStand === 'fehler' ? 'Relays nicht erreichbar' : 'Materialien laden');
+    else datenstand('v-sammlung', 'live', `${treffer.length} von ${liste.length} Materialien · abgefragt bei ${RELAYS.length} Relays`);
+    document.getElementById('saListe').innerHTML = treffer.length ? treffer.map(m => {
+      const zeile = [m.art, m.quelle, m.stufe].filter(Boolean).map(esc).join(' · ');
+      return `<a class="mp-card" href="#materialpool?d=${encodeURIComponent(m.d)}&p=${m.pk}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand}">${esc(m.licLabel || 'Lizenz nicht angegeben')}</span></a>`;
+    }).join('') : `<p>${liste.length ? 'Nichts gefunden; Filter lockern.' : (saStand === 'fehler' ? 'Gerade keine Verbindung zu den Relays.' : 'Materialien werden geladen …')}</p>`;
+    // Kennungen der gewählten Begriffe aus den Materialien (für fixed_level und fixed_subject)
+    const kennung = (feld, name) => { for (const m of liste) for (const w of ambWerte(m.ev, feld)) if (name && w.label.toLowerCase() === name.toLowerCase()) return w.id; return ''; };
+    const fp = { ...saF, stufeId: kennung('educationalLevel', saF.stufe[0]), fachId: kennung('about', saF.fach[0]) };
+    const req = { kinds: [30142], limit: 200 };
+    if (hex) req['#h'] = [hex];
+    if (saF.q.length) req.search = saF.q.join(' ');
+    saAusgaben = { wp: shortcodeAus(fp), kp: kontextprofilAus(saF), req: JSON.stringify(['REQ', 'sammlung', req], null, 2) };
+    const auf = id => { const d = document.getElementById(id); return d && d.open ? ' open' : ''; };
+    const aus = document.getElementById('saAus');
+    const offen = { e: auf('saEinbetten'), a: auf('saAbo') };
+    aus.innerHTML = `<div class="sa-aus"><button type="button" data-sa-teilen>Teilen</button><button type="button" data-sa-auf="saEinbetten">Einbetten</button><button type="button" data-sa-auf="saAbo">Abonnieren</button></div>
+      <details class="sa-box" id="saEinbetten"${offen.e}><summary>Einbetten</summary>
+        <p>WordPress (Plugin amb_nostr):</p><pre>${esc(saAusgaben.wp)}</pre><button type="button" class="sa-copy" data-sa-copy="wp">Schnipsel kopieren</button>
+        <p>Kontextprofil (JSON). Für die Steuerkonsole als eigenständiges Skript (<code>config-src</code>); das Skript folgt mit dem Issue „Eigene Instanz“.</p><pre>${esc(saAusgaben.kp)}</pre><button type="button" class="sa-copy" data-sa-copy="kp">Kontextprofil kopieren</button>
+      </details>
+      <details class="sa-box sa-abo" id="saAbo"${offen.a}><summary>Abonnieren</summary>
+        <p>Der Nostr-Filter, in jeder Nostr-App als Abfrage nutzbar. Fach, Stufe und Lizenz prüft diese Seite selbst; im Filter stehen Community und Suchbegriffe.</p><pre>${esc(saAusgaben.req)}</pre><button type="button" class="sa-copy" data-sa-copy="req">Filter kopieren</button>
+        <p><button type="button" class="sa-copy" disabled aria-disabled="true">Als Nostr-Liste speichern</button> braucht Anmeldung mit Schlüssel, folgt.</p>
+        <p>Ein Feed zu einem beliebigen Filter braucht einen Server; hier gibt es keinen.</p>
+      </details>`;
+  }
+  /** Ansicht #finden/sammlung (auch bei Wechsel der Community): Filter aus der Adresszeile, Filterleiste sofort, dann nur die Caches von mpLaden und coLaden (die Community nur bei gesetztem Filter), danach zeichnen */
+  function saOpen(qs) {
+    const f = saF = sammlungFilter(qs), lauf = ++saLauf, hex = f.c ? saHex(f.c) : null;
+    saCo = null; saStand = 'laden';
+    saFelder(); saRender();
+    Promise.all([mpLaden().catch(() => []), hex ? coLaden(hex).catch(() => null) : null]).then(([liste, co]) => {
+      if (lauf !== saLauf) return;
+      saStand = liste.length ? 'live' : 'fehler';
+      if (co && co.antwort) {
+        saCo = new Set(coEintraege(co).filter(e => e.kind === 30142).map(e => e.adr));
+        saZahlen[saF.c] = saCo.size;
+      }
+      saFelder(); saRender();
+    });
+  }
+  (() => {
+    const v = document.getElementById('v-sammlung');
+    const aendere = neu => { Object.assign(saF, neu); saSchreibe(); saFelder(); saRender(); };
+    v.addEventListener('change', e => {
+      if (e.target.id === 'saC') { saF.c = e.target.value; saSchreibe(); saOpen(CUR.split('?')[1]); }
+      if (e.target.id === 'saFach') aendere({ fach: e.target.value ? [e.target.value] : [] });
+      if (e.target.id === 'saStufe') aendere({ stufe: e.target.value ? [e.target.value] : [] });
+    });
+    v.addEventListener('input', e => { if (e.target.id === 'saQ') { saF.q = e.target.value.split(/\s+/).filter(Boolean); saSchreibe(); saRender(); } });
+    v.addEventListener('click', e => {
+      const l = e.target.closest('[data-sa-lic]'), t = e.target.closest('[data-sa-teilen]'), a = e.target.closest('[data-sa-auf]'), c = e.target.closest('[data-sa-copy]');
+      if (l) aendere({ lizenz: l.dataset.saLic });
+      if (t) rtCopy(location.href, 'Link zu dieser Sammlung kopiert.');
+      if (a) { const d = document.getElementById(a.dataset.saAuf); d.open = !d.open; }
+      if (c && saAusgaben[c.dataset.saCopy]) rtCopy(saAusgaben[c.dataset.saCopy], 'Kopiert.');
+    });
+  })();
 
   // ---------- Hinweis für noch nicht gebaute Ziele ----------
   const toastEl = document.getElementById('toast'); let toastT;
@@ -3514,6 +3716,12 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       return standardAktion(d, 'materialpool');
     }
   });
+  RelihubSteuerkonsole.registerContext('sammlung', {
+    handler: d => {
+      if (d.action === 'finden.material') { go('materialpool'); return false; }
+      return standardAktion(d, 'Sammlung');
+    }
+  });
   RelihubSteuerkonsole.registerContext('rpi-virtuell', {
     handler: d => {
       if (d.action === 'finden.fortbildungen') {
@@ -3645,9 +3853,11 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const raw = CUR;
     const [viewRaw, qs] = raw.split('?');
     const [view, sub] = viewRaw.split('/');
-    const v = ['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell'].includes(view) ? view : (view === 'partner' || view === 'hilfe' ? 'start' : 'start');
+    const finden = view === 'finden' && sub ? (['sammlung'].includes(sub) ? sub : null) : undefined;   // finden/<sub> → Ansicht v-<sub>
+    const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell'].includes(view) ? view : 'start');
+    if (finden === null) toast('Diese Seite gibt es nicht.');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
-    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
+    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung · Materialpool Religion', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || 'relilab', pp.get('tab')); }
     leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v);
     if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); }
@@ -3661,6 +3871,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     if (view === 'hilfe') { explainDefault(); setTimeout(() => document.getElementById('explain').scrollIntoView({ behavior: 'smooth', block: 'start' }), 30); return; }
     if (v === 'start') explainDefault();
     if (v === 'materialpool') mpOpen(qs);
+    if (v === 'sammlung') saOpen(qs);
     window.scrollTo(0, 0);
   }
   window.addEventListener('hashchange', () => { CUR = leseHash(); route(); });

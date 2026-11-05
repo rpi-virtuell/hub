@@ -7,6 +7,7 @@ Die Startseite erklärt mit Erklärkarte und Narrativ, was der Hub kann. Die Kon
 | Begriff | Startseite | Konsole (Aktion) | Ziel (Route) | Leiste (Instanz) | Farbe | Stand |
 |---|---|---|---|---|---|---|
 | Material | Material | `finden.material` | `#materialpool` | Materialpool | finden | gebaut |
+| Sammlung | – | – (über Materialpool und Erklärkarte) | `#finden/sammlung` | – | finden | gebaut |
 | Fortbildungen | Fortbildungen | `finden.fortbildungen` | `#rpi-virtuell?tab=fortbildungen` | rpi-virtuell | finden | gebaut |
 | Beiträge | Artikel und Nachrichten | `finden.beitraege` | `#profil?zu=artikel` | – | finden | gebaut |
 | Schreibtisch | Mein Schreibtisch | `erstellen.schreibtisch` | `#relidesk?tab=schreibtisch` | relidesk | erstellen | gebaut |
