@@ -174,6 +174,22 @@ Rohdaten: `ambJsonLd(ev)` bildet das AMB-Objekt allein aus den Tags (Kontext `ht
 
 Prüf-Marker (Stufe B): Trägt das Event ein Tag `l` mit dem Wert `geprueft`, steht „Nach den Qualitätskriterien geprüft.“; sonst „Noch nicht nach den Qualitätskriterien geprüft.“ mit Link zu den Kriterien (`spielregelLink`). Bisher trägt kein Event das Tag, die Lücke bleibt sichtbar.
 
+### Verbraucher: Personen
+
+`#kooperieren/personen` zeigt nur Menschen, die in der Personen-Liste stehen. Die Liste ist ein `kind:30000` (Follow-Liste) mit `d=personen` und `p`-Tags; sie gilt als Einverständnis der Genannten, nie wird jemand allein wegen einer Community-Mitgliedschaft aufgeführt. Angenommen wird sie nur vom Schaufenster-Schlüssel oder vom Community-Schlüssel rpi-virtuell (`PERSONEN_LISTE.autoren`, beide beim Team); liegen beide vor, gewinnt das neuere `created_at`. Die Pflege der Liste ist Sache des Teams.
+
+`peLaden()` fragt einmal je Sitzung in höchstens zwei Schritten: (1) `{kinds:[30000], authors:<feste Autoren>, '#d':['personen'], limit:2}` plus ein Gesundheitsblick (`kind:0` der Community-Schlüssel, `limit:5`), damit „Relays antworten nicht“ von „Liste noch nicht angelegt“ unterscheidbar ist; (2) nur wenn die Liste da ist: `{kinds:[0], authors:<p-Tags>}` und `{kinds:[30000], authors:<p-Tags>, '#d':['communities']}`. Es zählen nur gültige Hex-Schlüssel (`istHex64`), höchstens 150. Die Mitgliedschaften (`p`-Tags der Liste `d=communities`) werden über die Hex-Schlüssel von `CO_SCHLUESSEL` auf Namen abgebildet; unbekannte Communities zählen nicht.
+
+`profilAus(ev)`: `name` aus `display_name` oder `name` (höchstens 80 Zeichen), ohne Namen kein Profil; `about` auf 160 Zeichen am Wortende gekürzt; `picture` und `website` über `sichereUrl`; `nip05` nur als `name@domain`; alle Texte über `esc`. Bot-Regel: Profile mit `"bot": true` stehen nicht in der Liste (auf der Profilseite mit Hinweis „automatisches Konto“); Profile mit Mastodon-Brücke erscheinen wie alle anderen.
+
+Rückfall: Fehlt die Liste, zeigt die Seite die Teamseite aus dem Schaufenster (`OC_TEAM`, Schnappschuss, „Stand vom 04.11.2026“) mit dem Satz, dass die Liste noch nicht angelegt ist; antwortet gar kein Relay, steht stattdessen „Die Relays antworten gerade nicht.“. „Folgen“ ist bis zur Anmeldung mit Schlüssel ausgegraut. Stand-Zeile mit Liste: `live · <n> Personen · Liste vom <Datum>`.
+
+### Verbraucher: Person
+
+`#person?p=<npub>` zeigt Profil, Mitgliedschaften und Veröffentlichungen eines Schlüssels. `prOpen(qs)` prüft den npub (`npubToHex`, Rückprobe mit `bech32`; sonst „Kein gültiges Profil in der Adresse.“ mit Rückweg) und fragt in einer Abfrage je Relay `{kinds:[30142, 30023, 31923], authors:[<hex>], limit:30}`, bei nicht zwischengespeichertem Profil zusätzlich `kind:0` und `kind:30000` mit `d=communities` des Schlüssels. Liegt das Profil schon im Cache von `peLaden()`, entfällt der zweite und dritte Filter. Die Veröffentlichungen laufen über `eintragKarte` (neueste 10 je Abschnitt Materialien, Beiträge, Termine; leere Abschnitte sagen „noch nichts veröffentlicht“). Stand-Zeile: `live · Profil vom <Datum>` oder `Nachbau · Profil nicht gefunden`. Die Persona-Ansicht `#profil` bleibt Nachbau und verweist auf die Personen.
+
+Offen: Der Link „Bei edufeed ansehen“ (`https://edufeed.org/<npub>`) steht nur als Text, bis die Route der App für Profile geklärt ist.
+
 ## Schnappschuss erneuern
 
 ```bash

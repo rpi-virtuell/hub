@@ -17,6 +17,8 @@
   --lic-offen:#DDF1E3;--lic-offen-x:#14532D;--lic-geschuetzt:#E9E8E4;--lic-geschuetzt-x:#44433F;--lic-unbekannt:#FBEFC9;--lic-unbekannt-x:#6B4A00;
   /* Logik-Pillen im Fortbildungskalender: Labor (Hellton von erstellen), Institut (Hellton von finden); Text 4,5:1 auf Fläche, paper und card */
   --ka-labor:#FEEFD9;--ka-labor-text:#7A4300;--ka-institut:#DDF1F0;--ka-institut-text:#00605C;
+  /* Personen: Initialen und Chips auf dem Hellton von kooperieren; Text 4,5:1 auf Fläche, paper und card */
+  --pe-hell:#FAE1EA;--pe-text:#7A1A3E;
   --mp:#00726D;--mp-dark:#004E4A;--mp-l1:#8FD3CE;--mp-l2:#3FA9A2;--mp-soft:#E3F2F1;
   /* rpi-virtuell.de (Blocksy-Palette: Farbe 1 Leitfarbe, Farbe 5 Hellton); Textfarbe abgedunkelt, 4,5:1 auch auf dem Hellton */
   --rv:#0072AA;--rv-x:#00669A;--rv-soft:#DFE8ED;
@@ -296,6 +298,37 @@ a.mp-card:hover{border-color:var(--mp)}
 .ka-logik-institut{background:var(--ka-institut);color:var(--ka-institut-text)}
 .ka-act{display:flex;flex-wrap:wrap;gap:8px}
 @media (max-width:560px){.ka-ev{grid-template-columns:minmax(0,1fr)}}
+/* Personen und Person (Hellton von kooperieren, Text 4,5:1 auf Fläche, paper und card) */
+#v-personen,#v-person{font-family:Inter,system-ui,sans-serif;background:#fff;color:#1B2B2A;font-size:16px}
+#v-personen .stand,#v-person .stand{color:#5A6B69}
+.pe-in{max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,40px) 24px}
+.pe-in h1{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:clamp(30px,4.5vw,44px);line-height:1.1;margin:18px 0 8px;color:var(--x-koop)}
+.pe-in .sub{margin:0 0 20px;color:#36504D;max-width:68ch}
+.pe-in h2{font-family:"Space Grotesk",sans-serif;font-size:20px;margin:26px 0 10px;color:var(--x-koop)}
+.pe-satz{margin:0 0 16px;padding:12px 16px;border-radius:10px;background:var(--pe-hell);color:var(--pe-text);max-width:68ch}
+.pe-liste{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px;margin:0 0 12px}
+.pe-card{display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--card);overflow-wrap:anywhere}
+.pe-card b{display:block;font-family:"Space Grotesk",sans-serif;font-size:17px;line-height:1.3;margin-bottom:4px}
+.pe-card p{margin:0 0 6px;font-size:14.5px;color:#36504D}
+.pe-card small,.pe-kopf small{display:block;font-size:14px;color:#4A5D5B}
+.pe-av{position:relative;flex:0 0 64px;width:64px;height:64px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:var(--pe-hell);color:var(--pe-text);font-weight:700;font-size:20px}
+.pe-av.gross{flex-basis:96px;width:96px;height:96px;font-size:30px}
+.pe-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pe-chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.pe-chips span{border-radius:999px;padding:1px 10px;font-size:13px;font-weight:600;background:var(--pe-hell);color:var(--pe-text)}
+.pe-act{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px}
+.pe-btn{display:inline-flex;align-items:center;min-height:44px;padding:8px 16px;border-radius:8px;background:var(--x-koop);color:#fff;font-weight:600;font-size:14px;text-decoration:none}
+.pe-btn:focus-visible,.pe-in a:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.pe-folgen{display:inline-flex;flex-direction:column;gap:2px}
+.pe-folgen button{font:inherit;font-size:14px;font-weight:600;min-height:44px;padding:8px 16px;border-radius:8px;border:1px solid #9DB8B5;background:#F1F4F3;color:#4A5D5B;cursor:not-allowed}
+.pe-hinweis{margin:18px 0 8px;font-size:14px;color:#4A5D5B;max-width:68ch}
+.pe-hinweis code{overflow-wrap:anywhere}
+.pe-kopf{display:flex;gap:20px;align-items:flex-start;margin:0 0 8px}
+.pe-kopf h1{margin-top:0}
+.pe-about{margin:0 0 8px;max-width:68ch;color:#36504D}
+.pe-pubs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.pe-leer{margin:0;color:#4A5D5B}
+@media (max-width:560px){.pe-kopf{flex-direction:column}.pe-card{flex-direction:column}}
 /* Sammlung */
 #v-sammlung{font-family:Inter,system-ui,sans-serif;background:#fff;color:#1B2B2A;font-size:16px}
 #v-sammlung .stand{color:#5A6B69}
@@ -1003,6 +1036,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
       <div style="position:relative;z-index:1">
         <h1>Hallo Luca!</h1>
         <p>Das ist neu in deinem Netz seit deinem letzten Besuch am Montag.</p>
+        <p>Dein eigenes Profil kommt mit der Anmeldung per Schlüssel; echte Profile findest du unter <a href="#kooperieren/personen" style="color:inherit;text-decoration:underline">Personen</a>.</p>
         <div class="chips">
           <span style="font-size:14px;color:var(--muted);margin-right:2px">Meine Interessen:</span>
           <span class="chip"><i></i>Schöpfung</span>
@@ -1209,6 +1243,42 @@ a.kat-card:hover{border-color:var(--c-koop)}
     <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> Teil des reli_hub</span>
   </div></footer>
   <relihub-steuerkonsole id="kaFlower" floating size="58" popover-size="210" context="fortbildungen"></relihub-steuerkonsole>
+</div>
+
+<!-- ===================== Ansicht: Personen (kooperieren › Personen) ===================== -->
+<div class="view" id="v-personen" data-stand="stand:04.11.2026 · Teamseite, Personen-Liste fehlt">
+  <header class="mp-head">
+    <a class="mp-brand" href="#kooperieren/personen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c2 .6 3.3 2.2 3.6 4.7"/></svg>Personen</a>
+    <span class="sp"></span>
+    <nav class="mp-nav"><a href="#communities"><span>Communities</span></a><a href="#profil"><span>Mein Profil</span></a></nav>
+  </header>
+  <p class="stand" aria-live="polite"></p>
+  <main class="pe-in">
+    <h1>Personen</h1>
+    <p class="sub">Menschen, die im Ökosystem sichtbar sein wollen: Lehrkräfte, Fortbildende, Forschende, Teams der Institute.</p>
+    <div id="peAus"></div>
+  </main>
+  <footer class="mp-foot"><div class="in">
+    <span>Es erscheint nur, wer in der Personen-Liste des Teams steht.</span>
+    <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> Teil des reli_hub</span>
+  </div></footer>
+  <relihub-steuerkonsole id="peFlower" floating size="58" popover-size="210" context="personen"></relihub-steuerkonsole>
+</div>
+
+<!-- ===================== Ansicht: Person (Profil aus kind:0 mit Veröffentlichungen) ===================== -->
+<div class="view" id="v-person" data-stand="nachbau:Profil laden">
+  <header class="mp-head">
+    <a class="mp-brand" href="#kooperieren/personen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c2 .6 3.3 2.2 3.6 4.7"/></svg>Personen</a>
+    <span class="sp"></span>
+    <nav class="mp-nav"><a href="#kooperieren/personen"><span>Alle Personen</span></a><a href="#profil"><span>Mein Profil</span></a></nav>
+  </header>
+  <p class="stand" aria-live="polite"></p>
+  <main class="pe-in" id="prAus"></main>
+  <footer class="mp-foot"><div class="in">
+    <span>Quelle: relay.edufeed.org, relay-rpi.edufeed.org, amb-relay.edufeed.org</span>
+    <span class="hubmark"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg> Teil des reli_hub</span>
+  </div></footer>
+  <relihub-steuerkonsole id="prFlower" floating size="58" popover-size="210" context="personen"></relihub-steuerkonsole>
 </div>
 
 <!-- ===================== Ansicht 9: rpi-virtuell (Nachbau rpi-virtuell.de) ===================== -->
@@ -2080,6 +2150,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     return hex;
   }
   function bech32(hrp, bytes) {
+    const B32 = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';   // lokal, damit die Funktion allein ausgeschnitten und getestet werden kann
     const G = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3], d = []; let acc = 0, bits = 0;
     for (const b of bytes) { acc = ((acc << 8) | b) & 0xfff; bits += 8; while (bits >= 5) { bits -= 5; d.push((acc >> bits) & 31); } }
     if (bits) d.push((acc << (5 - bits)) & 31);
@@ -2386,7 +2457,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     'erstellen.labor': { fn:'erstellen › Labor', t:'Unser Labor', p:'Entwickle gemeinsam mit anderen Material weiter, erprobe Neues und hol dir Rückmeldung. Stelle Unfertiges vor und lade zum Mitmachen ein.', lock:true, go:['Ins relilab','#relilab'] },
     'kooperieren': { fn:'kooperieren', t:'Mit anderen arbeiten', p:'Finde Menschen und Communities, mit denen du arbeiten möchtest – zu deinen Themen oder für deine Zielgruppe.', subs:['kooperieren.communities','kooperieren.personen'] },
     'kooperieren.communities': { fn:'kooperieren › Communities', t:'Communities', p:'Verschaffe dir einen Überblick über religionspädagogische Communities. Suche Verbündete, arbeite mit. Gründe deine eigene Community und suche Mitstreiter_innen.', go:['Communities entdecken','#communities'] },
-    'kooperieren.personen': { fn:'kooperieren › Personen', t:'Personen', p:'Entdecke, wer zu deinen Themen arbeitet. Folge Profilen, nimm Kontakt auf – und werde selbst sichtbar.', go:['Personen entdecken',null] },
+    'kooperieren.personen': { fn:'kooperieren › Personen', t:'Personen', p:'Entdecke, wer zu deinen Themen arbeitet. Folge Profilen, nimm Kontakt auf – und werde selbst sichtbar.', go:['Personen entdecken','#kooperieren/personen'] },
     'veroeffentlichen': { fn:'veröffentlichen', t:'Zeigen, was du hast', p:'Du möchtest einen Lerninhalt im Materialpool anzeigen, eine Veranstaltung bewerben, einen Blogbeitrag veröffentlichen? Hier findest du die Werkzeuge dazu.', lock:true, subs:['veroeffentlichen.lerninhalte','veroeffentlichen.termin','veroeffentlichen.beitrag'] },
     'veroeffentlichen.lerninhalte': { fn:'veröffentlichen › Lerninhalte', t:'Lerninhalte', p:'Mach dein Material im Materialpool sichtbar: Verweise auf einen Lerninhalt, beschreibe ihn mit Zielgruppe, Thema und Lizenz – und er wird im ganzen Netzwerk gefunden.', lock:true, go:['Lerninhalt eintragen','@lerninhalt'] },
     'veroeffentlichen.termin': { fn:'veröffentlichen › Termin', t:'Termin', p:'Bewirb deine Fortbildung oder Veranstaltung: Einmal eingetragen, erscheint sie im gemeinsamen Kalender und auf allen angeschlossenen Seiten, zu denen sie passt.', lock:true, go:['Termin eintragen','@termin'] },
@@ -3958,9 +4029,131 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     });
   })();
 
+  // ---------- Personen und Profile (Issue 06): nur wer in der Personen-Liste steht, erscheint; Profile kommen von den Relays ----------
+  // Die Liste ist ein kind:30000 mit d=personen und p-Tags und gilt als Einverständnis der Genannten; angenommen wird sie nur vom
+  // Schaufenster-Schlüssel oder vom Community-Schlüssel rpi-virtuell (beide beim Team). Liegen beide vor, gewinnt das neuere created_at.
+  const PERSONEN_LISTE = { d: 'personen', autoren: [FO_HEX, npubToHex('npub14esenw6rt4c2pmxwvyey4jqw0sjdahetq6qvh5lffxp7w4thg63ql480z2')] };
+  let peDaten = null, peLauf = null, peStart = 0, prLauf = 0;   // Antwort mit Liste (gehalten), laufende Abfrage, Zähler gegen späte Antworten
+  /** Neuestes Event je Autor (Map pubkey → Event), nur von erlaubten Schlüsseln */
+  function peNeueste(evs, erlaubt) {
+    const m = new Map();
+    for (const e of evs) { const alt = m.get(e.pubkey); if (erlaubt.includes(e.pubkey) && (!alt || e.created_at > alt.created_at)) m.set(e.pubkey, e); }
+    return m;
+  }
+  /** Personen-Liste und Profile in höchstens zwei Abfragen je Relay, einmal je Sitzung (nur eine vorhandene Liste wird gehalten).
+   *  Abfrage 1 trägt neben der Liste einen Gesundheitsblick (Profile der Hub-Community-Schlüssel), damit „Relays antworten nicht“ von „Liste fehlt“ unterscheidbar ist. */
+  function peLaden() {
+    if (peDaten) return Promise.resolve(peDaten);
+    if (peLauf) return peLauf;
+    peLauf = hubFetch('personen', [{ kinds: [30000], authors: PERSONEN_LISTE.autoren, '#d': [PERSONEN_LISTE.d], limit: 2 }, { kinds: [0], authors: CO_SCHLUESSEL.map(c => c.hex), limit: 5 }]).then(evs => {
+      const liste = [...peNeueste(evs.filter(e => e.kind === 30000 && tagWert(e, 'd') === PERSONEN_LISTE.d), PERSONEN_LISTE.autoren).values()].sort((a, b) => b.created_at - a.created_at)[0] || null;
+      if (!liste) { peLauf = null; return { liste: null, antwort: evs.length > 0, pks: [], profile: new Map(), mitglied: new Map() }; }
+      const pks = [...new Set(tagWerte(liste, 'p').filter(h => istHex64(h)))].slice(0, 150);
+      return hubFetch('personen:profile', [{ kinds: [0], authors: pks }, { kinds: [30000], authors: pks, '#d': ['communities'] }]).then(ev2 => {
+        const profile = new Map(), mitglied = new Map();
+        peNeueste(ev2.filter(e => e.kind === 0), pks).forEach((e, pk) => { const p = profilAus(e); if (p) profile.set(pk, Object.assign(p, { zeit: e.created_at })); });
+        peNeueste(ev2.filter(e => e.kind === 30000 && tagWert(e, 'd') === 'communities'), pks).forEach((e, pk) => {
+          mitglied.set(pk, tagWerte(e, 'p').map(h => (CO_SCHLUESSEL.find(c => c.hex === h) || {}).n).filter(Boolean));   // unbekannte Communities zählen nicht
+        });
+        peDaten = { liste, antwort: true, pks, profile, mitglied };
+        return peDaten;
+      });
+    });
+    return peLauf;
+  }
+  /** Profil aus einem kind:0 oder null (kein JSON, kein Name). Alle Texte maskiert und gekürzt, Adressen über sichereUrl, npub per bech32. */
+  function profilAus(ev) {
+    let c; try { c = JSON.parse(ev.content); } catch (e) { return null; }
+    if (!c || typeof c !== 'object' || !istHex64(ev.pubkey)) return null;
+    const text = (x, n) => typeof x === 'string' ? x.trim().slice(0, n) : '';
+    const name = text(c.display_name, 80) || text(c.name, 80);
+    if (!name) return null;
+    let about = text(c.about, 4000);
+    if (about.length > 160) { const k = about.slice(0, 160), i = k.lastIndexOf(' '); about = (i > 80 ? k.slice(0, i) : k).trimEnd() + '…'; }
+    const nip05 = text(c.nip05, 120);
+    return {
+      pk: ev.pubkey, npub: bech32('npub', ev.pubkey.match(/../g).map(h => parseInt(h, 16))),
+      name: esc(name), about: esc(about), bild: sichereUrl(text(c.picture, 500)), web: sichereUrl(text(c.website, 500)),
+      nip05: /^[^@\s]+@[^@\s]+$/.test(nip05) ? esc(nip05) : '', bot: c.bot === true
+    };
+  }
+  /** Initiale für Karten ohne Bild (Name ist schon maskiert; Entitäten fallen weg) */
+  const peIni = n => esc((n || '').replace(/&(amp|lt|gt|quot);/g, '').split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase() || '?');
+  const peAv = (p, gross) => `<span class="pe-av${gross ? ' gross' : ''}" aria-hidden="true">${peIni(p.name)}${p.bild ? `<img src="${esc(p.bild)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`;
+  const peDatum = sek => new Date(sek * 1000).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const peChips = namen => namen && namen.length ? `<p class="pe-chips">${namen.map(n => `<span>${esc(n)}</span>`).join('')}</p>` : '';
+  const PE_FOLGEN_HINT = 'braucht Anmeldung mit Schlüssel, folgt';   // „Folgen“ bleibt bis zur Anmeldung ausgegraut (Knopf steht in peRender und prRender)
+  /** Ansicht Personen zeichnen: daten null = lädt (Teamseite), liste null = noch nicht angelegt oder keine Antwort, sonst Karten ohne Bots */
+  function peRender(daten) {
+    const aus = document.getElementById('peAus'); if (!aus) return;
+    const team = () => OC_TEAM.map(g => `<h2 class="pe-g">${esc(g.g)}</h2><div class="pe-liste">${g.p.map(m => `<div class="pe-card"><span class="pe-av" aria-hidden="true">${peIni(esc(m.n.replace(/^(Prof\. |Dr\. )+/, '')))}</span><div><b>${esc(m.n)}</b><small>${esc(m.f)}</small></div></div>`).join('')}</div>`).join('');
+    const hinweis = '<p class="pe-hinweis">Wer hier stehen möchte, sagt es dem Community-Management; die Liste pflegt das Team. Profile mit Mastodon-Brücke erscheinen hier wie alle anderen.</p>';
+    if (!daten || !daten.liste) {
+      const satz = !daten ? '' : daten.antwort ? '<p class="pe-satz">Die Personen-Liste ist noch nicht angelegt; bis dahin stehen hier die Teams aus dem Schaufenster.</p>' : '<p class="pe-satz">Die Relays antworten gerade nicht. Bis dahin stehen hier die Teams aus dem Schaufenster.</p>';
+      aus.innerHTML = satz + team() + hinweis;
+      datenstand('v-personen', 'stand', '04.11.2026');
+      return;
+    }
+    const karten = daten.pks.map(pk => daten.profile.get(pk)).filter(p => p && !p.bot);
+    aus.innerHTML = (karten.length ? `<div class="pe-liste">${karten.map(p => `<article class="pe-card">${peAv(p)}<div><b>${p.name}</b>${p.about ? `<p>${p.about}</p>` : ''}${p.nip05 ? `<small>${p.nip05}</small>` : ''}${peChips(daten.mitglied.get(p.pk))}<div class="pe-act"><a class="pe-btn" href="#person?p=${esc(p.npub)}">Profil ansehen ›</a><span class="pe-folgen"><button type="button" disabled aria-disabled="true">Folgen</button><small>${PE_FOLGEN_HINT}</small></span></div></div></article>`).join('')}</div>` : '<p class="pe-satz">Zu den Genannten liegen noch keine Profile vor.</p>') + hinweis;
+    datenstand('v-personen', 'live', `${karten.length} Personen · Liste vom ${peDatum(daten.liste.created_at)}`);
+  }
+  function peOpen() {
+    peRender(null);
+    const lauf = ++peStart;
+    peLaden().then(d => { if (lauf === peStart) peRender(d); }, () => {});
+  }
+  /** Profilseite #person?p=<npub>: Profil, Mitgliedschaften und Veröffentlichungen in einer Abfrage je Relay (liegt das Profil schon im Cache der Liste, nur die Veröffentlichungen) */
+  function prOpen(qs) {
+    const p = new URLSearchParams(qs || '').get('p') || '', lauf = ++prLauf;
+    let hex = ''; try { hex = /^npub1[0-9a-z]+$/.test(p) ? npubToHex(p) : ''; } catch (e) {}
+    if (!istHex64(hex) || bech32('npub', hex.match(/../g).map(h => parseInt(h, 16))) !== p) { prRender({ fehler: 'Kein gültiges Profil in der Adresse.' }); return; }
+    prRender({ hex, laden: true });
+    const cp = peDaten && peDaten.profile.get(hex), cm = peDaten && peDaten.mitglied.get(hex);
+    const filter = [{ kinds: [30142, 30023, 31923], authors: [hex], limit: 30 }];
+    if (!cp) filter.push({ kinds: [0], authors: [hex], limit: 1 }, { kinds: [30000], authors: [hex], '#d': ['communities'], limit: 1 });
+    hubFetch('person:' + hex + (cp ? ':veroeffentlicht' : ''), filter).then(evs => {
+      if (lauf !== prLauf) return;
+      let profil = cp || null, mitglied = cm || [];
+      if (!cp) {
+        const k0 = peNeueste(evs.filter(e => e.kind === 0), [hex]).get(hex), km = peNeueste(evs.filter(e => e.kind === 30000 && tagWert(e, 'd') === 'communities'), [hex]).get(hex);
+        const pa = k0 && profilAus(k0); profil = pa ? Object.assign(pa, { zeit: k0.created_at }) : null;
+        mitglied = km ? tagWerte(km, 'p').map(h => (CO_SCHLUESSEL.find(c => c.hex === h) || {}).n).filter(Boolean) : [];
+      }
+      const neu = new Map();   // je Adresse das neueste Event
+      for (const e of evs) {
+        if (e.pubkey !== hex || ![30142, 30023, 31923].includes(e.kind)) continue;
+        const adr = `${e.kind}:${e.pubkey}:${tagWert(e, 'd')}`, alt = neu.get(adr);
+        if (!alt || e.created_at > alt.ev.created_at) neu.set(adr, { adr, kind: e.kind, pk: e.pubkey, d: tagWert(e, 'd'), ev: e, geteilt: null, zeit: e.created_at });
+      }
+      prRender({ hex, profil, mitglied, eintraege: [...neu.values()].sort((a, b) => b.zeit - a.zeit) });
+    }, () => { if (lauf === prLauf) prRender({ hex, profil: cp || null, mitglied: cm || [], eintraege: [] }); });
+  }
+  function prRender(d) {
+    const aus = document.getElementById('prAus'); if (!aus) return;
+    if (d.fehler) {
+      aus.innerHTML = '<h1>Profil</h1><p class="pe-satz">'+ esc(d.fehler) +'</p><p><a class="pe-btn" href="#kooperieren/personen">Zu den Personen ›</a></p>';
+      datenstand('v-person', 'nachbau', 'Profil nicht gefunden'); return;
+    }
+    if (d.laden) {
+      aus.innerHTML = '<h1>Profil</h1><p class="pe-satz">Profil wird geladen …</p>';
+      datenstand('v-person', 'nachbau', 'Profil laden'); return;
+    }
+    const npub = bech32('npub', d.hex.match(/../g).map(h => parseInt(h, 16))), p = d.profil;
+    const abschnitt = (titel, kind) => {
+      const liste = d.eintraege.filter(e => e.kind === kind).slice(0, 10);
+      return `<section class="pe-sek"><h2>${titel}</h2>${liste.length ? `<div class="pe-pubs">${liste.map(eintragKarte).join('')}</div>` : '<p class="pe-leer">noch nichts veröffentlicht</p>'}</section>`;
+    };
+    const kopf = p
+      ? `${peAv(p, true)}<div><h1>${p.name}</h1>${p.bot ? '<p class="pe-chips"><span>automatisches Konto</span></p>' : ''}${p.about ? `<p class="pe-about">${p.about}</p>` : ''}${p.nip05 ? `<p><small>${p.nip05}</small></p>` : ''}${p.web ? `<p><a href="${esc(p.web)}" target="_blank" rel="noopener">${esc(p.web.replace(/^https?:\/\//i, ''))}</a></p>` : ''}${peChips(d.mitglied)}<div class="pe-act"><span class="pe-folgen"><button type="button" disabled aria-disabled="true">Folgen</button><small>${PE_FOLGEN_HINT}</small></span></div></div>`
+      : `<div><h1>${esc(npub.slice(0, 14))}…</h1><p class="pe-satz">Zu diesem Schlüssel liegt kein Profil vor.</p></div>`;
+    aus.innerHTML = `<div class="pe-kopf">${kopf}</div>${abschnitt('Materialien', 30142)}${abschnitt('Beiträge', 30023)}${abschnitt('Termine', 31923)}<p class="pe-hinweis">Bei edufeed ansehen › <code>https://edufeed.org/${esc(npub)}</code></p><p><a class="pe-btn" href="#kooperieren/personen">Zu den Personen ›</a></p>`;
+    if (p) datenstand('v-person', 'live', `Profil vom ${peDatum(p.zeit)}`); else datenstand('v-person', 'nachbau', 'Profil nicht gefunden');
+  }
+
   // ---------- Kontexte der Steuerkonsole: dieselbe Steuerkonsole, je nach Seite andere Aktionen ----------
   let LOGGED = false;
-  const VIEW_OF = { 'finden.material': 'materialpool', 'finden.beitraege': 'profil?zu=artikel', 'hub.profil': 'profil', 'hub.home': 'start', 'erstellen.labor': 'relilab', 'erstellen.schreibtisch': 'relidesk?tab=schreibtisch', 'finden.fortbildungen': 'finden/fortbildungen' };
+  const VIEW_OF = { 'finden.material': 'materialpool', 'finden.beitraege': 'profil?zu=artikel', 'hub.profil': 'profil', 'hub.home': 'start', 'erstellen.labor': 'relilab', 'erstellen.schreibtisch': 'relidesk?tab=schreibtisch', 'finden.fortbildungen': 'finden/fortbildungen', 'kooperieren.personen': 'kooperieren/personen' };
   function navTo(view, url) { const q = new URL(url).search; go(view + (q ? (view.includes('?') ? '&' + q.slice(1) : q) : '')); }
   function info(d) {
     if (!['finden', 'erstellen', 'kooperieren', 'veroeffentlichen'].includes(d.action)) return false;
@@ -4026,6 +4219,12 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       if (d.action === 'finden.fortbildungen') { window.scrollTo({ top: 0, behavior: 'smooth' }); toast('Du bist bereits bei den Fortbildungen.'); return false; }
       if (d.action === 'finden.material') { go('materialpool'); return false; }
       return standardAktion(d, 'Fortbildungen');
+    }
+  });
+  RelihubSteuerkonsole.registerContext('personen', {
+    handler: d => {
+      if (d.action === 'kooperieren.personen') { window.scrollTo({ top: 0, behavior: 'smooth' }); toast('Du bist bereits bei den Personen.'); return false; }
+      return standardAktion(d, 'Personen');
     }
   });
   RelihubSteuerkonsole.registerContext('rpi-virtuell', {
@@ -4159,11 +4358,11 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const raw = CUR;
     const [viewRaw, qs] = raw.split('?');
     const [view, sub] = viewRaw.split('/');
-    const finden = view === 'finden' && sub ? (['sammlung', 'fortbildungen'].includes(sub) ? sub : null) : undefined;   // finden/<sub> → Ansicht v-<sub>
-    const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell'].includes(view) ? view : 'start');
+    const finden = view === 'finden' && sub ? (['sammlung', 'fortbildungen'].includes(sub) ? sub : null) : view === 'kooperieren' && sub ? (sub === 'personen' ? sub : null) : undefined;   // finden/<sub>, kooperieren/<sub> → Ansicht v-<sub>
+    const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell', 'person'].includes(view) ? view : 'start');
     if (finden === null) toast('Diese Seite gibt es nicht.');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
-    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung · Materialpool Religion', fortbildungen: 'Fortbildungen · Fortbildungskalender', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
+    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung · Materialpool Religion', fortbildungen: 'Fortbildungen · Fortbildungskalender', personen: 'Personen · reli_hub', person: 'Profil · reli_hub', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || 'relilab', pp.get('zu') === 'katalog' ? 'katalog' : pp.get('tab')); }
     leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v === 'fortbildungen' ? 'rpi-virtuell' : v);
     if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); }
@@ -4179,6 +4378,8 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     if (v === 'materialpool') mpOpen(qs);
     if (v === 'sammlung') saOpen(qs);
     if (v === 'fortbildungen') kaOpen(qs);
+    if (v === 'personen') peOpen();
+    if (v === 'person') prOpen(qs);
     window.scrollTo(0, 0);
   }
   window.addEventListener('hashchange', () => { CUR = leseHash(); route(); });

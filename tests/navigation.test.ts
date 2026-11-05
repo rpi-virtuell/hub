@@ -110,7 +110,7 @@ Deno.test('Navigation: Tabelle, Farben in der Konsole, Lerninhalte in den Materi
   assert(/this\.text\(bud, s\.label[^;]*f\.ink, 'out'\)/.test(c) && !/\.out\{[^}]*fill:/.test(c), 'Knospen nicht in Bereichsfarbe');
   assert(/veroeffentlichen\.lerninhalte'\) \{ go\('materialpool'\); openChooser\('materialpool'\)/.test(block(/function standardAktion[\s\S]*?\n  \}/)), 'Lerninhalte springen nicht in den Materialpool');
   const nullZiele = [...block(/const EX = \{[\s\S]*?\n  \};/).matchAll(/go:\['[^']*',null\]/g)].length;
-  assert(nullZiele === 1, `offene Ziele in EX: ${nullZiele}, erlaubt ist nur Personen`);
+  assert(nullZiele === 0, `offene Ziele in EX: ${nullZiele}`);
 });
 
 Deno.test('Konsole auf der Startseite verankert', () => {

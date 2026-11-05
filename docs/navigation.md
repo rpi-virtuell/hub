@@ -13,7 +13,7 @@ Die Startseite erklärt mit Erklärkarte und Narrativ, was der Hub kann. Die Kon
 | Schreibtisch | Mein Schreibtisch | `erstellen.schreibtisch` | `#relidesk?tab=schreibtisch` | relidesk | erstellen | gebaut |
 | Labor | Unser Labor | `erstellen.labor` | `#relilab` | relilab | erstellen | gebaut |
 | Communities | Communities | `kooperieren.communities` | `#communities` | – | kooperieren | gebaut |
-| Personen | Personen | `kooperieren.personen` | noch kein Ziel (Hinweis per Toast) | – | kooperieren | folgt mit Issue „Personen-Ansicht und echte Profile“ (`693c69cc`) |
+| Personen | Personen | `kooperieren.personen` | `#kooperieren/personen` | – | kooperieren | gebaut |
 | Lerninhalte | Lerninhalte | `veroeffentlichen.lerninhalte` | `#materialpool` mit Editor darüber | Materialpool | veröffentlichen | gebaut |
 | Termin | Termin | `veroeffentlichen.termin` | Editor für Termine | – | veröffentlichen | gebaut |
 | Beitrag | Beitrag | `veroeffentlichen.beitrag` | Editor für Beiträge | – | veröffentlichen | gebaut |
