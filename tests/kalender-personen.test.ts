@@ -41,3 +41,25 @@ Deno.test('kalLaden: eine Abfrage für Kalender und rpi-virtuell, feste Quellen'
   assert(new Set(t.match(/npub1[0-9a-z]{58}/g) || []).size >= 14, 'Schnappschuss kennt alle Quellen');
   assert(/#finden\/fortbildungen/.test(await Deno.readTextFile(new URL('../docs/navigation.md', import.meta.url))));
 });
+
+Deno.test('profilAus: maskiert, sichere Adressen, Bots erkannt', () => {
+  const pa = bau('profilAus', block(/  function bech32\([^)]*\) \{[\s\S]*?\n  \}/));
+  const ev = (c: unknown) => ({ pubkey: 'ab'.repeat(32), content: typeof c === 'string' ? c : JSON.stringify(c), tags: [] });
+  const p = pa(ev({ name: '<b>Ada</b>', about: 'x'.repeat(400), picture: 'data:image/png;base64,AAA', website: 'https://ada.example', nip05: 'ada@example.org', bot: true }));
+  assert(p.name === '&lt;b&gt;Ada&lt;/b&gt;' && p.about.length <= 162 && p.bild === '' && p.web === 'https://ada.example' && p.nip05 === 'ada@example.org' && p.bot === true && /^npub1/.test(p.npub));
+  assertEquals(pa(ev('{kaputt')), null); assertEquals(pa(ev({ about: 'ohne Namen' })), null);
+  assertEquals(pa(ev({ name: 'A', nip05: 'kein mail' })).nip05, '');
+});
+
+Deno.test('peLaden: zwei Abfragen, feste Autoren; Personen und Person: Rückfall Teamseite, Folgen deaktiviert', () => {
+  const l = block(/function peLaden\(\)[\s\S]*?\n  \}/);
+  assert(/hubFetch\('personen', \[\{ kinds: \[30000\], authors: PERSONEN_LISTE\.autoren, '#d': \[PERSONEN_LISTE\.d\]/.test(l), 'Liste nur von festen Autoren');
+  assert(/hubFetch\('personen:profile'/.test(l) && /kinds: \[0\]/.test(l) && /'#d': \['communities'\]/.test(l) && (l.match(/hubFetch\(/g) || []).length === 2, 'zweite Abfrage abhängig, keine dritte');
+  assert(/istHex64\(/.test(l) && /150/.test(l), 'Schlüssel geprüft, gedeckelt');
+  const r = block(/function peRender\(daten\)[\s\S]*?\n  \}/);
+  assert(/OC_TEAM/.test(r) && /noch nicht angelegt/.test(r) && /antworten gerade nicht/.test(r) && /disabled aria-disabled="true"/.test(r) && /\.bot/.test(r), 'Zustände, Teamseite, Folgen, Bots');
+  const o = block(/function prOpen\(qs\)[\s\S]*?\n  \}/);
+  assert(/npubToHex\(/.test(o) && /kinds: \[30142, 30023, 31923\]/.test(o) && /Kein gültiges Profil/.test(o), 'Profilseite');
+  assert(/id="v-personen" data-stand="stand:04\.11\.2026/.test(html) && /id="v-person" data-stand="nachbau:/.test(html), 'Ansichten mit Stand');
+  assert(/'kooperieren\.personen': 'kooperieren\/personen'/.test(s) && /'person'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'Konsole und Route');
+});
