@@ -120,6 +120,7 @@ Deno.test('relilab als Labor: Kriterien, Trias, Menschen nur mit Profil', () => 
   assert(k.includes('offen ohne Anmeldung') && k.includes('Ergebnisse unter freier Lizenz') && (k.match(/'/g) || []).length === 14, 'sieben Kriterien');
   const l = fn('rlLaden');
   assert(/coLaden\(RL_HEX\)/.test(l) && /terminLogik\(/.test(l) && /hubFetch\('relilab:menschen', \[\{ kinds: \[0\], authors:/.test(l) && (l.match(/hubFetch\(/g) || []).length === 1 && /\.bot/.test(l), 'Quellen und eine Nachfrage');
+  assert(/!CO_SCHLUESSEL\.some\(c => c\.hex === pk\) && !KAL_HEX\.has\(pk\)/.test(l), 'Funktionsschlüssel (Community, Kalenderquellen) sind keine Menschen');
   const h = fn('rlHome');
   assert(/Materialien/.test(h) && /Menschen/.test(h) && /Mitmachen/.test(h) && /#person\?p=/.test(h) && /zu=katalog/.test(h) && /logik=labor/.test(h) && /esc\(/.test(h), 'drei Spalten mit Links');
   assert(/data-rlsec="mitmachen"/.test(html) && /pkRender\(/.test(fn('rlShow')), 'Raum im relilab-Rahmen');

@@ -4583,7 +4583,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   const RL_KRITERIEN = ['offen ohne Anmeldung', 'kostenfrei', 'online', 'kurzer Impuls, dann Werkstatt', 'Unfertiges darf vorgestellt werden', 'Ergebnisse unter freier Lizenz', 'bundesland- und religionsübergreifend'];
   let rlDaten = null, rlLauf = null;   // Antwort (gehalten, wenn Relays geantwortet haben), laufende Abfrage
   /** Inhalte des Labors einmal je Sitzung: Materialien und Beiträge aus der Community relilab, bevorstehende Labortermine (höchstens 6, `termineZahl` zählt alle),
-   *  Menschen = Autoren der Inhalte ohne die Community-Schlüssel, nur mit Profil (kind 0 mit Namen), keine Bots; wer in der Personen-Liste steht, zuerst. Eine Profilabfrage für fehlende Profile. */
+   *  Menschen = Autoren der Inhalte ohne die Community-Schlüssel und die Kalenderquellen (KAL_HEX), nur mit Profil (kind 0 mit Namen), keine Bots; wer in der Personen-Liste steht, zuerst. Eine Profilabfrage für fehlende Profile. */
   function rlLaden() {
     if (rlDaten) return Promise.resolve(rlDaten);
     if (rlLauf) return rlLauf;
@@ -4595,7 +4595,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
         const materialien = mit.filter(e => e.ev.kind === 30142), beitraege = mit.filter(e => e.ev.kind === 30023);
         const alle = kal.filter(ev => ev && istHex64(ev.pubkey) && terminLogik(ev) === 'labor').map(evToTermin).filter(t => t.s >= jetzt).sort((a, b) => a.s - b.s);
         const zahl = new Map(), liste = new Set((peDaten && peDaten.pks) || []);
-        mit.forEach(e => { const pk = e.ev.pubkey; if (istHex64(pk) && !CO_SCHLUESSEL.some(c => c.hex === pk)) zahl.set(pk, (zahl.get(pk) || 0) + 1); });
+        mit.forEach(e => { const pk = e.ev.pubkey; if (istHex64(pk) && !CO_SCHLUESSEL.some(c => c.hex === pk) && !KAL_HEX.has(pk)) zahl.set(pk, (zahl.get(pk) || 0) + 1); });
         const schluessel = [...zahl.keys()].sort((a, b) => liste.has(b) - liste.has(a) || zahl.get(b) - zahl.get(a)).slice(0, 40);
         const profile = new Map();
         schluessel.forEach(h => { const pr = bzProfil(h); if (pr) profile.set(h, pr); });
