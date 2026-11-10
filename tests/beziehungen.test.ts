@@ -48,3 +48,25 @@ Deno.test('bzNachbarn und bzPunkte', () => {
   assertEquals(nb(kanten, ents, 'p:a', null).length, 2);
   assertEquals(pt(ents, kanten, 'p:a', null), 4); assertEquals(pt(ents, kanten, 'p:a', 'a'), 104); assertEquals(pt(ents, kanten, 'c:b', null), 1); assertEquals(pt(ents, kanten, 'm:x', null), 0);
 });
+
+Deno.test('Ökosystem: Ansicht, Route, drei Zustände, Karten maskiert', () => {
+  assert(/id="v-oekosystem" data-stand="nachbau:/.test(html), 'Ansicht mit Stand-Zeile');
+  assert(/'oekosystem'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)) && /ozOpen\(/.test(s), 'Route');
+  const o = fn('ozOpen');
+  assert(/bzLaden\(\)/.test(o) && /bzBauen\(bzQuellen\(\)\)/.test(o + fn('ozBauen')) && /Stand vom/.test(o + fn('datenstand')) && /ohne Rollenprüfung/.test(o) && /können gerade nicht geladen werden/.test(o), 'Zustände');
+  const k = fn('ozKarte');
+  assert(/esc\(/.test(k) && /sichereUrl\(/.test(k) && /kurzHash\(/.test(k) && /aria-pressed/.test(k) && /Das bist du/.test(k), 'Karte');
+  assert(/function ozSichtbar\(ent\)/.test(s) && /HUB_C/.test(fn('ozSichtbar')), 'Sichtbarkeit kennt den Zuschnitt');
+  assert(/'hub\.home': \{[^}]*#oekosystem/.test(s), 'Konsole: Home führt ins Ökosystem');
+});
+
+Deno.test('Communities live: cyAus, Partnerkacheln, RpiCommunity ausgeblendet', () => {
+  const ca = bau('cyAus', "const C = { kooperieren: '#000' }; const kurzHash = () => 'abcd1234';");
+  const ev = { kind: 10222, pubkey: 'ab'.repeat(32), created_at: 1, tags: [['r', 'wss://relay.edufeed.org']] };
+  const c = ca(ev, { name: '<b>Kreis</b>', about: 'x'.repeat(200), picture: 'javascript:x' });
+  assertEquals(c.hex, 'ab'.repeat(32)); assertEquals(c.n, '<b>Kreis</b>'); assert(c.bio.length <= 92 && c.bild === '' && c.live === true);
+  const cy = fn('cyRender');
+  assert(/cy-partner/.test(cy) && /Partner ohne eigenen Schlüssel/.test(cy), 'Partnerkacheln');
+  assert(/npub1gc2zfp/.test(s) && /ausgeblendet|RpiCommunity/.test(block(/const CY_HEX[\s\S]*?\n  \]\)?;/) + fn('cyLaden')), 'RpiCommunity ausgeblendet');
+  assert(html.includes('id="v-communities" data-stand="stand:26.10.2026 · Texte teils Beispiel"'), 'Startwert bleibt');
+});

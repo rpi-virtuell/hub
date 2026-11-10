@@ -27,7 +27,8 @@ Jede Ansicht außer der Startseite trägt direkt unter ihrer Kopfzeile eine Stan
 | Ansicht | Startwert | Datenquelle |
 |---|---|---|
 | `v-profil` | Nachbau · Persona Luca Beispiel | keine, Persona |
-| `v-communities` | Stand vom 26.10.2026 · Texte teils Beispiel | eingebettete Liste realer Communities, Beschreibungen teils Beispieltext |
+| `v-communities` | Stand vom 26.10.2026 · Texte teils Beispiel → live | eingebettete Liste, dann `cyLaden()` (Konten mit `kind:10222` aus `bzLaden()`); „live · <n> Communities · <m> Partner ohne Schlüssel“ |
+| `v-oekosystem` | Nachbau · Gefüge laden → Stand vom (jüngstes Schnappschuss-Datum) → live | Schnappschüsse (`MP`, `RT_RAW`, `OC_RAW`, `CY`) ohne Kanten, dann `bzLaden()` und die Caches der anderen Ansichten |
 | `v-community` | Nachbau · Beispielinhalte | Beispielinhalte (Beiträge, Chat), keine Datenquelle |
 | `v-materialpool` | Stand vom 22.10.2026 → live | eingebettete Liste (`MP`), dann `mpLaden()` |
 | `v-relilab` | Stand vom `RT_STAND` → live | Schnappschuss, dann `hubFetch('relilab-termine', …)` |
@@ -200,7 +201,7 @@ Offen: Der Link „Bei edufeed ansehen“ (`https://edufeed.org/<npub>`) steht n
 
 ## Beziehungsgefüge
 
-Das Beziehungsgefüge verbindet Personen, Communities, Materialien und Beiträge sowie Termine zu einem Graphen (Entitäten `p:<hex>`, `c:<hex>`, `m:<kind>:<pk>:<d>`, `e:<kind>:<pk>:<d>`; Kanten ungerichtet). Es hat keine eigene Ansicht, spätere Ansichten lesen es.
+Das Beziehungsgefüge verbindet Personen, Communities, Materialien und Beiträge sowie Termine zu einem Graphen (Entitäten `p:<hex>`, `c:<hex>`, `m:<kind>:<pk>:<d>`, `e:<kind>:<pk>:<d>`; Kanten ungerichtet). Verbraucher sind die Ansicht Ökosystem und die Communities-Liste (unten); weitere Ansichten lesen es.
 
 **Quellen aus den Caches:** `bzQuellen()` sammelt ohne Netz, was die anderen Ansichten schon geholt haben: Materialpool (`mpDaten`), Beiträge, Seiten und Termine der Schaufenster-Schlüssel (`ocDaten`), die direkten Inhalte und Reposts je Community (`coLaden`), die Termine des Kalenders (`kalLaden`) und die Personen-Liste (`peDaten`). Fehlende Caches ergeben leere Listen.
 
@@ -223,6 +224,28 @@ Das Ziel von Zusage und Reaktion ist der erste gültige `a`-Tag, sonst der erste
 **Regel ohne Rollenprüfung:** Kanten aus `h`-Tags gelten wie „geteilt“, ohne Rollenprüfung; das Gruppen-Relay wird nie gelesen. Mitgliedschaft allein macht niemanden in der Personen-Ansicht sichtbar.
 
 **Grenze:** Zusagen und Reaktionen sind nur die neuesten 200 je Art; ältere Beziehungen fehlen im Gefüge.
+
+### Verbraucher: Ökosystem
+
+`#oekosystem?wahl=<id>&reihen=person,event,community,material` zeigt vier Reihen (Menschen, Termine, Communities, Materialien). `wahl` ist eine Entitäts-ID des Gefüges (maskiert mit `encodeURIComponent`), `reihen` die Reihenfolge der vier Reihen; Tauschknöpfe zwischen den Reihen und die Auswahl schreiben beides in die Route (ohne nach oben zu springen).
+
+`ozOpen(qs)` zeigt sofort die Schnappschuss-Einträge (Materialien `MP`, Termine `RT_RAW`, Beiträge `OC_RAW`, Communities `CY`) ohne Kanten und ohne Personen, mit `Stand vom <jüngstes Datum>`. Dann läuft `Promise.all([mpLaden(), ocLaden(), kalLaden(), peLaden(), bzLaden(), …coLaden(<die fünf Schlüssel>)])`, danach `cyLaden()` (eine abhängige Nachfrage nach den Profilen der übrigen Community-Konten) und `bzBauen(bzQuellen())`. Neu geholt wird nur die Abfrage `beziehungen` (eine Verbindung je Relay); alles andere kommt aus den Caches der anderen Ansichten. Ein Lauf-Zähler verwirft späte Antworten.
+
+| Zustand | Stand-Zeile | Hinweis |
+| --- | --- | --- |
+| vor der Antwort | `Stand vom <Datum>` | „Verbindungen werden geladen …“ |
+| Antwort von `bzLaden` | `live · <n> Einträge · <k> Kanten · ohne Rollenprüfung` | – |
+| keine Antwort | `Stand vom <Datum>` | „Verbindungen können gerade nicht geladen werden“, Schnappschuss ohne Kanten bleibt |
+
+**Sichtbarkeit** (`ozSichtbar`): Personen nur mit Profilname und mindestens einer Kante (oder als der Angemeldete); Communities immer; Termine nur, wenn Ende oder Beginn nicht älter als ein Tag sind; Beiträge (`kind:30023`) nur mit Community-Bezug (eigene Kante oder Kante des Autors) oder mit Autor in der Personen-Liste; bei gesetztem Zuschnitt `HUB_C` nur Einträge mit Kante zu dieser Community oder von einem Autor mit dieser Kante. Profile kommen aus `bzProfil` (Personen-Ansicht, Beziehungsabfrage, Community-Konten); Personen, deren Profil keine der Quellen trägt, bleiben unsichtbar. Bilder nur über `sichereUrl`, alle Texte über `esc`.
+
+**Reihen** (`ozReihe(i)`): ohne Auswahl Personen und Communities nach `bzPunkte`, Termine und Materialien mit Community-Bezug zuerst, dann Datum (Termine aufsteigend, Materialien absteigend), höchstens 80 je Reihe; mit Auswahl in den anderen Reihen die Nachbarn vom Typ der Reihe („<n> verbunden mit „<Name>““ oder „Keine Verbindung zu „<Name>““), in der Reihe ihres Typs als Fokuskarte. Die Auswahlzeile (`#ozAuswahl`) nennt Typ und Name, verlinkt „Bei edufeed ansehen ›“ und hebt die Auswahl mit ✕ oder Escape auf.
+
+### Verbraucher: Communities (live)
+
+`cyLaden()` liest einmal je Sitzung aus `bzDaten.communities` (`kind:10222`) und `bzDaten.profile`; Konten ohne Profil in der Antwort holt eine abhängige Nachfrage (`communities:profile`, nur `authors`). `cyAus(ev, profil)` macht daraus einen Eintrag (`id` = Hex-Präfix 8, `hex`, Name und Beschreibung roh, Bild nur über `sichereUrl`, Mitglieder aus dem Gefüge). Bekannte Schlüssel (`CY_HEX`, Hex → Kennung) behalten die Kennung der eingebetteten Karte, damit `#community?c=<id>` weiter gilt; die RpiCommunity ist ausgeblendet (Entscheidung 04.11.2026), der Schaufenster-Schlüssel `oercommunity` hat keine `10222` und bleibt eingebettet.
+
+`cyRender()` zeigt die Live-Einträge nach Mitgliederzahl, dahinter die eingebetteten Einträge ohne Schlüssel als Partnerkacheln (`cy-partner`, Hinweis „Partner ohne eigenen Schlüssel im Datenraum“, ohne Folgen-, Raum- und Katalog-Knopf). Stand-Zeile: `live · <n> Communities · <m> Partner ohne Schlüssel`; ohne Antwort bleibt der eingebettete Stand vom 26.10.2026. Live-Communities ohne eigene Karte im Hub öffnen im Ökosystem (`#oekosystem?wahl=c:<hex>`).
 
 ## Schnappschuss erneuern
 
