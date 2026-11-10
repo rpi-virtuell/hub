@@ -4144,6 +4144,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     sec.querySelector('[data-hinweis]').innerHTML = t.hinweis; sec.querySelector('.oz-fokus').innerHTML = t.fokus; sec.querySelector('.oz-spur').innerHTML = t.spur;
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && ozWahl && document.getElementById('v-oekosystem').classList.contains('on')) ozWaehlen(''); });
+  document.getElementById('v-oekosystem').addEventListener('focusout', () => {   // zurückgestelltes Neuzeichnen, wenn der Fokus das Ökosystem verlässt
+    if (ozVeraltet) setTimeout(() => { if (ozVeraltet) ozNachzeichnen(); }, 0);   // prüft selbst, ob jetzt ein Feld darin den Fokus hat
+  });
 
   // ---------- Mitmachen (ADR-0009): Aktivitätsprotokoll und Gespräche, Farbe „kooperieren“ ----------
   // Das Protokoll sagt in Sätzen, was im Ökosystem geschieht (Anlegen, Teilen, Zusagen, Reaktionen, Kommentare, kurze Beiträge). Quellen: alle Events von bzQuellen, die Abfrage `mitmachen`
@@ -4153,7 +4156,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   let pkDaten = null, pkLauf = null;   // Antwort der Abfrage `mitmachen` (gehalten, wenn nicht leer), laufende Abfrage
   let pkListe = [], pkG = null, pkGeladen = false, pkSub = null, pkVerbunden = 0, pkWurzel = null, pkC = '', pkLaufNr = 0;
   const pkNeu = [], pkMarke = new Map(), pkGesehen = new Set(), pkHoerer = new WeakSet();   // gesammelte Live-Events, Ankunftszeit der neuen Einträge, schon gesehene Live-IDs, Wurzeln mit Auswahl-Hörer
-  let pkTimer = null;
+  let pkTimer = null, ozVeraltet = false;   // Bündel-Timer; Ökosystem wartet auf Neuzeichnen, weil ein Eingabefeld darin den Fokus hatte
+  const PK_MAX = 500;   // höchstens so viele fremde Live-Events und gesehene Kennungen
   /** Kommentare (NIP-22) zu Materialien, Beiträgen und Terminen und kurze Beiträge der fünf Hub-Communities; einmal je Sitzung, ohne Antwort `antwort: false` */
   function pkLaden() {
     if (pkDaten) return Promise.resolve(pkDaten);
@@ -4253,17 +4257,58 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     }
     pkListe = liste.sort((a, b) => b.zeit - a.zeit);
   }
+  /** Kann ein Live-Event einen Protokolleintrag oder eine Kante ergeben? `g`: aktuelles Gefüge { ents, kanten } oder null (dann wird das Ziel noch nicht geprüft, die Kappung begrenzt); `comm`: Set bekannter Community-Schlüssel. Rein bis auf den Index `g.byId`, den auch pkEintrag nutzt. */
+  function pkBrauchbar(ev, g, comm) {
+    if (!ev || typeof ev.id !== 'string' || !istHex64(ev.pubkey) || !Array.isArray(ev.tags)) return false;
+    const k = ev.kind, text = String(ev.content || '').trim();
+    if (k === 30142 || k === 30023 || k === 31922 || k === 31923) return !!tagWert(ev, 'd');
+    if (k === 1) return !!text && tagWerte(ev, 'h').some(h => comm.has(h));
+    if (k === 30000) return tagWert(ev, 'd') === 'communities' && tagWerte(ev, 'p').some(h => comm.has(h));
+    if (![6, 16, 7, 31925, 1111].includes(k) || (k === 1111 && !text)) return false;
+    if (!g) return true;
+    const byId = g.byId || (g.byId = new Map([...g.ents.values()].filter(e => e.ev && e.ev.id).map(e => [e.ev.id, e.id])));
+    const adr = (kind, w) => g.ents.has(([30142, 30023].includes(kind) ? 'm:' : 'e:') + w);
+    if (k === 6 || k === 16) { const r = repostZiel(ev); return !!r && (r.id ? byId.has(r.id) : adr(r.kind, r.adr)); }
+    return [...tagWerte(ev, 'a'), ...tagWerte(ev, 'A')].some(w => { const a = aTagLesen(w); return !!a && adr(a.kind, w); })
+      || [...tagWerte(ev, 'e'), ...tagWerte(ev, 'E')].some(i => istHex64(i) && byId.has(i));
+  }
+  /** Hält die Live-Quellen klein: in `liste` höchstens `max` Events (die ältesten fremden gehen zuerst, eigene des Angemeldeten `ich` bleiben), in `gesehen` höchstens `max` Kennungen (älteste zuerst); Marken entfallen mit ihrem Event. Ändert nur die übergebenen Behälter. */
+  function pkKappen(liste, gesehen, marke, max, ich) {
+    let zuViel = liste.length - max;
+    if (zuViel > 0) {
+      const raus = new Set();
+      for (const ev of liste) { if (zuViel <= 0) break; if (ev.pubkey !== ich) { raus.add(ev); zuViel--; } }
+      const bleibt = liste.filter(ev => !raus.has(ev)); liste.length = 0; liste.push(...bleibt);
+      raus.forEach(ev => marke.delete(ev.id));
+    }
+    for (const id of gesehen) { if (gesehen.size <= max) break; gesehen.delete(id); }
+  }
+  /** Ein Event der Subscription: nur, was im Protokoll oder als Kante erscheinen kann (pkBrauchbar), einmal je Kennung; gebündelt nach 600 ms */
   function pkLiveEvent(ev) {
     if (!ev || !ev.id || pkGesehen.has(ev.id)) return;
+    const comm = new Set([...CO_SCHLUESSEL.map(c => c.hex), ...(bzDaten ? bzDaten.communities.map(e => e.pubkey) : [])]);
+    if (!pkBrauchbar(ev, pkG || (ozLive ? ozGefuege : null), comm)) return;
     pkGesehen.add(ev.id); pkNeu.push(ev);
     if (!pkTimer) pkTimer = setTimeout(pkBuendeln, 600);
   }
-  /** Gesammelte Live-Events nach 600 ms zusammen nachtragen: Gefüge neu bauen, Ökosystem und Mitmachen zeichnen */
+  /** Maß eines Gefüges für „hat sich geändert“: Zahl der Einträge und der Kanten */
+  function bzMass(g) {
+    return g ? g.ents.size + ':' + [...g.kanten.values()].reduce((a, s) => a + s.size, 0) : '';
+  }
+  /** Ökosystem zeichnen, wenn es offen ist und kein Eingabefeld darin den Fokus hat; sonst beim Verlassen des Felds nachholen */
+  function ozNachzeichnen() {
+    const v = document.getElementById('v-oekosystem'), a = document.activeElement;
+    if (!v.classList.contains('on')) { ozVeraltet = false; return; }
+    if (a && v.contains(a) && a.matches('input, select, textarea')) { ozVeraltet = true; return; }
+    ozVeraltet = false; ozRender();
+  }
+  /** Gesammelte Live-Events nach 600 ms zusammen nachtragen (gekappt): Gefüge neu bauen, das Ökosystem nur bei geändertem Gefüge neu zeichnen, Mitmachen neu */
   function pkBuendeln() {
     pkTimer = null;
     const neu = pkNeu.splice(0); pkLive.push(...neu); neu.forEach(ev => pkMarke.set(ev.id, Date.now()));
-    if (!pkGeladen) return;   // vor dem Laden trägt pkBerechnen sie ein
-    if (ozLive) { ozBauen(); if (document.getElementById('v-oekosystem').classList.contains('on')) ozRender(); }
+    pkKappen(pkLive, pkGesehen, pkMarke, PK_MAX, ICH.hex);
+    if (!pkGeladen || !neu.length) return;   // vor dem Laden trägt pkBerechnen sie ein
+    if (ozLive) { const vorher = bzMass(ozGefuege); ozBauen(); if (bzMass(ozGefuege) !== vorher) ozNachzeichnen(); }
     pkBerechnen(); pkAktualisieren();
   }
   /** Die eine dauerhafte Subscription der Sitzung (je Relay eine Verbindung, nur neue Events) */

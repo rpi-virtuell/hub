@@ -107,6 +107,35 @@ Deno.test('pkEintrag: Sätze je Kind, Kommentar als Text, ohne Ziel null', () =>
   assert(r && /geteilt/.test(r.html) && r.bezug.includes('c:' + C) && r.bezug.includes('p:' + A), 'Repost mit Community');
 });
 
+Deno.test('Protokoll live: nur Brauchbares, gekappt, Ökosystem nur bei geändertem Gefüge', () => {
+  const pb = bau('pkBrauchbar', fn('aTagLesen') + fn('repostZiel'));
+  const A = 'aa'.repeat(32), C = 'cc'.repeat(32), F = '99'.repeat(32), M = 'dd'.repeat(32), comm = new Set([C]);
+  const g = { ents: new Map([[`m:30142:${A}:m1`, { id: `m:30142:${A}:m1`, typ: 'material', pk: A, ev: { id: M, kind: 30142, pubkey: A, tags: [['d', 'm1']] } }], ['c:' + C, { id: 'c:' + C, typ: 'community', pk: C }]]), kanten: new Map() };
+  const ev = (kind: number, tags: string[][], content = 'x', id = 'e' + Math.random()) => ({ id, kind, pubkey: A, created_at: 1, content, tags });
+  assert(pb(ev(1, [['h', C]]), g, comm), 'kind 1 in bekannter Community');
+  assert(!pb(ev(1, []), g, comm) && !pb(ev(1, [['h', F]]), g, comm) && !pb(ev(1, [['h', C]], '  '), g, comm), 'kind 1 ohne bekannte Community oder ohne Text fällt weg');
+  assert(!pb(ev(4, [['h', C]]), g, comm) && !pb(ev(30001, [['d', 'x']]), g, comm), 'Kinds, die das Protokoll nicht zeigt');
+  assert(pb(ev(7, [['e', M]], '+'), g, comm) && pb(ev(7, [['a', `30142:${A}:m1`]], '+'), g, comm), 'Reaktion auf bekanntes Ziel');
+  assert(!pb(ev(7, [['e', 'ff'.repeat(32)]], '+'), g, comm) && !pb(ev(31925, [['a', `31923:${A}:t9`], ['status', 'accepted']]), g, comm), 'Reaktion und Zusage ohne bekanntes Ziel fallen weg');
+  assert(pb(ev(1111, [['A', `30142:${A}:m1`]], 'gut'), g, comm) && !pb(ev(1111, [['A', `30142:${A}:m1`]], ''), g, comm), 'Kommentar nur mit Ziel und Text');
+  assert(pb(ev(16, [['a', `30142:${A}:m1`], ['h', C]]), g, comm) && !pb(ev(16, [['e', 'ff'.repeat(32)]]), g, comm), 'Repost nur mit bekanntem Ziel');
+  assert(pb(ev(30000, [['d', 'communities'], ['p', C]]), g, comm) && !pb(ev(30000, [['d', 'communities'], ['p', F]]), g, comm) && !pb(ev(30000, [['d', 'andere'], ['p', C]]), g, comm), 'Beitritt nur zu bekannter Community');
+  assert(pb(ev(30142, [['d', 'neu']]), g, comm) && !pb(ev(30142, []), g, comm), 'eigene Inhalte mit d');
+  assert(pb(ev(7, [['e', 'ff'.repeat(32)]], '+'), null, comm), 'vor dem ersten Gefüge zählt nur die Form');
+  const kap = bau('pkKappen'), ich = 'ee'.repeat(32);
+  const liste = Array.from({ length: 700 }, (_, i) => ({ id: 'i' + i, pubkey: i === 3 ? ich : A })), gesehen = new Set(liste.map((e) => e.id)), marke = new Map(liste.map((e) => [e.id, 1]));
+  kap(liste, gesehen, marke, 500, ich);
+  assertEquals(liste.length, 500); assert(liste.some((e) => e.id === 'i3'), 'eigenes Event bleibt');
+  assertEquals(liste[1].id, 'i201', 'die ältesten fremden gehen zuerst'); assertEquals(liste.at(-1)!.id, 'i699');
+  assertEquals(gesehen.size, 500); assert(gesehen.has('i699') && !gesehen.has('i0'), 'gesehene Kennungen: älteste hinaus');
+  assert(!marke.has('i0') && marke.has('i699'), 'Marken mit ihrem Event');
+  const le = fn('pkLiveEvent'), bu = fn('pkBuendeln'), nz = fn('ozNachzeichnen');
+  assert(/pkBrauchbar\(ev, /.test(le) && le.indexOf('pkBrauchbar') < le.indexOf('pkNeu.push'), 'pkLiveEvent verwirft vor dem Sammeln');
+  assert(/pkKappen\(pkLive, pkGesehen, pkMarke, PK_MAX, ICH\.hex\)/.test(bu) && /const PK_MAX = 500/.test(s), 'pkBuendeln kappt');
+  assert(/bzMass\(ozGefuege\) !== vorher\) ozNachzeichnen\(\)/.test(bu) && !/ozRender\(\)/.test(bu), 'Ökosystem nur bei geändertem Gefüge');
+  assert(/input, select, textarea/.test(nz) && /ozVeraltet = true/.test(nz), 'nicht bei Fokus in einem Eingabefeld');
+});
+
 Deno.test('Mitmachen: Ansicht, Abfrage, Zustände, Protokoll im Ökosystem', () => {
   assert(/id="v-mitmachen" data-stand="nachbau:/.test(html) && /'mitmachen'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'Ansicht und Route');
   const l = fn('pkLaden');
