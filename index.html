@@ -757,6 +757,32 @@ relihub-steuerkonsole[hidden]{display:none}
 @media (prefers-reduced-motion:reduce){.cy-in{transition:none}}
 @media (max-width:640px){.cy-bar input{margin-left:0;width:100%}.cy-head h1{font-size:38px}}
 
+/* ---------- Mitmachen: Protokoll und Gespräche (ADR-0009); Farbe „kooperieren“ ---------- */
+.pk-wrap{max-width:1180px;margin:0 auto;padding:6px clamp(16px,4vw,40px) 70px}
+.pk-wrap h1{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:46px;line-height:1;margin:10px 0 8px}
+.pk-wrap h2,.pk-streifen h2{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:26px;line-height:1.1;margin:0 0 8px}
+.pk-wrap h3{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:19px;margin:0 0 6px}
+.pk-sub{margin:0 0 14px;color:var(--muted);max-width:62ch}
+.pk-wahl{display:inline-flex;align-items:center;gap:8px;margin:0 0 18px;font-size:15px;font-weight:600;color:var(--oz-text)}
+.pk-wahl select{font:inherit;font-size:15px;border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;background:var(--card);color:var(--ink)}
+.pk-wahl select:focus-visible,.pk-wrap a:focus-visible,.pk-streifen a:focus-visible{outline:3px solid var(--c-hub);outline-offset:2px}
+.pk-spalten{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:26px;align-items:start}
+.pk-liste{list-style:none;margin:0;padding:0}
+.pk-zeile{display:flex;gap:12px;align-items:baseline;padding:8px 10px;border-bottom:1px solid var(--line);font-size:15px;line-height:1.4;overflow-wrap:anywhere}
+.pk-zeile.neu{background:var(--oz-hell);color:var(--oz-text);border-radius:10px}
+.pk-zeit{flex:0 0 auto;min-width:6.5em;font-size:13px;color:var(--muted)}
+.pk-zeile.neu .pk-zeit{color:var(--oz-text)}
+.pk-satz a,.pk-kommentar a,.pk-leer a,.pk-streifen p a{color:var(--oz-text);font-weight:600}
+.pk-gruppe{margin:0 0 20px}
+.pk-gruppe ul{list-style:none;margin:8px 0 0;padding:0}
+.pk-kommentar{padding:8px 0 8px 12px;border-left:3px solid var(--oz-hell)}
+.pk-kommentar p{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.pk-in{font-size:12.5px;font-weight:600;color:var(--oz-text);background:var(--oz-hell);border-radius:999px;padding:2px 9px}
+.pk-leer{margin:0;padding:12px 0;color:var(--muted);font-size:15px}
+.pk-streifen{margin:6px 0 20px}
+.pk-streifen[hidden]{display:none}
+@media (max-width:760px){.pk-spalten{grid-template-columns:minmax(0,1fr)}.pk-wrap h1{font-size:38px}.pk-zeile{flex-direction:column;gap:2px}}
+
 /* ---------- Ökosystem: Explorer mit vier Reihen (ADR-0009); Farbe „kooperieren“ ---------- */
 .oz-wrap{max-width:1180px;margin:0 auto;padding:6px clamp(16px,4vw,40px) 70px}
 .oz-wrap h1{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:46px;line-height:1;margin:10px 0 8px}
@@ -1179,9 +1205,23 @@ a.kat-card:hover{border-color:var(--c-koop)}
     <p class="oz-meldung" id="ozMeldung" role="status"></p>
     <div class="oz-auswahl" id="ozAuswahl" hidden></div>
     <div id="ozReihen"></div>
+    <section class="pk-streifen" id="ozProtokoll" aria-label="Was gerade passiert" hidden></section>
   </main>
   <footer class="hub-foot"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> reli_hub · ein Vorhaben von FOERBICO · Prototyp</footer>
   <relihub-steuerkonsole id="ozFlower" floating size="58" popover-size="210" context="hub-communities"></relihub-steuerkonsole>
+</div>
+
+<!-- ===================== Ansicht: Mitmachen (Aktivitätsprotokoll, ADR-0009) ===================== -->
+<div class="view" id="v-mitmachen" data-stand="nachbau:Protokoll verbinden">
+  <header class="hub-top">
+    <a class="brand" href="#start"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg>reli_hub</a>
+    <span class="sp"></span>
+    <nav><a href="#oekosystem">Ökosystem</a><a href="#communities">Communities</a><a class="btn btn-profil" href="#profil">Mein Profil</a></nav>
+  </header>
+  <p class="stand" aria-live="polite"></p>
+  <main class="pk-wrap" id="pkRoot"></main>
+  <footer class="hub-foot"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> reli_hub · ein Vorhaben von FOERBICO · Prototyp</footer>
+  <relihub-steuerkonsole id="pkFlower" floating size="58" popover-size="210" context="hub-communities"></relihub-steuerkonsole>
 </div>
 
 <!-- ===================== Ansicht 7: Community-Raum ===================== -->
@@ -2210,6 +2250,56 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       return events;
     });
   }
+  // Dauerhafte Subscription: nur das Aktivitätsprotokoll hält eine; je Relay höchstens eine Verbindung, nie für Listen oder Inhalte (docs/daten.md)
+  const hubAbos = new Map();   // Name → Halter { schliessen }
+  /** Öffnet je Relay eine Verbindung mit `REQ` (Filter plus `since` = jetzt); `opts.beiEvent(ev)`, `opts.beiStatus(n)` = Zahl verbundener Relays. Bei Abbruch Wiederverbinden nach 4000 · (Versuch + 1) ms, höchstens fünfmal je Relay. Derselbe Name ersetzt die vorige Subscription. */
+  function hubAbonnieren(name, filters, opts = {}) {
+    if (hubAbos.has(name)) hubAbos.get(name).schliessen();
+    const relays = [...new Set(opts.relays || ['wss://relay.edufeed.org', 'wss://relay-rpi.edufeed.org'])];
+    const sub = 'rh-' + Math.random().toString(36).slice(2, 10), seit = Math.floor(Date.now() / 1000);
+    const verbunden = new Set(), socks = new Set(), timer = new Set();
+    let zu = false;
+    const status = () => { try { if (opts.beiStatus) opts.beiStatus(verbunden.size); } catch (e) {} };
+    const oeffne = (url, versuch) => {
+      if (zu) return;
+      let ws, ende = false;
+      const abbruch = () => {   // onerror und onclose: nur einmal je Socket
+        if (ende) return; ende = true; socks.delete(ws);
+        if (verbunden.delete(url)) status();
+        if (zu || versuch >= 5) return;
+        const t = setTimeout(() => { timer.delete(t); oeffne(url, versuch + 1); }, 4000 * (versuch + 1)); timer.add(t);
+      };
+      try { ws = new WebSocket(url); } catch (e) { ende = false; abbruch(); return; }
+      socks.add(ws);
+      ws.onopen = () => {
+        if (zu) { try { ws.close(); } catch (e) {} return; }
+        try { ws.send(JSON.stringify(['REQ', sub, ...filters.map(f => Object.assign({}, f, { since: seit }))])); } catch (e) { return; }
+        verbunden.add(url); status();
+      };
+      ws.onmessage = m => {
+        if (zu) return;
+        let d; try { d = JSON.parse(m.data); } catch (e) { return; }
+        if (d[0] === 'EVENT' && d[1] === sub && d[2] && d[2].id) { try { if (opts.beiEvent) opts.beiEvent(d[2]); } catch (e) {} }
+        else if (d[0] === 'CLOSED' && d[1] === sub) { try { ws.close(); } catch (e) {} }
+      };
+      ws.onerror = ws.onclose = abbruch;
+    };
+    const halter = {
+      schliessen() {
+        zu = true; timer.forEach(t => clearTimeout(t)); timer.clear();
+        socks.forEach(w => { try { w.close(); } catch (e) {} }); socks.clear(); verbunden.clear();
+        if (hubAbos.get(name) === halter) hubAbos.delete(name);
+      }
+    };
+    hubAbos.set(name, halter);
+    relays.forEach(u => oeffne(u, 0));
+    return halter;
+  }
+  function hubAbbestellen(name) {
+    const h = hubAbos.get(name);
+    if (h) h.schliessen();
+    hubAbos.delete(name);
+  }
   /** Datenstand sichtbar machen (ADR-0006): zustand 'live' | 'stand' | 'nachbau' */
   function datenstand(viewId, zustand, info) {
     const p = document.querySelector('#' + viewId + ' .stand'); if (!p) return;
@@ -2522,6 +2612,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   const ICH = { hex: null, kann: false };   // Anmeldestand, gefüllt von der Anmeldung (Hex des Schlüssels, ob signiert werden kann)
   let ozGefuege = null, ozLive = false;   // Gefüge der Ökosystem-Ansicht { ents, kanten } und ob es vom Relay kommt
   const cyProfile = new Map();   // Profile (profilAus) der Community-Konten aus cyLaden
+  const pkLive = [];   // Events der Protokoll-Subscription (nur Live-Zugänge dieser Sitzung); bzQuellen trägt sie nach, bzDaten und coDaten bleiben unverändert
   /** Mitgliedschaften, Community-Konten, deren Profile, Zusagen und Reaktionen in einer Abfrage; einmal je Sitzung (leere Antwort wird nicht gehalten) */
   function bzLaden() {
     if (bzDaten) return Promise.resolve(bzDaten);
@@ -2566,13 +2657,13 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   /** Alles, was die Caches schon tragen, ohne Netz; fehlende Caches ergeben leere Listen */
   function bzQuellen() {
     const co = [...coDaten.values()].map(p => p.fertig).filter(Boolean), direkt = art => co.flatMap(d => d.direkt.filter(ev => art.includes(ev.kind)));
-    const oc = ocDaten, bz = bzDaten, liste = peDaten && peDaten.liste;
+    const oc = ocDaten, bz = bzDaten, liste = peDaten && peDaten.liste, live = art => pkLive.filter(ev => art.includes(ev.kind));
     return {
-      materialien: [...(mpDaten || []).map(m => m.ev), ...direkt([30142])],
-      beitraege: [...(oc ? [...oc.seiten.values(), ...oc.beitraege] : []), ...direkt([30023])],
-      termine: [...kalFertig, ...(oc ? oc.termine : []), ...direkt([31922, 31923])],
-      reposts: co.flatMap(d => d.reposts),
-      mitgliedschaften: bz ? bz.mitgliedschaften : [], zusagen: bz ? bz.zusagen : [], reaktionen: bz ? bz.reaktionen : [],
+      materialien: [...(mpDaten || []).map(m => m.ev), ...direkt([30142]), ...live([30142])],
+      beitraege: [...(oc ? [...oc.seiten.values(), ...oc.beitraege] : []), ...direkt([30023]), ...live([30023])],
+      termine: [...kalFertig, ...(oc ? oc.termine : []), ...direkt([31922, 31923]), ...live([31922, 31923])],
+      reposts: [...co.flatMap(d => d.reposts), ...live([6, 16])],
+      mitgliedschaften: [...(bz ? bz.mitgliedschaften : []), ...live([30000])], zusagen: [...(bz ? bz.zusagen : []), ...live([31925])], reaktionen: [...(bz ? bz.reaktionen : []), ...live([7])],
       personenListe: liste ? tagWerte(liste, 'p').filter(istHex64) : [],
       communities: [...new Set([...CO_SCHLUESSEL.map(c => c.hex), ...(bz ? bz.communities.map(ev => ev.pubkey) : [])].filter(istHex64))]
     };
@@ -2696,7 +2787,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     'erstellen': { fn:'erstellen', t:'Unterricht vorbereiten, Material entwickeln', p:'Allein am eigenen Schreibtisch oder gemeinsam im Labor: Hier wird aus Material Unterricht – und aus Ideen neues Material.', lock:true, subs:['erstellen.schreibtisch','erstellen.labor'] },
     'erstellen.schreibtisch': { fn:'erstellen › Schreibtisch', t:'Mein Schreibtisch', p:'Sammle Materialien auf deinem digitalen Schreibtisch, ordne sie, passe sie an und plane daraus deine nächste Lernsequenz.', lock:true, go:['Zum relidesk','#relidesk?tab=schreibtisch'] },
     'erstellen.labor': { fn:'erstellen › Labor', t:'Unser Labor', p:'Entwickle gemeinsam mit anderen Material weiter, erprobe Neues und hol dir Rückmeldung. Stelle Unfertiges vor und lade zum Mitmachen ein.', lock:true, go:['Ins relilab','#relilab'] },
-    'kooperieren': { fn:'kooperieren', t:'Mit anderen arbeiten', p:'Finde Menschen und Communities, mit denen du arbeiten möchtest – zu deinen Themen oder für deine Zielgruppe.', subs:['kooperieren.communities','kooperieren.personen'] },
+    'kooperieren': { fn:'kooperieren', t:'Mit anderen arbeiten', p:'Finde Menschen und Communities, mit denen du arbeiten möchtest – zu deinen Themen oder für deine Zielgruppe.', p2:'Was gerade besprochen wird, steht im Raum Mitmachen.', go2:['Raum Mitmachen','#mitmachen'], subs:['kooperieren.communities','kooperieren.personen'] },
     'kooperieren.communities': { fn:'kooperieren › Communities', t:'Communities', p:'Verschaffe dir einen Überblick über religionspädagogische Communities. Suche Verbündete, arbeite mit. Gründe deine eigene Community und suche Mitstreiter_innen.', go:['Communities entdecken','#communities'] },
     'kooperieren.personen': { fn:'kooperieren › Personen', t:'Personen', p:'Entdecke, wer zu deinen Themen arbeitet. Folge Profilen, nimm Kontakt auf – und werde selbst sichtbar.', go:['Personen entdecken','#kooperieren/personen'] },
     'veroeffentlichen': { fn:'veröffentlichen', t:'Zeigen, was du hast', p:'Du möchtest einen Lerninhalt im Materialpool anzeigen, eine Veranstaltung bewerben, einen Blogbeitrag veröffentlichen? Hier findest du die Werkzeuge dazu.', lock:true, subs:['veroeffentlichen.lerninhalte','veroeffentlichen.termin','veroeffentlichen.beitrag'] },
@@ -2741,7 +2832,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const btnStyle = `background:${col};color:${T[key]}`;
     const SUBL = { 'hub.profil':'mein Profil', 'hub.home':'Home', 'veroeffentlichen.lerninhalte':'Lerninhalte', 'veroeffentlichen.termin':'Termin', 'veroeffentlichen.beitrag':'Beitrag', 'finden.material':'Material', 'finden.fortbildungen':'Fortbildungen', 'finden.beitraege':'Beiträge', 'erstellen.schreibtisch':'Schreibtisch', 'erstellen.labor':'Labor', 'kooperieren.communities':'Communities', 'kooperieren.personen':'Personen' };
     const go = e.subs ? `<span class="hint">Weiter zu:</span>` + e.subs.map(x => `<button type="button" class="btn btn-ghost" data-ex="${x}" style="border-color:${col};color:${col}">${SUBL[x]} ›</button>`).join('') : e.go[1] && e.go[1][0] === '@' ? `<button type="button" class="btn" style="${btnStyle}" data-open="${e.go[1].slice(1)}">${e.go[0]} ›</button>` : e.go[1] ? `<a class="btn" style="${btnStyle}" href="${e.go[1]}">${e.go[0]} ›</a>` : `<a class="btn" style="${btnStyle}" href="#" data-todo="${e.go[0]}">${e.go[0]} ›</a>`;
-    exEl.innerHTML = `${icon(action)}<div><p class="fn" style="color:${col}">${e.fn}</p><h2>${e.t}</h2><p>${e.p}${e.p2 ? ` ${e.p2.replace(/Sammlung zusammenstellen/, `<a href="${e.go2[1]}" style="color:${col}">${e.go2[0]}</a>`)}` : ''}</p><div class="acts">${go}${e.lock ? '<span class="badge-lock">● mit Profil</span>' : ''}</div></div>`;
+    exEl.innerHTML = `${icon(action)}<div><p class="fn" style="color:${col}">${e.fn}</p><h2>${e.t}</h2><p>${e.p}${e.p2 ? ` ${e.p2.replace(e.go2[0], `<a href="${e.go2[1]}" style="color:${col}">${e.go2[0]}</a>`)}` : ''}</p><div class="acts">${go}${e.lock ? '<span class="badge-lock">● mit Profil</span>' : ''}</div></div>`;
     if (exEl.classList.contains('sheet')) exEl.insertAdjacentHTML('afterbegin', '<button type="button" class="sheet-x" data-sheet-close aria-label="Schließen">✕</button>');
     exEl.classList.remove('anim'); void exEl.offsetWidth; exEl.classList.add('anim');
   }
@@ -3880,6 +3971,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     document.getElementById('ozReihen').innerHTML = ozReihenFolge.map((_, i) => ozReihe(i)).join('');
     ozAuswahlRender();
     document.getElementById('ozMeldung').textContent = ozMeldung;
+    pkStreifen();
   }
   /** Route zur Auswahl und Reihenfolge schreiben, ohne nach oben zu springen */
   function ozRoute() {
@@ -3914,10 +4006,12 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       ozMeldung = '';
       datenstand('v-oekosystem', 'live', `${[...g.ents.values()].filter(ozSichtbar).length} Einträge · ${[...g.kanten.values()].reduce((a, s) => a + s.size, 0) / 2} Kanten · ohne Rollenprüfung`);
       ozRender();
+      pkAnstossen();
     }, () => {});
   }
   document.getElementById('v-oekosystem').addEventListener('click', e => {
     const w = e.target.closest('[data-wahl]'), t = e.target.closest('[data-tausch]'), l = e.target.closest('[data-lupe]');
+    if (w && w.tagName === 'A') return;   // Links aus dem Protokoll: der Router öffnet die Auswahl
     if (w) { ozWaehlen(w.dataset.wahl); return; }
     if (e.target.closest('[data-aufheben]')) { ozWaehlen(''); return; }
     if (t) {
@@ -3937,6 +4031,200 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     sec.querySelector('[data-hinweis]').innerHTML = t.hinweis; sec.querySelector('.oz-fokus').innerHTML = t.fokus; sec.querySelector('.oz-spur').innerHTML = t.spur;
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && ozWahl && document.getElementById('v-oekosystem').classList.contains('on')) ozWaehlen(''); });
+
+  // ---------- Mitmachen (ADR-0009): Aktivitätsprotokoll und Gespräche, Farbe „kooperieren“ ----------
+  // Das Protokoll sagt in Sätzen, was im Ökosystem geschieht (Anlegen, Teilen, Zusagen, Reaktionen, Kommentare, kurze Beiträge). Quellen: alle Events von bzQuellen, die Abfrage `mitmachen`
+  // (Kommentare nach NIP-22 und kurze Beiträge mit Community-Bezug) und die eine dauerhafte Subscription `protokoll` (eine Verbindung je Relay). Kommentare sind immer Text, nie Markdown.
+  const PK_KINDS = [30142, 30023, 31922, 31923, 31925, 7, 16, 30000, 1111, 1];
+  const PK_RELAYS = ['wss://relay.edufeed.org', 'wss://relay-rpi.edufeed.org'];
+  let pkDaten = null, pkLauf = null;   // Antwort der Abfrage `mitmachen` (gehalten, wenn nicht leer), laufende Abfrage
+  let pkListe = [], pkG = null, pkGeladen = false, pkSub = null, pkVerbunden = 0, pkWurzel = null, pkC = '', pkLaufNr = 0;
+  const pkNeu = [], pkMarke = new Map(), pkGesehen = new Set(), pkHoerer = new WeakSet();   // gesammelte Live-Events, Ankunftszeit der neuen Einträge, schon gesehene Live-IDs, Wurzeln mit Auswahl-Hörer
+  let pkTimer = null;
+  /** Kommentare (NIP-22) zu Materialien, Beiträgen und Terminen und kurze Beiträge der fünf Hub-Communities; einmal je Sitzung, ohne Antwort `antwort: false` */
+  function pkLaden() {
+    if (pkDaten) return Promise.resolve(pkDaten);
+    if (pkLauf) return pkLauf;
+    pkLauf = hubFetch('mitmachen', [{ kinds: [1111], '#K': ['30142', '30023', '31922', '31923'], limit: 100 }, { kinds: [1], '#h': CO_SCHLUESSEL.map(k => k.hex), limit: 100 }], { relays: PK_RELAYS }).then(events => {
+      const daten = { antwort: events.length > 0, kommentare: events.filter(ev => ev && ev.kind === 1111), beitraege: events.filter(ev => ev && ev.kind === 1) };
+      if (!daten.antwort) { pkLauf = null; return daten; }   // ohne Antwort beim nächsten Aufruf erneut versuchen
+      pkDaten = daten;
+      return daten;
+    });
+    return pkLauf;
+  }
+  /** Eine Protokollzeile aus einem Event: Satz je Kind mit Links nur auf Hub-Routen; Ziel über a- oder e-Tag wie in bzBauen. Ohne auflösbares Ziel null (außer eigene Inhalte und Beiträge kind 1). */
+  function pkEintrag(ev, gefuege) {
+    if (!ev || !ev.id || !istHex64(ev.pubkey)) return null;
+    const ents = gefuege.ents, k = ev.kind;
+    const kurz = (t, n) => { const x = String(t || '').replace(/\s+/g, ' ').trim(); return x.length > n ? x.slice(0, n).trimEnd() + '…' : x; };
+    const voll = hex => bech32('npub', hex.match(/../g).map(h => parseInt(h, 16))), co = hex => CO_SCHLUESSEL.find(c => c.hex === hex);
+    const name = hex => { const p = bzProfil(hex), c = co(hex); return p ? p.name : c ? esc(c.n) : esc(voll(hex).slice(0, 12) + '…'); };
+    const wer = hex => `<a class="pk-wer" href="${esc(co(hex) ? '#community?c=' + co(hex).id : '#person?p=' + voll(hex))}">${name(hex)}</a>`;
+    const comm = hex => co(hex) ? `<a href="${esc('#community?c=' + co(hex).id)}">${name(hex)}</a>` : `<a href="${esc('#oekosystem?wahl=' + encodeURIComponent('c:' + hex))}" data-wahl="c:${hex}">${name(hex)}</a>`;
+    const titel = e => { const t = e.ev, n = e.ev.kind === 30142 ? tagWert(t, 'name') || tagWert(t, 'title') : tagWert(t, 'title') || tagWert(t, 'name'); return esc(kurz(n || tagWert(t, 'd'), 80)); };
+    const link = e => e.ev.kind === 30142 ? `<a href="${esc('#materialpool?d=' + encodeURIComponent(tagWert(e.ev, 'd')) + '&p=' + e.pk)}">${titel(e)}</a>`
+      : ents.has(e.id) ? `<a href="${esc('#oekosystem?wahl=' + encodeURIComponent(e.id))}" data-wahl="${esc(e.id)}">${titel(e)}</a>` : `<b>${titel(e)}</b>`;
+    const entId = (kind, a) => ([30142, 30023].includes(kind) ? 'm:' : 'e:') + a;
+    const byId = gefuege.byId || (gefuege.byId = new Map([...ents.values()].filter(e => e.ev && e.ev.id).map(e => [e.ev.id, e.id])));
+    const ziel = () => {
+      for (const w of [...tagWerte(ev, 'a'), ...tagWerte(ev, 'A')]) { const a = aTagLesen(w), id = a && entId(a.kind, w); if (id && ents.has(id)) return ents.get(id); }
+      const e = [...tagWerte(ev, 'e'), ...tagWerte(ev, 'E')].find(i => istHex64(i) && byId.has(i));
+      return e ? ents.get(byId.get(e)) : null;
+    };
+    const hs = [...new Set(tagWerte(ev, 'h').filter(istHex64))];
+    const fertig = (satz, bezug) => ({ id: ev.id, zeit: ev.created_at || 0, bezug: [...new Set([...bezug, ents.has('c:' + ev.pubkey) ? 'c:' + ev.pubkey : 'p:' + ev.pubkey])], html: `${wer(ev.pubkey)} ${satz}` });
+    if (k === 30142 || k === 30023 || k === 31922 || k === 31923) {   // eigene Inhalte
+      const d = tagWert(ev, 'd'); if (!d) return null;
+      const id = entId(k, k + ':' + ev.pubkey + ':' + d), l = link(ents.get(id) || { id, pk: ev.pubkey, ev });
+      return fertig(k === 30142 ? `hat ${l} veröffentlicht` : k === 30023 ? `hat den Beitrag ${l} geschrieben` : `hat ${l} angelegt`, [id]);
+    }
+    if (k === 31925) {
+      const z = ziel(), st = tagWert(ev, 'status'); if (!z) return null;
+      const l = link(z), satz = st === 'accepted' ? `hat ${l} im Kalender gespeichert` : st === 'tentative' ? `kommt vielleicht zu ${l}` : st === 'declined' ? `hat ${l} abgesagt` : '';
+      return satz ? fertig(satz, [z.id]) : null;
+    }
+    if (k === 7) {
+      const z = ziel(), c = String(ev.content || ''); if (!z) return null;
+      const l = link(z);
+      return fertig(c === '-' ? `hat ${l} abgelehnt` : c === '' || c === '+' ? `hat ${l} geliked` : `hat ${l} mit ${esc(kurz(c, 8))} markiert`, [z.id]);
+    }
+    if (k === 6 || k === 16) {
+      const r = repostZiel(ev), id = r && (r.id ? byId.get(r.id) : entId(r.kind, r.adr)), e = id && ents.get(id); if (!e) return null;
+      return fertig(`hat ${link(e)}${hs.length ? ' in ' + hs.slice(0, 3).map(comm).join(', ') : ''} geteilt`, [e.id, ...hs.map(h => 'c:' + h)]);
+    }
+    if (k === 30000) {   // Mitgliedsliste: nur bekannte Communities
+      if (tagWert(ev, 'd') !== 'communities') return null;
+      const cs = [...new Set(tagWerte(ev, 'p').filter(istHex64))].filter(h => ents.has('c:' + h)); if (!cs.length) return null;
+      return fertig(`ist ${cs.slice(0, 3).map(comm).join(', ')} beigetreten`, cs.map(h => 'c:' + h));
+    }
+    if (k === 1111) {
+      const z = ziel(), t = kurz(ev.content, 160); if (!z || !t) return null;
+      return fertig(`hat zu ${link(z)} geschrieben: „${esc(t)}“`, [z.id]);
+    }
+    if (k === 1) {   // kurzer Beitrag: nur mit bekannter Community im h-Tag
+      const cs = hs.filter(h => ents.has('c:' + h)), t = kurz(ev.content, 160); if (!cs.length || !t) return null;
+      return fertig(`schreibt in ${comm(cs[0])}: „${esc(t)}“`, cs.map(h => 'c:' + h));
+    }
+    return null;
+  }
+  /** Relative Zeit: gerade eben, vor n Min., vor n Std., vor n Tg., sonst Datum */
+  function pkZeit(sek) {
+    const d = Math.floor(Date.now() / 1000) - sek;
+    return d < 60 ? 'gerade eben' : d < 3600 ? `vor ${Math.floor(d / 60)} Min.` : d < 86400 ? `vor ${Math.floor(d / 3600)} Std.` : d < 30 * 86400 ? `vor ${Math.floor(d / 86400)} Tg.` : new Date(sek * 1000).toLocaleDateString('de-DE');
+  }
+  /** Auswahl der Community: Kennung, Hex oder leer/„alle“ → Hex oder '' */
+  function pkHex(c) {
+    const k = CO_SCHLUESSEL.find(x => x.id === c || x.hex === c);
+    return k ? k.hex : istHex64(c) ? c : '';
+  }
+  /** Gehört der Eintrag zur Community `c` (Hex)? Er nennt sie oder etwas, das im Gefüge mit ihr verbunden ist (Mitglieder, Materialien, Termine) */
+  function pkPasst(e, c) {
+    if (!c) return true;
+    const nb = pkG && pkG.kanten.get('c:' + c) || new Set();
+    return e.bezug.some(id => id === 'c:' + c || nb.has(id));
+  }
+  /** Alle Events der Quellen, die Abfrage `mitmachen` und die Live-Events → Protokollzeilen, neueste zuerst; je Adresse gilt die neueste Fassung */
+  function pkBerechnen() {
+    const q = bzQuellen(), alle = new Map(), neuste = new Map(), jetzt = Date.now() / 1000;
+    for (const ev of [...q.materialien, ...q.beitraege, ...q.termine, ...q.reposts, ...q.mitgliedschaften, ...q.zusagen, ...q.reaktionen, ...(pkDaten ? [...pkDaten.kommentare, ...pkDaten.beitraege] : []), ...pkLive.filter(e => [1111, 1].includes(e.kind))]) {
+      if (!ev || !ev.id || !istHex64(ev.pubkey) || !(ev.created_at <= jetzt + 86400)) continue;
+      alle.set(ev.id, ev);
+      if ([30142, 30023, 31922, 31923, 31925, 30000].includes(ev.kind)) { const a = ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd'), alt = neuste.get(a); if (!alt || ev.created_at > alt.created_at) neuste.set(a, ev); }
+    }
+    pkG = ozLive && ozGefuege ? ozGefuege : bzBauen(q);
+    const liste = [];
+    for (const ev of alle.values()) {
+      if (neuste.has(ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd')) && neuste.get(ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd')) !== ev) continue;
+      const e = pkEintrag(ev, pkG); if (e) liste.push(Object.assign(e, { ev }));
+    }
+    pkListe = liste.sort((a, b) => b.zeit - a.zeit);
+  }
+  function pkLiveEvent(ev) {
+    if (!ev || !ev.id || pkGesehen.has(ev.id)) return;
+    pkGesehen.add(ev.id); pkNeu.push(ev);
+    if (!pkTimer) pkTimer = setTimeout(pkBuendeln, 600);
+  }
+  /** Gesammelte Live-Events nach 600 ms zusammen nachtragen: Gefüge neu bauen, Ökosystem und Mitmachen zeichnen */
+  function pkBuendeln() {
+    pkTimer = null;
+    const neu = pkNeu.splice(0); pkLive.push(...neu); neu.forEach(ev => pkMarke.set(ev.id, Date.now()));
+    if (!pkGeladen) return;   // vor dem Laden trägt pkBerechnen sie ein
+    if (ozLive) { ozBauen(); if (document.getElementById('v-oekosystem').classList.contains('on')) ozRender(); }
+    pkBerechnen(); pkAktualisieren();
+  }
+  /** Die eine dauerhafte Subscription der Sitzung (je Relay eine Verbindung, nur neue Events) */
+  function pkStart() {
+    if (pkSub) return;
+    pkSub = hubAbonnieren('protokoll', [{ kinds: PK_KINDS }], { relays: PK_RELAYS, beiEvent: pkLiveEvent, beiStatus: n => { pkVerbunden = n; pkAktualisieren(); } });
+  }
+  /** Zeichnet Mitmachen und den Streifen im Ökosystem neu, ohne eine offene Auswahl zu stören */
+  function pkAktualisieren() {
+    const a = document.activeElement;
+    if (pkWurzel && pkWurzel.closest('.view.on') && !(a && a.matches && a.matches('[data-pkc]'))) pkRender(pkWurzel);
+    pkStreifen();
+  }
+  /** Subscription starten, Quellen und Abfrage `mitmachen` laden (Caches der anderen Ansichten werden mitgenutzt), Protokoll berechnen */
+  function pkAnstossen() {
+    pkStart();
+    const lauf = ++pkLaufNr;
+    Promise.all([mpLaden(), ocLaden(), kalLaden(), peLaden(), bzLaden(), pkLaden(), ...CO_SCHLUESSEL.map(k => coLaden(k.hex))]).then(() => cyLaden()).catch(() => {}).then(() => {
+      if (lauf !== pkLaufNr) return;   // späte Antwort einer früheren Öffnung
+      pkBerechnen(); pkGeladen = true; pkAktualisieren();
+    });
+  }
+  function pkAutor(hex) {
+    const p = bzProfil(hex), voll = bech32('npub', hex.match(/../g).map(h => parseInt(h, 16)));
+    return `<a class="pk-wer" href="${esc('#person?p=' + voll)}">${p ? p.name : esc(voll.slice(0, 12) + '…')}</a>`;
+  }
+  /** Ansicht Mitmachen in `root` (Standard: der Raum #mitmachen); `c` = Community (Kennung oder Hex, 'alle' oder leer = alle), ohne Angabe bleibt die Auswahl */
+  function pkRender(root, c) {
+    root = root || document.getElementById('pkRoot'); pkWurzel = root;
+    if (c !== undefined) pkC = pkHex(c);
+    const liste = pkListe.filter(e => pkPasst(e, pkC)), kom = liste.filter(e => e.ev.kind === 1111), beitr = liste.filter(e => e.ev.kind === 1);
+    const antwort = !!((bzDaten && bzDaten.antwort) || (pkDaten && pkDaten.antwort)), r = pkVerbunden, g = pkG;
+    const opts = CO_SCHLUESSEL.map(k => [k.hex, esc(k.n)]).concat(g ? [...g.ents.values()].filter(e => e.typ === 'community' && !CO_SCHLUESSEL.some(k => k.hex === e.pk)).map(e => [e.pk, bzName(e)]) : []);
+    const wahl = `<label class="pk-wahl">Community <select data-pkc><option value="">Alle</option>${opts.map(([h, n]) => `<option value="${esc(h)}"${h === pkC ? ' selected' : ''}>${n}</option>`).join('')}</select></label>`;
+    let prot, gespr;
+    if (!pkGeladen) { prot = '<p class="pk-leer">Das Protokoll wird geladen …</p>'; gespr = ''; }
+    else {
+      prot = liste.length ? `<ul class="pk-liste">${liste.slice(0, 80).map(e => `<li class="pk-zeile${pkMarke.has(e.id) && Date.now() - pkMarke.get(e.id) < 180000 ? ' neu' : ''}"><span class="pk-zeit">${esc(pkZeit(e.zeit))}</span><span class="pk-satz">${e.html}</span></li>`).join('')}</ul>`
+        : `<p class="pk-leer">${antwort ? 'Noch keine Aktivitäten zu dieser Auswahl.' : 'Die Relays antworten gerade nicht.'}</p>`;
+      const gruppen = new Map();
+      kom.forEach(e => { if (!gruppen.has(e.bezug[0])) gruppen.set(e.bezug[0], []); gruppen.get(e.bezug[0]).push(e); });
+      const gk = [...gruppen].filter(([id]) => g && g.ents.get(id) && g.ents.get(id).ev).map(([id, es]) => `<div class="pk-gruppe">${eintragKarte({ ev: g.ents.get(id).ev, adr: id })}<ul>${es.map(e => `<li class="pk-kommentar"><b>${pkAutor(e.ev.pubkey)}</b> <span class="pk-zeit">${esc(pkZeit(e.zeit))}</span><p>${esc(String(e.ev.content || '').trim().slice(0, 1000))}</p></li>`).join('')}</ul></div>`).join('');
+      const bk = beitr.map(e => `<li class="pk-kommentar">${e.bezug[0] && g && g.ents.get(e.bezug[0]) ? `<span class="pk-in">${bzName(g.ents.get(e.bezug[0]))}</span> ` : ''}<b>${pkAutor(e.ev.pubkey)}</b> <span class="pk-zeit">${esc(pkZeit(e.zeit))}</span><p>${esc(String(e.ev.content || '').trim().slice(0, 600))}</p></li>`).join('');
+      gespr = (gk || bk) ? gk + (bk ? `<div class="pk-gruppe"><h3>Kurze Beiträge in Communities</h3><ul>${bk}</ul></div>` : '')
+        : '<p class="pk-leer">Noch kein Gespräch zu Materialien, Terminen oder Beiträgen des Ökosystems. Der erste Kommentar entsteht in der <a href="https://edufeed.org" target="_blank" rel="noopener">edufeed-App</a>.</p>';
+    }
+    root.innerHTML = `<h1>Mitmachen</h1><p class="pk-sub">Was im Ökosystem gerade passiert: Kommentare, Zusagen, Reaktionen, Geteiltes. Lesen geht ohne Anmeldung, Schreiben mit Schlüssel in der edufeed-App.</p>${wahl}`
+      + `<div class="pk-spalten"><section aria-label="Protokoll"><h2>Protokoll</h2>${prot}</section><section aria-label="Gespräche"><h2>Gespräche</h2>${gespr}</section></div>`;
+    const v = root.closest('.view');
+    if (v && pkGeladen) datenstand(v.id, antwort ? 'live' : 'nachbau', antwort ? `${liste.length} Aktivitäten · ${kom.length} Kommentare · Protokoll verbunden mit ${r} von 2 Relays${r ? '' : ' · keine Live-Verbindung'}` : 'Relays nicht erreichbar');
+    if (!pkHoerer.has(root)) {
+      pkHoerer.add(root);
+      root.addEventListener('change', e => {
+        const s = e.target.closest('[data-pkc]'); if (!s) return;
+        pkRender(root, s.value);
+        if (root.id === 'pkRoot') { const k = CO_SCHLUESSEL.find(x => x.hex === pkC); CUR = 'mitmachen' + (pkC ? '?c=' + (k ? k.id : pkC) : HUB_C ? '?c=alle' : ''); try { history.pushState(null, '', '#' + CUR); } catch (er) {} }
+        const n = root.querySelector('[data-pkc]'); if (n) n.focus();
+      });
+    }
+  }
+  /** Streifen im Ökosystem: die neuesten acht Protokollzeilen (mit Zuschnitt nur die der Community) */
+  function pkStreifen() {
+    const el = document.getElementById('ozProtokoll'); if (!el) return;
+    const liste = pkListe.filter(e => pkPasst(e, HUB_C || '')).slice(0, 8);
+    if (!pkGeladen || !liste.length) { el.hidden = true; el.innerHTML = ''; return; }
+    el.innerHTML = `<h2>Was gerade passiert</h2><ul class="pk-liste">${liste.map(e => `<li class="pk-zeile${pkMarke.has(e.id) && Date.now() - pkMarke.get(e.id) < 180000 ? ' neu' : ''}"><span class="pk-zeit">${esc(pkZeit(e.zeit))}</span><span class="pk-satz">${e.html}</span></li>`).join('')}</ul><p><a href="#mitmachen">Alle im Raum Mitmachen ›</a></p>`;
+    el.hidden = false;
+  }
+  /** Route `#mitmachen?c=<Community>`: ohne Angabe gilt der Zuschnitt (HUB_C) */
+  function pkOpen(qs) {
+    const c = new URLSearchParams(qs || '').get('c');
+    pkRender(document.getElementById('pkRoot'), c === null ? (HUB_C || '') : c);
+    pkAnstossen();
+  }
 
   // ---------- Community-Räume (Funktionen nach edufeed.org; Inhalte Beispieldaten, relilab nach Screenshot) ----------
   const CR_ICON = {
@@ -4886,14 +5174,15 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const [viewRaw, qs] = raw.split('?');
     const [view, sub] = viewRaw.split('/');
     const finden = view === 'finden' && sub ? (['sammlung', 'fortbildungen'].includes(sub) ? sub : null) : view === 'kooperieren' && sub ? (sub === 'personen' ? sub : null) : undefined;   // finden/<sub>, kooperieren/<sub> → Ansicht v-<sub>
-    const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell', 'person', 'oekosystem'].includes(view) ? view : 'start');
+    const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell', 'person', 'oekosystem', 'mitmachen'].includes(view) ? view : 'start');
     if (finden === null) toast('Diese Seite gibt es nicht.');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
-    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'Fortbildungen', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', oekosystem: 'reli_hub · Ökosystem', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
+    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'Fortbildungen', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', oekosystem: 'reli_hub · Ökosystem', mitmachen: 'reli_hub · Mitmachen', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || 'relilab', pp.get('zu') === 'katalog' ? 'katalog' : pp.get('tab')); }
     leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v === 'fortbildungen' ? 'rpi-virtuell' : v);
     if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); cyOpen(); }
     if (v === 'oekosystem') ozOpen(qs);
+    if (v === 'mitmachen') pkOpen(qs);
     if (v === 'oercommunity') ocOpen(sub);
     if (v === 'relilab') rlShow(qs);
     if (v === 'rpi-virtuell') rvOpen(qs);

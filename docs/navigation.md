@@ -19,6 +19,7 @@ Die Startseite erklärt mit Erklärkarte und Narrativ, was der Hub kann. Die Kon
 | Beitrag | Beitrag | `veroeffentlichen.beitrag` | Editor für Beiträge | – | veröffentlichen | gebaut |
 | Profil | Mein Profil | `hub.profil` | `#profil` | – | reli_hub | gebaut |
 | Ökosystem | Home | `hub.home` | `#oekosystem` | – | reli_hub | gebaut |
+| Mitmachen | – | – (Erklärkarte kooperieren) | `#mitmachen` | – | kooperieren | gebaut |
 | Start | – | – | `#start` | Start | reli_hub | gebaut |
 | Spielregeln | – | – | `#oercommunity/spielregeln` | Schaufenster-Menü | – | gebaut |
 | Hilfe | Hilfe | – | `#hilfe` | – | reli_hub | gebaut |
