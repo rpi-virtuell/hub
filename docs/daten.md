@@ -233,7 +233,7 @@ Das Ziel von Zusage und Reaktion ist der erste gültige `a`-Tag, sonst der erste
 
 `#oekosystem?wahl=<id>&reihen=person,event,community,material` zeigt vier Reihen (Menschen, Termine, Communities, Materialien). `wahl` ist eine Entitäts-ID des Gefüges (maskiert mit `encodeURIComponent`), `reihen` die Reihenfolge der vier Reihen; Tauschknöpfe zwischen den Reihen und die Auswahl schreiben beides in die Route (ohne nach oben zu springen).
 
-`ozOpen(qs)` zeigt sofort die Schnappschuss-Einträge (Materialien `MP`, Termine `RT_RAW`, Beiträge `OC_RAW`, Communities `CY`) ohne Kanten und ohne Personen, mit `Stand vom <jüngstes Datum>`. Dann läuft `Promise.all([mpLaden(), ocLaden(), kalLaden(), peLaden(), bzLaden(), …coLaden(<die fünf Schlüssel>)])`, danach `cyLaden()` (eine abhängige Nachfrage nach den Profilen der übrigen Community-Konten) und `bzBauen(bzQuellen())`. Neu geholt wird nur die Abfrage `beziehungen` (eine Verbindung je Relay); alles andere kommt aus den Caches der anderen Ansichten. Ein Lauf-Zähler verwirft späte Antworten.
+`ozOpen(qs)` zeigt sofort die Schnappschuss-Einträge (Materialien `MP`, Termine `RT_RAW`, Beiträge `OC_RAW`, Communities `CY`) ohne Kanten und ohne Personen, mit `Stand vom <jüngstes Datum>`. Dann läuft `Promise.all([mpLaden(), ocLaden(), kalLaden(), peLaden(), bzLaden(), …coLaden(<die fünf Schlüssel>)])`, danach `cyLaden()` (ohne eigene Abfrage, aus `bzDaten`) und `bzBauen(bzQuellen())`. Neu geholt wird nur die Abfrage `beziehungen` (eine Verbindung je Relay); alles andere kommt aus den Caches der anderen Ansichten. Ein Lauf-Zähler verwirft späte Antworten.
 
 | Zustand | Stand-Zeile | Hinweis |
 | --- | --- | --- |

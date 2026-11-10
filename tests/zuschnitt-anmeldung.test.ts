@@ -125,3 +125,11 @@ Deno.test('aktion: Reaktion und Zusage nur mit 64-Hex-Event-Kennung', () => {
   assert(/!istHex64\(ev\.id\)/.test(a) && /fehlt die Event-Kennung/.test(a), 'ohne e-Tag kein kind 7 und kein kind 31925');
   assert(!/\.\.\.\(istHex64\(ev\.id\) \? \[\['e'/.test(a), 'e-Tag nicht mehr optional');
 });
+
+Deno.test('ADR-0009 und README nennen die Etappe', async () => {
+  const adr = await Deno.readTextFile(new URL('../docs/adr/0009-beziehungsgefuege-mitmachen-anmeldung.md', import.meta.url));
+  assert(/^# ADR-0009/.test(adr) && /## Status/.test(adr) && /## Entscheidung/.test(adr) && /e6875f0b/.test(adr) && /bfa727b9/.test(adr) && /NIP-07/.test(adr) && /\?c=/.test(adr) && /ohne Rollenprüfung|Mitgliederrollen/.test(adr) && /purplepag/.test(adr));
+  assert(!/Arbeitspaket|Meilenstein|Förderkennzeichen|Projektträger|Zwischenbericht/.test(adr), 'Projektsprache');
+  const r = await Deno.readTextFile(new URL('../README.md', import.meta.url));
+  assert(/0009-beziehungsgefuege-mitmachen-anmeldung/.test(r) && /Ökosystem/.test(r) && /Mitmachen/.test(r) && /Anmeldung|anmelden/.test(r), 'README');
+});
