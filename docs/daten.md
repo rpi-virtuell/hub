@@ -308,6 +308,30 @@ Der ganze Hub lässt sich auf eine Community zuschneiden: `https://hub.rpi-virtu
 
 Die Seite `#eigene-instanz?c=<npub>` zeigt die Vorschau (zweite Steuerkonsole und Leiste, Kontext `vorschau-<hex>`) und vier Schnipsel zum Kopieren: den Link, das Kontextprofil (`kontextprofilAus`, Feld `c`), den WordPress-Shortcode (`shortcodeAus`) und den Hinweis auf den White-Label-Betrieb der edufeed-App. Sie zeigt keine Relay-Daten außer den Namen der Communities (Stand-Zeile „Nachbau · Vorschau“).
 
+## Anmeldung und Schreiben
+
+Angemeldet wird nur über eine Browser-Erweiterung nach NIP-07 (`window.nostr`, zum Beispiel nos2x oder Alby) oder mit „nur ansehen“ über einen npub. Der Hub fragt nie nach einem `nsec`, hält keinen privaten Schlüssel und merkt sich in der Sitzung nur den öffentlichen (`sessionStorage`, Schlüssel `relihub-ich`: Hex und ob signiert werden kann). Der Dialog `#anmelden` öffnet sich über „Anmelden“ in den Kopfzeilen; angemeldet heißt der Knopf „Mein Profil“ und führt nach `#profil`.
+
+- `anmelden()`: ohne Erweiterung der Toast „Keine Nostr-Erweiterung gefunden (zum Beispiel nos2x oder Alby). Alternativ: nur ansehen mit npub.“; sonst `getPublicKey()`, Schlüssel prüfen (`istHex64`), `ICH = { hex, kann: true }`, Profil laden, Dialog schließen, Ansicht neu.
+- `nurAnsehen(npub)`: gültiger npub (Prüfsumme über die Rückwandlung), `ICH.kann = false`; alle Knöpfe zum Mitmachen bleiben aus.
+- `abmelden()`: `ICH` leeren, Sitzung löschen, Ansicht neu. `LOGGED` folgt `ICH.hex`.
+- Profil: eine Abfrage `ich:<hex>` mit `kind:0`, `kind:30000 d=communities` und `kind:3`, je `authors: [hex]`, `limit: 1`. Die Profilseite holt dazu einmal `ich:inhalte:<hex>` (eigene `30142`, `30023`, `31923`, eigene `30004`, dazu ein Gesundheitsblick auf das Schaufenster-Profil). „Meine Communities“ sind die Kanten der Person im Beziehungsgefüge, ergänzt um die eigene Mitgliedsliste; „Meine Sammlungen“ sind eigene `kind:30004` mit `d`, das mit `sammlung` beginnt. Stand-Zeile `live · angemeldet` oder `live · nur ansehen`; ohne Antwort `Nachbau · Relays nicht erreichbar · …`. Nicht angemeldet bleibt die Persona (`Nachbau · Persona Luca Beispiel`).
+
+**Sendeweg.** Gesendet wird nur auf Klick des Knopfes, der es sagt. `signierenUndSenden(vorlage, erfolg)` ergänzt `created_at` (jetzt), `content: ''` und `pubkey`, lässt die Erweiterung signieren (`signEvent`) und gibt das Event an `hubSenden(ev)`: je Relay der drei `RELAYS` eine Verbindung, `['EVENT', ev]`, gezählt wird nur `['OK', id, true, …]`, je Relay höchstens 8 s, danach wird jede Verbindung geschlossen. Toasts: „<Erfolg> (angenommen von <n> Relays)“, „Kein Relay hat das Ereignis angenommen.“, „Signieren abgebrochen.“, ohne Schlüssel „Zum Mitmachen bitte mit Schlüssel anmelden.“. Ein angenommenes Event kommt in die Live-Quellen der Sitzung (`pkLive`): Gefüge, Protokoll und die offene Ansicht werden neu gezeichnet.
+
+**Listen-Regel.** Vor jedem Schreiben in eine Liste (`kind:3`, `kind:30000`, `kind:30004`) holt der Hub die aktuelle Liste frisch von den Relays (am Zwischenspeicher vorbei, ein `REQ` je Relay mit `authors: [ICH.hex]` und einem Gesundheitsblick) und ergänzt sie mit `listeErgaenzen(alt, kind, d, tag)`: alle bisherigen Tags und `content` bleiben, der neue Tag kommt hinten dazu; ist er schon enthalten, wird nichts gesendet. Antwortet kein Relay, wird nichts gesendet. Fehlt die Liste, fragt der Hub vor dem Anlegen nach (Folgen, Beitreten).
+
+| Aktion | Wo | Event | Zustand statt Knopf |
+|---|---|---|---|
+| Folgen | Personen-Karten, `#person`, Auswahl im Ökosystem | `kind:3` ergänzt um `p` | „Folgst du“ (eigene Folgeliste); das eigene Profil zeigt „Das bist du“ |
+| Beitreten | Community-Raum (Communities mit Schlüssel), Auswahl im Ökosystem | `kind:30000 d=communities` ergänzt um `p` der Community | „Mitglied“ (eigene Mitgliedsliste) |
+| Zusagen, Vielleicht | Fortbildungskalender, Auswahl im Ökosystem | `kind:31925`, `d` = `rsvp-<Adresse>`, `a`, `e`, `p`, `status` `accepted` oder `tentative` | „Zugesagt“, „Vielleicht zugesagt“ (eigene Zusagen aus Gefüge-Abfrage und Sitzung) |
+| Gefällt mir | Material-Detail, Auswahl im Ökosystem | `kind:7`, `content: '+'`, `e`, `p`, `a`, `k` | „Gefällt dir“ |
+| Als Nostr-Liste speichern | Sammlung, Kasten „Abonnieren“ | `kind:30004` aus `sammlungListe(f, treffer)`: `d` = `sammlung-<Hash des Filters>`, `title`, `description`, `a`-Tags der ersten 100 Treffer; eine schon gespeicherte Liste wird ergänzt | „Diese Sammlung ist schon gespeichert.“ (Toast) |
+| Zur eigenen Sammlung | Material-Detail (dritte Aktion, nur offen lizenziert) | `kind:30004 d=sammlung` ergänzt um `a` des Materials | „Das Material ist schon in deiner Sammlung.“ (Toast) |
+
+Ohne Anmeldung und bei „nur ansehen“ bleiben alle Knöpfe sichtbar, deaktiviert und mit dem Hinweis „braucht Anmeldung mit Schlüssel“; „Zur eigenen Sammlung“ zeigt dann den Hinweis und öffnet die Sammlung mit dem Material. Der Hub setzt keinen eigenen `client`-Tag; Tags einer bisherigen Liste bleiben, wie sie sind.
+
 ## Schnappschuss erneuern
 
 ```bash

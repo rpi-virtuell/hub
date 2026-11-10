@@ -17,7 +17,8 @@ Die Startseite erklärt mit Erklärkarte und Narrativ, was der Hub kann. Die Kon
 | Lerninhalte | Lerninhalte | `veroeffentlichen.lerninhalte` | `#materialpool` mit Editor darüber | Materialpool | veröffentlichen | gebaut |
 | Termin | Termin | `veroeffentlichen.termin` | Editor für Termine | – | veröffentlichen | gebaut |
 | Beitrag | Beitrag | `veroeffentlichen.beitrag` | Editor für Beiträge | – | veröffentlichen | gebaut |
-| Profil | Mein Profil | `hub.profil` | `#profil` | – | reli_hub | gebaut |
+| Profil | Mein Profil | `hub.profil` | `#profil` (angemeldet: eigenes Profil) | – | reli_hub | gebaut |
+| Anmelden | Kopfzeile | – | Dialog `#anmelden` | – | reli_hub | gebaut |
 | Ökosystem | Home | `hub.home` | `#oekosystem` | – | reli_hub | gebaut |
 | Mitmachen | – | – (Erklärkarte kooperieren) | `#mitmachen` | – | kooperieren | gebaut |
 | Eigene Instanz | – | – (Leiste: Zuschnitt) | `#eigene-instanz` | Zuschnitt | kooperieren | gebaut |
