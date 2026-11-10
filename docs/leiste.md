@@ -11,11 +11,11 @@ Sie ist ein eigenständiges Custom Element mit Shadow DOM. Die Anwendung liefert
 | | Leiste | Steuerkonsole |
 |---|---|---|
 | Frage | Wo bin ich? | Was will ich tun? |
-| Beschriftung | „Orte“ | „Tätigkeiten“ (Überschrift im aufgeklappten Popover) |
-| Inhalt | Instanzen und Communities | finden, erstellen, kooperieren, veröffentlichen, hub |
+| Beschriftung | „Orte“ | „Vier plus ich“ (Überschrift im aufgeklappten Popover) |
+| Inhalt | Instanzen und Communities | ich, Menschen, Communities, Materialien, Termine |
 | Element | `<relihub-leiste>` | `<relihub-steuerkonsole>` |
 
-Darum steht „Profil“ nicht in der Leiste: Das Profil ist eine Tätigkeit der Konsole (`hub.profil`) und steht in der Kopfzeile.
+Darum steht „Profil“ nicht in der Leiste: Das Profil ist eine Tätigkeit der Konsole (`ich.profil`) und steht in der Kopfzeile.
 
 ## Daten
 

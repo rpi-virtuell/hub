@@ -35,7 +35,7 @@ Deno.test('kalLaden: eine Abfrage für Kalender und rpi-virtuell, feste Quellen'
   const rv = block(/function rvOpen\(qs\)[\s\S]*?\n  \}/);
   assert(/kalLaden\(\)/.test(rv) && !/kinds: \[31923\]/.test(rv) && /terminLogik\(/.test(rv) && /#finden\/fortbildungen/.test(rv), 'rpi-virtuell teilt die Abfrage');
   assert(/RT_RAW\.filter\(ev => RT_HEX\[ev\.pubkey\]\)/.test(s), 'relilab filtert den Schnappschuss');
-  assert(/'finden\.fortbildungen': 'finden\/fortbildungen'/.test(s), 'Konsole');
+  assert(/'termine\.finden': 'finden\/fortbildungen'/.test(s), 'Konsole');
   assert(/id="v-fortbildungen"/.test(html) && /keine Angabe/.test(block(/function kaRender\(\)[\s\S]*?\n  \}/)), 'Ansicht und ehrliche Merkmale');
   const t = await Deno.readTextFile(new URL('../tools/schnappschuss.ts', import.meta.url));
   assert(new Set(t.match(/npub1[0-9a-z]{58}/g) || []).size >= 14, 'Schnappschuss kennt alle Quellen');
@@ -62,7 +62,7 @@ Deno.test('peLaden: zwei Abfragen, feste Autoren; Personen und Person: Rückfall
   assert(/npubToHex\(/.test(o) && /kinds: \[30142, 30023, 31923\]/.test(o) && /Kein gültiges Profil/.test(o), 'Profilseite');
   assert(/kinds: \[0\], authors: \[FO_HEX\], limit: 1/.test(o) && /antworten gerade nicht/.test(o) && /!evs\.length/.test(o), 'Profilseite im Funkloch: Gesundheitsfilter, ehrliche Meldung');
   assert(/id="v-personen" data-stand="stand:04\.11\.2026/.test(html) && /id="v-person" data-stand="nachbau:/.test(html), 'Ansichten mit Stand');
-  assert(/'kooperieren\.personen': 'kooperieren\/personen'/.test(s) && /'person'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'Konsole und Route');
+  assert(/'menschen\.finden': 'kooperieren\/personen'/.test(s) && /'person'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'Konsole und Route');
 });
 
 Deno.test('ADR-0008 und README nennen die Etappe', async () => {

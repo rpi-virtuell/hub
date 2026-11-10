@@ -242,6 +242,8 @@ Das Ziel von Zusage und Reaktion ist der erste gültige `a`-Tag, sonst der erste
 
 **Relay-Last eines kalten Aufrufs** (keine andere Ansicht vorher besucht, Zwischenspeicher leer): neun Abfragen und die Subscription. Es sind `materialpool`, `oercommunity`, `kalender`, `personen` mit der abhängigen `personen:profile`, `beziehungen` mit der abhängigen `beziehungen:profile`, die fünf Community-Abfragen gebündelt als eine (`communities`, siehe oben) und nach der Antwort `mitmachen` (über `pkAnstossen`), dazu die Protokoll-Subscription. Jede Abfrage öffnet je Relay eine Verbindung (höchstens drei zugleich, `MAX_CONN`); `relay.edufeed.org` sieht alle neun und die Subscription, also zehn Verbindungen. Warm (Ansichten schon besucht, unter 60 s) bleiben es die Abfragen, deren Zwischenspeicher fehlt. Mehrere Besucher hinter einer gemeinsamen Adresse (Tagungs-WLAN) erreichen damit schnell die Sperrschwelle der Relays (etwa 20 schnelle Anfragen je Adresse): eine Leseausnahme für die Tagungsadresse bleibt nötig.
 
+**Startseite (ADR-0010):** Die Vorschau der vier Elemente nutzt dieselben Quellen (`ozQuellenLaden`). Sie lädt erst beim ersten Blick auf eines der vier Elemente, einmal je Sitzung (`stLaden`), ohne die Subscription des Protokolls. Bis zur Antwort zeigt sie den eingebetteten Bestand; Menschen erscheinen erst mit der Antwort. Die Themen (`relihub-themen`) filtern nur im Browser und lösen keine Abfrage aus.
+
 | Zustand | Stand-Zeile | Hinweis |
 | --- | --- | --- |
 | vor der Antwort | `Stand vom <Datum>` | „Verbindungen werden geladen …“ |
@@ -298,7 +300,7 @@ Die Startseite `#relilab` zeigt das relilab als Labor (Issue 16): oben die siebe
 | Menschen | Profilkarten (Bild oder Initiale, Name, `about`) | `#person?p=<npub>` |
 | Mitmachen | nächste 6 Labortermine | „Alle Labortermine ›“ nach `#finden/fortbildungen?logik=labor`, „Zum Raum Mitmachen ›“ nach `#relilab?tab=mitmachen` |
 
-Stand-Zeile: `live · <m> Materialien · <p> Menschen · <t> Labortermine`; vor der Antwort und ohne Antwort bleibt `Stand vom <Datum des Schnappschusses>` (die Termine der dritten Spalte kommen dann aus dem Schnappschuss). `#relilab?tab=mitmachen` bindet den Raum Mitmachen mit festem Zuschnitt ein (`pkRender` mit `data-pkfest="relilab"`, Hinweis „Zuschnitt: relilab“, keine Auswahl). Die Konsole im relilab führt `kooperieren.personen` nach `#relilab?zu=menschen` (Scroll auf die Spalte Menschen).
+Stand-Zeile: `live · <m> Materialien · <p> Menschen · <t> Labortermine`; vor der Antwort und ohne Antwort bleibt `Stand vom <Datum des Schnappschusses>` (die Termine der dritten Spalte kommen dann aus dem Schnappschuss). `#relilab?tab=mitmachen` bindet den Raum Mitmachen mit festem Zuschnitt ein (`pkRender` mit `data-pkfest="relilab"`, Hinweis „Zuschnitt: relilab“, keine Auswahl). Die Konsole im relilab führt `menschen.finden` nach `#relilab?zu=menschen` (Scroll auf die Spalte Menschen).
 
 ## Zuschnitt
 
@@ -312,7 +314,7 @@ Der ganze Hub lässt sich auf eine Community zuschneiden: `https://hub.rpi-virtu
 | Community-Raum (`#community`) | ohne `c` gilt der Zuschnitt; Communities nur mit Schlüssel (npub oder Hex) führen ins Ökosystem |
 | Personen (`#kooperieren/personen`) | von der Personen-Liste nur, wer im Beziehungsgefüge mit der Community verbunden ist; Satz „Zuschnitt: <Name>“ (eine zwischengespeicherte Abfrage des Gefüges) |
 | Ökosystem, Mitmachen | der Zuschnitt setzt den Rahmen: nur, was mit der Community verbunden ist (`ozSichtbar`, `pkPasst`) |
-| Steuerkonsole | `finden.material`, `finden.fortbildungen` und `kooperieren.communities` tragen den Parameter `c` |
+| Steuerkonsole | `material.finden`, `termine.finden` und `communities.finden` tragen den Parameter `c` |
 | Leiste | abwählbare Markierung „Zuschnitt: <Name>“ (`kind: 'zuschnitt'`), Knopf „Zuschnitt aufheben“ im Panel „Leiste anpassen“ |
 
 Die Seite `#eigene-instanz?c=<npub>` zeigt die Vorschau (zweite Steuerkonsole und Leiste, Kontext `vorschau-<hex>`) und vier Schnipsel zum Kopieren: den Link, das Kontextprofil (`kontextprofilAus`, Feld `c`), den WordPress-Shortcode (`shortcodeAus`) und den Hinweis auf den White-Label-Betrieb der edufeed-App. Sie zeigt keine Relay-Daten außer den Namen der Communities (Stand-Zeile „Nachbau · Vorschau“).

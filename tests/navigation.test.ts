@@ -44,7 +44,7 @@ Deno.test('Konsole: ganze Knospe samt Wort ist Trefferfläche', () => {
   assert(/\.out\{[^}]*pointer-events:auto[^}]*cursor:pointer/.test(c), '.out nicht klickbar');
   assert(/\.lbl\{[^}]*pointer-events:none/.test(c), '.lbl verändert');
   assert(/const HIT = 44/.test(c) && /el\('circle', \{ class: 'hit', r: HIT, fill: 'transparent' \}, bud\)/.test(c), 'Treffer-Kreis fehlt');
-  assert(/\.bud circle:not\(\.hit\)\{transition/.test(c) && /\.bud:hover circle:not\(\.hit\),\.bud\.kbd circle:not\(\.hit\)\{fill/.test(c) && /\.kbd>circle:not\(\.hit\)/.test(c), 'Treffer-Kreis nicht von Füllung/Fokusring ausgenommen');
+  assert(/\.bud circle:not\(\.hit\)\{transition/.test(c) && /\.bud:not\(\[data-stand\]\):hover circle:not\(\.hit\),\.bud:not\(\[data-stand\]\)\.kbd circle:not\(\.hit\)\{fill/.test(c) && /\.kbd>circle:not\(\.hit\)/.test(c), 'Treffer-Kreis nicht von Füllung/Fokusring ausgenommen');
 });
 
 Deno.test('Konsole: Tutorial- und Direktmodus, eine Standardkette', () => {
@@ -74,11 +74,11 @@ Deno.test('Leiste: eigenständiges Widget, klar von der Konsole unterschieden', 
   assert(html.includes('<relihub-leiste id="leiste" label="Orte"') && !/class="proto"/.test(html), 'Leiste nicht ersetzt');
   assert(/const LEISTE = \[/.test(s) && !/id: 'profil'/.test(block(/const LEISTE = \[[\s\S]*?\n  \];/)), 'LEISTE oder Profil-Eintrag');
   assert(/function leisteItems\(\)/.test(s) && /kind: 'community'/.test(s) && /relihub-leiste-select/.test(s), 'Anwendung nutzt das Widget nicht');
-  assert(/Tätigkeiten/.test(c) && /\.cap\{/.test(c), 'Konsole ohne Überschrift');
+  assert(/Vier plus ich/.test(c) && /\.cap\{/.test(c), 'Konsole ohne Überschrift');
   const rt = block(/function route\(\)[\s\S]*?window\.scrollTo/), si = rt.indexOf('setItems(leisteItems())');
   assert(si > 0 && si < rt.indexOf('return'), 'setItems läuft nicht bei jedem Routenaufruf');
   const d = await Deno.readTextFile(new URL('../docs/leiste.md', import.meta.url));
-  assert(/relihub-leiste-select/.test(d) && /setItems/.test(d) && /Tätigkeiten/.test(d), 'docs/leiste.md unvollständig');
+  assert(/relihub-leiste-select/.test(d) && /setItems/.test(d) && /Vier plus ich/.test(d), 'docs/leiste.md unvollständig');
 });
 
 Deno.test('rpi-virtuell: eigene Instanz in Leiste, Kachel, Konsole und Community', () => {
@@ -91,7 +91,7 @@ Deno.test('rpi-virtuell: eigene Instanz in Leiste, Kachel, Konsole und Community
   assert(/id: 'rpi-virtuell', label: 'rpi-virtuell'/.test(block(/const LEISTE = \[[\s\S]*?\n  \];/)), 'Leisten-Eintrag');
   assert(/\['rpi-virtuell', 'Materialpool, Fortbildungen, News', 'finden', 'rv', '#rpi-virtuell'/.test(s) && !/'FK', null/.test(s), 'Partner-Kachel');
   assert(/id: 'rpi-virtuell'[^}]*inst: \['rpi-virtuell', 'rpi-virtuell'\]/.test(block(/const CY = \[[\s\S]*?\n  \];/)), 'Community-Bezug');
-  assert(/'finden\.fortbildungen': 'finden\/fortbildungen'/.test(s) && /'#finden\/fortbildungen'/.test(s), 'Fortbildungen haben ein Ziel');
+  assert(/'termine\.finden': 'finden\/fortbildungen'/.test(s) && /'#finden\/fortbildungen'/.test(s), 'Fortbildungen haben ein Ziel');
   const rv = block(/function rvOpen[\s\S]*?hubFetch\('rpi-virtuell-news'[\s\S]*?\.then/);
   assert(/kalLaden\(\)/.test(rv) && /kinds: \[30023\]/.test(rv) && /npubToHex\(RV_NEWS\)/.test(rv) && /RV_NEWS = 'npub12jguy/.test(s) && !/amb-relay/.test(rv), 'Filter der Ansicht');
   assert(/mit Teilnahmebescheinigung/.test(view) && /href="#relilab"/.test(view), 'Institutslogik und Verweis auf das relilab');
@@ -106,9 +106,9 @@ Deno.test('Navigation: Tabelle, Farben in der Konsole, Lerninhalte in den Materi
   const c = consoleScript(), s = appScript();
   const d = await Deno.readTextFile(new URL('../docs/navigation.md', import.meta.url));
   assert(/\| Begriff \| Startseite \| Konsole \(Aktion\) \| Ziel \(Route\) \| Leiste \(Instanz\) \| Farbe \| Stand \|/.test(d), 'Tabellenkopf');
-  for (const b of ['Material', 'Fortbildungen', 'Beiträge', 'Schreibtisch', 'Labor', 'Communities', 'Personen', 'Lerninhalte', 'Termin', 'Beitrag', 'Profil', 'Start', 'Hilfe']) assert(new RegExp(`\\| ${b} \\|`).test(d), `Zeile ${b} fehlt`);
+  for (const b of ['Material', 'Fortbildungen', 'Beiträge', 'Schreibtisch', 'Labor', 'Communities', 'Personen', 'Lerninhalte', 'Termin', 'Beitrag', 'Profil', 'Themen', 'Überblick', 'Mitmachen', 'Gründen', 'Start', 'Hilfe']) assert(new RegExp(`\\| ${b} \\|`).test(d), `Zeile ${b} fehlt`);
   assert(/this\.text\(bud, s\.label[^;]*f\.ink, 'out'\)/.test(c) && !/\.out\{[^}]*fill:/.test(c), 'Knospen nicht in Bereichsfarbe');
-  assert(/veroeffentlichen\.lerninhalte'\) \{ go\('materialpool'\); openChooser\('materialpool'\)/.test(block(/function standardAktion[\s\S]*?\n  \}/)), 'Lerninhalte springen nicht in den Materialpool');
+  assert(/material\.teilen'\) \{ go\('materialpool'\); openChooser\('materialpool'\)/.test(block(/function standardAktion[\s\S]*?\n  \}/)), 'Lerninhalte springen nicht in den Materialpool');
   const nullZiele = [...block(/const EX = \{[\s\S]*?\n  \};/).matchAll(/go:\['[^']*',null\]/g)].length;
   assert(nullZiele === 0, `offene Ziele in EX: ${nullZiele}`);
 });
