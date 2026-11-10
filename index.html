@@ -841,6 +841,37 @@ relihub-steuerkonsole[hidden]{display:none}
 .oz-mini{display:inline-grid;place-items:center;position:relative;overflow:hidden;width:24px;height:24px;border-radius:50%;font-size:10px;font-weight:700;background:hsl(var(--oz-h,330) 55% 88%);color:hsl(var(--oz-h,330) 60% 20%)}
 .oz-mini img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .oz-mehr{font-size:12px;color:var(--muted);margin-left:3px}
+/* Anmeldung (NIP-07): Farbe „hub“; Knöpfe zum Mitmachen zeigen Zustand, Aktion oder Hinweis */
+.an-dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;border:0;border-radius:14px;padding:22px 24px;color:var(--ink);background:var(--card);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.an-dialog::backdrop{background:rgba(29,29,27,.45)}
+.an-dialog h2{margin:0 0 10px;color:var(--x-hub)}
+.an-dialog p{line-height:1.5}
+.an-zu{float:right;margin:-10px -12px 0 0}
+.an-zu button{font:inherit;font-size:18px;min-width:44px;min-height:44px;border:0;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer}
+.an-btn{font:inherit;font-weight:600;font-size:15px;color:#fff;background:var(--x-hub);border:0;border-radius:8px;padding:9px 16px;min-height:44px;cursor:pointer}
+.an-btn.zweit{color:var(--x-hub);background:var(--card);border:1.5px solid var(--x-hub)}
+.an-ansehen{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.an-ansehen label{display:block;font-weight:600;margin-bottom:6px}
+.an-ansehen div{display:flex;flex-wrap:wrap;gap:8px}
+.an-ansehen input{flex:1 1 220px;min-width:0;font:inherit;min-height:44px;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px}
+.an-klein{font-size:14px;color:var(--muted)}
+.an-klein a{color:var(--x-hub);font-weight:600}
+.an-fehler{margin:0;padding:10px 14px;border-radius:8px;background:var(--t-hub);color:var(--x-hub);font-weight:600}
+.an-fehler[hidden]{display:none}
+.an-zeile{display:inline-flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.an-knopf{display:inline-flex;flex-direction:column;gap:2px}
+.an-knopf button{font:inherit;font-size:14px;font-weight:600;min-height:44px;padding:8px 16px;border-radius:8px;border:1.5px solid var(--x-hub);background:var(--card);color:var(--x-hub);cursor:pointer}
+.an-knopf button.an-tun{background:var(--x-hub);color:#fff}
+.an-knopf button:disabled{border-color:var(--line);background:var(--paper);color:var(--muted);cursor:not-allowed}
+.an-knopf button.an-zustand{border-color:var(--x-hub);background:var(--t-hub);color:var(--x-hub);cursor:default}
+.an-knopf small{font-size:12px;color:var(--muted)}
+.an-btn:focus-visible,.an-knopf button:focus-visible,.an-ansehen input:focus-visible,.an-zu button:focus-visible,.an-klein a:focus-visible,.an-liste a:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.an-du{display:inline-block;margin:0 0 6px;padding:2px 10px;border-radius:999px;background:var(--t-hub);color:var(--x-hub);font-size:13px;font-weight:600}
+.an-ich{max-width:1180px;margin:0 auto;padding:18px clamp(16px,4vw,40px) 60px}
+.an-ich[hidden],#v-profil .dash[hidden]{display:none}
+.an-liste{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.an-liste a{color:var(--x-hub);font-weight:600}
+.an-liste small{color:var(--muted)}
 /* Communities live: Partnerkacheln ohne eigenen Schlüssel */
 .cy-trenn{grid-column:1/-1;font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:24px;margin:12px 0 0}
 .cy-partner{cursor:default;height:300px}
@@ -1139,10 +1170,11 @@ a.kat-card:hover{border-color:var(--c-koop)}
   <header class="hub-top">
     <a class="brand" href="#profil"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg>reli_hub</a>
     <span class="sp"></span>
-    <span class="who-name" style="font-weight:600">Luca Beispiel</span>
-    <a class="btn btn-ghost" href="#start" id="logout">Abmelden</a>
+    <span class="who-name" style="font-weight:600" id="prWer">Luca Beispiel</span>
+    <button type="button" class="btn btn-ghost" id="logout">Anmelden</button>
   </header>
   <p class="stand" aria-live="polite"></p>
+  <section class="an-ich" id="prIch" aria-live="polite" hidden></section>
 
   <main class="dash">
     <section class="hello">
@@ -1154,6 +1186,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
         <h1>Hallo Luca!</h1>
         <p>Das ist neu in deinem Netz seit deinem letzten Besuch am Montag.</p>
         <p>Dein eigenes Profil kommt mit der Anmeldung per Schlüssel; echte Profile findest du unter <a href="#kooperieren/personen" style="color:inherit;text-decoration:underline">Personen</a>.</p>
+        <p><button type="button" class="an-btn" data-anmelden>Anmelden</button></p>
         <div class="chips">
           <span style="font-size:14px;color:var(--muted);margin-right:2px">Meine Interessen:</span>
           <span class="chip"><i></i>Schöpfung</span>
@@ -1670,6 +1703,22 @@ a.kat-card:hover{border-color:var(--c-koop)}
   <button type="button" class="btn" data-cfg-done>Fertig</button>
 </div>
 <div class="toast" id="toast" role="status"></div>
+
+<!-- ===================== Anmeldung (NIP-07): Dialog ===================== -->
+<dialog class="an-dialog" id="anmelden" aria-labelledby="anTitel">
+  <form method="dialog" class="an-zu"><button type="submit" aria-label="Schließen">✕</button></form>
+  <h2 id="anTitel">Anmelden</h2>
+  <p>Mit deinem Nostr-Schlüssel kannst du Personen folgen, Communities beitreten, Terminen zusagen, „Gefällt mir“ sagen und Sammlungen speichern.</p>
+  <p>Der Schlüssel bleibt in deiner Browser-Erweiterung (NIP-07, zum Beispiel nos2x oder Alby). Diese Seite fragt nie nach deinem privaten Schlüssel, speichert keinen Schlüssel und sendet nur, wenn du auf den Knopf klickst, der es sagt.</p>
+  <p><button type="button" class="an-btn" data-an-schluessel>Mit Schlüssel anmelden</button></p>
+  <p class="an-fehler" id="anFehler" role="alert" hidden></p>
+  <form class="an-ansehen" data-an-ansehen>
+    <label for="anNpub">Nur ansehen mit deinem öffentlichen Schlüssel (npub)</label>
+    <div><input id="anNpub" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="npub1…"><button type="submit" class="an-btn zweit">Ansehen</button></div>
+    <p class="an-klein">So siehst du dein Profil und deine Communities; die Knöpfe zum Mitmachen bleiben aus.</p>
+  </form>
+  <p class="an-klein">Noch keinen Schlüssel? <a href="https://edufeed.org" target="_blank" rel="noopener">Konto bei edufeed anlegen ›</a></p>
+</dialog>
 
 <script>
 /*!
@@ -2667,6 +2716,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   let bzDaten = null, bzLauf = null;   // Antwort (gehalten, wenn nicht leer), laufende Abfrage
   let HUB_C = null;   // Zuschnitt auf eine Community (Hex oder null); Block „Zuschnitt (ADR-0009)“
   const ICH = { hex: null, kann: false };   // Anmeldestand, gefüllt von der Anmeldung (Hex des Schlüssels, ob signiert werden kann)
+  let ichDaten = null, ichInhalte = null;   // Block „Anmeldung“: Profil, Mitglieds- und Folgeliste der angemeldeten Person; eigene Veröffentlichungen und Sammlungen
+  const AN_HINWEIS = 'braucht Anmeldung mit Schlüssel';   // Hinweis an allen Knöpfen zum Mitmachen, solange niemand mit Schlüssel angemeldet ist
   let ozGefuege = null, ozLive = false;   // Gefüge der Ökosystem-Ansicht { ents, kanten } und ob es vom Relay kommt
   const cyProfile = new Map();   // Profile (profilAus) der Community-Konten aus cyLaden
   const pkLive = [];   // Events der Protokoll-Subscription (nur Live-Zugänge dieser Sitzung); bzQuellen trägt sie nach, bzDaten und coDaten bleiben unverändert
@@ -2880,7 +2931,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const kopf = direkt ? `<h2>Die Konsole führt dich direkt zur Aktion</h2><p>Ein Klick auf eine Knospe öffnet sofort, was dahintersteht. Unter „Hilfe“ zeigt dir die Konsole die Erklärungen wieder. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`
       : `<h2>Wähle einen Bereich der Steuerkonsole</h2><p>Fahre an den äußeren Rand eines Kreises – er springt heraus. Klicke ihn oder eine seiner Knospen an, und hier erfährst du, worum es geht. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`;
     const umschalter = direkt ? `<button type="button" class="btn btn-ghost modus" data-modus="tutorial">Konsole wieder erklären lassen</button>` : `<button type="button" class="btn btn-ghost modus" data-modus="direkt">Verstanden, direkt loslegen</button>`;
-    exEl.innerHTML = `${icon('none')}<div><p class="fn" style="color:var(--muted)">So funktioniert's</p>${kopf}<div class="acts"><span class="hint">Schon dabei?</span><a class="btn btn-ghost" href="#profil">Anmelden</a>${umschalter}</div></div>`;
+    exEl.innerHTML = `${icon('none')}<div><p class="fn" style="color:var(--muted)">So funktioniert's</p>${kopf}<div class="acts"><span class="hint">Schon dabei?</span><a class="btn btn-ghost" href="#profil" data-anmelden>Anmelden</a>${umschalter}</div></div>`;
   }
   function explain(action) {
     const e = EX[action]; if (!e) return;
@@ -2899,7 +2950,6 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (e.target.closest('[data-sheet-close]') || e.target.closest('#explain a[href], #explain [data-open]') || !(e.target.closest('#explain') || e.target.closest('relihub-steuerkonsole'))) exEl.classList.remove('sheet');
   });
   explainDefault();
-  document.getElementById('logout').addEventListener('click', () => { LOGGED = false; });
   document.addEventListener('click', e => {
     const b = e.target.closest('[data-ex]'); if (b) explain(b.dataset.ex);
     const m = e.target.closest('[data-modus]'); if (m) setModus(m.dataset.modus);
@@ -3142,7 +3192,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     return [
       { label: 'Auf den Schreibtisch holen', geht: offen, tu: () => go('relidesk?tab=schreibtisch') },
       { label: 'In der Community weiterbearbeiten', geht: offen, tu: () => openChooser('materialpool') },
-      { label: 'In der Sammlung zeigen', geht: offen, tu: () => go('finden/sammlung?q=' + encodeURIComponent(m.t)) },
+      { label: 'Zur eigenen Sammlung', geht: offen, tu: () => { if (ICH.kann) { aktion('zurSammlung', '30142:' + m.pk + ':' + m.d); return; } go('finden/sammlung?q=' + encodeURIComponent(m.t)); toast('Zur eigenen Sammlung: braucht Anmeldung mit Schlüssel. Bis dahin zeigt dir die Sammlung das Material.'); } },
       { label: 'Ansehen', geht: true, tu: () => { if (m.url) window.open(m.url, '_blank', 'noopener'); else toast('Keine Adresse hinterlegt.'); } },
       { label: 'Link kopieren', geht: true, tu: () => rtCopy(location.href, 'Link kopiert.') },
       { label: 'Empfehlen', geht: true, tu: () => toast('Teilen in Communities folgt.') }
@@ -3178,7 +3228,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       const aktionen = mpAktionen.map((a, i) => a.geht
         ? `<button type="button" data-mp-aktion="${i}">${esc(a.label)}</button>`
         : `<button type="button" disabled aria-disabled="true" title="nur mit offener Lizenz" data-mp-aktion="${i}">${esc(a.label)}</button>`).join('');
-      const geprueft = tagWerte(ev, 'l').includes('geprueft');
+      const geprueft = tagWerte(ev, 'l').includes('geprueft'), adr = akMerken(ev);
       const pruef = geprueft ? 'Nach den Qualitätskriterien geprüft.' : `Noch nicht nach den Qualitätskriterien geprüft. <a href="${spielregelLink('spielregeln-qualitaetskriterien')}">Zu den Kriterien ›</a>`;
       const bildSrc = sichereUrl(tagWert(ev, 'image'));
       const bild = bildSrc ? `<img class="mp-bild" src="${esc(bildSrc)}" alt="" loading="lazy">` : `<div class="mp-bild-fehlt">${esc(m.art || 'Material')}</div>`;
@@ -3188,7 +3238,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
         <dl>${felder.map(f => `<dt>${f[0]}</dt><dd>${f[1]}</dd>`).join('')}</dl>
         <div class="mp-links">${links}</div>
         <p>${licU ? `<a class="lic lic-${m.stand}" href="${esc(licU)}" target="_blank" rel="noopener">${esc(m.licLabel)}</a>` : pille}</p>${nachweis}
-        <p class="mp-stand">${satz}</p><div class="mp-aktionen">${aktionen}</div>
+        <p class="mp-stand">${satz}</p><div class="mp-aktionen">${aktionen}</div>${adr ? `<div class="an-zeile">${akKnopf('gefaellt', adr, 'Gefällt mir')}</div>` : ''}
         <p class="mp-pruef">${pruef}</p>
         <details class="mp-roh"><summary>Rohdaten (JSON-LD)</summary><p class="hint">aus dem Event gebildet (AMB-Kontext)</p><pre>${esc(roh)}</pre><button type="button" data-mp-copy>Kopieren</button></details>`;
     };
@@ -3320,6 +3370,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       sammlung: { community: npub, fach: f.fach, stufe: f.stufe, lizenz: f.lizenz, q: f.q, relays: RELAYS }
     }, null, 2);
   }
+  let saTreffer = [];   // Adressen der aktuellen Treffer (saRender), Grundlage von sammlungListe
   let saF = sammlungFilter(''), saLauf = 0, saCo = null, saExtra = [], saFehlt = 0, saCoFehler = '', saZahlen = {}, saAusgaben = {}, saStand = 'laden';   // Filter, Lauf-Zähler, Adressen der Community, Zahlen je Community, Schnipsel, Ladezustand
   const saHex = id => (CO_SCHLUESSEL.find(k => k.id === id) || {}).hex;
   /** Filter in die Adresszeile schreiben (ohne neuen Verlaufseintrag) */
@@ -3357,6 +3408,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const liste = (mpDaten || []).concat(saExtra);   // saExtra: mit der Community geteilte Materialien außerhalb der Pool-Liste (mpDaten bleibt unberührt)
     const hex = saF.c ? saHex(saF.c) : null;
     const treffer = liste.filter(m => sammlungPasst(m, saF, saCo)).sort((a, b) => b.datum - a.datum);
+    saTreffer = treffer.map(m => ({ adr: '30142:' + m.pk + ':' + m.d, kind: 30142 }));   // für „Als Nostr-Liste speichern“
     if (!liste.length) datenstand('v-sammlung', 'nachbau', saStand === 'fehler' ? 'Relays nicht erreichbar' : 'Materialien laden');
     else datenstand('v-sammlung', 'live', `${treffer.length} von ${liste.length} Materialien · abgefragt bei ${RELAYS.length} Relays${saF.c && saCoFehler ? ' · ' + saCoFehler : ''}${saF.c && saFehlt ? ` · ${saFehlt} geteilt, aber nicht auffindbar` : ''}`);
     document.getElementById('saListe').innerHTML = treffer.length ? treffer.map(m => {
@@ -3380,7 +3432,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       </details>
       <details class="sa-box sa-abo" id="saAbo"${offen.a}><summary>Abonnieren</summary>
         <p>Der Nostr-Filter, in jeder Nostr-App als Abfrage nutzbar. Fach, Stufe und Lizenz prüft diese Seite selbst; im Filter stehen Community und Suchbegriffe.</p><pre>${esc(saAusgaben.req)}</pre><button type="button" class="sa-copy" data-sa-copy="req">Filter kopieren</button>
-        <p><button type="button" class="sa-copy" disabled aria-disabled="true">Als Nostr-Liste speichern</button> braucht Anmeldung mit Schlüssel, folgt.</p>
+        <p>${ICH.kann ? '<button type="button" class="sa-copy" data-ak="sammlungSpeichern" data-ziel="">Als Nostr-Liste speichern</button> Die ersten 100 Treffer als Liste unter deinem Schlüssel.' : '<button type="button" class="sa-copy" disabled aria-disabled="true">Als Nostr-Liste speichern</button> ' + AN_HINWEIS + '.'}</p>
         <p>Ein Feed zu einem beliebigen Filter braucht einen Server; hier gibt es keinen.</p>
       </details>`;
   }
@@ -4018,7 +4070,10 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const el = document.getElementById('ozAuswahl'), e = ozGefuege && ozWahl ? ozGefuege.ents.get(ozWahl) : null;
     if (!e) { el.hidden = true; el.innerHTML = ''; return; }
     const href = ozLink(e), extern = /^https?:/.test(href);
-    el.innerHTML = `<span class="oz-typ">${OZ_ART[e.typ]}</span><b>${ozName(e)}</b>` + (href ? `<a href="${esc(href)}"${extern ? ' target="_blank" rel="noopener"' : ''}>Bei edufeed ansehen ›</a>` : '') + `<button type="button" data-aufheben aria-label="Auswahl aufheben">✕</button>`;
+    const adr = e.ev ? akMerken(e.ev) : '';
+    const ak = e.typ === 'person' && istHex64(e.pk) ? akKnopf('folgen', e.pk, 'Folgen') : e.typ === 'community' && istHex64(e.pk) ? akKnopf('beitreten', e.pk, 'Beitreten')
+      : e.typ === 'event' && adr ? akKnopf('zusagen', adr, 'Zusagen') + akKnopf('vielleicht', adr, 'Vielleicht') : e.typ === 'material' && adr ? akKnopf('gefaellt', adr, 'Gefällt mir') : '';
+    el.innerHTML = `<span class="oz-typ">${OZ_ART[e.typ]}</span><b>${ozName(e)}</b>` + (href ? `<a href="${esc(href)}"${extern ? ' target="_blank" rel="noopener"' : ''}>Bei edufeed ansehen ›</a>` : '') + (ak ? `<span class="an-zeile">${ak}</span>` : '') + `<button type="button" data-aufheben aria-label="Auswahl aufheben">✕</button>`;
     el.hidden = false;
   }
   function ozRender() {
@@ -4512,7 +4567,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   }
   function crRender() {
     const c = CY.find(x => x.id === crId); if (!c) return;
-    const mem = crMember[c.id], fol = cyFollow.has(c.id), req = crReq[c.id];
+    const mem = crMember[c.id], fol = cyFollow.has(c.id), req = crReq[c.id], hx = (CO_SCHLUESSEL.find(k => k.id === c.id) || {}).hex || ([...CY_HEX].find(x => x[1] === c.id) || [])[0] || '';   // Schlüssel der Community für „Beitreten“
     const nav = (k, ic, l, extra) => `<button type="button" data-crtab="${k}" class="${crTab === k ? 'on' : ''}">${ic}${l}${extra || ''}</button>`;
     crRootEl.innerHTML = `
       <aside class="cr-side"><div class="cr-sh" style="--sht:color-mix(in srgb, ${c.col} 13%, white)">${cyAv(c)}<span>${c.n}</span></div>
@@ -4521,7 +4576,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       <main>
         <div class="cr-top"><span class="ring" style="width:240px;height:240px;background:${c.col};right:-50px;top:-120px"></span><span class="ring" style="width:170px;height:170px;background:var(--c-koop);right:130px;bottom:-120px"></span><div class="cr-id"><div class="cr-name">${crAv(c, 64)}<h1>${c.n}</h1><button type="button" class="cr-fol${fol ? '' : ' off'}" data-cract="follow">${fol ? '✓ Folge ich' : '+ Folgen'}</button></div>
           <button type="button" class="cr-mem" data-crtab="mem"><span class="st">${PEOPLE.slice(0, 3).map((p, i) => `<span style="background:${PCOL[i]}">${ini(p)}</span>`).join('')}</span>${c.m} Mitglieder ›</button>${c.inst ? `<div>${cyRel(c)}</div>` : ''}${nlLine(c)}</div>
-          <div class="cr-act">${mem ? '<span class="cr-badge">✓ Mitglied</span>' : req ? '<span class="cr-badge">Anfrage gesendet</span>' : '<button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button>'}${mem ? '' : '<a data-cract="code">Einladungscode einlösen</a><div class="cr-code" id="crCode" hidden><input placeholder="Code eingeben" aria-label="Einladungscode"><button type="button" class="cr-pill" data-cract="redeem">Einlösen</button></div>'}</div></div>
+          <div class="cr-act">${hx ? akKnopf('beitreten', hx, 'Beitreten') : mem ? '<span class="cr-badge">✓ Mitglied</span>' : req ? '<span class="cr-badge">Anfrage gesendet</span>' : '<button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button>'}${mem ? '' : '<a data-cract="code">Einladungscode einlösen</a><div class="cr-code" id="crCode" hidden><input placeholder="Code eingeben" aria-label="Einladungscode"><button type="button" class="cr-pill" data-cract="redeem">Einlösen</button></div>'}</div></div>
         ${crMain(c)}
       </main>`;
     if (crTab === 'katalog') katRender(c);
@@ -4939,7 +4994,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
         <div><h3><a href="${rtEsc(e.u)}" target="_blank" rel="noopener">${rtEsc(e.t || 'ohne Titel')}</a></h3>
         <p class="ka-meta">${rtEsc(e.a)}<span class="ka-pill ka-logik-${t.logik}">${t.logik === 'labor' ? 'Labor' : 'Institut'}</span></p>
         <p class="ka-merk">${merk.length ? merk.map(w => `<span>${rtEsc(w)}</span>`).join('') : '<span>keine Angabe</span>'}</p>
-        <div class="ka-act"><button type="button" data-kaics="${i}" aria-label="${rtEsc('Als Kalenderdatei: ' + e.t)}">.ics</button><button type="button" data-kan="${i}" aria-label="${rtEsc('Nostr-Adresse kopieren: ' + e.t)}">nostr:</button></div></div></article>`;
+        <div class="ka-act">${(adr => adr ? akKnopf('zusagen', adr, 'Zusagen') + akKnopf('vielleicht', adr, 'Vielleicht') : '')(akMerken(t.ev))}<button type="button" data-kaics="${i}" aria-label="${rtEsc('Als Kalenderdatei: ' + e.t)}">.ics</button><button type="button" data-kan="${i}" aria-label="${rtEsc('Nostr-Adresse kopieren: ' + e.t)}">nostr:</button></div></div></article>`;
     });
     document.getElementById('kaListe').innerHTML = h || `<p>${alle.length ? 'Nichts gefunden; Filter lockern.' : 'Gerade keine bevorstehenden Termine.'}</p>`;
     if (kalStand.live) datenstand('v-fortbildungen', 'live', `${alle.length} Termine · ${kalStand.quellen} Quellen${kalStand.grenze ? ' · Relay-Grenze erreicht, ältere Termine können fehlen' : ''}`);
@@ -5023,7 +5078,6 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   const peAv = (p, gross) => `<span class="pe-av${gross ? ' gross' : ''}" aria-hidden="true">${peIni(p.name)}${p.bild ? `<img src="${esc(p.bild)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`;
   const peDatum = sek => new Date(sek * 1000).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const peChips = namen => namen && namen.length ? `<p class="pe-chips">${namen.map(n => `<span>${esc(n)}</span>`).join('')}</p>` : '';
-  const PE_FOLGEN_HINT = 'braucht Anmeldung mit Schlüssel, folgt';   // „Folgen“ bleibt bis zur Anmeldung ausgegraut (Knopf steht in peRender und prRender)
   /** Ansicht Personen zeichnen: daten null = lädt (Teamseite), liste null = noch nicht angelegt oder keine Antwort, sonst Karten ohne Bots */
   function peRender(daten) {
     const aus = document.getElementById('peAus'); if (!aus) return;
@@ -5041,7 +5095,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       if (g) karten = karten.filter(p => (g.kanten.get('p:' + p.pk) || new Set()).has(z));
       zsatz = `<p class="pe-satz">Zuschnitt: ${zuschnittName()}${g ? '' : ' · die Verbindungen laden noch, bis dahin steht hier die ganze Liste'}</p>`;
     }
-    aus.innerHTML = zsatz + (karten.length ? `<div class="pe-liste">${karten.map(p => `<article class="pe-card">${peAv(p)}<div><b>${p.name}</b>${p.about ? `<p>${p.about}</p>` : ''}${p.nip05 ? `<small>${p.nip05}</small>` : ''}${peChips(daten.mitglied.get(p.pk))}<div class="pe-act"><a class="pe-btn" href="#person?p=${esc(p.npub)}">Profil ansehen ›</a><span class="pe-folgen"><button type="button" disabled aria-disabled="true">Folgen</button><small>${PE_FOLGEN_HINT}</small></span></div></div></article>`).join('')}</div>` : '<p class="pe-satz">Zu den Genannten liegen noch keine Profile vor.</p>') + hinweis;
+    aus.innerHTML = zsatz + (karten.length ? `<div class="pe-liste">${karten.map(p => `<article class="pe-card">${peAv(p)}<div><b>${p.name}</b>${p.about ? `<p>${p.about}</p>` : ''}${p.nip05 ? `<small>${p.nip05}</small>` : ''}${peChips(daten.mitglied.get(p.pk))}<div class="pe-act"><a class="pe-btn" href="#person?p=${esc(p.npub)}">Profil ansehen ›</a>${ICH.hex ? akKnopf('folgen', p.pk, 'Folgen') : `<span class="pe-folgen"><button type="button" disabled aria-disabled="true">Folgen</button><small>${AN_HINWEIS}</small></span>`}</div></div></article>`).join('')}</div>` : '<p class="pe-satz">Zu den Genannten liegen noch keine Profile vor.</p>') + hinweis;
     datenstand('v-personen', 'live', `${karten.length} Personen · Liste vom ${peDatum(daten.liste.created_at)}`);
   }
   function peOpen() {
@@ -5096,14 +5150,14 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       return `<section class="pe-sek"><h2>${titel}</h2>${liste.length ? `<div class="pe-pubs">${liste.map(eintragKarte).join('')}</div>` : '<p class="pe-leer">noch nichts veröffentlicht</p>'}</section>`;
     };
     const kopf = p
-      ? `${peAv(p, true)}<div><h1>${p.name}</h1>${p.bot ? '<p class="pe-chips"><span>automatisches Konto</span></p>' : ''}${p.about ? `<p class="pe-about">${p.about}</p>` : ''}${p.nip05 ? `<p><small>${p.nip05}</small></p>` : ''}${p.web ? `<p><a href="${esc(p.web)}" target="_blank" rel="noopener">${esc(p.web.replace(/^https?:\/\//i, ''))}</a></p>` : ''}${peChips(d.mitglied)}<div class="pe-act"><span class="pe-folgen"><button type="button" disabled aria-disabled="true">Folgen</button><small>${PE_FOLGEN_HINT}</small></span></div></div>`
+      ? `${peAv(p, true)}<div><h1>${p.name}</h1>${p.bot ? '<p class="pe-chips"><span>automatisches Konto</span></p>' : ''}${p.about ? `<p class="pe-about">${p.about}</p>` : ''}${p.nip05 ? `<p><small>${p.nip05}</small></p>` : ''}${p.web ? `<p><a href="${esc(p.web)}" target="_blank" rel="noopener">${esc(p.web.replace(/^https?:\/\//i, ''))}</a></p>` : ''}${peChips(d.mitglied)}<div class="pe-act">${d.hex === ICH.hex ? '<p class="an-du">Das bist du</p>' : akKnopf('folgen', d.hex, 'Folgen')}</div></div>`
       : `<div><h1>${esc(npub.slice(0, 14))}…</h1><p class="pe-satz">Zu diesem Schlüssel liegt kein Profil vor.</p></div>`;
     aus.innerHTML = `<div class="pe-kopf">${kopf}</div>${abschnitt('Materialien', 30142)}${abschnitt('Beiträge', 30023)}${abschnitt('Termine', 31923)}<p class="pe-hinweis">Bei edufeed ansehen › <code>https://edufeed.org/${esc(npub)}</code></p><p><a class="pe-btn" href="#kooperieren/personen">Zu den Personen ›</a></p>`;
     if (p) datenstand('v-person', 'live', `Profil vom ${peDatum(p.zeit)}`); else datenstand('v-person', 'nachbau', 'Profil nicht gefunden');
   }
 
   // ---------- Kontexte der Steuerkonsole: dieselbe Steuerkonsole, je nach Seite andere Aktionen ----------
-  let LOGGED = false;
+  let LOGGED = false;   // abgeleitet aus ICH.hex (ichSetzen im Block „Anmeldung“)
   const VIEW_OF = { 'finden.material': 'materialpool', 'finden.beitraege': 'profil?zu=artikel', 'hub.profil': 'profil', 'hub.home': 'start', 'erstellen.labor': 'relilab', 'erstellen.schreibtisch': 'relidesk?tab=schreibtisch', 'finden.fortbildungen': 'finden/fortbildungen', 'kooperieren.personen': 'kooperieren/personen' };
   function navTo(view, url) { const q = new URL(url).search; go(view + (q ? (view.includes('?') ? '&' + q.slice(1) : q) : '')); }
   function info(d) {
@@ -5246,13 +5300,14 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   function leisteAus() {
     try { const a = JSON.parse(speicher('relihub-leiste-aus')); return Array.isArray(a) ? a.filter(x => typeof x === 'string') : []; } catch (e) { return []; }
   }
-  // Instanzen gefiltert (Kontext der aktuellen Ansicht, dann Person; „Start“ bleibt immer als Anker); angemeldet kommen die Communities dazu, in denen die Persona Mitglied ist (nur solche mit eigenem Raum), nie gefiltert
+  // Instanzen gefiltert (Kontext der aktuellen Ansicht, dann Person; „Start“ bleibt immer als Anker); angemeldet kommen die Communities der eigenen Liste dazu (nur solche mit eigenem Raum), nie gefiltert
   function leisteItems() {
     const v = CUR.split('?')[0], aus = ((LEISTE_KONTEXT[v] || {}).aus || []).concat(leisteAus());
     const inst = LEISTE.filter(x => x.id === 'start' || !aus.includes(x.id));
     if (HUB_C) { const n = zuschnittName().replace(/&(lt|gt|quot|amp);/g, m => ({ '&lt;': '<', '&gt;': '>', '&quot;': '"', '&amp;': '&' }[m])); inst.unshift({ id: 'zuschnitt', label: 'Zuschnitt: ' + n, short: n, href: '#eigene-instanz', kind: 'zuschnitt' }); }   // abwählbare Markierung vor den Instanzen
     if (!LOGGED) return inst;
-    return inst.concat(COMM.filter(c => c[1] === 'Mitglied' && c[4]).map(c => ({ id: 'c-' + c[4], label: c[0].replace(/\u00ad/g, ''), href: '#community?c=' + c[4], kind: 'community' })));
+    const meine = ichDaten && ichDaten.liste ? [...new Set(tagWerte(ichDaten.liste, 'p').filter(istHex64).map(zuschnittCyId).filter(Boolean))] : [];   // Communities aus der eigenen Liste (kind 30000), nur mit Raum
+    return inst.concat(meine.map(id => CY.find(c => c.id === id)).filter(Boolean).map(c => ({ id: 'c-' + c.id, label: c.n.replace(/\u00ad/g, ''), href: '#community?c=' + c.id, kind: 'community' })));
   }
   const leisteEl = document.getElementById('leiste');
   let leisteKey = null;   // Ansicht + Anmeldung: ändert sich eins davon, setzt route() die Einträge neu
@@ -5417,6 +5472,300 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (c && eiAus[c.dataset.eicopy]) rtCopy(eiAus[c.dataset.eicopy], 'Schnipsel kopiert.');
   });
 
+  // ---------- Anmeldung (NIP-07, ADR-0009) ----------
+  // Angemeldet wird nur über die Browser-Erweiterung (window.nostr) oder „nur ansehen“ mit npub; der Hub fragt nie nach einem nsec und hält nur den öffentlichen Schlüssel.
+  // Gesendet wird nur auf Klick des Knopfes, der es sagt. Listen (kind 3, 30000, 30004) werden davor frisch vom Relay geholt und ergänzt, nie blind ersetzt.
+  // Jedes gesendete Event geht an die drei RELAYS; der Toast sagt, wie viele es angenommen haben.
+  let ichLauf = 0, akLaeuft = false;   // Zähler gegen späte Antworten nach Ab- oder Ummeldung; Sperre, solange eine Aktion läuft
+  const AK_ZIEL = new Map();   // Adresse → Event, gemerkt beim Zeichnen der Knöpfe Zusagen, Vielleicht und Gefällt mir
+  const anDialogEl = document.getElementById('anmelden');
+  /** Anmeldestand setzen (Hex, ob signiert werden kann) oder leeren (null): Sitzung `relihub-ich`, LOGGED, Kopfzeilen, Profil laden */
+  function ichSetzen(hex, kann) {
+    ICH.hex = istHex64(hex) ? hex : null; ICH.kann = !!(ICH.hex && kann); LOGGED = !!ICH.hex;
+    ichDaten = null; ichInhalte = null; ichLauf++;
+    try { if (ICH.hex) sessionStorage.setItem('relihub-ich', JSON.stringify({ hex: ICH.hex, kann: ICH.kann })); else sessionStorage.removeItem('relihub-ich'); } catch (e) {}
+    kopfzeilen();
+    if (ICH.hex) ichLaden();
+  }
+  /** Profil, Mitgliedsliste (kind 30000, d=communities) und Folgeliste (kind 3) der angemeldeten Person in einer Abfrage je Relay */
+  function ichLaden() {
+    const hex = ICH.hex, lauf = ichLauf;
+    return hubFetch('ich:' + hex, [{ kinds: [0], authors: [hex], limit: 1 }, { kinds: [30000], authors: [hex], '#d': ['communities'], limit: 1 }, { kinds: [3], authors: [hex], limit: 1 }]).then(evs => {
+      if (lauf !== ichLauf) return;
+      const neuestes = (kind, d) => evs.filter(e => e && e.kind === kind && e.pubkey === hex && (d == null || tagWert(e, 'd') === d)).sort((a, b) => b.created_at - a.created_at)[0] || null;
+      const k0 = neuestes(0), pa = k0 && profilAus(k0), vorher = ichDaten;
+      ichDaten = { antwort: evs.length > 0, profil: pa ? Object.assign(pa, { zeit: k0.created_at }) : null, liste: null, kontakte: null };
+      [neuestes(30000, 'communities'), neuestes(3), vorher && vorher.liste, vorher && vorher.kontakte].forEach(ichListeMerken);   // Gesendetes dieser Sitzung bleibt, wenn es neuer ist
+      kopfzeilen(); RelihubLeiste.setItems(leisteItems()); akZeichnen();
+    }, () => {});
+  }
+  /** Eigene Folge- oder Mitgliedsliste übernehmen, wenn sie neuer ist als die gehaltene */
+  function ichListeMerken(ev) {
+    if (!ev || !ichDaten || ev.pubkey !== ICH.hex) return;
+    const feld = ev.kind === 3 ? 'kontakte' : ev.kind === 30000 && tagWert(ev, 'd') === 'communities' ? 'liste' : '';
+    if (feld && (!ichDaten[feld] || ev.created_at >= ichDaten[feld].created_at)) ichDaten[feld] = ev;
+  }
+  /** Kopfzeilen: „Anmelden“ (öffnet den Dialog) oder „Mein Profil“; Name und Knopf im Kopf der Profilseite */
+  function kopfzeilen() {
+    document.querySelectorAll('a.btn-profil').forEach(a => { a.textContent = ICH.hex ? 'Mein Profil' : 'Anmelden'; });
+    const b = document.getElementById('logout'), w = document.getElementById('prWer');
+    if (b) b.textContent = ICH.hex ? 'Abmelden' : 'Anmelden';
+    if (w) w.innerHTML = !ICH.hex ? 'Luca Beispiel' : ichDaten && ichDaten.profil ? ichDaten.profil.name : esc(zuschnittNpub(ICH.hex).slice(0, 12) + '…');
+  }
+  function anDialogAuf() {
+    const f = document.getElementById('anFehler'); f.hidden = true; f.textContent = '';
+    if (typeof anDialogEl.showModal === 'function') { if (!anDialogEl.open) anDialogEl.showModal(); } else anDialogEl.setAttribute('open', '');
+  }
+  function anDialogZu() {
+    if (!anDialogEl.open) return;
+    try { anDialogEl.close(); } catch (e) { anDialogEl.removeAttribute('open'); }
+  }
+  /** Meldung als Toast und, solange der Dialog offen ist, auch darin (der Dialog liegt über dem Toast) */
+  function anMeldung(text) {
+    toast(esc(text));
+    const f = document.getElementById('anFehler');
+    if (anDialogEl.open) { f.textContent = text; f.hidden = false; }
+  }
+  /** Anmelden über die Browser-Erweiterung (NIP-07): öffentlicher Schlüssel von getPublicKey, signiert wird später je Klick */
+  function anmelden() {
+    const n = window.nostr;
+    if (!n || typeof n.getPublicKey !== 'function') { anMeldung('Keine Nostr-Erweiterung gefunden (zum Beispiel nos2x oder Alby). Alternativ: nur ansehen mit npub.'); return Promise.resolve(); }
+    return Promise.resolve().then(() => n.getPublicKey()).then(hex => {
+      if (!istHex64(hex)) { anMeldung('Die Erweiterung hat keinen gültigen Schlüssel geliefert.'); return; }
+      anFertig(hex, typeof n.signEvent === 'function');
+    }, () => anMeldung('Anmeldung abgebrochen.'));
+  }
+  /** Nur ansehen: ein gültiger npub (Prüfsumme über die Rückwandlung), nie signieren */
+  function nurAnsehen(npub) {
+    const x = String(npub || '').trim().toLowerCase();
+    let hex = ''; try { hex = /^npub1[0-9a-z]{58}$/.test(x) ? npubToHex(x) : ''; } catch (e) {}
+    if (!istHex64(hex) || zuschnittNpub(hex) !== x) { anMeldung('Das ist kein gültiger npub.'); return; }
+    anFertig(hex, false);
+  }
+  /** Gemeinsamer Schluss von anmelden und nurAnsehen: Stand setzen, Dialog schließen, Ansicht neu (von der Startseite ins eigene Profil) */
+  function anFertig(hex, kann) {
+    ichSetzen(hex, kann); anDialogZu();
+    toast(kann ? 'Angemeldet. Mitmachen geht jetzt mit deinem Schlüssel.' : 'Nur ansehen: Mitmachen geht mit Schlüssel.');
+    if (CUR.split('?')[0] === 'start') go('profil'); else route();
+  }
+  function abmelden() {
+    ichSetzen(null, false); toast('Abgemeldet.');
+    route();
+  }
+  /** Sendet `['EVENT', ev]` an alle drei RELAYS, wartet je Relay auf `['OK', id, true|false, grund]` (höchstens TIMEOUT_MS), schließt jede Verbindung; liefert die Zahl der Relays, die angenommen haben */
+  function hubSenden(ev) {
+    const relay = url => new Promise(resolve => {
+      let ws = null, fertig = false;
+      const ende = ok => { if (fertig) return; fertig = true; clearTimeout(timer); try { if (ws) ws.close(); } catch (e) {} resolve(ok); };
+      const timer = setTimeout(() => ende(false), TIMEOUT_MS);
+      try { ws = new WebSocket(url); } catch (e) { ende(false); return; }
+      ws.onopen = () => { try { ws.send(JSON.stringify(['EVENT', ev])); } catch (e) { ende(false); } };
+      ws.onmessage = m => {
+        let d; try { d = JSON.parse(m.data); } catch (e) { return; }
+        if (Array.isArray(d) && d[0] === 'OK' && d[1] === ev.id) ende(d[2] === true);
+      };
+      ws.onerror = ws.onclose = () => ende(false);
+    });
+    return Promise.all(RELAYS.map(relay)).then(r => r.filter(Boolean).length);
+  }
+  /** Vorlage signieren (Erweiterung) und senden; nur mit ICH.kann. Erfolg: Toast mit Zahl der Relays, Event in die lokalen Quellen (pkLive), Gefüge und Ansicht neu. Liefert true bei mindestens einem Relay. */
+  function signierenUndSenden(vorlage, erfolg) {
+    const n = window.nostr;
+    if (!ICH.kann || !ICH.hex || !n || typeof n.signEvent !== 'function') { toast('Zum Mitmachen bitte mit Schlüssel anmelden.'); return Promise.resolve(false); }
+    const roh = Object.assign({ created_at: Math.floor(Date.now() / 1000), content: '' }, vorlage, { pubkey: ICH.hex });
+    return Promise.resolve().then(() => n.signEvent(roh)).then(ev => {
+      if (!ev || ev.pubkey !== ICH.hex || ev.kind !== roh.kind || !istHex64(ev.id) || typeof ev.sig !== 'string') { toast('Signieren abgebrochen.'); return false; }
+      return hubSenden(ev).then(zahl => {
+        if (!zahl) { toast('Kein Relay hat das Ereignis angenommen.'); return false; }
+        toast(`${erfolg} (angenommen von ${zahl} ${zahl === 1 ? 'Relay' : 'Relays'})`);
+        akAufnehmen(ev);
+        return true;
+      });
+    }, () => { toast('Signieren abgebrochen.'); return false; });
+  }
+  /** Gesendetes Event in die Quellen der Sitzung: Protokoll (pkLive), eigene Listen und Inhalte; Gefüge und Protokoll neu */
+  function akAufnehmen(ev) {
+    if (!pkGesehen.has(ev.id)) { pkGesehen.add(ev.id); pkLive.push(ev); pkMarke.set(ev.id, Date.now()); }
+    if (!ichDaten && (ev.kind === 3 || ev.kind === 30000)) ichDaten = { antwort: false, profil: null, liste: null, kontakte: null };   // Sitzungskopie auch dann halten, wenn das Profil noch lädt (ichLaden übernimmt die neuere)
+    ichListeMerken(ev);
+    if (ev.kind === 3 || ev.kind === 30000) { try { sessionStorage.removeItem('relihub:ich:' + ICH.hex); } catch (e) {} }   // nach dem Neuladen nicht die alte Liste aus dem Zwischenspeicher
+    if (ichInhalte && [30004, 30142, 30023, 31923].includes(ev.kind)) ichInhalte.evs = [ev, ...ichInhalte.evs];
+    if (ev.kind === 30000) RelihubLeiste.setItems(leisteItems());
+    if (ozLive) ozBauen();
+    if (pkGeladen) { pkBerechnen(); pkAktualisieren(); }
+  }
+  /** Neues Listen-Event aus dem bisherigen (`alt` oder null): alle Tags außer d bleiben, d vorn (kind 3 ohne d), neuer Tag hinten; content bleibt. null, wenn der Tag schon enthalten ist. Rein. */
+  function listeErgaenzen(alt, kind, d, tag) {
+    const bisher = (alt && Array.isArray(alt.tags) ? alt.tags : []).filter(t => Array.isArray(t) && t[0] !== 'd').map(t => t.slice());
+    if (bisher.some(t => t[0] === tag[0] && t[1] === tag[1])) return null;
+    return { kind, content: alt && typeof alt.content === 'string' ? alt.content : '', tags: [...(kind === 3 || d == null ? [] : [['d', d]]), ...bisher, tag.slice()] };
+  }
+  /** Sammlung als unsigniertes kind 30004: d aus dem Filter (stabil), Titel und Beschreibung aus dem Filter, a-Tags der ersten 100 Treffer. Rein. */
+  function sammlungListe(f, eintraege) {
+    const lizenz = { offen: 'offen lizenziert', geschuetzt: 'geschützt', unbekannt: 'Lizenz unbekannt' }[f.lizenz] || '';
+    const teile = [...(f.fach || []), ...(f.stufe || []), lizenz, ...(f.q || [])].filter(Boolean);
+    const kurz = teile.join(' · ') || 'alle Materialien', titel = 'Sammlung: ' + (kurz.length > 80 ? kurz.slice(0, 79).trimEnd() + '…' : kurz);
+    const satz = [f.c ? 'Community ' + f.c : '', (f.fach || []).length ? 'Fach ' + f.fach.join(', ') : '', (f.stufe || []).length ? 'Stufe ' + f.stufe.join(', ') : '', lizenz ? 'Lizenz ' + lizenz : '', (f.q || []).length ? 'Begriffe ' + f.q.join(' ') : ''].filter(Boolean).join('; ');
+    const a = (eintraege || []).map(e => e && e.adr).filter(x => typeof x === 'string' && /^\d+:[0-9a-f]{64}:.+$/.test(x)).slice(0, 100);
+    return { kind: 30004, content: '', tags: [['d', 'sammlung-' + kurzHash(JSON.stringify(f))], ['title', titel], ['description', 'Aus dem Materialpool zusammengestellt' + (satz ? ': ' + satz : '') + '.'], ...a.map(x => ['a', x])] };
+  }
+  /** Adresse eines Events für die Knöpfe merken; nur gültige Adressen (Muster der a-Tags), sonst '' */
+  function akMerken(ev) {
+    if (!ev || !istHex64(ev.pubkey)) return '';
+    const adr = ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd');
+    if (!/^\d+:[0-9a-f]{64}:.+$/.test(adr)) return '';
+    AK_ZIEL.set(adr, ev);
+    return adr;
+  }
+  /** Was schon vorliegt, als Zustandstext ('' = noch nicht): Folge und Mitgliedschaft aus den eigenen Listen, Zusage und Reaktion aus Gefüge-Abfrage und Live-Events */
+  function akZustand(was, ziel) {
+    if (!ICH.hex) return '';
+    if (was === 'folgen') return ziel === ICH.hex ? 'Das bist du' : ichDaten && ichDaten.kontakte && tagWerte(ichDaten.kontakte, 'p').includes(ziel) ? 'Folgst du' : '';
+    if (was === 'beitreten') return ichDaten && ichDaten.liste && tagWerte(ichDaten.liste, 'p').includes(ziel) ? 'Mitglied' : '';
+    const eigene = [...(bzDaten ? [...bzDaten.zusagen, ...bzDaten.reaktionen] : []), ...pkLive].filter(e => e && e.pubkey === ICH.hex);
+    if (was === 'gefaellt') return eigene.some(e => e.kind === 7 && e.content !== '-' && tagWerte(e, 'a').includes(ziel)) ? 'Gefällt dir' : '';
+    const z = eigene.filter(e => e.kind === 31925 && (tagWert(e, 'd') === 'rsvp-' + ziel || tagWerte(e, 'a').includes(ziel))).sort((a, b) => b.created_at - a.created_at)[0], st = z ? tagWert(z, 'status') : '';
+    return was === 'zusagen' && st === 'accepted' ? 'Zugesagt' : was === 'vielleicht' && st === 'tentative' ? 'Vielleicht zugesagt' : '';
+  }
+  /** Aktionsknopf: Zustand (sendet nicht erneut), mit Schlüssel aktiv, sonst sichtbar, deaktiviert und mit Hinweis (auch bei „nur ansehen“) */
+  function akKnopf(was, ziel, label) {
+    const z = akZustand(was, ziel);
+    if (z) return `<span class="an-knopf"><button type="button" class="an-zustand" disabled aria-disabled="true">${esc(z)}</button></span>`;
+    if (ICH.kann) return `<span class="an-knopf"><button type="button" class="an-tun" data-ak="${esc(was)}" data-ziel="${esc(ziel)}">${esc(label)}</button></span>`;
+    return `<span class="an-knopf"><button type="button" disabled aria-disabled="true">${esc(label)}</button><small>${AN_HINWEIS}</small></span>`;
+  }
+  /** Anzeigename eines Schlüssels für Toasts, schon maskiert */
+  function akName(hex) {
+    const p = bzProfil(hex), k = CO_SCHLUESSEL.find(x => x.hex === hex), c = CY.find(x => x.id === CY_HEX.get(hex));
+    return p ? p.name : k ? esc(k.n) : c ? esc(c.n.replace(/­/g, '')) : esc(zuschnittNpub(hex).slice(0, 12) + '…');
+  }
+  /** Liste frisch von den Relays: am Zwischenspeicher vorbei (Name mit Zeitstempel, danach entfernt); der zweite Filter belegt, dass ein Relay geantwortet hat */
+  function frischHolen(filter) {
+    const name = 'ich:frisch:' + Date.now();
+    return hubFetch(name, [filter, { kinds: [0], authors: [FO_HEX], limit: 1 }]).then(evs => { try { sessionStorage.removeItem('relihub:' + name); } catch (e) {} return evs; });
+  }
+  /** Eine Liste (kind 3, 30000, 30004) ergänzen und senden. `a`: { filter, kind, d, tags, basis, frage, schon, erfolg, nameText }; `dep`: { ich, sitzung, holen(filter), senden(vorlage, erfolg), fragen(text), melden(html), merken(ev) }.
+   *  Grundlage ist die neuere von frischer Antwort und Sitzungskopie; ohne Antwort wird nichts gesendet; fehlt die Liste, wird vor dem Anlegen gefragt; kind 3 fragt immer (die Folgeliste ist global, gelesen werden nur drei Relays). */
+  function listeSchreiben(a, dep) {
+    return dep.holen(a.filter).then(evs => {
+      if (!evs || !evs.length) { dep.melden('Die Relays antworten gerade nicht; nichts gesendet.'); return false; }
+      const passt = e => !!e && e.kind === a.kind && e.pubkey === dep.ich && (a.kind === 3 || tagWert(e, 'd') === a.d);
+      const alt = [...evs.filter(passt), dep.sitzung].filter(passt).sort((x, y) => y.created_at - x.created_at)[0] || null;
+      if (alt && dep.merken) dep.merken(alt);
+      let neu = alt || a.basis || null, anders = false;
+      for (const t of a.tags) { const n = listeErgaenzen(neu, a.kind, a.d, t); if (n) { neu = n; anders = true; } }   // bisherige Einträge bleiben, neue kommen dazu
+      if (!anders) { dep.melden(a.schon); return false; }
+      const datum = alt ? new Date(alt.created_at * 1000).toLocaleDateString('de-DE') : '';
+      const frage = a.kind === 3 && alt ? `Gefunden: Folgeliste vom ${datum} mit ${tagWerte(alt, 'p').length} Einträgen. Sie wird um ${a.nameText} ergänzt und neu veröffentlicht. Folgst du anderswo mehr Personen, gehen diese Einträge verloren. Fortfahren?` : alt ? '' : a.frage || '';
+      if (frage && !dep.fragen(frage)) return false;
+      return dep.senden(neu, a.erfolg);
+    });
+  }
+  /** Eine Aktion auf Klick: folgen, beitreten, zusagen, vielleicht, gefaellt, sammlungSpeichern, zurSammlung. Listen über listeSchreiben (frisch geholt, ergänzt). Liefert true, wenn gesendet wurde. */
+  function aktion(was, ziel) {
+    if (!ICH.kann || !ICH.hex || !window.nostr) { toast('Zum Mitmachen bitte mit Schlüssel anmelden.'); return Promise.resolve(false); }   // auch nach dem Neuladen ohne Erweiterung nichts holen
+    if (akLaeuft) { toast('Einen Moment, die vorige Aktion läuft noch.'); return Promise.resolve(false); }
+    const adrOk = /^\d+:[0-9a-f]{64}:.+$/.test(ziel || ''), ev = adrOk ? AK_ZIEL.get(ziel) : null;
+    const titel = ev ? esc(tagWert(ev, 'title') || tagWert(ev, 'name') || 'ohne Titel') : '';
+    const text = html => String(html).replace(/&(lt|gt|quot|amp);/g, m => ({ '&lt;': '<', '&gt;': '>', '&quot;': '"', '&amp;': '&' }[m]));   // für confirm (Klartext)
+    const eigeneSammlung = d => pkLive.filter(e => e.kind === 30004 && e.pubkey === ICH.hex && tagWert(e, 'd') === d).sort((x, y) => y.created_at - x.created_at)[0] || null;
+    const dep = sitzung => ({ ich: ICH.hex, sitzung, holen: frischHolen, senden: signierenUndSenden, fragen: t => confirm(t), melden: toast, merken: ichListeMerken });
+    let lauf = null;
+    if (was === 'folgen' && istHex64(ziel) && ziel !== ICH.hex) {
+      lauf = listeSchreiben({ filter: { kinds: [3], authors: [ICH.hex], limit: 1 }, kind: 3, d: null, tags: [['p', ziel]], nameText: text(akName(ziel)), frage: 'Auf den Relays liegt noch keine Folgeliste zu deinem Schlüssel. Eine neue anlegen? Folgst du schon Menschen in einer anderen Nostr-App, deren Liste hier fehlt, würde sie durch die neue ersetzt.', schon: `Du folgst ${akName(ziel)} schon.`, erfolg: `Du folgst jetzt ${akName(ziel)}.` }, dep(ichDaten && ichDaten.kontakte));
+    } else if (was === 'beitreten' && istHex64(ziel)) {
+      lauf = listeSchreiben({ filter: { kinds: [30000], authors: [ICH.hex], '#d': ['communities'], limit: 1 }, kind: 30000, d: 'communities', tags: [['p', ziel]], frage: 'Zu deinem Schlüssel gibt es noch keine Liste deiner Communities. Eine neue anlegen?', schon: `Du bist schon Mitglied in ${akName(ziel)}.`, erfolg: `${akName(ziel)} beigetreten.` }, dep(ichDaten && ichDaten.liste));
+    } else if ((was === 'zusagen' || was === 'vielleicht' || was === 'gefaellt') && ev && !istHex64(ev.id)) {
+      toast('Zu diesem Eintrag fehlt die Event-Kennung; hier geht das nicht.');   // NIP-25 und NIP-52 brauchen das e-Tag
+    } else if ((was === 'zusagen' || was === 'vielleicht') && ev && !akZustand(was, ziel)) {
+      const tags = [['d', 'rsvp-' + ziel], ['a', ziel], ['e', ev.id], ['p', ev.pubkey], ['status', was === 'zusagen' ? 'accepted' : 'tentative']];
+      lauf = signierenUndSenden({ kind: 31925, tags }, was === 'zusagen' ? `Zugesagt: ${titel}.` : `Vielleicht: ${titel}.`);
+    } else if (was === 'gefaellt' && ev && !akZustand(was, ziel)) {
+      const tags = [['e', ev.id], ['p', ev.pubkey], ['a', ziel], ['k', String(ev.kind)]];
+      lauf = signierenUndSenden({ kind: 7, content: '+', tags }, `Gefällt dir: ${titel}.`);
+    } else if (was === 'sammlungSpeichern') {
+      const vorlage = sammlungListe(saF, saTreffer), d = tagWert(vorlage, 'd'), neueA = vorlage.tags.filter(t => t[0] === 'a');
+      if (!neueA.length) { toast('Die Sammlung ist leer; nichts gespeichert.'); return Promise.resolve(false); }
+      lauf = listeSchreiben({ filter: { kinds: [30004], authors: [ICH.hex], '#d': [d], limit: 1 }, kind: 30004, d, tags: neueA, basis: { kind: 30004, content: '', tags: vorlage.tags.filter(t => t[0] !== 'a') }, schon: 'Diese Sammlung ist schon gespeichert.', erfolg: 'Sammlung gespeichert; du findest sie unter „Mein Profil“.' }, dep(eigeneSammlung(d)));
+    } else if (was === 'zurSammlung' && adrOk) {
+      lauf = listeSchreiben({ filter: { kinds: [30004], authors: [ICH.hex], '#d': ['sammlung'], limit: 1 }, kind: 30004, d: 'sammlung', tags: [['a', ziel]], basis: { kind: 30004, content: '', tags: [['title', 'Meine Sammlung']] }, schon: 'Das Material ist schon in deiner Sammlung.', erfolg: 'In deine Sammlung aufgenommen.' }, dep(eigeneSammlung('sammlung')));
+    }
+    if (!lauf) { akZeichnen(); return Promise.resolve(false); }
+    akLaeuft = true;
+    return lauf.catch(() => { toast('Das hat nicht geklappt; nichts gesendet.'); return false; }).then(ok => { akLaeuft = false; akZeichnen(); return ok; });
+  }
+  /** Die offene Ansicht mit den Knöpfen neu zeichnen, ohne nach oben zu springen (nur aus Caches) */
+  function akZeichnen() {
+    const [pfad, qs] = CUR.split('?');
+    if (pfad === 'oekosystem' && ozGefuege) ozRender();
+    else if (pfad === 'kooperieren/personen' && peDaten) peRender(peDaten);
+    else if (pfad === 'person') prOpen(qs);
+    else if (pfad === 'community') crRender();
+    else if (pfad === 'finden/fortbildungen') kaRender();
+    else if (pfad === 'finden/sammlung') saRender();
+    else if (pfad === 'materialpool' && mpAktuell) mpDetail(mpAktuell.d, mpAktuell.pk);
+    else if (pfad === 'profil') ichRender();
+  }
+  /** Route #profil: angemeldet das eigene Profil (eine Abfrage für Veröffentlichungen und Sammlungen), sonst die Persona */
+  function ichOpen() {
+    ichRender();
+    if (!ICH.hex || (ichInhalte && ichInhalte.antwort)) return;
+    const hex = ICH.hex, lauf = ichLauf;
+    hubFetch('ich:inhalte:' + hex, [{ kinds: [30142, 30023, 31923], authors: [hex], limit: 30 }, { kinds: [30004], authors: [hex], limit: 30 }, { kinds: [0], authors: [FO_HEX], limit: 1 }]).then(evs => {   // dritter Filter: Gesundheitsblick
+      if (lauf !== ichLauf) return;
+      ichInhalte = { antwort: evs.length > 0, evs: evs.filter(e => e && e.pubkey === hex) };
+      if (CUR.split('?')[0] === 'profil') ichRender();
+    }, () => {});
+  }
+  /** Profilseite zeichnen: angemeldet Kopf („Das bist du“), Meine Communities (Kanten), Meine Veröffentlichungen, Meine Sammlungen, Abmelden; sonst die Persona */
+  function ichRender() {
+    const box = document.getElementById('prIch'), dash = document.querySelector('#v-profil .dash');
+    kopfzeilen();
+    if (!ICH.hex) { box.hidden = true; box.innerHTML = ''; dash.hidden = false; datenstand('v-profil', 'nachbau', 'Persona Luca Beispiel'); return; }
+    dash.hidden = true; box.hidden = false;
+    const npub = zuschnittNpub(ICH.hex), d = ichDaten, inh = ichInhalte, modus = ICH.kann ? 'angemeldet' : 'nur ansehen';
+    if (!d) { box.innerHTML = '<h1>Mein Profil</h1><p class="pe-satz">Dein Profil wird geladen …</p>'; datenstand('v-profil', 'nachbau', 'Profil laden · ' + modus); return; }
+    const p = d.profil, antwort = d.antwort || !!(inh && inh.antwort);
+    const kopf = `<div class="pe-kopf">${p ? peAv(p, true) : ''}<div><p class="an-du">Das bist du${ICH.kann ? '' : ' · nur ansehen'}</p><h1>${p ? p.name : esc(npub.slice(0, 14)) + '…'}</h1>`
+      + (p && p.about ? `<p class="pe-about">${p.about}</p>` : '') + (p && p.nip05 ? `<p><small>${p.nip05}</small></p>` : '')
+      + (p ? '' : `<p class="pe-satz">${antwort ? 'Zu deinem Schlüssel liegt noch kein Profil vor; anlegen kannst du es in der edufeed-App.' : 'Die Relays antworten gerade nicht.'}</p>`)
+      + `<div class="pe-act"><a class="pe-btn" href="#person?p=${esc(npub)}">So sehen dich andere ›</a><button type="button" class="an-btn zweit" data-an-ab>Abmelden</button></div></div></div>`;
+    const q = bzQuellen(); if (d.liste) q.mitgliedschaften = q.mitgliedschaften.concat([d.liste]);
+    const g = bzBauen(q), comms = bzNachbarn(g.kanten, g.ents, 'p:' + ICH.hex, 'community');
+    const cLink = e => { const id = zuschnittCyId(e.pk); return id ? '#community?c=' + id : '#oekosystem?wahl=' + encodeURIComponent(e.id); };
+    const commHtml = comms.length ? `<ul class="an-liste">${comms.map(e => `<li><a href="${esc(cLink(e))}">${bzName(e)}</a></li>`).join('')}</ul>`
+      : `<p class="pe-leer">${antwort ? 'Du bist noch in keiner Community; beitreten kannst du in einem Community-Raum oder im Ökosystem.' : 'Die Relays antworten gerade nicht.'}</p>`;
+    const je = new Map();   // je Adresse die neueste Fassung
+    for (const e of (inh ? inh.evs : [])) { const a = e.kind + ':' + e.pubkey + ':' + tagWert(e, 'd'), alt = je.get(a); if (!alt || e.created_at > alt.created_at) je.set(a, e); }
+    const alle = [...je.values()].sort((a, b) => b.created_at - a.created_at);
+    const pubs = alle.filter(e => [30142, 30023, 31923].includes(e.kind)).slice(0, 12), samml = alle.filter(e => e.kind === 30004 && tagWert(e, 'd').startsWith('sammlung'));
+    const leer = text => `<p class="pe-leer">${!inh ? 'wird geladen …' : inh.antwort ? text : 'Die Relays antworten gerade nicht.'}</p>`;
+    const pubHtml = pubs.length ? `<div class="pe-pubs">${pubs.map(e => eintragKarte({ adr: e.kind + ':' + e.pubkey + ':' + tagWert(e, 'd'), ev: e, geteilt: null })).join('')}</div>` : leer('noch nichts veröffentlicht');
+    const samHtml = samml.length ? `<ul class="an-liste">${samml.map(e => `<li><a href="${esc('https://edufeed.org/' + naddr(tagWert(e, 'd'), e.pubkey, 30004))}" target="_blank" rel="noopener">${esc(tagWert(e, 'title') || tagWert(e, 'd'))}</a> <small>${tagWerte(e, 'a').length} Einträge</small></li>`).join('')}</ul>`
+      : leer('noch keine Sammlung gespeichert; das geht in der Sammlung unter „Abonnieren“');
+    box.innerHTML = kopf + `<section class="pe-sek"><h2>Meine Communities</h2>${commHtml}</section><section class="pe-sek"><h2>Meine Veröffentlichungen</h2>${pubHtml}</section><section class="pe-sek"><h2>Meine Sammlungen</h2>${samHtml}</section>`;
+    if (antwort) datenstand('v-profil', 'live', modus); else datenstand('v-profil', 'nachbau', 'Relays nicht erreichbar · ' + modus);
+  }
+  // Ohne Anmeldung öffnen „Anmelden“ in den Kopfzeilen und Knöpfe mit data-anmelden den Dialog statt der Route (Erfassung vor dem Router)
+  document.addEventListener('click', e => {
+    if (ICH.hex) return;
+    const a = e.target.closest('a.btn-profil, [data-anmelden]'); if (!a) return;
+    e.preventDefault(); e.stopPropagation(); anDialogAuf();
+  }, true);
+  document.addEventListener('click', e => {
+    const k = e.target.closest('[data-ak]');
+    if (k && !k.disabled) { k.disabled = true; k.setAttribute('aria-busy', 'true'); aktion(k.dataset.ak, k.dataset.ziel || '').then(() => { k.disabled = false; k.removeAttribute('aria-busy'); }); return; }
+    if (e.target.closest('[data-an-ab]')) abmelden();
+  });
+  document.getElementById('logout').addEventListener('click', () => { if (ICH.hex) abmelden(); else anDialogAuf(); });
+  anDialogEl.addEventListener('click', e => {
+    if (e.target.closest('[data-an-schluessel]')) anmelden();
+    else if (e.target === anDialogEl) anDialogZu();   // Klick auf den Hintergrund
+  });
+  anDialogEl.querySelector('[data-an-ansehen]').addEventListener('submit', e => { e.preventDefault(); nurAnsehen(document.getElementById('anNpub').value); });
+  (() => { try { const x = JSON.parse(sessionStorage.getItem('relihub-ich') || 'null'); if (x && istHex64(x.hex)) ichSetzen(x.hex, x.kann === true); } catch (e) {} })();   // Anmeldung der Sitzung (nur öffentlicher Schlüssel)
+  kopfzeilen();
+
   // ---------- Ansichten (Hash-Routing) ----------
   const PRE_NAMES = { sek1: 'Sekundarstufe I' };
   // Eigene Navigation statt reiner Hash-Links: funktioniert auch in Vorschauen, die Links abfangen
@@ -5467,7 +5816,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (v === 'relilab') rlShow(qs);
     if (v === 'rpi-virtuell') rvOpen(qs);
     if (v === 'relidesk') rdTab(new URLSearchParams(qs || '').get('tab'));
-    if (v === 'profil') { LOGGED = true; if (MODUS !== 'direkt') setModus('direkt'); renderArtikel(); const zu = new URLSearchParams(qs || '').get('zu'); if (zu) setTimeout(() => { const t = document.getElementById(zu); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
+    if (v === 'profil') { ichOpen(); if (MODUS !== 'direkt') setModus('direkt'); renderArtikel(); const zu = new URLSearchParams(qs || '').get('zu'); if (zu) setTimeout(() => { const t = document.getElementById(zu); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
     if (leisteKey !== v + '|' + LOGGED + '|' + HUB_C) { leisteKey = v + '|' + LOGGED + '|' + HUB_C; RelihubLeiste.setItems(leisteItems()); }   // vor jedem return: Ansicht (Kontext-Filter) und Anmeldung (Communities) ändern die Einträge
     if (view === 'partner') { setTimeout(() => document.getElementById('partner').scrollIntoView(), 30); return; }
     if (view === 'hilfe') { explainDefault(); setTimeout(() => document.getElementById('explain').scrollIntoView({ behavior: 'smooth', block: 'start' }), 30); return; }
