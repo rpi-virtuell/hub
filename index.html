@@ -3900,28 +3900,30 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   { const nb = document.getElementById('rtNl'); if (nb) nb.outerHTML = nlBox(); }
   function cyRel(c) { if (!c.inst) return ''; return c.inst[1] ? `<a class="cy-rel" href="#${c.inst[1]}">↔ Instanz: ${c.inst[0]} ›</a>` : `<span class="cy-rel">↔ Instanz: ${c.inst[0]}</span>`; }
   function cyAv(c) { return `<div class="cy-av" style="--av:${c.col}"><span class="${c.id === 'relilab' ? 'rl' : ''}" style="background:${c.col};color:${c.tx || '#fff'}">${c.id === 'relilab' ? '#' : esc(c.ab)}</span>${c.bild ? `<img src="${esc(c.bild)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</div>`; }
-  /** Kacheln; `art` (nur Partner ohne Schlüssel): { klasse, hinweis } ersetzt Folgen-, Raum- und Katalog-Knopf durch den Hinweis. Alle Texte über esc. */
-  function cyCards(list, ctxRel, art) { return list.map(c => {
+  /** Kacheln; `art` (nur Partner ohne Schlüssel): { klasse, hinweis } ersetzt Folgen-, Raum- und Katalog-Knopf durch den Hinweis; `live`: statt des Beispiel-Knopfs „Folgen“ der echte Knopf „Beitreten“ (nur mit Schlüssel der Community, sonst keiner). Alle Texte über esc. */
+  function cyCards(list, ctxRel, art, live) { return list.map(c => {
+    const knopf = art ? '' : !live ? cyBtn(c) : istHex64(c.hex) ? akKnopf('beitreten', c.hex, 'Beitreten') : '';
     const nm = esc(c.n), eigen = c.live && !CY.some(x => x.id === c.id), ziel = eigen ? 'oekosystem?wahl=' + encodeURIComponent('c:' + c.hex) : '';
     const hinweis = art ? `<span class="cy-hinweis">${esc(art.hinweis)}</span>` : '', seite = art ? PARTNERS.find(x => x[0] === c.n && x[4]) : null;
     const raum = art ? (seite ? `<a class="cy-katalog" href="${esc(seite[4])}">Zur Seite ›</a>` : '') : ziel ? `<a class="cy-follow open" href="#${esc(ziel)}">Im Ökosystem zeigen ›</a>` : `<button type="button" class="cy-follow open" data-cyopen="${esc(c.id)}">Community-Raum öffnen ›</button>`;
     const meta = art ? '' : `<div class="meta">${c.m} Mitglieder${c.series ? ' · ' + c.series.map(x => x[1]).filter(Boolean)[0] : ''}</div>`;
     return `<div class="cy-card${art ? ' ' + art.klasse : ''}" ${ctxRel ? `id="cy-${esc(c.id)}"` : `data-rid="cy-${esc(c.id)}"`}${ziel ? ` data-ziel="${esc(ziel)}"` : ''} tabindex="0" aria-label="${nm}">
       <div class="cy-in">
-        <div class="cy-f">${cyAv(c)}<h3>${nm}${c.ver ? SHIELD : ''}</h3><p class="cy-bio">${esc(c.bio)}</p>${hinweis}${c.series ? `<div class="cy-ser">${c.series.map(x => `<span>Serie: ${x[0]}</span>`).join('')}</div>` : ''}${c.nl ? `<div class="cy-nl">${c.nl.map(x => `<span>Newsletter: ${x[0]}</span>`).join('')}</div>` : ''}${ctxRel && !art ? cyRel(c) : ''}<span style="flex:1"></span>${art ? '' : cyBtn(c)}</div>
-        <div class="cy-f cy-back"><small>Über die Community</small><h3>${nm}</h3><p>${esc(c.back)}</p>${meta}${hinweis}${ctxRel && !art ? cyRel(c) : ''}<span style="flex:1"></span>${raum}${!art && !eigen && CO_SCHLUESSEL.some(x => x.id === c.id) ? `<a class="cy-katalog" href="#community?c=${esc(c.id)}&zu=katalog">Katalog ›</a>` : ''}${art ? '' : cyBtn(c)}</div>
+        <div class="cy-f">${cyAv(c)}<h3>${nm}${c.ver ? SHIELD : ''}</h3><p class="cy-bio">${esc(c.bio)}</p>${hinweis}${c.series ? `<div class="cy-ser">${c.series.map(x => `<span>Serie: ${x[0]}</span>`).join('')}</div>` : ''}${c.nl ? `<div class="cy-nl">${c.nl.map(x => `<span>Newsletter: ${x[0]}</span>`).join('')}</div>` : ''}${ctxRel && !art ? cyRel(c) : ''}<span style="flex:1"></span>${knopf}</div>
+        <div class="cy-f cy-back"><small>Über die Community</small><h3>${nm}</h3><p>${esc(c.back)}</p>${meta}${hinweis}${ctxRel && !art ? cyRel(c) : ''}<span style="flex:1"></span>${raum}${!art && !eigen && CO_SCHLUESSEL.some(x => x.id === c.id) ? `<a class="cy-katalog" href="#community?c=${esc(c.id)}&zu=katalog">Katalog ›</a>` : ''}${knopf}</div>
       </div></div>`; }).join('') || '<p class="cy-empty">Keine Community gefunden.</p>'; }
   /** Liste der Communities: mit Antwort die Live-Einträge (nach Mitgliedern), dahinter Partnerkacheln der eingebetteten Einträge ohne Schlüssel (cy-partner); ohne Antwort der eingebettete Stand vom 26.10.2026 */
   function cyRender() {
     const art = { klasse: 'cy-partner', hinweis: 'Partner ohne eigenen Schlüssel im Datenraum' };
-    const passt = c => (cyFilter === 'alle' || (cyFilter === 'meine' ? cyFollow.has(c.id) : c.ty === cyFilter)) && c.n.toLowerCase().includes(cyQ);
     const live = cyDaten && cyDaten.liste.length ? cyDaten.liste : null;
+    const meine = c => live ? !!(istHex64(c.hex) && akZustand('beitreten', c.hex)) : cyFollow.has(c.id);   // live: nur die eigene Mitgliedsliste, keine Persona
+    const passt = c => (cyFilter === 'alle' || (cyFilter === 'meine' ? meine(c) : c.ty === cyFilter)) && c.n.toLowerCase().includes(cyQ);
     if (!live) document.getElementById('cyGrid').innerHTML = cyCards(CY.filter(passt), true);
     else {
       live.forEach(c => { c.m = cyMitglieder(c.hex); });
       const ids = new Set([...CY_HEX.values(), 'oercommunity']), partner = CY.filter(c => !ids.has(c.id));
       const vorn = [...live].sort((a, b) => b.m - a.m || a.n.localeCompare(b.n, 'de')).filter(passt), schau = CY.filter(c => c.id === 'oercommunity' && passt(c)), hinten = partner.filter(passt);
-      document.getElementById('cyGrid').innerHTML = cyCards([...vorn, ...schau], true) + (hinten.length ? `<h2 class="cy-trenn">${esc(art.hinweis)}</h2>` + cyCards(hinten, true, art) : '');
+      document.getElementById('cyGrid').innerHTML = cyCards([...vorn, ...schau], true, null, true) + (hinten.length ? `<h2 class="cy-trenn">${esc(art.hinweis)}</h2>` + cyCards(hinten, true, art) : '');
       datenstand('v-communities', 'live', `${live.length} Communities · ${partner.length} Partner ohne Schlüssel`);
     }
     if (typeof rlCommRender === 'function') rlCommRender();
@@ -3944,7 +3946,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   document.getElementById('cyGrid').addEventListener('click', e => {
     const f = e.target.closest('[data-cyf]');
     if (f) { const id = f.dataset.cyf; if (cyFollow.has(id)) cyFollow.delete(id); else cyFollow.add(id); const keep = document.querySelector(`#cy-${id}.flip`); cyRender(); if (keep) document.getElementById('cy-' + id).classList.add('flip'); return; }
-    if (e.target.closest('a')) return;
+    if (e.target.closest('a, .an-knopf')) return;   // Aktionsknöpfe (Beitreten) behandelt der Hörer für [data-ak]
     const o = e.target.closest('[data-cyopen]'); if (o) { go('community?c=' + o.dataset.cyopen); return; }
     const c = e.target.closest('.cy-card'); if (!c) return;
     // Touch: erstes Antippen dreht die Kachel, zweites öffnet den Community-Raum. Maus: Klick öffnet direkt.
@@ -4645,7 +4647,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
         <nav class="cr-nav" aria-label="Community-Raum">${nav('home', CR_ICON.home, 'Übersicht')}<div class="cr-sec">Inhalte</div>${nav('art', CR_ICON.art, 'Artikel')}${nav('lern', CR_ICON.lern, 'Lernen')}${nav('katalog', CR_ICON.art, 'Katalog')}${nav('kal', CR_ICON.kal, 'Kalender', mem ? '' : '<span class="lk">🔒</span>')}<div class="cr-sec">Kanäle</div>${nav('chat', '<span style="width:20px;text-align:center;font-weight:600">#</span>', 'Allgemein', '<span class="gl" title="öffentlich"></span>')}
           <div class="cr-bottom">${nav('mem', CR_ICON.mem, 'Mitglieder')}${nav('set', CR_ICON.set, 'Einstellungen')}</div></nav></aside>
       <main>
-        <div class="cr-top"><span class="ring" style="width:240px;height:240px;background:${c.col};right:-50px;top:-120px"></span><span class="ring" style="width:170px;height:170px;background:var(--c-koop);right:130px;bottom:-120px"></span><div class="cr-id"><div class="cr-name">${crAv(c, 64)}<h1>${c.n}</h1><button type="button" class="cr-fol${fol ? '' : ' off'}" data-cract="follow">${fol ? '✓ Folge ich' : '+ Folgen'}</button></div>
+        <div class="cr-top"><span class="ring" style="width:240px;height:240px;background:${c.col};right:-50px;top:-120px"></span><span class="ring" style="width:170px;height:170px;background:var(--c-koop);right:130px;bottom:-120px"></span><div class="cr-id"><div class="cr-name">${crAv(c, 64)}<h1>${c.n}</h1>${hx ? '' : `<button type="button" class="cr-fol${fol ? '' : ' off'}" data-cract="follow">${fol ? '✓ Folge ich' : '+ Folgen'}</button>`}</div>
           <button type="button" class="cr-mem" data-crtab="mem"><span class="st">${PEOPLE.slice(0, 3).map((p, i) => `<span style="background:${PCOL[i]}">${ini(p)}</span>`).join('')}</span>${c.m} Mitglieder ›</button>${c.inst ? `<div>${cyRel(c)}</div>` : ''}${nlLine(c)}</div>
           <div class="cr-act">${hx ? akKnopf('beitreten', hx, 'Beitreten') : mem ? '<span class="cr-badge">✓ Mitglied</span>' : req ? '<span class="cr-badge">Anfrage gesendet</span>' : '<button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button>'}${mem ? '' : '<a data-cract="code">Einladungscode einlösen</a><div class="cr-code" id="crCode" hidden><input placeholder="Code eingeben" aria-label="Einladungscode"><button type="button" class="cr-pill" data-cract="redeem">Einlösen</button></div>'}</div></div>
         ${crMain(c)}
@@ -5774,6 +5776,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (pfad === 'oekosystem' && ozGefuege) ozRender();
     else if (pfad === 'kooperieren/personen' && peDaten) peRender(peDaten);
     else if (pfad === 'person') prOpen(qs);
+    else if (pfad === 'communities') cyRender();
     else if (pfad === 'community') crRender();
     else if (pfad === 'finden/fortbildungen') kaRender();
     else if (pfad === 'finden/sammlung') saRender();

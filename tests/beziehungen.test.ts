@@ -76,6 +76,21 @@ Deno.test('Communities live: cyAus, Partnerkacheln, RpiCommunity ausgeblendet', 
   assert(html.includes('id="v-communities" data-stand="stand:26.10.2026 · Texte teils Beispiel"'), 'Startwert bleibt');
 });
 
+Deno.test('Communities live: echter Knopf „Beitreten“ statt Beispiel-Folgen, keine Persona', () => {
+  const stubs = "const cyBtn = c => '<button data-cyf=\"' + c.id + '\">Folgen</button>'; const akKnopf = (was, ziel, label) => '<button data-ak=\"' + was + '\" data-ziel=\"' + ziel + '\">' + label + '</button>';"
+    + "const cyAv = () => ''; const cyRel = () => ''; const SHIELD = ''; const PARTNERS = []; const CY = [{ id: 'relilab' }]; const CO_SCHLUESSEL = [{ id: 'relilab' }];";
+  const cc = bau('cyCards', stubs), H = 'ab'.repeat(32);
+  const mitSchluessel = cc([{ id: 'relilab', n: 'relilab', bio: '', back: '', m: 3, hex: H, live: true, mine: 'Mitglied' }], true, null, true);
+  assert(mitSchluessel.includes(`data-ak="beitreten" data-ziel="${H}"`) && !/data-cyf/.test(mitSchluessel) && !/Mitglied ✓|Folge ich/.test(mitSchluessel), 'live mit Schlüssel: Beitreten, keine Persona');
+  const ohne = cc([{ id: 'oercommunity', n: 'OER', bio: '', back: '', m: 0, mine: 'folge ich' }], true, null, true);
+  assert(!/data-cyf|data-ak/.test(ohne), 'live ohne Schlüssel: kein Knopf');
+  assert(/data-cyf/.test(cc([{ id: 'relilab', n: 'relilab', bio: '', back: '', m: 3 }], true)), 'eingebetteter Stand: Beispiel-Knopf bleibt');
+  const r = fn('cyRender');
+  assert(/cyCards\(\[\.\.\.vorn, \.\.\.schau\], true, null, true\)/.test(r) && /live \? !!\(istHex64\(c\.hex\) && akZustand\('beitreten', c\.hex\)\) : cyFollow\.has\(c\.id\)/.test(r), 'live: echter Knopf und „meine“ aus der eigenen Mitgliedsliste');
+  assert(/\$\{hx \? '' : `<button type="button" class="cr-fol/.test(fn('crRender')), 'Raum mit Schlüssel: kein Beispiel-Folgen');
+  assert(/'communities'\) cyRender\(\)/.test(fn('akZeichnen')), 'nach dem Beitreten neu zeichnen');
+});
+
 Deno.test('ozHinweis: Hinweiszeile in einem Zug, ohne doppelte Umhüllung', () => {
   const h = bau('ozHinweis');
   assertEquals(h({ n: 3, filter: false, wahl: '', nachbarn: false, quelle: 3 }), '3 Einträge');
