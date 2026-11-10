@@ -2369,7 +2369,8 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       }));
     }
     coDaten.set(hex, lauf);
-    lauf.then(d => { if (!d.antwort) coDaten.delete(hex); }, () => coDaten.delete(hex));
+    // die fertige Antwort hängt am Promise, damit bzQuellen ohne Warten liest
+    lauf.then(d => { if (d.antwort) lauf.fertig = d; else coDaten.delete(hex); }, () => coDaten.delete(hex));
     return lauf;
   }
   /** Einträge einer Community: direkte Events und Repost-Ziele, je Adresse der neueste, ohne die vom Community-Schlüssel entfernten; neueste zuerst. Ohne Rollenprüfung. */
@@ -2437,6 +2438,153 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     }
     const d = tagWert(ev, 'd'), href = ev.pubkey === FO_HEX ? beitragUrl(ev) : 'https://edufeed.org/' + naddr(d, ev.pubkey, ev.kind);
     return `<a class="kat-card" href="${esc(sichereUrl(href))}"><b>${esc(tagWert(ev, 'title') || d)}</b><span>${esc(datum(+tagWert(ev, 'published_at') || ev.created_at))}</span>${von}</a>`;
+  }
+
+  // ---------- Beziehungsgefüge (ADR-0009) ----------
+  // Entitäten (Personen, Communities, Materialien/Beiträge, Termine) und ungerichtete Kanten aus Autorschaft, h-Tags, Reposts, Mitgliedschaften, Zusagen und Reaktionen.
+  // Quellen sind die Caches der anderen Ansichten; neu geholt wird nur, was sie nicht tragen (bzLaden: eine Abfrage). Kanten gelten wie geteilt, ohne Rollenprüfung.
+  let bzDaten = null, bzLauf = null;   // Antwort (gehalten, wenn nicht leer), laufende Abfrage
+  let HUB_C = null;   // Zuschnitt auf eine Community (Hex oder null); gefüllt ab ADR-0009 Zuschnitt
+  /** Mitgliedschaften, Community-Konten, deren Profile, Zusagen und Reaktionen in einer Abfrage; einmal je Sitzung (leere Antwort wird nicht gehalten) */
+  function bzLaden() {
+    if (bzDaten) return Promise.resolve(bzDaten);
+    if (bzLauf) return bzLauf;
+    const autoren = [...new Set([...CO_SCHLUESSEL.map(c => c.hex), ...KAL_HEX.keys()].filter(istHex64))].slice(0, 60);   // Schlüsselliste des Hubs; die 10222-Autoren stehen erst nach der Antwort fest
+    bzLauf = hubFetch('beziehungen', [
+      { kinds: [30000], '#d': ['communities'], limit: 300 },
+      { kinds: [10222], limit: 60 },
+      { kinds: [0], authors: autoren, limit: 60 },
+      { kinds: [31925], limit: 200 },
+      { kinds: [7], '#k': ['30142', '30023', '31922', '31923'], limit: 200 }
+    ], { relays: ['wss://relay.edufeed.org', 'wss://relay-rpi.edufeed.org'] }).then(events => {
+      const neueste = liste => {
+        const neu = new Map();
+        for (const ev of liste) {
+          if (!ev || !istHex64(ev.pubkey)) continue;
+          const k = ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd'), alt = neu.get(k);
+          if (!alt || ev.created_at > alt.created_at) neu.set(k, ev);
+        }
+        return [...neu.values()];
+      };
+      const art = k => events.filter(ev => ev && ev.kind === k);
+      const daten = {
+        antwort: events.length > 0,
+        mitgliedschaften: neueste(art(30000).filter(ev => tagWert(ev, 'd') === 'communities')),
+        communities: neueste(art(10222)), profile: neueste(art(0)), zusagen: neueste(art(31925)),
+        reaktionen: art(7).filter(ev => istHex64(ev.pubkey))
+      };
+      if (daten.antwort) bzDaten = daten; else bzLauf = null;   // ohne Antwort beim nächsten Aufruf erneut versuchen
+      return daten;
+    });
+    return bzLauf;
+  }
+  /** Alles, was die Caches schon tragen, ohne Netz; fehlende Caches ergeben leere Listen */
+  function bzQuellen() {
+    const co = [...coDaten.values()].map(p => p.fertig).filter(Boolean), direkt = art => co.flatMap(d => d.direkt.filter(ev => art.includes(ev.kind)));
+    const oc = ocDaten, bz = bzDaten, liste = peDaten && peDaten.liste;
+    return {
+      materialien: [...(mpDaten || []).map(m => m.ev), ...direkt([30142])],
+      beitraege: [...(oc ? [...oc.seiten.values(), ...oc.beitraege] : []), ...direkt([30023])],
+      termine: [...kalFertig, ...(oc ? oc.termine : []), ...direkt([31922, 31923])],
+      reposts: co.flatMap(d => d.reposts),
+      mitgliedschaften: bz ? bz.mitgliedschaften : [], zusagen: bz ? bz.zusagen : [], reaktionen: bz ? bz.reaktionen : [],
+      personenListe: liste ? tagWerte(liste, 'p').filter(istHex64) : [],
+      communities: [...new Set([...CO_SCHLUESSEL.map(c => c.hex), ...(bz ? bz.communities.map(ev => ev.pubkey) : [])].filter(istHex64))]
+    };
+  }
+  /** Beide Richtungen einer Kante; leere oder gleiche Enden ergeben nichts */
+  function bzVerbinde(kanten, a, b) {
+    if (!a || !b || a === b) return;
+    if (!kanten.has(a)) kanten.set(a, new Set());
+    if (!kanten.has(b)) kanten.set(b, new Set());
+    kanten.get(a).add(b); kanten.get(b).add(a);
+  }
+  /** Zeitraum eines Termins in Sekunden; 31922 aus YYYY-MM-DD (Ende ist der Beginn des Folgetags), 31923 aus Sekunden */
+  function bzZeit(ev) {
+    if (ev.kind === 31922) {
+      const tag = t => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(t || ''); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) / 1000 : 0; };
+      const start = tag(tagWert(ev, 'start')), ende = tag(tagWert(ev, 'end'));
+      return { start, ende: (ende >= start && ende ? ende : start) + 86400, ganz: true };
+    }
+    const start = +tagWert(ev, 'start') || 0, ende = +tagWert(ev, 'end') || 0;
+    return { start, ende: ende >= start && ende ? ende : start, ganz: false };
+  }
+  /** Entitäten und Kanten aus den Quellen von bzQuellen; rein, ohne Netz und DOM. Je Adresse gilt das neueste created_at, Ungültiges ergibt weder Entität noch Kante. */
+  function bzBauen(q) {
+    const ents = new Map(), kanten = new Map(), adr = new Map(), byId = new Map();
+    const comm = new Set((q.communities || []).filter(istHex64));
+    const nimm = (id, typ, pk, extra) => { if (!ents.has(id)) ents.set(id, Object.assign({ id, typ, pk }, extra)); return id; };
+    const community = pk => istHex64(pk) ? nimm('c:' + pk, 'community', pk) : null;
+    const person = pk => !istHex64(pk) ? null : comm.has(pk) ? community(pk) : nimm('p:' + pk, 'person', pk);   // Community-Schlüssel sind nie Personen
+    const neueste = liste => {
+      const neu = new Map();
+      for (const ev of liste || []) {
+        if (!ev || !istHex64(ev.pubkey)) continue;
+        const k = ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd'), alt = neu.get(k);
+        if (!alt || ev.created_at > alt.created_at) neu.set(k, ev);
+      }
+      return [...neu.values()];
+    };
+    comm.forEach(community);
+    (q.personenListe || []).forEach(person);
+    for (const ev of neueste([...(q.materialien || []), ...(q.beitraege || []), ...(q.termine || [])])) {
+      const d = tagWert(ev, 'd');
+      if (!d || ![30142, 30023, 31922, 31923].includes(ev.kind)) continue;
+      const stoff = ev.kind === 30142 || ev.kind === 30023, a = ev.kind + ':' + ev.pubkey + ':' + d;
+      const id = stoff ? nimm('m:' + a, 'material', ev.pubkey, { ev }) : nimm('e:' + a, 'event', ev.pubkey, Object.assign({ ev }, (({ start, ende }) => ({ start, ende }))(bzZeit(ev))));
+      adr.set(a, id); if (istHex64(ev.id)) byId.set(ev.id, id);
+      bzVerbinde(kanten, id, person(ev.pubkey));
+      tagWerte(ev, 'h').forEach(h => bzVerbinde(kanten, id, community(h)));
+      if (!stoff) tagWerte(ev, 'p').forEach(p => bzVerbinde(kanten, id, person(p)));
+    }
+    for (const ev of neueste((q.mitgliedschaften || []).filter(e => e.kind === 30000 && tagWert(e, 'd') === 'communities'))) {
+      const ziele = tagWerte(ev, 'p').filter(istHex64);
+      if (ziele.length) { const von = person(ev.pubkey); ziele.forEach(c => bzVerbinde(kanten, von, community(c))); }
+    }
+    const ziel = ev => {   // erster gültiger a-Tag, sonst erster e-Tag, der auf ein bekanntes Event zeigt
+      const a = tagWerte(ev, 'a').map(aTagLesen).find(Boolean);
+      if (a && adr.has(a.kind + ':' + a.pk + ':' + a.d)) return adr.get(a.kind + ':' + a.pk + ':' + a.d);
+      const e = tagWerte(ev, 'e').find(i => istHex64(i) && byId.has(i));
+      return e ? byId.get(e) : null;
+    };
+    for (const r of q.reposts || []) {
+      if (!r || ![6, 16].includes(r.kind)) continue;
+      const z = repostZiel(r), id = z && (z.id ? byId.get(z.id) : adr.get(z.adr));
+      if (id) tagWerte(r, 'h').forEach(h => bzVerbinde(kanten, id, community(h)));
+    }
+    for (const ev of neueste((q.zusagen || []).filter(e => e.kind === 31925))) {
+      if (!['accepted', 'tentative'].includes(tagWert(ev, 'status'))) continue;
+      const z = ziel(ev); if (z) bzVerbinde(kanten, z, person(ev.pubkey));
+    }
+    for (const ev of q.reaktionen || []) {
+      if (!ev || ev.kind !== 7 || ev.content === '-') continue;
+      const z = ziel(ev); if (z) bzVerbinde(kanten, z, person(ev.pubkey));
+    }
+    return { ents, kanten };
+  }
+  /** Nachbarn einer Entität als Entitäten, nur vom Typ `typ` (null = alle) */
+  function bzNachbarn(kanten, ents, id, typ) {
+    return [...(kanten.get(id) || [])].map(i => ents.get(i)).filter(e => e && (!typ || e.typ === typ));
+  }
+  /** Gewicht für die Reihenfolge: Person 3 je Community, Materialien bis 5, Termine bis 4, 2 mit Profilbild (Feld `bild`), 100 für den Angemeldeten; Community = Zahl der Personen; Inhalt 0 */
+  function bzPunkte(ents, kanten, id, ich) {
+    const e = ents.get(id); if (!e) return 0;
+    const nb = [...(kanten.get(id) || [])].map(i => ents.get(i)).filter(Boolean), zahl = typ => nb.filter(n => n.typ === typ).length;
+    if (e.typ === 'community') return zahl('person');
+    if (e.typ !== 'person') return 0;
+    return 3 * zahl('community') + Math.min(5, zahl('material')) + Math.min(4, zahl('event')) + (e.bild ? 2 : 0) + (ich && id === 'p:' + ich ? 100 : 0);
+  }
+  /** Profil (profilAus-Objekt) eines Schlüssels aus der Personen-Ansicht oder der Beziehungsabfrage, sonst null */
+  function bzProfil(hex) {
+    const p = peDaten && peDaten.profile && peDaten.profile.get(hex);
+    if (p) return p;
+    const ev = bzDaten && bzDaten.profile.find(e => e.pubkey === hex);
+    return ev ? profilAus(ev) : null;
+  }
+  /** Anzeigename einer Entität, schon maskiert: Profilname, bei Communities sonst Hub-Name, sonst gekürzter npub */
+  function bzName(ent) {
+    const p = bzProfil(ent.pk), c = CO_SCHLUESSEL.find(k => k.hex === ent.pk);
+    return p ? p.name : ent.typ === 'community' && c ? esc(c.n) : bech32('npub', ent.pk.match(/../g).map(h => parseInt(h, 16))).slice(0, 12) + '…';
   }
 
   // ---------- kleine Symbole der Steuerkonsole (Logo, Abschnittssymbole) ----------
@@ -3882,6 +4030,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   const KAL_HEX = new Map(KAL_QUELLEN.map(q => [npubToHex(q.npub), q]));
   const RL_HEX = npubToHex('npub1fpcxaz2wvjl90gjs60x37ny2pa5u4yqfx7fklz73rgfjnnfujl3sr2fxgk');   // relilab
   const KAL_RELAYS = ['wss://relay.edufeed.org', 'wss://relay-rpi.edufeed.org'];
+  let kalFertig = [];   // letztes Ergebnis von kalLaden (rohe Events) für bzQuellen
   let kalDaten = null, kalStand = { live: 0, quellen: 0, grenze: false };   // Promise der Abfrage (einmal je Sitzung); Zahl der Relay-Termine und ihrer Absender
   /** Alle Termine der Quellen plus der Hub-Communities (h-Tag), gemischt mit dem Schnappschuss je Adresse (neuestes created_at gewinnt); rohe Events */
   function kalLaden() {
@@ -3898,7 +4047,8 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       [...RT_RAW, ...evs].forEach(ev => { const a = ev.pubkey + ':' + tagWert(ev, 'd'), b = m.get(a); if (!b || ev.created_at >= b.created_at) m.set(a, ev); });
       kalStand = { live: evs.length, quellen: new Set(evs.map(ev => ev.pubkey)).size, grenze: [labor, andere].some(g => evs.filter(ev => g.includes(ev.pubkey)).length >= 500) };   // Gruppe an der Relay-Grenze
       if (!evs.length) kalDaten = null;   // ohne Antwort beim nächsten Öffnen erneut versuchen
-      return [...m.values()];
+      kalFertig = [...m.values()];
+      return kalFertig;
     });
     return kalDaten;
   }
