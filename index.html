@@ -2551,9 +2551,9 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
         reaktionen: art(7).filter(ev => istHex64(ev.pubkey))
       };
       if (!daten.antwort) { bzLauf = null; return daten; }   // ohne Antwort beim nächsten Aufruf erneut versuchen
-      // eine abhängige Nachfrage: Profile der Mitglieder (Absender der Mitgliedslisten mit bekannter Community), Zusagenden und Reagierenden; ohne Antwort bleibt die erste Antwort heil
+      // eine abhängige Nachfrage: Profile der Mitglieder (Community-Konten, Absender der Mitgliedslisten mit bekannter Community), Zusagenden und Reagierenden; ohne Antwort bleibt die erste Antwort heil
       const bekannt = new Set([...CO_SCHLUESSEL.map(c => c.hex), ...daten.communities.map(ev => ev.pubkey)]), habe = new Set(daten.profile.map(ev => ev.pubkey));
-      const fehlend = [...new Set([...daten.mitgliedschaften.filter(ev => tagWerte(ev, 'p').some(h => bekannt.has(h))).map(ev => ev.pubkey), ...daten.zusagen.map(ev => ev.pubkey), ...daten.reaktionen.map(ev => ev.pubkey)].filter(pk => istHex64(pk) && !habe.has(pk)))].slice(0, 150);
+      const fehlend = [...new Set([...daten.communities.map(ev => ev.pubkey), ...daten.mitgliedschaften.filter(ev => tagWerte(ev, 'p').some(h => bekannt.has(h))).map(ev => ev.pubkey), ...daten.zusagen.map(ev => ev.pubkey), ...daten.reaktionen.map(ev => ev.pubkey)].filter(pk => istHex64(pk) && !habe.has(pk)))].slice(0, 150);
       const nach = fehlend.length ? hubFetch('beziehungen:profile', [{ kinds: [0], authors: fehlend, limit: 150 }], { relays: ['wss://relay.edufeed.org', 'wss://relay-rpi.edufeed.org'] }) : Promise.resolve([]);
       return nach.then(extra => {
         daten.profile = neueste([...daten.profile, ...extra.filter(ev => ev && ev.kind === 0)]);
@@ -3643,11 +3643,9 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     cyLauf = bzLaden().then(bz => {
       if (!bz.antwort) { cyLauf = null; return { antwort: false, liste: [] }; }
       const konten = bz.communities.filter(ev => istHex64(ev.pubkey) && !CY_AUS.has(ev.pubkey));   // RpiCommunity ausgeblendet
-      const fehlend = konten.map(ev => ev.pubkey).filter(pk => !bz.profile.some(e => e.pubkey === pk));
-      const nach = fehlend.length ? hubFetch('communities:profile', [{ kinds: [0], authors: fehlend.slice(0, 60), limit: 60 }], { relays: ['wss://relay.edufeed.org', 'wss://relay-rpi.edufeed.org'] }) : Promise.resolve([]);
-      return nach.then(extra => {
+      {   // Profile stehen schon in bz.profile (bzLaden holt auch die der Community-Konten)
         const neu = new Map();
-        for (const ev of [...bz.profile, ...extra]) {
+        for (const ev of bz.profile) {
           if (!ev || ev.kind !== 0 || !istHex64(ev.pubkey)) continue;
           const alt = neu.get(ev.pubkey); if (!alt || ev.created_at > alt.created_at) neu.set(ev.pubkey, ev);
         }
@@ -3661,7 +3659,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
         });
         cyDaten = { antwort: true, liste };
         return cyDaten;
-      });
+      }
     });
     return cyLauf;
   }
@@ -3832,16 +3830,20 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const datum = e => typ === 'event' ? e.start || 0 : e.ev ? (e.ev.kind === 30142 ? mpMaterial(e.ev).datum : +tagWert(e.ev, 'published_at') || e.ev.created_at) : 0;
     return liste.map(e => [bezug(e), datum(e), e]).sort((a, b) => b[0] - a[0] || (typ === 'event' ? a[1] - b[1] : b[1] - a[1])).map(x => x[2]);
   }
+  /** Hinweiszeile einer Reihe in einem Zug: n gezeigte Treffer (Spur zeigt höchstens 80), filter gesetzt, wahl = maskierter Name der Auswahl, nachbarn = Reihe zeigt Verbundenes, quelle = Zahl vor dem Textfilter */
+  function ozHinweis(a) {
+    const zahl = a.n > 80 ? `80 von ${a.n}` : `${a.n}`;
+    if (a.nachbarn) return !a.quelle ? `Keine Verbindung zu „${a.wahl}“` : !a.n ? 'Nichts gefunden.' : a.filter ? `${zahl} von ${a.quelle} verbunden mit „${a.wahl}“` : `${zahl} verbunden mit „${a.wahl}“`;
+    if (a.wahl) return !a.n ? `„${a.wahl}“ gewählt · ${a.filter ? 'nichts gefunden' : 'keine weiteren'}` : `„${a.wahl}“ gewählt · ${zahl} weitere`;
+    return !a.n ? (a.filter ? 'Nichts gefunden.' : 'Keine Einträge') : a.n > 80 ? `80 von ${a.n} Einträgen` : `${a.n} ${a.n === 1 ? 'Eintrag' : 'Einträge'}`;
+  }
   /** Teile der Reihe `i`: Hinweiszeile, Fokuskarte (die gewählte, in der Reihe ihres Typs) und Spur (höchstens 80 Karten) */
   function ozTeile(i) {
     const g = ozGefuege, typ = ozReihenFolge[i], wahl = ozWahl ? g.ents.get(ozWahl) : null, nachbarn = !!wahl && wahl.typ !== typ;
     const q = ozFilter[typ].trim().toLowerCase();
     const quelle = (nachbarn ? bzNachbarn(g.kanten, g.ents, wahl.id, typ) : [...g.ents.values()].filter(e => e.typ === typ && (!wahl || e.id !== wahl.id))).filter(ozSichtbar);
     const liste = ozSortiert(quelle.filter(e => !q || ozEntesc(ozName(e) + ' ' + ozUntertitel(e)).toLowerCase().includes(q)), typ);
-    let hinweis = !liste.length && q ? 'Nichts gefunden.' : liste.length > 80 ? `80 von ${liste.length}` : `${liste.length}`;
-    if (nachbarn) hinweis = quelle.length ? `${quelle.length} verbunden mit „${ozName(wahl)}“` : `Keine Verbindung zu „${ozName(wahl)}“`;
-    else if (wahl) hinweis = `„${ozName(wahl)}“ gewählt · ${hinweis} weitere`;
-    else hinweis = `${hinweis} ${liste.length === 1 ? 'Eintrag' : 'Einträge'}`;
+    const hinweis = ozHinweis({ n: liste.length, filter: !!q, wahl: wahl ? ozName(wahl) : '', nachbarn, quelle: quelle.length });
     return { hinweis, fokus: wahl && !nachbarn ? ozKarte(wahl.id) : '', spur: liste.slice(0, 80).map(e => ozKarte(e.id)).join('') || '<p class="oz-leer">Hier ist nichts zu sehen.</p>' };
   }
   const OZ_LUPE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>';

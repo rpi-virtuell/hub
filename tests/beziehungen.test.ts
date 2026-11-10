@@ -73,3 +73,22 @@ Deno.test('Communities live: cyAus, Partnerkacheln, RpiCommunity ausgeblendet', 
   assert(/npub1gc2zfp/.test(s) && /ausgeblendet|RpiCommunity/.test(block(/const CY_HEX[\s\S]*?\n  \]\)?;/) + fn('cyLaden')), 'RpiCommunity ausgeblendet');
   assert(html.includes('id="v-communities" data-stand="stand:26.10.2026 · Texte teils Beispiel"'), 'Startwert bleibt');
 });
+
+Deno.test('ozHinweis: Hinweiszeile in einem Zug, ohne doppelte Umhüllung', () => {
+  const h = bau('ozHinweis');
+  assertEquals(h({ n: 3, filter: false, wahl: '', nachbarn: false, quelle: 3 }), '3 Einträge');
+  assertEquals(h({ n: 1, filter: false, wahl: '', nachbarn: false, quelle: 1 }), '1 Eintrag');
+  assertEquals(h({ n: 200, filter: false, wahl: '', nachbarn: false, quelle: 200 }), '80 von 200 Einträgen');
+  assertEquals(h({ n: 0, filter: true, wahl: '', nachbarn: false, quelle: 5 }), 'Nichts gefunden.');
+  assertEquals(h({ n: 0, filter: true, wahl: 'X', nachbarn: false, quelle: 5 }), '„X“ gewählt · nichts gefunden');
+  assertEquals(h({ n: 90, filter: false, wahl: 'X', nachbarn: false, quelle: 90 }), '„X“ gewählt · 80 von 90 weitere');
+  assertEquals(h({ n: 4, filter: false, wahl: 'X', nachbarn: true, quelle: 4 }), '4 verbunden mit „X“');
+  assertEquals(h({ n: 0, filter: false, wahl: 'X', nachbarn: true, quelle: 0 }), 'Keine Verbindung zu „X“');
+  assertEquals(h({ n: 0, filter: true, wahl: 'X', nachbarn: true, quelle: 4 }), 'Nichts gefunden.');
+  assertEquals(h({ n: 2, filter: true, wahl: 'X', nachbarn: true, quelle: 4 }), '2 von 4 verbunden mit „X“');
+});
+
+Deno.test('cyLaden: keine eigene Profilabfrage, Konten stehen in der Beziehungsabfrage', () => {
+  assert(!/hubFetch\(/.test(fn('cyLaden')) && !/communities:profile/.test(s), 'cyLaden holt nichts nach');
+  assert(/daten\.communities\.map\(ev => ev\.pubkey\), \.\.\.daten\.mitgliedschaften/.test(fn('bzLaden')), 'Community-Konten stehen vorn in der Profilabfrage von bzLaden');
+});
