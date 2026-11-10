@@ -125,7 +125,7 @@ Deno.test('lizenzAktionen: offen alles, geschützt nur ansehen', () => {
   const la = new Function('go', 'openChooser', 'toast', 'rtCopy', 'ICH', 'aktion', block(/  function lizenzAktionen\(stand, m\) \{[\s\S]*?\n  \}/) + '; return lizenzAktionen;')((h: string) => ruf.push(['go', h]), () => {}, (t: string) => ruf.push(['toast', t]), () => {}, ich, (w: string, z: string) => ruf.push(['aktion', w, z]));
   assertEquals(la('offen', {}).map((a: any) => a.geht), [true, true, true, true, true, true]);
   const m = { t: 'T', pk: 'ab'.repeat(32), d: 'x' }, drei = () => la('offen', m)[2];
-  assertEquals(drei().label, 'Zur eigenen Sammlung');
+  assertEquals(drei().label, 'Zur eigenen Sammlung (öffentliche Liste)');
   drei().tu(); assert(ruf.some((r) => r[0] === 'toast' && /braucht Anmeldung mit Schlüssel/.test(r[1])) && !ruf.some((r) => r[0] === 'aktion'), 'ohne Anmeldung: Hinweis, nichts gesendet');
   ruf.length = 0; ich.hex = 'cd'.repeat(32); ich.kann = true; drei().tu();
   assertEquals(ruf, [['aktion', 'zurSammlung', '30142:' + 'ab'.repeat(32) + ':x']], 'angemeldet: sendet über aktion');

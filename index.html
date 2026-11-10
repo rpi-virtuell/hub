@@ -3218,7 +3218,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     return [
       { label: 'Auf den Schreibtisch holen', geht: offen, tu: () => go('relidesk?tab=schreibtisch') },
       { label: 'In der Community weiterbearbeiten', geht: offen, tu: () => openChooser('materialpool') },
-      { label: 'Zur eigenen Sammlung', geht: offen, tu: () => { if (ICH.kann) { aktion('zurSammlung', '30142:' + m.pk + ':' + m.d); return; } go('finden/sammlung?q=' + encodeURIComponent(m.t)); toast('Zur eigenen Sammlung: braucht Anmeldung mit Schlüssel. Bis dahin zeigt dir die Sammlung das Material.'); } },
+      { label: 'Zur eigenen Sammlung (öffentliche Liste)', geht: offen, tu: () => { if (ICH.kann) { aktion('zurSammlung', '30142:' + m.pk + ':' + m.d); return; } go('finden/sammlung?q=' + encodeURIComponent(m.t)); toast('Zur eigenen Sammlung: braucht Anmeldung mit Schlüssel. Bis dahin zeigt dir die Sammlung das Material.'); } },
       { label: 'Ansehen', geht: true, tu: () => { if (m.url) window.open(m.url, '_blank', 'noopener'); else toast('Keine Adresse hinterlegt.'); } },
       { label: 'Link kopieren', geht: true, tu: () => rtCopy(location.href, 'Link kopiert.') },
       { label: 'Empfehlen', geht: true, tu: () => toast('Teilen in Communities folgt.') }
@@ -5416,7 +5416,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   function zuschnittAus(search) {
     const c = new URLSearchParams(search || '').get('c') || '';
     if (istHex64(c)) return c;
-    if (/^npub1[0-9a-z]{58}$/.test(c)) { try { const h = npubToHex(c); return istHex64(h) ? h : null; } catch (e) { return null; } }
+    if (/^npub1[0-9a-z]{58}$/.test(c)) { try { const h = npubToHex(c); return istHex64(h) && bech32('npub', h.match(/../g).map(x => parseInt(x, 16))) === c ? h : null; } catch (e) { return null; } }   // Prüfsumme über die Rückwandlung
     return null;
   }
   const zuschnittNpub = hex => bech32('npub', hex.match(/../g).map(h => parseInt(h, 16)));
@@ -5840,7 +5840,18 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     else if (e.target === anDialogEl) anDialogZu();   // Klick auf den Hintergrund
   });
   anDialogEl.querySelector('[data-an-ansehen]').addEventListener('submit', e => { e.preventDefault(); nurAnsehen(document.getElementById('anNpub').value); });
-  (() => { try { const x = JSON.parse(sessionStorage.getItem('relihub-ich') || 'null'); if (x && istHex64(x.hex)) ichSetzen(x.hex, x.kann === true); } catch (e) {} })();   // Anmeldung der Sitzung (nur öffentlicher Schlüssel)
+  (() => {   // Anmeldung der Sitzung (nur öffentlicher Schlüssel); signieren kann sie nur mit Erweiterung, sonst bleiben die Knöpfe aus und zeigen den Hinweis
+    const signer = () => !!(window.nostr && typeof window.nostr.signEvent === 'function');
+    try {
+      const x = JSON.parse(sessionStorage.getItem('relihub-ich') || 'null'); if (!x || !istHex64(x.hex)) return;
+      ichSetzen(x.hex, x.kann === true && signer());
+      if (x.kann === true && !ICH.kann) window.addEventListener('load', () => setTimeout(() => {   // Erweiterungen hängen window.nostr oft erst nach dem Skript ein
+        if (ICH.hex !== x.hex || ICH.kann || !signer()) return;
+        ICH.kann = true; try { sessionStorage.setItem('relihub-ich', JSON.stringify({ hex: ICH.hex, kann: true })); } catch (e) {}
+        kopfzeilen(); akZeichnen();
+      }, 300), { once: true });
+    } catch (e) {}
+  })();
   kopfzeilen();
 
   // ---------- Ansichten (Hash-Routing) ----------

@@ -11,9 +11,11 @@ const fn = (name: string) => block(new RegExp(`  function ${name}\\([^)]*\\) \\{
 const bau = (name: string, extra = '') => new Function('esc', 'sichereUrl', 'istHex64', 'tagWert', 'tagWerte', extra + fn(name) + `; return ${name};`)(esc, sichereUrl, istHex64, tagWert, tagWerte);
 
 Deno.test('zuschnittAus: npub, Hex, Unsinn', () => {
-  const za = bau('zuschnittAus', fn('npubToHex'));
+  const za = bau('zuschnittAus', fn('npubToHex') + fn('bech32'));
   assertEquals(za('?c=npub14esenw6rt4c2pmxwvyey4jqw0sjdahetq6qvh5lffxp7w4thg63ql480z2'), 'ae6199bb435d70a0ecce61324ac80e7c24dedf2b0680cbd3e94983e7557746a2');
   assertEquals(za('?c=' + 'ab'.repeat(32)), 'ab'.repeat(32)); assertEquals(za('?c=kaputt'), null); assertEquals(za(''), null);
+  assertEquals(za('?c=npub14esenw6rt4c2pmxwvyey4jqw0sjdahetq6qvh5lffxp7w4thg63ql480z3'), null, 'falsche Prüfsumme (letztes Zeichen geändert)');
+  assertEquals(za('?c=npub14esenw6rt4c2pmxwvyey4jqw0sjdahetq6qvh5lffxp7w4thg63ql480qq'), null, 'falsche Prüfsumme (zwei Zeichen)');
 });
 
 Deno.test('Zuschnitt: Leiste, Ansichten, eigene Instanz', () => {
@@ -177,6 +179,19 @@ Deno.test('listeSchreiben: ein schweigendes Relay sendet nichts, Sammlung ohne L
   const jetzt = Math.floor(Date.now() / 1000);
   await sende({ kind: 30000, tags: [], created_at: zukunft + 1 }, 'ok'); await sende({ kind: 30000, tags: [] }, 'ok'); await sende({ kind: 30000, tags: [], created_at: 5 }, 'ok');
   assertEquals(signiert[0].created_at, zukunft + 1); assert(signiert[1].created_at >= jetzt && signiert[2].created_at >= jetzt, 'sonst jetzt');
+});
+
+Deno.test('Sitzung ohne Erweiterung: kann = false, Knöpfe mit Hinweis', () => {
+  const w = block(/  \(\(\) => \{   \/\/ Anmeldung der Sitzung[\s\S]*?\n  \}\)\(\);/);
+  assert(/ichSetzen\(x\.hex, x\.kann === true && signer\(\)\)/.test(w) && /typeof window\.nostr\.signEvent === 'function'/.test(w), 'kann nur mit signEvent');
+  const ich = { hex: null as string | null, kann: false }, laden = new Function('sessionStorage', 'window', 'istHex64', 'ichSetzen', 'kopfzeilen', 'akZeichnen', 'ICH', w);
+  const ss = { getItem: () => JSON.stringify({ hex: 'ab'.repeat(32), kann: true }), setItem: () => {} };
+  const fenster = (nostr: unknown) => ({ nostr, addEventListener: () => {} });
+  const setze = (hex: string, kann: boolean) => { ich.hex = hex; ich.kann = kann; };
+  laden(ss, fenster(undefined), istHex64, setze, () => {}, () => {}, ich); assertEquals(ich.kann, false, 'ohne Erweiterung');
+  laden(ss, fenster({ signEvent: () => {} }), istHex64, setze, () => {}, () => {}, ich); assertEquals(ich.kann, true, 'mit Erweiterung');
+  const ak = bau('akKnopf', "const akZustand = () => ''; const AN_HINWEIS = 'braucht Anmeldung mit Schlüssel'; const ICH = { kann: false };");
+  assert(/disabled/.test(ak('beitreten', 'ab'.repeat(32), 'Beitreten')) && /braucht Anmeldung mit Schlüssel/.test(ak('beitreten', 'ab'.repeat(32), 'Beitreten')), 'Knopf aus, mit Hinweis');
 });
 
 Deno.test('aktion: Reaktion und Zusage nur mit 64-Hex-Event-Kennung', () => {
