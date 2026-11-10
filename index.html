@@ -751,6 +751,34 @@ relihub-steuerkonsole[hidden]{display:none}
 .pk-wahl{display:inline-flex;align-items:center;gap:8px;margin:0 0 18px;font-size:15px;font-weight:600;color:var(--oz-text)}
 .pk-wahl select{font:inherit;font-size:15px;border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;background:var(--card);color:var(--ink)}
 .pk-wahl select:focus-visible,.pk-wrap a:focus-visible,.pk-streifen a:focus-visible{outline:3px solid var(--c-hub);outline-offset:2px}
+.ka-gruppe{font-family:"Space Grotesk",sans-serif;font-size:22px;margin:30px 0 0;color:var(--x-finden)}
+.ei-start{max-width:1180px;margin:0 auto;padding:12px clamp(16px,4vw,40px) 0;display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center}
+.ei-start[hidden]{display:none}
+.ei-satz{margin:0;font-size:16px;color:var(--oz-text)}
+.ei-link{font:inherit;font-weight:600;color:var(--oz-text);background:none;border:0;padding:6px 4px;text-decoration:underline;cursor:pointer}
+.ei-kachel{display:flex;gap:14px;align-items:center;text-decoration:none;color:var(--ink);background:var(--oz-hell);border:1px solid var(--line);border-radius:22px;padding:10px 18px 10px 10px}
+.ei-kachel span{display:flex;flex-direction:column;max-width:34ch}
+.ei-kachel small{color:var(--oz-text);font-size:14px}
+.ei-wrap{max-width:1180px;margin:0 auto;padding:6px clamp(16px,4vw,40px) 70px;color:var(--ink)}
+.ei-wrap h2{margin:26px 0 8px;font-size:22px}
+.ei-sub{margin:0 0 14px;color:var(--muted);max-width:62ch}
+.ei-wahl{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:0 0 20px}
+.ei-wahl label{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--oz-text)}
+.ei-wahl select,.ei-wahl input{font:inherit;font-size:15px;border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;background:var(--card);color:var(--ink);min-width:0}
+.ei-wahl label{display:flex;width:min(100%,32em)}
+.ei-wahl input,.ei-wahl select{flex:1;min-width:0;width:0}
+.ei-btn{font:inherit;font-weight:600;font-size:15px;color:#fff;background:var(--x-koop);border:0;border-radius:8px;padding:9px 16px;min-height:44px;cursor:pointer}
+.ei-btn.zweit{color:var(--ink);background:transparent;border:1.5px solid var(--line)}
+.ei-wrap button:focus-visible,.ei-wrap a:focus-visible,.ei-wrap select:focus-visible,.ei-wrap input:focus-visible,.ei-start a:focus-visible,.ei-start button:focus-visible{outline:3px solid var(--c-hub);outline-offset:2px}
+.ei-vorschau{display:flex;flex-wrap:wrap;gap:20px 28px;align-items:center;justify-content:center;background:var(--oz-hell);border:1.5px dashed var(--line);border-radius:22px;padding:22px 18px;min-height:240px}
+.ei-vorschau relihub-leiste{position:relative;left:auto;bottom:auto;display:block;max-width:100%}
+.ei-schnipsel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin:0 0 14px}
+.ei-schnipsel h3{margin:0 0 4px;font-size:17px}
+.ei-schnipsel p{margin:0 0 8px;max-width:70ch}
+.ei-schnipsel pre{margin:0 0 10px;padding:10px 12px;border-radius:10px;background:var(--oz-hell);color:var(--oz-text);overflow:auto;white-space:pre-wrap;word-break:break-word;font-size:14px}
+.ei-kacheln{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.ei-vorb{display:inline-block;margin-left:6px;padding:2px 10px;border-radius:999px;background:var(--oz-hell);color:var(--oz-text);font-size:13px;font-weight:600}
+@media (max-width:640px){.ei-vorschau{flex-direction:column;align-items:stretch}.ei-start{flex-direction:column;align-items:flex-start}}
 .pk-spalten{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:26px;align-items:start}
 .pk-liste{list-style:none;margin:0;padding:0}
 .pk-zeile{display:flex;gap:12px;align-items:baseline;padding:8px 10px;border-bottom:1px solid var(--line);font-size:15px;line-height:1.4;overflow-wrap:anywhere}
@@ -1076,6 +1104,8 @@ a.kat-card:hover{border-color:var(--c-koop)}
     </nav>
   </header>
 
+  <section class="ei-start" id="zuschnittStart" aria-label="Zuschnitt" hidden></section>
+
   <section class="stage">
     <span class="deco" style="width:520px;height:520px;background:var(--c-finden);right:-220px;top:-120px"></span>
     <span class="deco" style="width:420px;height:420px;background:var(--c-koop);left:-200px;top:260px"></span>
@@ -1228,6 +1258,19 @@ a.kat-card:hover{border-color:var(--c-koop)}
   <main class="pk-wrap" id="pkRoot"></main>
   <footer class="hub-foot"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> reli_hub · ein Vorhaben von FOERBICO · Prototyp</footer>
   <relihub-steuerkonsole id="pkFlower" floating size="58" popover-size="210" context="hub-communities"></relihub-steuerkonsole>
+</div>
+
+<!-- ===================== Ansicht: Eigene Instanz (Zuschnitt, ADR-0009) ===================== -->
+<div class="view" id="v-eigene-instanz" data-stand="nachbau:Vorschau">
+  <header class="hub-top">
+    <a class="brand" href="#start"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg>reli_hub</a>
+    <span class="sp"></span>
+    <nav><a href="#communities">Communities</a><a href="#oekosystem">Ökosystem</a><a class="btn btn-profil" href="#profil">Mein Profil</a></nav>
+  </header>
+  <p class="stand" aria-live="polite"></p>
+  <main class="ei-wrap" id="eiRoot"></main>
+  <footer class="hub-foot"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> reli_hub · ein Vorhaben von FOERBICO · Prototyp</footer>
+  <relihub-steuerkonsole id="eiFlower" floating size="58" popover-size="210" context="hub-communities"></relihub-steuerkonsole>
 </div>
 
 <!-- ===================== Ansicht 7: Community-Raum ===================== -->
@@ -1623,6 +1666,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
   <h2>Leiste anpassen</h2>
   <form></form>
   <p class="hint">Reihenfolge ändern folgt.</p>
+  <button type="button" class="btn btn-ghost" data-cfg-zuschnitt hidden>Zuschnitt aufheben</button>
   <button type="button" class="btn" data-cfg-done>Fertig</button>
 </div>
 <div class="toast" id="toast" role="status"></div>
@@ -2134,12 +2178,16 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
  *
  * API
  *   RelihubLeiste.setItems(items) setzt die Einträge aller Leisten der Seite.
- *   item = { id, label, short?, href, kind }, kind ∈ 'instanz' | 'community'.
+ *   item = { id, label, short?, href, kind }, kind ∈ 'instanz' | 'community' | 'zuschnitt'.
  *   Communities stehen nach einem Trennstrich mit Ring-Symbol; short ersetzt label unter 640 px.
+ *   Ein Eintrag mit kind 'zuschnitt' steht vor den Instanzen, mit Ring-Symbol und einem Knopf ✕ (aria-label „Zuschnitt aufheben“).
  *
  * EREIGNIS
  *   Jeder Klick löst "relihub-leiste-select" aus (bubbles, composed, cancelable) mit
  *   detail = { id, href, kind }. Ohne preventDefault() navigiert die Leiste zu href.
+ *
+ *   Der Knopf ✕ am Zuschnitt-Eintrag löst "relihub-leiste-entfernen" aus (bubbles, composed, nicht abbrechbar)
+ *   mit detail = { id, kind }; das Element entfernt nichts selbst.
  *
  *   Der Knopf „⋯“ am Ende (data-cfg, aria-label „Leiste anpassen“) löst "relihub-leiste-config"
  *   aus (bubbles, composed, nicht abbrechbar) mit detail = { items } (aktuelle Einträge).
@@ -2167,6 +2215,9 @@ button.cfg:hover{opacity:1}
 a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 .sep{width:1px;align-self:stretch;margin:4px 4px;background:currentColor;opacity:.4}
 .ring{width:11px;height:11px;flex:none}
+button.x{flex:none;font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:3px 7px 3px 0;margin-left:-6px;border-radius:999px;opacity:.75}
+button.x:hover{opacity:1}
+button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 .short{display:none}
 @media (max-width:640px){
   :host{left:10px;bottom:12px;font-size:12px}
@@ -2181,6 +2232,8 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       super();
       this.attachShadow({ mode: 'open' });
       this.shadowRoot.addEventListener('click', e => {
+        const x = e.target.closest('button[data-x]');
+        if (x) { const z = ITEMS.find(i => i.id === x.dataset.x); this.dispatchEvent(new CustomEvent('relihub-leiste-entfernen', { detail: { id: x.dataset.x, kind: z ? z.kind : '' }, bubbles: true, composed: true })); return; }
         if (e.target.closest('[data-cfg]')) { this.dispatchEvent(new CustomEvent('relihub-leiste-config', { detail: { items: ITEMS.slice() }, bubbles: true, composed: true })); return; }
         const a = e.target.closest('a[data-id]'); if (!a) return;
         if (e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;   // neuer Tab bleibt Sache des Browsers
@@ -2196,9 +2249,10 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       // Fokus über das Neuzeichnen retten: Eintrag (data-id) oder Knopf „⋯“ (data-cfg)
       const fa = this.shadowRoot.activeElement, fokus = fa ? (fa.dataset.id ? `a[data-id="${fa.dataset.id}"]` : fa.hasAttribute('data-cfg') ? '[data-cfg]' : '') : '';
       const cur = this.getAttribute('current'), label = this.getAttribute('label') || 'Orte';
-      const link = it => `<a href="${esc(it.href)}" data-id="${esc(it.id)}"${it.id === cur ? ' class="on" aria-current="page"' : ''}>${it.kind === 'community' ? RING : ''}${it.short ? `<span class="long">${esc(it.label)}</span><span class="short">${esc(it.short)}</span>` : esc(it.label)}</a>`;
-      const inst = ITEMS.filter(x => x.kind !== 'community'), comm = ITEMS.filter(x => x.kind === 'community');
-      this.shadowRoot.innerHTML = `<style>${CSS}</style><nav aria-label="${esc(label)}"><span class="lbl">${esc(label)}</span>${inst.map(link).join('')}${comm.length ? '<span class="sep" aria-hidden="true"></span>' + comm.map(link).join('') : ''}<button type="button" class="cfg" data-cfg aria-label="Leiste anpassen" title="Leiste anpassen">⋯</button></nav>`;
+      const link = it => `<a href="${esc(it.href)}" data-id="${esc(it.id)}"${it.id === cur ? ' class="on" aria-current="page"' : ''}>${it.kind === 'community' || it.kind === 'zuschnitt' ? RING : ''}${it.short ? `<span class="long">${esc(it.label)}</span><span class="short">${esc(it.short)}</span>` : esc(it.label)}</a>`;
+      const zus = ITEMS.filter(x => x.kind === 'zuschnitt'), inst = ITEMS.filter(x => x.kind !== 'community' && x.kind !== 'zuschnitt'), comm = ITEMS.filter(x => x.kind === 'community');
+      const marke = it => link(it) + `<button type="button" class="x" data-x="${esc(it.id)}" aria-label="Zuschnitt aufheben" title="Zuschnitt aufheben">✕</button>`;
+      this.shadowRoot.innerHTML = `<style>${CSS}</style><nav aria-label="${esc(label)}"><span class="lbl">${esc(label)}</span>${zus.map(marke).join('')}${inst.map(link).join('')}${comm.length ? '<span class="sep" aria-hidden="true"></span>' + comm.map(link).join('') : ''}<button type="button" class="cfg" data-cfg aria-label="Leiste anpassen" title="Leiste anpassen">⋯</button></nav>`;
       if (fokus) { const z = this.shadowRoot.querySelector(fokus); if (z) z.focus(); }
     }
   }
@@ -2311,6 +2365,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   // Bech32 (NIP-19): npub → Hex und naddr (TLV 3=kind, 2=pubkey, 0=d-Tag, Reihenfolge wie bei nostr-tools)
   const B32 = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
   function npubToHex(npub) {
+    const B32 = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';   // lokal, damit die Funktion allein ausgeschnitten und getestet werden kann
     let acc = 0, bits = 0, hex = '';
     for (const c of npub.slice(npub.lastIndexOf('1') + 1, -6)) { acc = ((acc << 5) | B32.indexOf(c)) & 0xfff; bits += 5; if (bits >= 8) { bits -= 8; hex += ((acc >> bits) & 255).toString(16).padStart(2, '0'); } }
     return hex;
@@ -2610,7 +2665,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   // Entitäten (Personen, Communities, Materialien/Beiträge, Termine) und ungerichtete Kanten aus Autorschaft, h-Tags, Reposts, Mitgliedschaften, Zusagen und Reaktionen.
   // Quellen sind die Caches der anderen Ansichten; neu geholt wird nur, was sie nicht tragen (bzLaden: eine Abfrage). Kanten gelten wie geteilt, ohne Rollenprüfung.
   let bzDaten = null, bzLauf = null;   // Antwort (gehalten, wenn nicht leer), laufende Abfrage
-  let HUB_C = null;   // Zuschnitt auf eine Community (Hex oder null); gefüllt ab ADR-0009 Zuschnitt
+  let HUB_C = null;   // Zuschnitt auf eine Community (Hex oder null); Block „Zuschnitt (ADR-0009)“
   const ICH = { hex: null, kann: false };   // Anmeldestand, gefüllt von der Anmeldung (Hex des Schlüssels, ob signiert werden kann)
   let ozGefuege = null, ozLive = false;   // Gefüge der Ökosystem-Ansicht { ents, kanten } und ob es vom Relay kommt
   const cyProfile = new Map();   // Profile (profilAus) der Community-Konten aus cyLaden
@@ -3246,9 +3301,9 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   /** WordPress-Schnipsel für das Plugin; fixed_level und fixed_subject nur, wenn saRender die Kennungen (stufeId, fachId) mitgibt */
   function shortcodeAus(f) {
     const w = x => String(x).replace(/"/g, '');
-    const k = f.c ? CO_SCHLUESSEL.find(x => x.id === f.c) : null;
+    const k = f.c ? CO_SCHLUESSEL.find(x => x.id === f.c) : null, npub = k ? k.npub : (f.npub || '');   // f.npub: Community ohne Kennung im Hub (nur Schlüssel)
     const attr = [];
-    if (k) attr.push(`community="${w(k.npub)}"`);
+    if (npub) attr.push(`community="${w(npub)}"`);
     if (f.q.length) attr.push(`search="${w(f.q.join(' '))}"`);
     if (f.stufeId) attr.push(`fixed_level="${w(f.stufeId)}"`);
     if (f.fachId) attr.push(`fixed_subject="${w(f.fachId)}"`);
@@ -3258,11 +3313,11 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   }
   /** Kontextprofil für die Steuerkonsole als JSON-Text */
   function kontextprofilAus(f) {
-    const k = f.c ? CO_SCHLUESSEL.find(x => x.id === f.c) : null;
+    const k = f.c ? CO_SCHLUESSEL.find(x => x.id === f.c) : null, npub = k ? k.npub : (f.npub || null);
     return JSON.stringify({
-      name: 'Sammlung', version: 1,
-      actions: { 'finden.material': { params: { thema: f.q, stufe: f.stufe } } },
-      sammlung: { community: k ? k.npub : null, fach: f.fach, stufe: f.stufe, lizenz: f.lizenz, q: f.q, relays: RELAYS }
+      name: 'Sammlung', version: 1, c: npub,   // c: Zuschnitt auf eine Community (npub) oder null
+      actions: { 'finden.material': { params: Object.assign({ thema: f.q, stufe: f.stufe }, npub ? { c: npub } : {}) } },
+      sammlung: { community: npub, fach: f.fach, stufe: f.stufe, lizenz: f.lizenz, q: f.q, relays: RELAYS }
     }, null, 2);
   }
   let saF = sammlungFilter(''), saLauf = 0, saCo = null, saExtra = [], saFehlt = 0, saCoFehler = '', saZahlen = {}, saAusgaben = {}, saStand = 'laden';   // Filter, Lauf-Zähler, Adressen der Community, Zahlen je Community, Schnipsel, Ladezustand
@@ -3270,7 +3325,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   /** Filter in die Adresszeile schreiben (ohne neuen Verlaufseintrag) */
   function saSchreibe() {
     const p = new URLSearchParams();
-    if (saF.c) p.set('c', saF.c);
+    if (saF.c) p.set('c', saF.c); else if (HUB_C) p.set('c', '');   // leeres c: „Alle“ bleibt gewählt, der Zuschnitt belegt nicht neu vor
     saF.fach.forEach(x => p.append('fach', x));
     saF.stufe.forEach(x => p.append('stufe', x));
     if (saF.lizenz) p.set('lizenz', saF.lizenz);
@@ -3331,7 +3386,9 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   }
   /** Ansicht #finden/sammlung (auch bei Wechsel der Community): Filter aus der Adresszeile, Filterleiste sofort, dann nur die Caches von mpLaden und coLaden (die Community nur bei gesetztem Filter), danach zeichnen */
   function saOpen(qs) {
-    const f = saF = sammlungFilter(qs), lauf = ++saLauf, hex = f.c ? saHex(f.c) : null;
+    const f = saF = sammlungFilter(qs), lauf = ++saLauf;
+    if (HUB_C && !new URLSearchParams(qs || '').has('c')) { const k = CO_SCHLUESSEL.find(x => x.hex === HUB_C); if (k) f.c = k.id; }   // Vorbelegung durch den Zuschnitt, die Person kann „Alle“ wählen
+    const hex = f.c ? saHex(f.c) : null;
     saCo = null; saExtra = []; saFehlt = 0; saCoFehler = ''; saStand = 'laden';
     saFelder(); saRender();
     Promise.all([mpLaden().catch(() => []), hex ? coLaden(hex).catch(() => null) : null]).then(([liste, co]) => {
@@ -4272,7 +4329,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   function spielregelLink(d) {
     return ocDaten && ocDaten.seiten.has(d) ? '#oercommunity/' + d : '#oercommunity/spielregeln';
   }
-  const OC_SEITEN = ['startseite', 'tagungen', 'qualitaet', 'oer-und-oep', 'unser-team', 'impressum', 'datenschutz', 'spielregeln', ...SPIELREGELN.map(s => s.d)];
+  const OC_SEITEN = ['startseite', 'tagungen', 'qualitaet', 'oer-und-oep', 'unser-team', 'impressum', 'datenschutz', 'spielregeln', 'kooperationsvereinbarung', 'bedarfe-technik', ...SPIELREGELN.map(s => s.d)];
   const OC_NAV_STD = '<button type="button" data-ocs="oc-tagungen">Tagungen</button><button type="button" data-ocs="oc-oer">Was ist OER?</button><button type="button" data-ocs="oc-qualitaet">Qualität</button><a href="#oercommunity/spielregeln">Spielregeln</a><button type="button" data-ocs="oc-team">Team</button><button type="button" data-ocs="oc-blog">Blog</button>';
   const OC_FUSS_STD = `${ocExt('https://oer.community/impressum/', 'Impressum')} &amp; ${ocExt('https://oer.community/datenschutz/', 'Datenschutz')}`;
   const OC_OER = [
@@ -4548,6 +4605,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   ['crRoot', 'rlCrRoot'].forEach(id => { const r = document.getElementById(id); r.addEventListener('click', crClick); r.addEventListener('submit', crSubmit); });
   // Ein Community-Raum kann im reli_hub oder eingebettet in einer Instanz (z. B. relilab) erscheinen
   function crOpen(id, tab, rootId) {
+    const wahl = id || HUB_C || 'relilab'; id = zuschnittCyId(wahl) || wahl;   // ohne Angabe gilt der Zuschnitt; npub und Hex werden zur Kennung
     ['crRoot', 'rlCrRoot'].forEach(x => { if (x !== (rootId || 'crRoot')) document.getElementById(x).innerHTML = ''; });
     katLauf++; crRootEl = document.getElementById(rootId || 'crRoot'); crId = id; crTab = tab || 'home'; crRender();
   }
@@ -4836,7 +4894,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
 
   // ---------- Fortbildungskalender (finden › Fortbildungen): alle Quellen, Filter nach Logik, Merkmal, Quelle, Suche ----------
   const KA_MERKMALE = [['online', 'online'], ['praesenz', 'Präsenz'], ['anmeldung', 'mit Anmeldung'], ['kostenfrei', 'kostenfrei']];
-  const kaF = { logik: '', merkmal: [], q: '', quelle: '' };
+  const kaF = { logik: '', merkmal: [], q: '', quelle: '', c: '', nur: false };   // c: Zuschnitt (Hex), nur: Chip „nur <Name>“
   const fKaD = rtF({ weekday: 'short', day: '2-digit', month: '2-digit' });
   let kaRoh = RT_RAW, kaListe = [], kaLauf = 0;
   /** Filter aus der Adresse: unbekannte Werte fallen weg */
@@ -4849,9 +4907,11 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const p = new URLSearchParams(); if (kaF.logik) p.set('logik', kaF.logik); kaF.merkmal.forEach(m => p.append('merkmal', m)); if (kaF.q) p.set('q', kaF.q); if (kaF.quelle) p.set('quelle', kaF.quelle);
     CUR = 'finden/fortbildungen' + (p.toString() ? '?' + p.toString() : ''); try { history.replaceState(null, '', '#' + CUR); } catch (e) {}
   }
+  /** Termin der Zuschnitt-Community: Absender oder #h */
+  const kaZus = ev => !!kaF.c && (ev.pubkey === kaF.c || tagWerte(ev, 'h').includes(kaF.c));
   function kaPasst(t) {
     const m = t.m, q = kaF.quelle ? (kaF.quelle === 'weitere' ? !KAL_HEX.has(t.ev.pubkey) : (KAL_HEX.get(t.ev.pubkey) || {}).npub === kaF.quelle) : true;
-    return q && (!kaF.logik || t.logik === kaF.logik)
+    return q && (!kaF.nur || kaZus(t.ev)) && (!kaF.logik || t.logik === kaF.logik)
       && kaF.merkmal.every(k => k === 'online' ? m.online === true : k === 'praesenz' ? m.online === false : k === 'anmeldung' ? m.anmeldung === true : m.kostenfrei === true)
       && (!kaF.q || (t.e.t + ' ' + t.e.x + ' ' + t.e.g.join(' ') + ' ' + t.e.a).toLowerCase().includes(kaF.q.toLowerCase()));
   }
@@ -4861,15 +4921,18 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const alle = kaRoh.map(ev => ({ ev, e: Object.assign(evToTermin(ev), { a: rvAbs(ev.pubkey) }), logik: terminLogik(ev), m: terminMerkmale(ev) }))
       .filter(t => t.e.s && (t.e.e && t.e.e - t.e.s <= 2 * 86400 ? t.e.e : t.e.s) >= jetzt).sort((a, b) => a.e.s - b.e.s);
     kaListe = alle.filter(kaPasst);
+    const zn = kaF.c ? zuschnittName() : '', gruppiert = !!zn && kaListe.some(t => kaZus(t.ev)) && kaListe.some(t => !kaZus(t.ev));
+    if (gruppiert) kaListe = kaListe.filter(t => kaZus(t.ev)).concat(kaListe.filter(t => !kaZus(t.ev)));   // Termine der Community zuerst
     const chip = (attr, wert, text, an) => `<button type="button" data-${attr}="${rtEsc(wert)}" aria-pressed="${an}">${rtEsc(text)}</button>`;
     document.getElementById('kaLogik').innerHTML = '<legend>Art</legend>' + [['', 'Alle'], ['institut', 'Institute und Communities'], ['labor', 'Labor']].map(([w, t]) => chip('kalogik', w, t, kaF.logik === w)).join('');
-    document.getElementById('kaMerk').innerHTML = '<legend>Merkmale</legend>' + KA_MERKMALE.map(([w, t]) => chip('kamerk', w, t, kaF.merkmal.includes(w))).join('');
+    document.getElementById('kaMerk').innerHTML = '<legend>Merkmale</legend>' + KA_MERKMALE.map(([w, t]) => chip('kamerk', w, t, kaF.merkmal.includes(w))).join('') + (zn ? `<button type="button" data-kanur aria-pressed="${kaF.nur}">nur ${zn}</button>` : '');
     const sel = document.getElementById('kaQuelle');
     sel.innerHTML = '<option value="">Alle Quellen</option>' + KAL_QUELLEN.map(q => `<option value="${q.npub}">${rtEsc(q.n)}</option>`).join('') + '<option value="weitere">weitere (über Community)</option>';
     sel.value = kaF.quelle;
-    let h = '', mo = '';
+    let h = '', mo = '', gr = null;
     kaListe.forEach((t, i) => {
       const e = t.e, m = t.m, monat = fMY.format(e.s * 1000);
+      if (gruppiert && gr !== kaZus(t.ev)) { gr = kaZus(t.ev); mo = ''; h += `<h2 class="ka-gruppe">${gr ? 'Von ' + zn : 'Weitere Termine'}</h2>`; }
       if (monat !== mo) { h += `<h2 class="ka-month">${rtEsc(monat)}</h2>`; mo = monat; }
       const merk = [m.online === true ? 'online' : m.online === false ? 'Präsenz' : '', m.anmeldung ? 'mit Anmeldung' : '', m.kostenfrei === true ? 'kostenfrei' : m.kostenfrei === false ? 'kostenpflichtig' : ''].filter(Boolean);
       h += `<article class="ka-ev"><time>${rtEsc(fKaD.format(e.s * 1000))}<br>${fT.format(e.s * 1000)}${e.e ? '–' + fT.format(e.e * 1000) : ''} Uhr</time>
@@ -4883,7 +4946,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     else datenstand('v-fortbildungen', 'stand', RT_STAND);
   }
   function kaOpen(qs) {
-    Object.assign(kaF, kaFilter(qs)); document.getElementById('kaQ').value = kaF.q; kaRoh = RT_RAW; kaRender();   // zuerst der Schnappschuss
+    Object.assign(kaF, kaFilter(qs), { c: HUB_C || '', nur: false }); document.getElementById('kaQ').value = kaF.q; kaRoh = RT_RAW; kaRender();   // zuerst der Schnappschuss
     const lauf = ++kaLauf;
     kalLaden().then(evs => { if (lauf === kaLauf) { kaRoh = evs; kaRender(); } }, () => {});
   }
@@ -4891,6 +4954,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const v = document.getElementById('v-fortbildungen');
     v.addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.kanur !== undefined) { kaF.nur = !kaF.nur; kaRender(); return; }
       if (b.dataset.kalogik !== undefined) { kaF.logik = b.dataset.kalogik; kaSync(); kaRender(); return; }
       if (b.dataset.kamerk) { kaF.merkmal = kaF.merkmal.includes(b.dataset.kamerk) ? kaF.merkmal.filter(m => m !== b.dataset.kamerk) : [...kaF.merkmal, b.dataset.kamerk]; kaSync(); kaRender(); return; }
       if (b.dataset.kaics) { rtIcs([kaListe[+b.dataset.kaics].e], 'fortbildung.ics'); return; }
@@ -4971,14 +5035,23 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       datenstand('v-personen', 'stand', '04.11.2026');
       return;
     }
-    const karten = daten.pks.map(pk => daten.profile.get(pk)).filter(p => p && !p.bot);
-    aus.innerHTML = (karten.length ? `<div class="pe-liste">${karten.map(p => `<article class="pe-card">${peAv(p)}<div><b>${p.name}</b>${p.about ? `<p>${p.about}</p>` : ''}${p.nip05 ? `<small>${p.nip05}</small>` : ''}${peChips(daten.mitglied.get(p.pk))}<div class="pe-act"><a class="pe-btn" href="#person?p=${esc(p.npub)}">Profil ansehen ›</a><span class="pe-folgen"><button type="button" disabled aria-disabled="true">Folgen</button><small>${PE_FOLGEN_HINT}</small></span></div></div></article>`).join('')}</div>` : '<p class="pe-satz">Zu den Genannten liegen noch keine Profile vor.</p>') + hinweis;
+    let karten = daten.pks.map(pk => daten.profile.get(pk)).filter(p => p && !p.bot), zsatz = '';
+    if (HUB_C) {   // Schnitt der Personen-Liste mit den Mitgliedern der Community (Kante im Gefüge); ohne Gefüge zeigt die Liste alle und sagt es
+      const g = bzDaten && bzDaten.antwort ? bzBauen(bzQuellen()) : null, z = 'c:' + HUB_C;
+      if (g) karten = karten.filter(p => (g.kanten.get('p:' + p.pk) || new Set()).has(z));
+      zsatz = `<p class="pe-satz">Zuschnitt: ${zuschnittName()}${g ? '' : ' · die Verbindungen laden noch, bis dahin steht hier die ganze Liste'}</p>`;
+    }
+    aus.innerHTML = zsatz + (karten.length ? `<div class="pe-liste">${karten.map(p => `<article class="pe-card">${peAv(p)}<div><b>${p.name}</b>${p.about ? `<p>${p.about}</p>` : ''}${p.nip05 ? `<small>${p.nip05}</small>` : ''}${peChips(daten.mitglied.get(p.pk))}<div class="pe-act"><a class="pe-btn" href="#person?p=${esc(p.npub)}">Profil ansehen ›</a><span class="pe-folgen"><button type="button" disabled aria-disabled="true">Folgen</button><small>${PE_FOLGEN_HINT}</small></span></div></div></article>`).join('')}</div>` : '<p class="pe-satz">Zu den Genannten liegen noch keine Profile vor.</p>') + hinweis;
     datenstand('v-personen', 'live', `${karten.length} Personen · Liste vom ${peDatum(daten.liste.created_at)}`);
   }
   function peOpen() {
     peRender(null);
     const lauf = ++peStart;
-    peLaden().then(d => { if (lauf === peStart) peRender(d); }, () => {});
+    peLaden().then(d => {
+      if (lauf !== peStart) return;
+      peRender(d);
+      if (HUB_C && d.liste && !(bzDaten && bzDaten.antwort)) bzLaden().then(() => { if (lauf === peStart) peRender(d); }, () => {});   // Verbindungen für den Zuschnitt (eine Abfrage je Sitzung, wie Ökosystem)
+    }, () => {});
   }
   /** Profilseite #person?p=<npub>: Profil, Mitgliedschaften und Veröffentlichungen in einer Abfrage je Relay (liegt das Profil schon im Cache der Liste, nur die Veröffentlichungen) */
   function prOpen(qs) {
@@ -5041,7 +5114,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
 
   // Gemeinsame Kette aller Kontexte: Knospe → Aktion (Editor, Ansicht), sonst Hinweis oder „führt später hierhin“
   function standardAktion(d, ctx) {
-    if (d.action === 'kooperieren.communities') { go('communities'); return false; }
+    if (d.action === 'kooperieren.communities') { go(HUB_C ? 'community' : 'communities'); return false; }   // mit Zuschnitt in den Raum der Community (ohne c gilt HUB_C)
     if (d.action === 'veroeffentlichen.beitrag') { openBlog(ctx); return false; }
     if (d.action === 'veroeffentlichen.termin') { openEvent(ctx); return false; }
     if (d.action === 'veroeffentlichen.lerninhalte') { go('materialpool'); openChooser('materialpool'); return false; }
@@ -5177,6 +5250,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   function leisteItems() {
     const v = CUR.split('?')[0], aus = ((LEISTE_KONTEXT[v] || {}).aus || []).concat(leisteAus());
     const inst = LEISTE.filter(x => x.id === 'start' || !aus.includes(x.id));
+    if (HUB_C) { const n = zuschnittName().replace(/&(lt|gt|quot|amp);/g, m => ({ '&lt;': '<', '&gt;': '>', '&quot;': '"', '&amp;': '&' }[m])); inst.unshift({ id: 'zuschnitt', label: 'Zuschnitt: ' + n, short: n, href: '#eigene-instanz', kind: 'zuschnitt' }); }   // abwählbare Markierung vor den Instanzen
     if (!LOGGED) return inst;
     return inst.concat(COMM.filter(c => c[1] === 'Mitglied' && c[4]).map(c => ({ id: 'c-' + c[4], label: c[0].replace(/\u00ad/g, ''), href: '#community?c=' + c[4], kind: 'community' })));
   }
@@ -5187,6 +5261,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   const leisteCfg = document.getElementById('leisteCfg');
   function leisteCfgRender() {
     const aus = leisteAus();
+    leisteCfg.querySelector('[data-cfg-zuschnitt]').hidden = !HUB_C;
     leisteCfg.querySelector('form').innerHTML = LEISTE.map(x => `<label><input type="checkbox" data-leiste-id="${x.id}"${x.id === 'start' ? ' disabled checked' : (aus.includes(x.id) ? '' : ' checked')}> ${x.label}</label>`).join('');
   }
   function leisteCfgZu() {
@@ -5200,8 +5275,147 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     speicher('relihub-leiste-aus', JSON.stringify(ab));
     RelihubLeiste.setItems(leisteItems());
   });
-  leisteCfg.addEventListener('click', e => { if (e.target.closest('[data-cfg-done]')) leisteCfgZu(); });
+  leisteCfg.addEventListener('click', e => {
+    if (e.target.closest('[data-cfg-zuschnitt]')) { leisteCfgZu(); zuschnittSetzen(null); return; }
+    if (e.target.closest('[data-cfg-done]')) leisteCfgZu();
+  });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !leisteCfg.hidden) leisteCfgZu(); });
+
+  // ---------- Zuschnitt (ADR-0009) ----------
+  // Der ganze Hub auf eine Community zugeschnitten: ?c=<npub> in der Adresse (HUB_C, Hex), sonst aus der Sitzung (sessionStorage `relihub-c`).
+  // Die Ansichten lesen HUB_C als Vorbelegung (Sammlung, Kalender, Katalog, Personen) oder als Rahmen (Ökosystem, Mitmachen); die Leiste zeigt die Markierung.
+  /** Hex der Community aus `?c=` (npub oder 64-Hex) oder null */
+  function zuschnittAus(search) {
+    const c = new URLSearchParams(search || '').get('c') || '';
+    if (istHex64(c)) return c;
+    if (/^npub1[0-9a-z]{58}$/.test(c)) { try { const h = npubToHex(c); return istHex64(h) ? h : null; } catch (e) { return null; } }
+    return null;
+  }
+  const zuschnittNpub = hex => bech32('npub', hex.match(/../g).map(h => parseInt(h, 16)));
+  /** Kennung der eingebetteten Community (CY) zu npub oder Hex, sonst '' (Community nur mit Schlüssel) */
+  function zuschnittCyId(x) {
+    const hex = zuschnittAus('?c=' + encodeURIComponent(x || ''));
+    if (!hex) return '';
+    const k = CO_SCHLUESSEL.find(c => c.hex === hex), id = k ? k.id : CY_HEX.get(hex);
+    return id && CY.some(c => c.id === id) ? id : '';
+  }
+  /** Route `community` mit npub oder Hex (oder nur mit Zuschnitt) ohne Kennung im Hub: die Community hat keinen Raum, die Auswahl im Ökosystem ersetzt ihn */
+  function zuschnittUmleiten(cur) {
+    const [pfad, qs] = cur.split('?');
+    if (pfad !== 'community') return cur;
+    const cc = new URLSearchParams(qs || '').get('c') || HUB_C || '', hx = zuschnittAus('?c=' + encodeURIComponent(cc));
+    if (!hx || zuschnittCyId(cc)) return cur;
+    const neu = 'oekosystem?wahl=' + encodeURIComponent('c:' + hx);
+    try { history.replaceState(null, '', '#' + neu); } catch (e) {}
+    return neu;
+  }
+  /** Anzeigename der Zuschnitt-Community, schon maskiert: Profilname, Hub-Name, eingebetteter Name, sonst gekürzter npub */
+  function zuschnittName() {
+    if (!HUB_C) return '';
+    const p = bzProfil(HUB_C), k = CO_SCHLUESSEL.find(x => x.hex === HUB_C), c = CY.find(x => x.id === CY_HEX.get(HUB_C)) || (cyDaten && cyDaten.liste.find(x => x.hex === HUB_C));
+    return p ? p.name : k ? esc(k.n) : c ? esc(c.n) : zuschnittNpub(HUB_C).slice(0, 12) + '…';
+  }
+  const ZUSCHNITT_AKTIONEN = ['finden.material', 'finden.fortbildungen', 'kooperieren.communities'];
+  /** Jeder Kontext der Steuerkonsole trägt den Zuschnitt als Parameter c an die Ziele dieser drei Aktionen (ohne Zuschnitt entfällt er) */
+  function zuschnittKonsolen() {
+    Object.keys(RelihubSteuerkonsole.contexts).forEach(name => {
+      if (name.startsWith('vorschau-')) return;
+      const prof = RelihubSteuerkonsole.contexts[name], a = Object.assign({}, prof.actions || {});
+      ZUSCHNITT_AKTIONEN.forEach(id => {
+        const params = Object.assign({}, (a[id] || {}).params || {});
+        if (HUB_C) params.c = zuschnittNpub(HUB_C); else delete params.c;
+        a[id] = Object.assign({}, a[id] || {}, { params });
+      });
+      prof.actions = a;
+      RelihubSteuerkonsole.registerContext(name, prof);
+    });
+  }
+  /** Eintrag der Zuschnitt-Community für Kachel und Vorschau: eingebettet, live oder nur mit Schlüssel */
+  function zuschnittEintrag() {
+    const p = bzProfil(HUB_C), c = CY.find(x => x.id === CY_HEX.get(HUB_C)) || (cyDaten && cyDaten.liste.find(x => x.hex === HUB_C)) || { id: HUB_C.slice(0, 8), ab: HUB_C.slice(0, 2).toUpperCase(), col: C.kooperieren, bio: '' };
+    return Object.assign({}, c, { bild: (p && p.bild) || c.bild || '' });
+  }
+  /** Startseite: Kachel der Community oben und der Satz mit dem Weg zurück */
+  function zuschnittStart() {
+    const el = document.getElementById('zuschnittStart'); if (!el) return;
+    if (!HUB_C) { el.hidden = true; el.innerHTML = ''; return; }
+    const c = zuschnittEintrag(), ziel = zuschnittCyId(HUB_C) ? '#community?c=' + c.id : '#oekosystem?wahl=' + encodeURIComponent('c:' + HUB_C);
+    el.innerHTML = `<a class="ei-kachel" href="${esc(ziel)}">${cyAv(c)}<span><b>${zuschnittName()}</b><small>${esc(c.bio || '')}</small></span></a><p class="ei-satz">Dieser Hub ist auf <b>${zuschnittName()}</b> zugeschnitten. <button type="button" class="ei-link" data-zuschnitt-aus>Aufheben</button></p>`;
+    el.hidden = false;
+  }
+  /** Zuschnitt setzen (Hex) oder aufheben (null): Zustand, Sitzung, Adresse, Konsolen, Leiste, Startseite, Ansicht */
+  function zuschnittSetzen(hex) {
+    HUB_C = istHex64(hex) ? hex : null;
+    try { if (HUB_C) sessionStorage.setItem('relihub-c', HUB_C); else sessionStorage.removeItem('relihub-c'); } catch (e) {}
+    try {
+      const u = new URL(location.href);
+      if (HUB_C) u.searchParams.set('c', zuschnittNpub(HUB_C)); else u.searchParams.delete('c');
+      history.replaceState(null, '', u.pathname + u.search + u.hash);
+    } catch (e) {}
+    zuschnittKonsolen(); zuschnittStart();
+    leisteKey = null; RelihubLeiste.setItems(leisteItems());
+    route();
+  }
+  HUB_C = zuschnittAus(location.search) || (() => { try { return zuschnittAus('?c=' + (sessionStorage.getItem('relihub-c') || '')); } catch (e) { return null; } })();
+  if (HUB_C) { try { sessionStorage.setItem('relihub-c', HUB_C); } catch (e) {} zuschnittKonsolen(); }
+  document.addEventListener('click', e => { if (e.target.closest('[data-zuschnitt-aus]')) zuschnittSetzen(null); });
+  document.addEventListener('relihub-leiste-entfernen', e => { if (e.detail && e.detail.kind === 'zuschnitt') zuschnittSetzen(null); });
+
+  // ---------- Eigene Instanz: Zuschnitt prüfen und den Schnipsel mitnehmen ----------
+  let eiC = null, eiAus = {};   // gewählte Community (Hex) und die Schnipsel zum Kopieren
+  const eiRoot = document.getElementById('eiRoot');
+  /** Auswahl: die fünf Schlüssel des Hubs und die live gefundenen Community-Konten (cyLaden, schon geholt) */
+  function eiListe() {
+    const m = new Map(CO_SCHLUESSEL.map(k => [k.hex, k.n]));
+    if (cyDaten) cyDaten.liste.forEach(c => { if (istHex64(c.hex) && !m.has(c.hex)) m.set(c.hex, c.n); });
+    return [...m].map(([hex, n]) => ({ hex, n }));
+  }
+  function eiOpen(qs) {
+    eiC = zuschnittAus('?' + (qs || '')) || HUB_C;
+    eiRender();
+    cyLaden().then(() => { if (CUR.split('?')[0] === 'eigene-instanz') eiRender(); }, () => {});   // eine zwischengespeicherte Abfrage (wie Ökosystem), nur für die Namen
+  }
+  function eiRender() {
+    const liste = eiListe(), k = eiC ? CO_SCHLUESSEL.find(x => x.hex === eiC) : null;
+    const fokus = document.activeElement && eiRoot.contains(document.activeElement) ? document.activeElement.id : '';
+    const opt = liste.map(c => `<option value="${esc(c.hex)}"${c.hex === eiC ? ' selected' : ''}>${esc(c.n)}</option>`).join('') + (eiC && !liste.some(c => c.hex === eiC) ? `<option value="${esc(eiC)}" selected>${esc(zuschnittNpub(eiC).slice(0, 12) + '…')}</option>` : '');
+    const wahl = `<form class="ei-wahl" data-eisuche><label>Community <select id="eiWahl" data-eic><option value="">Bitte wählen</option>${opt}</select></label><label>oder npub <input id="eiNpub" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="npub1…"></label><button type="submit" class="ei-btn zweit">Übernehmen</button></form>`;
+    const kopf = `<h1>Eigene Instanz</h1><p class="ei-sub">Schneide den Hub auf deine Community zu, prüfe die Vorschau und nimm den Schnipsel mit auf deine Seite.</p>${wahl}`;
+    datenstand('v-eigene-instanz', 'nachbau', 'Vorschau');
+    if (!eiC) { eiAus = {}; eiRoot.innerHTML = kopf + '<p class="ei-sub">Wähle eine Community oder füge einen npub ein; dann erscheinen Vorschau und Schnipsel.</p>'; return; }
+    const npub = zuschnittNpub(eiC), f = { c: k ? k.id : '', npub, q: [], fach: [], stufe: [], lizenz: '' }, name = esc(k ? k.n : (bzProfil(eiC) ? bzProfil(eiC).name.replace(/&amp;/g, '&') : npub.slice(0, 12) + '…'));
+    eiAus = { link: `https://hub.rpi-virtuell.net/?c=${npub}#start`, kp: kontextprofilAus(f), wp: shortcodeAus(f), git: 'https://git.edufeed.org/edufeed/edufeed-app' };
+    const aktionen = {}; ZUSCHNITT_AKTIONEN.forEach(id => { aktionen[id] = { params: { c: npub } }; });
+    RelihubSteuerkonsole.registerContext('vorschau-' + eiC, { actions: aktionen, handler: d => standardAktion(d, 'Vorschau') });
+    const ist = HUB_C === eiC;
+    const vorh = d => !!(ocDaten && ocDaten.seiten.has(d)), vb = d => vorh(d) ? '' : '<span class="ei-vorb">in Vorbereitung</span>';
+    const kopie = i => `<button type="button" class="ei-btn" data-eicopy="${i}">Kopieren</button>`;
+    eiRoot.innerHTML = kopf
+      + `<p class="ei-sub">Gewählt: <b>${name}</b>. ${ist ? 'Dieser Hub ist darauf zugeschnitten. <button type="button" class="ei-btn zweit" data-zuschnitt-aus>Zuschnitt aufheben</button>' : '<button type="button" class="ei-btn" data-eizu>Diesen Hub auf sie zuschneiden</button>'}</p>`
+      + `<h2>Vorschau</h2><div class="ei-vorschau"><relihub-steuerkonsole context="vorschau-${esc(eiC)}" size="200" variant="knospen"></relihub-steuerkonsole><relihub-leiste label="Vorschau" current="start"></relihub-leiste></div>`
+      + `<h2>Schnipsel</h2>`
+      + `<section class="ei-schnipsel"><h3>1 · Link</h3><p>Der Hub auf deine Community zugeschnitten; weitergeben genügt.</p><pre>${esc(eiAus.link)}</pre>${kopie('link')}</section>`
+      + `<section class="ei-schnipsel"><h3>2 · Kontextprofil</h3><p>Für die Steuerkonsole als eigenständiges Skript (<code>config-src</code>); das Skript folgt.</p><pre>${esc(eiAus.kp)}</pre>${kopie('kp')}</section>`
+      + `<section class="ei-schnipsel"><h3>3 · WordPress-Shortcode</h3><p>Für deine WordPress-Seite; sie braucht die Plugins amb-nostr, longform-nostr und nostr-calendar.</p><pre>${esc(eiAus.wp)}</pre>${kopie('wp')}</section>`
+      + `<section class="ei-schnipsel"><h3>4 · Eigene edufeed-App</h3><p>Ein eigener Auftritt im Look deiner Community läuft als White-Label-Betrieb der edufeed-App: Umgebungsvariablen, siehe edufeed-Dokumentation.</p><p><a href="${esc(eiAus.git)}" target="_blank" rel="noopener">${esc(eiAus.git)}</a></p>${kopie('git')}</section>`
+      + `<h2>Vereinbarung</h2><div class="ei-kacheln"><section class="ei-schnipsel"><h3>Kooperationsvereinbarung${vb('kooperationsvereinbarung')}</h3><p>Was Community und Datenraum einander zusichern.</p><a href="#oercommunity/kooperationsvereinbarung">Zur Vereinbarung ›</a></section><section class="ei-schnipsel"><h3>Technische Bedarfe${vb('bedarfe-technik')}</h3><p>Was deine Community technisch braucht und was der Datenraum bietet.</p><a href="#oercommunity/bedarfe-technik">Zu den Bedarfen ›</a></section></div>`;
+    if (fokus) { const n = document.getElementById(fokus); if (n) n.focus(); }
+  }
+  eiRoot.addEventListener('change', e => {
+    const s = e.target.closest('[data-eic]'); if (!s) return;
+    go('eigene-instanz' + (s.value ? '?c=' + zuschnittNpub(s.value) : ''));
+  });
+  eiRoot.addEventListener('submit', e => {
+    if (!e.target.closest('[data-eisuche]')) return;
+    e.preventDefault();
+    const hex = zuschnittAus('?c=' + encodeURIComponent(document.getElementById('eiNpub').value.trim()));
+    if (hex) go('eigene-instanz?c=' + zuschnittNpub(hex)); else toast('Das ist kein gültiger npub oder Schlüssel.');
+  });
+  eiRoot.addEventListener('click', e => {
+    const c = e.target.closest('[data-eicopy]'), z = e.target.closest('[data-eizu]');
+    if (z && eiC) { zuschnittSetzen(eiC); return; }
+    if (c && eiAus[c.dataset.eicopy]) rtCopy(eiAus[c.dataset.eicopy], 'Schnipsel kopiert.');
+  });
 
   // ---------- Ansichten (Hash-Routing) ----------
   const PRE_NAMES = { sek1: 'Sekundarstufe I' };
@@ -5234,28 +5448,30 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   function route() {
     exEl.classList.remove('sheet');   // jeder Routenwechsel schließt das Sheet
     exPinned = false;
+    CUR = zuschnittUmleiten(CUR);
     const raw = CUR;
     const [viewRaw, qs] = raw.split('?');
     const [view, sub] = viewRaw.split('/');
     const finden = view === 'finden' && sub ? (['sammlung', 'fortbildungen'].includes(sub) ? sub : null) : view === 'kooperieren' && sub ? (sub === 'personen' ? sub : null) : undefined;   // finden/<sub>, kooperieren/<sub> → Ansicht v-<sub>
-    const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell', 'person', 'oekosystem', 'mitmachen'].includes(view) ? view : 'start');
+    const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell', 'person', 'oekosystem', 'mitmachen', 'eigene-instanz'].includes(view) ? view : 'start');
     if (finden === null) toast('Diese Seite gibt es nicht.');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
-    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'Fortbildungen', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', oekosystem: 'reli_hub · Ökosystem', mitmachen: 'reli_hub · Mitmachen', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
-    if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || 'relilab', pp.get('zu') === 'katalog' ? 'katalog' : pp.get('tab')); }
-    leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v === 'fortbildungen' ? 'rpi-virtuell' : v);
+    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'Fortbildungen', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', oekosystem: 'reli_hub · Ökosystem', mitmachen: 'reli_hub · Mitmachen', 'eigene-instanz': 'reli_hub · Eigene Instanz', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
+    if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || '', pp.get('zu') === 'katalog' ? 'katalog' : pp.get('tab')); }
+    leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v === 'fortbildungen' ? 'rpi-virtuell' : v === 'eigene-instanz' ? 'zuschnitt' : v);
     if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); cyOpen(); }
     if (v === 'oekosystem') ozOpen(qs);
     if (v === 'mitmachen') pkOpen(qs);
+    if (v === 'eigene-instanz') eiOpen(qs);
     if (v === 'oercommunity') ocOpen(sub);
     if (v === 'relilab') rlShow(qs);
     if (v === 'rpi-virtuell') rvOpen(qs);
     if (v === 'relidesk') rdTab(new URLSearchParams(qs || '').get('tab'));
     if (v === 'profil') { LOGGED = true; if (MODUS !== 'direkt') setModus('direkt'); renderArtikel(); const zu = new URLSearchParams(qs || '').get('zu'); if (zu) setTimeout(() => { const t = document.getElementById(zu); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
-    if (leisteKey !== v + '|' + LOGGED) { leisteKey = v + '|' + LOGGED; RelihubLeiste.setItems(leisteItems()); }   // vor jedem return: Ansicht (Kontext-Filter) und Anmeldung (Communities) ändern die Einträge
+    if (leisteKey !== v + '|' + LOGGED + '|' + HUB_C) { leisteKey = v + '|' + LOGGED + '|' + HUB_C; RelihubLeiste.setItems(leisteItems()); }   // vor jedem return: Ansicht (Kontext-Filter) und Anmeldung (Communities) ändern die Einträge
     if (view === 'partner') { setTimeout(() => document.getElementById('partner').scrollIntoView(), 30); return; }
     if (view === 'hilfe') { explainDefault(); setTimeout(() => document.getElementById('explain').scrollIntoView({ behavior: 'smooth', block: 'start' }), 30); return; }
-    if (v === 'start') explainDefault();
+    if (v === 'start') { explainDefault(); zuschnittStart(); }
     if (v === 'materialpool') mpOpen(qs);
     if (v === 'sammlung') saOpen(qs);
     if (v === 'fortbildungen') kaOpen(qs);

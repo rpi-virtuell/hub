@@ -291,6 +291,23 @@ Die Startseite `#relilab` zeigt das relilab als Labor (Issue 16): oben die siebe
 
 Stand-Zeile: `live · <m> Materialien · <p> Menschen · <t> Labortermine`; vor der Antwort und ohne Antwort bleibt `Stand vom <Datum des Schnappschusses>` (die Termine der dritten Spalte kommen dann aus dem Schnappschuss). `#relilab?tab=mitmachen` bindet den Raum Mitmachen mit festem Zuschnitt ein (`pkRender` mit `data-pkfest="relilab"`, Hinweis „Zuschnitt: relilab“, keine Auswahl). Die Konsole im relilab führt `kooperieren.personen` nach `#relilab?zu=menschen` (Scroll auf die Spalte Menschen).
 
+## Zuschnitt
+
+Der ganze Hub lässt sich auf eine Community zuschneiden: `https://hub.rpi-virtuell.net/?c=<npub>#start`. `c` ist ein npub oder ein 64-stelliger Hex-Schlüssel (`zuschnittAus`). Der Zuschnitt (`HUB_C`, Hex) kommt aus der Adresse, sonst aus der Sitzung (`sessionStorage`, Schlüssel `relihub-c`); `zuschnittSetzen(hex)` schreibt Zustand, Sitzung und den Suchparameter `c`, setzt die Leiste und die Konsolen neu und zeichnet die Ansicht; `zuschnittSetzen(null)` hebt auf. Der Suchparameter `c` steht vor dem `#` und bleibt beim Routenwechsel erhalten. Der Zuschnitt öffnet keine eigene Abfrage und keine Subscription: Die Ansichten lesen `HUB_C` aus den Daten, die sie ohnehin holen.
+
+| Ansicht | Wirkung |
+|---|---|
+| Startseite | Kachel der Community oben, Satz „Dieser Hub ist auf <Name> zugeschnitten.“ mit Aufheben |
+| Sammlung (`#finden/sammlung`) | Filter „Community“ vorbelegt, falls die Community eine Kennung im Hub hat; „Alle“ bleibt wählbar |
+| Fortbildungen (`#finden/fortbildungen`) | Termine der Community (Absender oder `#h`) zuerst, Chip „nur <Name>“ |
+| Community-Raum (`#community`) | ohne `c` gilt der Zuschnitt; Communities nur mit Schlüssel (npub oder Hex) führen ins Ökosystem |
+| Personen (`#kooperieren/personen`) | von der Personen-Liste nur, wer im Beziehungsgefüge mit der Community verbunden ist; Satz „Zuschnitt: <Name>“ (eine zwischengespeicherte Abfrage des Gefüges) |
+| Ökosystem, Mitmachen | der Zuschnitt setzt den Rahmen: nur, was mit der Community verbunden ist (`ozSichtbar`, `pkPasst`) |
+| Steuerkonsole | `finden.material`, `finden.fortbildungen` und `kooperieren.communities` tragen den Parameter `c` |
+| Leiste | abwählbare Markierung „Zuschnitt: <Name>“ (`kind: 'zuschnitt'`), Knopf „Zuschnitt aufheben“ im Panel „Leiste anpassen“ |
+
+Die Seite `#eigene-instanz?c=<npub>` zeigt die Vorschau (zweite Steuerkonsole und Leiste, Kontext `vorschau-<hex>`) und vier Schnipsel zum Kopieren: den Link, das Kontextprofil (`kontextprofilAus`, Feld `c`), den WordPress-Shortcode (`shortcodeAus`) und den Hinweis auf den White-Label-Betrieb der edufeed-App. Sie zeigt keine Relay-Daten außer den Namen der Communities (Stand-Zeile „Nachbau · Vorschau“).
+
 ## Schnappschuss erneuern
 
 ```bash
