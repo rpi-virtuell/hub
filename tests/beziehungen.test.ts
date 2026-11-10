@@ -114,3 +114,15 @@ Deno.test('Mitmachen: Ansicht, Abfrage, Zustände, Protokoll im Ökosystem', () 
   assert(/hubAbonnieren\('protokoll', \[\{ kinds: PK_KINDS/.test(s) && /id="ozProtokoll"/.test(html), 'Subscription und Streifen');
   assert(!/mdSeite\(/.test(r) && !/mdSeite\(/.test(fn('pkEintrag')), 'Kommentare nie als Markdown');
 });
+
+Deno.test('relilab als Labor: Kriterien, Trias, Menschen nur mit Profil', () => {
+  const k = block(/const RL_KRITERIEN = \[[\s\S]*?\];/);
+  assert(k.includes('offen ohne Anmeldung') && k.includes('Ergebnisse unter freier Lizenz') && (k.match(/'/g) || []).length === 14, 'sieben Kriterien');
+  const l = fn('rlLaden');
+  assert(/coLaden\(RL_HEX\)/.test(l) && /terminLogik\(/.test(l) && /hubFetch\('relilab:menschen', \[\{ kinds: \[0\], authors:/.test(l) && (l.match(/hubFetch\(/g) || []).length === 1 && /\.bot/.test(l), 'Quellen und eine Nachfrage');
+  const h = fn('rlHome');
+  assert(/Materialien/.test(h) && /Menschen/.test(h) && /Mitmachen/.test(h) && /#person\?p=/.test(h) && /zu=katalog/.test(h) && /logik=labor/.test(h) && /esc\(/.test(h), 'drei Spalten mit Links');
+  assert(/data-rlsec="mitmachen"/.test(html) && /pkRender\(/.test(fn('rlShow')), 'Raum im relilab-Rahmen');
+  assert(!/Auf Instagram folgen/.test(html) && !/data-todo="Suche"/.test(html), 'Attrappen entfernt');
+  assert(/id="v-relilab" data-stand="stand:/.test(html), 'Startwert bleibt ein Stand');
+});

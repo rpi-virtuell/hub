@@ -448,7 +448,7 @@ a.mp-card:hover{border-color:var(--mp)}
 .rl-nav .cv::after{content:"";display:inline-block;width:5px;height:5px;border-right:1.4px solid currentColor;border-bottom:1.4px solid currentColor;transform:rotate(45deg) translate(-1px,-2px);margin-left:7px}
 .rl-burger{display:none;margin-left:auto;width:40px;height:40px;border:0;background:transparent;cursor:pointer}
 .rl-wrap{display:grid;grid-template-columns:minmax(0,620px) 300px;gap:36px;justify-content:center;padding:34px 20px 70px}
-.rl-main h1{font-family:"Roboto Condensed",Roboto,sans-serif;font-weight:700;font-size:21px;text-align:center;color:#3A3F47;margin:6px 0 26px}
+.rl-main h2{font-family:"Roboto Condensed",Roboto,sans-serif;font-weight:700;font-size:21px;text-align:center;color:#3A3F47;margin:6px 0 26px}
 .rl-hero{position:relative;aspect-ratio:618/346;overflow:hidden;container-type:inline-size;background:linear-gradient(100deg,#B451C9 0%,#E2589F 48%,#FF7B45 100%)}
 .rl-hero .blob{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.62),rgba(255,255,255,0));pointer-events:none}
 .rl-hero .big{position:absolute;left:24%;top:34%;width:52%;height:27%;border-radius:999px;padding:2.2cqw;background:linear-gradient(90deg,rgba(100,110,255,.85),rgba(170,90,255,.85),rgba(225,75,230,.8))}
@@ -471,24 +471,9 @@ a.mp-card:hover{border-color:var(--mp)}
 .rl-card h3{font-family:Oswald,"Roboto Condensed",sans-serif;font-weight:500;font-size:23px;color:#1F1F25;margin:0 0 16px;letter-spacing:-.3px}
 .rl-card p{font-size:13px;line-height:1.6;margin:0 0 10px}
 .rl-card a{color:#B23BD8;font-weight:600;font-size:13px;text-decoration:none}
-.rl-side{border-left:1px solid #E6E6E6;padding:8px 0 0 22px;font-size:12px}
-.rl-ig{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px}
-.rl-ig .av{flex:0 0 auto;width:34px;height:34px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#4F6BFF,#B24BFF)}
-.rl-ig .av span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#FF8A1E,#E83FCF);color:#fff;font-weight:700;font-size:13px}
-.rl-ig b{display:block;font-size:12px;color:#1F1F25}
-.rl-ig p{margin:2px 0 0;font-size:10.5px;line-height:1.35;color:#555}
-.rl-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
-.rl-tiles span{position:relative;aspect-ratio:1;display:flex;align-items:flex-start;padding:5px;font-size:9px;font-weight:700;line-height:1.15;color:#fff;overflow:hidden}
-.rl-tiles span.v::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-40%,-50%);border-left:12px solid rgba(255,255,255,.9);border-top:8px solid transparent;border-bottom:8px solid transparent}
-.rl-ibtn{display:flex;gap:8px;justify-content:center;margin:12px 0 30px}
-.rl-ibtn a{font-size:10.5px;font-weight:600;color:#fff;text-decoration:none;padding:6px 9px;border-radius:3px}
-.rl-search input,.rl-search select{display:block;width:100%;font:inherit;font-size:11.5px;border:1px solid #DADADA;border-radius:2px;padding:7px 9px;margin-bottom:6px;background:#fff;color:#555}
-.rl-search input{width:58%}
-.rl-search button{background:#2B6FE8;color:#fff;border:0;border-radius:2px;font:inherit;font-size:11.5px;font-weight:600;padding:7px 12px;cursor:pointer}
 @media (max-width:1000px){
   .rl-nav{display:none}.rl-burger{display:block}
   .rl-wrap{grid-template-columns:minmax(0,620px);gap:30px}
-  .rl-side{border-left:0;border-top:1px solid #E6E6E6;padding:24px 0 0}
 }
 @media (max-width:560px){.rl-cards{grid-template-columns:1fr}.rl-cal .wd{font-size:0}.rl-cal .wd::first-letter{font-size:11px}}
 
@@ -969,6 +954,27 @@ relihub-steuerkonsole[hidden]{display:none}
 .cr-members .cr-av{width:58px;height:58px;margin:0 auto 8px;font-size:20px}
 .cr-members small{display:block;color:var(--muted);font-weight:400;font-size:13px}
 .cr-set label{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:10px;font-size:16px}
+.rl-wrap.rl-eins{grid-template-columns:minmax(0,620px);padding-top:10px}
+.rl-lab{max-width:1180px;margin:0 auto;padding:28px 20px 0}
+.rl-lab h1{font-family:Oswald,"Roboto Condensed",sans-serif;font-weight:500;font-size:34px;color:#1F1F25;margin:0 0 12px}
+.rl-krit{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;padding:0}
+.rl-krit li{background:#F4E6FA;color:#5B1C73;border-radius:999px;padding:4px 13px;font-size:14px;font-weight:600}
+.rl-satz{max-width:70ch;margin:0 0 22px;color:#3A3F47}
+.rl-trias{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:start}
+.rl-trias>section{border:1px solid #E6E6E6;border-radius:6px;padding:16px 16px 18px;min-width:0}
+.rl-trias h2{font-family:Oswald,"Roboto Condensed",sans-serif;font-weight:500;font-size:24px;color:#1F1F25;margin:0 0 4px}
+.rl-trias .rl-hint{margin:0 0 12px;font-size:14px;color:#4B515A}
+.rl-trias .mp-card,.rl-trias .kat-card,.rl-trias .rl-person,.rl-trias .rl-termin{display:block;margin:0 0 10px;padding:12px 14px}
+.rl-trias .rl-person{display:flex;gap:12px;align-items:flex-start;text-decoration:none;color:inherit;border:1px solid #D8E6E4;border-radius:12px;background:#fff}
+.rl-trias .rl-person .pe-av{flex-basis:44px;width:44px;height:44px;font-size:15px}
+.rl-trias .rl-person p{margin:2px 0 0;font-size:14px;color:#36504D;overflow-wrap:anywhere}
+.rl-trias .rl-termin{text-decoration:none;color:inherit;border:1px solid #E6E6E6;border-radius:12px;background:#fff}
+.rl-trias .rl-termin b{display:block;font-size:15px;line-height:1.3}
+.rl-trias .rl-termin span{font-size:13.5px;color:#4B515A}
+.rl-trias .rl-leer{margin:0;color:#4B515A;font-size:15px}
+.rl-trias .rl-mehr{display:inline-block;margin-top:6px;color:#B23BD8;font-weight:600;text-decoration:none}
+.rl-trias a:focus-visible,.rl-krit a:focus-visible{outline:3px solid var(--c-hub);outline-offset:2px}
+@media (max-width:900px){.rl-trias{grid-template-columns:minmax(0,1fr)}}
 .rl-comm{max-width:1180px;margin:0 auto;padding:28px 20px 70px}
 .rl-comm h1{font-family:Oswald,"Roboto Condensed",sans-serif;font-weight:500;font-size:34px;color:#1F1F25;margin:0 0 8px}
 .rl-comm>p{max-width:70ch;color:#3A3F47;margin:0 0 6px}
@@ -1436,27 +1442,33 @@ a.kat-card:hover{border-color:var(--c-koop)}
 </div>
 
 <!-- ===================== Ansicht 4: relilab (Nachbau relilab.org) ===================== -->
-<div class="view" id="v-relilab" data-stand="stand:26.10.2026">
+<div class="view" id="v-relilab" data-stand="stand:Schnappschuss">
   <header class="rl-head">
     <a class="rl-logo" href="#relilab" aria-label="relilab Startseite"><span class="in"><span class="pill">relilab</span></span></a>
     <nav class="rl-nav">
       <a class="cv" href="#" data-todo="Impressum &amp; Datenschutz">Impressum &amp; Datenschutz</a>
       <a href="#" data-todo="Newsletter">Newsletter</a>
-      <a class="cv" href="#" data-todo="Mitmachen">Mitmachen</a>
+      <a class="cv" href="#relilab?tab=mitmachen">Mitmachen</a>
       <a class="cv" href="#" data-todo="Serie">Serie</a>
       <a class="cv" href="#relilab?tab=termine">relilab-Termine</a>
       <a class="cv" href="#" data-todo="Lernmodule">Lernmodule</a>
       <a class="cv" href="#" data-todo="Das relilab">Das relilab</a>
       <a href="#profil">Login</a>
-      <a href="#" data-todo="Suche" aria-label="Suche"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a>
     </nav>
     <button class="rl-burger" aria-label="Menü" data-todo="Menü"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2F3640" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   </header>
   <p class="stand" aria-live="polite"></p>
 
-  <div data-rlsec="home" class="on"><div class="rl-wrap">
+  <div data-rlsec="home" class="on">
+  <div class="rl-lab">
+    <h1>relilab · ein Labor</h1>
+    <ul class="rl-krit" id="rlKrit" aria-label="Was das relilab auszeichnet"></ul>
+    <p class="rl-satz">Was hier entsteht, ist unfertig und frei: Praxisentwürfe und Unterrichtsversuche stehen gleichrangig neben Produkten der Institute.</p>
+    <div class="rl-trias" id="rlTrias"></div>
+  </div>
+  <div class="rl-wrap rl-eins">
     <main class="rl-main">
-      <h1>Gemeinsam religionsbezogene Bildung ermöglichen.</h1>
+      <h2>Gemeinsam religionsbezogene Bildung ermöglichen.</h2>
       <div class="rl-hero" role="img" aria-label="relilab … ist, was du draus machst!">
         <span class="blob" style="left:8%;top:-8%;width:44%;height:60%"></span>
         <span class="blob" style="left:36%;top:-14%;width:48%;height:56%"></span>
@@ -1480,19 +1492,9 @@ a.kat-card:hover{border-color:var(--c-koop)}
       </div>
     </main>
 
-    <aside class="rl-side">
-      <div class="rl-ig"><span class="av"><span>#</span></span><div><b>relilab</b><p>DAS Netzwerk für Religionspädagogik 🆕 kollegiale 🔨 trinationale Zusammenarbeit 📚 zeitgemäße Impulse Links + Impressum: ⤵️ https://relilab.org/impressum/</p></div></div>
-      <div class="rl-tiles" id="rlTiles"></div>
-      <div class="rl-ibtn"><a href="#" data-todo="Mehr laden" style="background:#2B2B2B">Mehr laden…</a><a href="#" data-todo="Auf Instagram folgen" style="background:#3F86D8">◎ Auf Instagram folgen</a></div>
-      <form class="rl-search" onsubmit="return false">
-        <input type="search" placeholder="Search …" aria-label="Suche">
-        <select aria-label="Kategorien"><option>Alle Kategorien</option></select>
-        <select aria-label="Schlagwörter"><option>Alle Schlagwörter</option></select>
-        <div style="display:flex;gap:8px;align-items:center"><select aria-label="Sortierung" style="width:34px;margin:0"><option></option></select><button type="submit" data-todo="Suche">Submit</button></div>
-      </form>
-    </aside>
   </div>
   </div>
+  <section data-rlsec="mitmachen"><div class="pk-wrap" id="rlPkRoot" data-pkfest="relilab"></div></section>
   <section data-rlsec="termine"><div class="rt">
     <div class="rt-crumb"><a href="#relilab">relilab</a> › relilab-Termine via Nostr</div>
     <h1>relilab-Termine via Nostr<span class="nz">NOSTR</span></h1>
@@ -2910,7 +2912,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   document.getElementById('events').innerHTML = EVENTS.map(([d, m, t, s]) =>
     `<div class="ev" ${s.startsWith('relilab') ? 'data-go="relilab" style="cursor:pointer"' : ''}><span class="date"><span><b>${d}</b><small>${m}</small></span></span><div class="tx"><b>${t}</b><span>${s}</span></div></div>`).join('');
 
-  // ---------- relilab: Kalender und Instagram-Kacheln (Platzhalter) ----------
+  // ---------- relilab: Kalender (Schnappschuss der Termine) ----------
   // Absender der Termine: [Farbe, gekürzter npub für die Anzeige, vollständiger npub]
   const RT_SRC = { 'relilab-Termine-Bot': ['#E23BD2', 'npub17mq54…jqk3d', 'npub17mq54dad6ewkrnunzx5xs4t4c0edur99gz7ymhu3dam0pz034fpsxjqk3d'], 'relilab-impuls': ['#FF8A1E', 'npub1lde03…5vz8y', 'npub1lde034983zllh2nhe48lt60q6p3a6lsxn0g90uemhg0906jsnzesh5vz8y'], 'relilab': ['#8E44D9', 'npub1fpcxa…2fxgk', 'npub1fpcxaz2wvjl90gjs60x37ny2pa5u4yqfx7fklz73rgfjnnfujl3sr2fxgk'] };
   const RT_HEX = {}; Object.keys(RT_SRC).forEach(a => RT_HEX[npubToHex(RT_SRC[a][2])] = a);
@@ -2945,6 +2947,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   document.getElementById('v-oercommunity').dataset.stand = 'stand:' + OC_STAND;
   document.getElementById('v-fortbildungen').dataset.stand = 'stand:' + RT_STAND;
   document.querySelectorAll('div.view[data-stand]').forEach(v => { const [z, ...i] = v.dataset.stand.split(':'); datenstand(v.id, z, i.join(':')); });
+  document.getElementById('v-relilab').dataset.stand = 'stand:' + RT_STAND;
   datenstand('v-relilab', 'stand', RT_STAND);
   datenstand('v-fortbildungen', 'stand', RT_STAND);
   const RL_EV = {};
@@ -2954,11 +2957,6 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   for (let d = 22; d <= 31; d++) cal += `<span class="d${RL_EV[d] ? ' evt' : ''}" ${RL_EV[d] ? `data-go="relilab?tab=termine&ansicht=monat" title="${d}.10. · ${RL_EV[d].replace(/"/g, '&quot;')}" style="cursor:pointer"` : ''}>${d}.</span>`;
   cal += '<span class="d e0"></span>';
   document.getElementById('rlCal').innerHTML = cal;
-  const TILES = [['Religionspädagogik digital', 'linear-gradient(135deg,#F3E9FF,#E9D9FB)', '#5B2D90'], ['', 'linear-gradient(135deg,#9AA3AD,#5E6670)', '', 1], ['Sozialformen Arbeitsblätter', 'linear-gradient(160deg,#1F8A7A,#5C6B73)', '', 1],
-    ['Worum geht\'s hier eigentlich?', 'linear-gradient(135deg,#A7A29A,#6F6A63)', '', 1], ['Globales Lernen', 'linear-gradient(135deg,#1F7F8A,#2E5E6B)'], ['Was ist der Mensch?', 'linear-gradient(135deg,#2F8C7E,#E6EFEC)'],
-    ['', 'linear-gradient(135deg,#2E8A80,#DDE9E6)'], ['Frieden', 'linear-gradient(135deg,#D9D5E8,#B9B4CC)', '#4B3D7A'], ['', 'linear-gradient(135deg,#E6EEF0,#7FB7B0)'],
-    ['', 'linear-gradient(135deg,#8C8478,#3E3A34)'], ['Raum für Zweifel', 'linear-gradient(135deg,#3B4A52,#151C21)'], ['Kirche per Klick', 'linear-gradient(135deg,#2F7C86,#1B3F4A)']];
-  document.getElementById('rlTiles').innerHTML = TILES.map(([t, bg, col, v]) => `<span class="${v ? 'v' : ''}" style="background:${bg};color:${col || '#fff'}">${t}</span>`).join('');
 
   // ---------- relidesk: Schreibtisch mit Lucas Sammlung (Beispieldaten) ----------
   const RD_ICD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>';
@@ -4180,11 +4178,12 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   /** Ansicht Mitmachen in `root` (Standard: der Raum #mitmachen); `c` = Community (Kennung oder Hex, 'alle' oder leer = alle), ohne Angabe bleibt die Auswahl */
   function pkRender(root, c) {
     root = root || document.getElementById('pkRoot'); pkWurzel = root;
-    if (c !== undefined) pkC = pkHex(c);
+    const fest = root.dataset.pkfest;   // fester Zuschnitt (relilab-Raum): Auswahl nicht änderbar
+    if (fest) pkC = pkHex(fest); else if (c !== undefined) pkC = pkHex(c);
     const liste = pkListe.filter(e => pkPasst(e, pkC)), kom = liste.filter(e => e.ev.kind === 1111), beitr = liste.filter(e => e.ev.kind === 1);
     const antwort = !!((bzDaten && bzDaten.antwort) || (pkDaten && pkDaten.antwort)), r = pkVerbunden, g = pkG;
     const opts = CO_SCHLUESSEL.map(k => [k.hex, esc(k.n)]).concat(g ? [...g.ents.values()].filter(e => e.typ === 'community' && !CO_SCHLUESSEL.some(k => k.hex === e.pk)).map(e => [e.pk, bzName(e)]) : []);
-    const wahl = `<label class="pk-wahl">Community <select data-pkc><option value="">Alle</option>${opts.map(([h, n]) => `<option value="${esc(h)}"${h === pkC ? ' selected' : ''}>${n}</option>`).join('')}</select></label>`;
+    const wahl = fest ? `<p class="pk-wahl">Zuschnitt: ${esc((CO_SCHLUESSEL.find(k => k.hex === pkC) || { n: fest }).n)}</p>` : `<label class="pk-wahl">Community <select data-pkc><option value="">Alle</option>${opts.map(([h, n]) => `<option value="${esc(h)}"${h === pkC ? ' selected' : ''}>${n}</option>`).join('')}</select></label>`;
     let prot, gespr;
     if (!pkGeladen) { prot = '<p class="pk-leer">Das Protokoll wird geladen …</p>'; gespr = ''; }
     else {
@@ -4569,10 +4568,74 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   });
   function g_rlFlip(c) { document.querySelectorAll('#rlCommGrid .cy-card.flip').forEach(x => x.classList.remove('flip')); c.classList.add('flip'); }
   function rlShow(qs) {
-    const p = new URLSearchParams(qs || ''), room = p.get('room'), sec = room ? 'room' : ['communities', 'termine'].includes(p.get('tab')) ? p.get('tab') : 'home';
+    const p = new URLSearchParams(qs || ''), room = p.get('room'), sec = room ? 'room' : ['communities', 'termine', 'mitmachen'].includes(p.get('tab')) ? p.get('tab') : 'home';
     document.querySelectorAll('#v-relilab [data-rlsec]').forEach(n => n.classList.toggle('on', n.dataset.rlsec === sec));
     if (sec === 'room') crOpen(room, p.get('rtab'), 'rlCrRoot'); else if (sec === 'communities') rlCommRender();
     else if (sec === 'termine') rtOpen(p);
+    else if (sec === 'mitmachen') { pkRender(document.getElementById('rlPkRoot'), 'relilab'); pkAnstossen(); }
+    else {
+      rlHome(rlDaten || undefined);
+      rlLaden().then(d => rlHome(d));
+      if (p.get('zu') === 'menschen') setTimeout(() => { const el = document.getElementById('rlMenschen'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+    }
+  }
+  // ---------- relilab als Labor: Kriterien, Materialien, Menschen, Mitmachen (Issue 16) ----------
+  const RL_KRITERIEN = ['offen ohne Anmeldung', 'kostenfrei', 'online', 'kurzer Impuls, dann Werkstatt', 'Unfertiges darf vorgestellt werden', 'Ergebnisse unter freier Lizenz', 'bundesland- und religionsübergreifend'];
+  let rlDaten = null, rlLauf = null;   // Antwort (gehalten, wenn Relays geantwortet haben), laufende Abfrage
+  /** Inhalte des Labors einmal je Sitzung: Materialien und Beiträge aus der Community relilab, bevorstehende Labortermine (höchstens 6, `termineZahl` zählt alle),
+   *  Menschen = Autoren der Inhalte ohne die Community-Schlüssel, nur mit Profil (kind 0 mit Namen), keine Bots; wer in der Personen-Liste steht, zuerst. Eine Profilabfrage für fehlende Profile. */
+  function rlLaden() {
+    if (rlDaten) return Promise.resolve(rlDaten);
+    if (rlLauf) return rlLauf;
+    const leer = { antwort: false, materialien: [], beitraege: [], termine: [], termineZahl: 0, menschen: [] };
+    rlLauf = Promise.all([coLaden(RL_HEX), kalLaden()]).then(([co, kal]) => {
+      const eintraege = coEintraege(co), jetzt = Math.floor(Date.now() / 1000);
+      return eintraegeAufloesen(eintraege).then(() => {
+        const mit = eintraege.filter(e => e.ev && [30142, 30023].includes(e.ev.kind));
+        const materialien = mit.filter(e => e.ev.kind === 30142), beitraege = mit.filter(e => e.ev.kind === 30023);
+        const alle = kal.filter(ev => ev && istHex64(ev.pubkey) && terminLogik(ev) === 'labor').map(evToTermin).filter(t => t.s >= jetzt).sort((a, b) => a.s - b.s);
+        const zahl = new Map(), liste = new Set((peDaten && peDaten.pks) || []);
+        mit.forEach(e => { const pk = e.ev.pubkey; if (istHex64(pk) && !CO_SCHLUESSEL.some(c => c.hex === pk)) zahl.set(pk, (zahl.get(pk) || 0) + 1); });
+        const schluessel = [...zahl.keys()].sort((a, b) => liste.has(b) - liste.has(a) || zahl.get(b) - zahl.get(a)).slice(0, 40);
+        const profile = new Map();
+        schluessel.forEach(h => { const pr = bzProfil(h); if (pr) profile.set(h, pr); });
+        const fehlend = schluessel.filter(h => !profile.has(h));
+        const nach = fehlend.length ? hubFetch('relilab:menschen', [{ kinds: [0], authors: fehlend, limit: 80 }]) : Promise.resolve([]);
+        return nach.then(evs => {
+          const neu = new Map();
+          evs.filter(ev => ev && ev.kind === 0 && fehlend.includes(ev.pubkey)).forEach(ev => { const a = neu.get(ev.pubkey); if (!a || ev.created_at > a.created_at) neu.set(ev.pubkey, ev); });
+          neu.forEach((ev, h) => { const pr = profilAus(ev); if (pr) profile.set(h, pr); });
+          const menschen = schluessel.map(h => profile.get(h)).filter(pr => pr && !pr.bot);
+          const daten = { antwort: co.antwort, materialien, beitraege, termine: alle.slice(0, 6), termineZahl: alle.length, menschen };
+          if (daten.antwort) rlDaten = daten; else rlLauf = null;   // ohne Antwort beim nächsten Öffnen erneut versuchen
+          return daten;
+        });
+      });
+    }).catch(() => { rlLauf = null; return leer; });
+    return rlLauf;
+  }
+  /** Startseite des Labors: Kriterien und drei Spalten. `daten` fehlt = lädt; ohne Antwort bleibt der Stand des Schnappschusses, Termine kommen dann aus ihm. Alle Texte über esc. */
+  function rlHome(daten) {
+    const kr = document.getElementById('rlKrit'), tr = document.getElementById('rlTrias'); if (!kr || !tr) return;
+    kr.innerHTML = RL_KRITERIEN.map(k => `<li>${esc(k)}</li>`).join('');
+    const antwort = !!(daten && daten.antwort), jetzt = Math.floor(Date.now() / 1000);
+    const leer = text => `<p class="rl-leer">${esc(text)}</p>`, stumm = !daten ? 'Wird geladen …' : 'Die Relays antworten gerade nicht.';
+    const mat = antwort ? daten.materialien.slice(0, 6) : [], men = antwort ? daten.menschen : [];
+    const termine = antwort ? daten.termine : RT_EV.filter(t => t.s >= jetzt).slice(0, 6);
+    const fZeit = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    tr.innerHTML = `<section id="rlMaterialien" aria-label="Materialien"><h2>Materialien</h2><p class="rl-hint">Neu im Katalog des relilab.</p>`
+      + (mat.length ? mat.map(eintragKarte).join('') : leer(antwort ? 'Noch nichts im Katalog.' : stumm))
+      + `<a class="rl-mehr" href="${esc('#community?c=relilab&zu=katalog')}">Alle im Katalog ›</a></section>`
+      + `<section id="rlMenschen" aria-label="Menschen"><h2>Menschen</h2><p class="rl-hint">Wer hier steht, hat im Labor veröffentlicht oder geteilt.</p>`
+      + (men.length ? men.slice(0, 8).map(pr => `<a class="pe-card rl-person" href="${esc('#person?p=' + pr.npub)}">${peAv(pr)}<div><b>${pr.name}</b>${pr.about ? `<p>${pr.about}</p>` : ''}</div></a>`).join('') : leer(antwort ? 'Noch niemand mit Profil.' : stumm))
+      + `</section>`
+      + `<section id="rlMitmachen" aria-label="Mitmachen"><h2>Mitmachen</h2><p class="rl-hint">Die nächsten Labortermine.</p>`
+      + (termine.length ? termine.map(t => `<a class="rl-termin" href="${esc(sichereUrl(t.u))}"><b>${esc(t.t || t.id)}</b><span>${esc(fZeit.format(new Date(t.s * 1000)))}</span></a>`).join('') : leer(!daten || antwort ? 'Keine bevorstehenden Termine.' : stumm))
+      + `<a class="rl-mehr" href="${esc('#finden/fortbildungen?logik=labor')}">Alle Labortermine ›</a><br><a class="rl-mehr" href="${esc('#relilab?tab=mitmachen')}">Zum Raum Mitmachen ›</a></section>`;
+    if (document.querySelector('#v-relilab [data-rlsec="home"]').classList.contains('on')) {
+      if (antwort) datenstand('v-relilab', 'live', `${daten.materialien.length} Materialien · ${daten.menschen.length} Menschen · ${daten.termineZahl} Labortermine`);
+      else datenstand('v-relilab', 'stand', RT_STAND);
+    }
   }
   // ---------- relilab-Termine via Nostr (NIP-52), im relilab-Rahmen ----------
   const rtF = o => new Intl.DateTimeFormat('de-DE', Object.assign({ timeZone: 'Europe/Berlin' }, o));
@@ -5066,6 +5129,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     actions: { 'finden.material': { params: { thema: 'Digitalität' } } },
     handler: d => {
       if (d.action === 'kooperieren.communities') { go('relilab?tab=communities'); return false; }
+      if (d.action === 'kooperieren.personen') { go('relilab?zu=menschen'); return false; }
       if (d.action === 'finden.fortbildungen') { go('relilab?tab=termine&von=konsole'); return false; }
       if (d.action === 'erstellen.labor') { go('relilab'); toast('Du bist im relilab.'); return false; }
       return standardAktion(d, 'relilab');

@@ -279,6 +279,18 @@ Die Live-Events sammelt `pkLiveEvent` (`pkNeu`), nach 600 ms bündelt `pkBuendel
 
 Ohne Gespräche zeigt die rechte Spalte „Noch kein Gespräch zu Materialien, Terminen oder Beiträgen des Ökosystems. Der erste Kommentar entsteht in der edufeed-App.“ mit Link auf `https://edufeed.org`. Das Ökosystem zeigt über `#ozProtokoll` die neuesten acht Zeilen mit dem Link „Alle im Raum Mitmachen ›“.
 
+### Verbraucher: relilab
+
+Die Startseite `#relilab` zeigt das relilab als Labor (Issue 16): oben die sieben Kriterien `RL_KRITERIEN` als Pillen, darunter drei Spalten, unter ihnen bleibt der Monatskalender des Nachbaus. `rlLaden()` stellt einmal je Sitzung zusammen, ohne eigene Subscription: `coLaden(RL_HEX)` → `coEintraege` → `eintraegeAufloesen` liefert Materialien (`30142`) und Beiträge (`30023`); `kalLaden()` liefert die Termine, gezeigt werden die bevorstehenden mit `terminLogik(ev) === 'labor'` (höchstens 6, `termineZahl` zählt alle). Menschen sind die Autoren dieser Inhalte ohne die Community-Schlüssel (höchstens 40 Schlüssel); wer in der Personen-Liste steht, kommt zuerst. Ihre Profile kommen aus `bzProfil`, fehlende in **einer** Abfrage `relilab:menschen` (`kinds: [0]`, `authors`); gezeigt werden nur Profile mit Namen, Bots bleiben draußen. Eine leere Antwort wird nicht gehalten.
+
+| Spalte | Inhalt | Link |
+| --- | --- | --- |
+| Materialien | neueste 6 über `eintragKarte` | „Alle im Katalog ›“ nach `#community?c=relilab&zu=katalog` |
+| Menschen | Profilkarten (Bild oder Initiale, Name, `about`) | `#person?p=<npub>` |
+| Mitmachen | nächste 6 Labortermine | „Alle Labortermine ›“ nach `#finden/fortbildungen?logik=labor`, „Zum Raum Mitmachen ›“ nach `#relilab?tab=mitmachen` |
+
+Stand-Zeile: `live · <m> Materialien · <p> Menschen · <t> Labortermine`; vor der Antwort und ohne Antwort bleibt `Stand vom <Datum des Schnappschusses>` (die Termine der dritten Spalte kommen dann aus dem Schnappschuss). `#relilab?tab=mitmachen` bindet den Raum Mitmachen mit festem Zuschnitt ein (`pkRender` mit `data-pkfest="relilab"`, Hinweis „Zuschnitt: relilab“, keine Auswahl). Die Konsole im relilab führt `kooperieren.personen` nach `#relilab?zu=menschen` (Scroll auf die Spalte Menschen).
+
 ## Schnappschuss erneuern
 
 ```bash
