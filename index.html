@@ -2327,30 +2327,33 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   const RELAYS = ['wss://relay.edufeed.org', 'wss://relay-rpi.edufeed.org', 'wss://amb-relay.edufeed.org'];
   const TIMEOUT_MS = 8000; const MAX_CONN = 3; const RETRY_MS = 60000;
   const hubWarte = []; let laufend = 0;   // Warteschlange wartender Sockets, Zahl offener Sockets
-  /** Holt Events je Ansicht; Cache in sessionStorage `relihub:<name>`. Löst immer auf (bei Fehlern mit dem bis dahin Empfangenen), nie ab. */
+  /** Holt Events je Ansicht; Cache in sessionStorage `relihub:<name>`. Löst immer auf (bei Fehlern mit dem bis dahin Empfangenen), nie ab.
+   *  `opts.bericht`: am Cache vorbei, ohne Cache-Eintrag, Ergebnis `{ events, alle }`; `alle` ist true, wenn jedes Relay mit EOSE geendet hat (NOTICE, CLOSED, Fehler und Zeitgrenze zählen nicht). */
   function hubFetch(name, filters, opts = {}) {
     const key = 'relihub:' + name, relays = (opts.relays || RELAYS).filter(r => RELAYS.includes(r));
-    let cache = null; try { cache = JSON.parse(sessionStorage.getItem(key)); } catch (e) {}
+    let cache = null; try { cache = opts.bericht ? null : JSON.parse(sessionStorage.getItem(key)); } catch (e) {}
     if (cache && Date.now() - cache.t < RETRY_MS) return Promise.resolve(cache.events);   // innerhalb von RETRY_MS kein Netz
     const got = new Map();
     const relay = url => new Promise(resolve => {
       const start = () => {
         laufend++; let ws, done = false;
-        const fertig = () => { if (done) return; done = true; clearTimeout(timer); try { ws && ws.close(); } catch (e) {} laufend--; const next = hubWarte.shift(); if (next) next(); resolve(); };
+        const fertig = (eose = false) => { if (done) return; done = true; clearTimeout(timer); try { ws && ws.close(); } catch (e) {} laufend--; const next = hubWarte.shift(); if (next) next(); resolve(eose === true); };
         const timer = setTimeout(fertig, TIMEOUT_MS), sub = 'rh-' + Math.random().toString(36).slice(2, 10);
         try { ws = new WebSocket(url); } catch (e) { fertig(); return; }
         ws.onopen = () => { try { ws.send(JSON.stringify(['REQ', sub, ...filters])); } catch (e) { fertig(); } };
         ws.onmessage = m => {
           let d; try { d = JSON.parse(m.data); } catch (e) { return; }
           if (d[0] === 'EVENT' && d[1] === sub && d[2] && d[2].id) got.set(d[2].id, d[2]);
-          else if (d[0] === 'NOTICE' || ((d[0] === 'EOSE' || d[0] === 'CLOSED') && d[1] === sub)) fertig();
+          else if (d[0] === 'EOSE' && d[1] === sub) fertig(true);
+          else if (d[0] === 'NOTICE' || (d[0] === 'CLOSED' && d[1] === sub)) fertig();
         };
-        ws.onerror = ws.onclose = fertig;
+        ws.onerror = ws.onclose = () => fertig();
       };
       if (laufend < MAX_CONN) start(); else hubWarte.push(start);
     });
-    return Promise.all(relays.map(relay)).then(() => {
+    return Promise.all(relays.map(relay)).then(eose => {
       const events = [...got.values()];
+      if (opts.bericht) return { events, alle: eose.length > 0 && eose.every(Boolean) };
       try { sessionStorage.setItem(key, JSON.stringify({ t: Date.now(), events })); } catch (e) {}   // ohne Speicher: kein Cache, sonst gleich
       return events;
     });
@@ -5572,7 +5575,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   function signierenUndSenden(vorlage, erfolg) {
     const n = window.nostr;
     if (!ICH.kann || !ICH.hex || !n || typeof n.signEvent !== 'function') { toast('Zum Mitmachen bitte mit Schlüssel anmelden.'); return Promise.resolve(false); }
-    const roh = Object.assign({ created_at: Math.floor(Date.now() / 1000), content: '' }, vorlage, { pubkey: ICH.hex });
+    const jetzt = Math.floor(Date.now() / 1000), roh = Object.assign({ content: '' }, vorlage, { created_at: Math.max(jetzt, Number.isFinite(vorlage.created_at) ? vorlage.created_at : 0), pubkey: ICH.hex });
     return Promise.resolve().then(() => n.signEvent(roh)).then(ev => {
       if (!ev || ev.pubkey !== ICH.hex || ev.kind !== roh.kind || !istHex64(ev.id) || typeof ev.sig !== 'string') { toast('Signieren abgebrochen.'); return false; }
       return hubSenden(ev).then(zahl => {
@@ -5639,24 +5642,27 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const p = bzProfil(hex), k = CO_SCHLUESSEL.find(x => x.hex === hex), c = CY.find(x => x.id === CY_HEX.get(hex));
     return p ? p.name : k ? esc(k.n) : c ? esc(c.n.replace(/­/g, '')) : esc(zuschnittNpub(hex).slice(0, 12) + '…');
   }
-  /** Liste frisch von den Relays: am Zwischenspeicher vorbei (Name mit Zeitstempel, danach entfernt); der zweite Filter belegt, dass ein Relay geantwortet hat */
+  /** Liste frisch von allen drei Relays, am Zwischenspeicher vorbei; `{ evs, alle }`: `alle` nur, wenn jedes Relay mit EOSE geantwortet hat (gesendet wird an alle drei). Der zweite Filter belegt zusätzlich, dass Daten kamen. */
   function frischHolen(filter) {
-    const name = 'ich:frisch:' + Date.now();
-    return hubFetch(name, [filter, { kinds: [0], authors: [FO_HEX], limit: 1 }]).then(evs => { try { sessionStorage.removeItem('relihub:' + name); } catch (e) {} return evs; });
+    return hubFetch('ich:frisch:' + Date.now(), [filter, { kinds: [0], authors: [FO_HEX], limit: 1 }], { bericht: true }).then(r => ({ evs: r.events, alle: r.alle }));
   }
   /** Eine Liste (kind 3, 30000, 30004) ergänzen und senden. `a`: { filter, kind, d, tags, basis, frage, schon, erfolg, nameText }; `dep`: { ich, sitzung, holen(filter), senden(vorlage, erfolg), fragen(text), melden(html), merken(ev) }.
-   *  Grundlage ist die neuere von frischer Antwort und Sitzungskopie; ohne Antwort wird nichts gesendet; fehlt die Liste, wird vor dem Anlegen gefragt; kind 3 fragt immer (die Folgeliste ist global, gelesen werden nur drei Relays). */
+   *  `holen` liefert `{ evs, alle }`; ohne Antwort aller Relays (EOSE) wird nichts gesendet. Grundlage ist die neuere von frischer Antwort und Sitzungskopie; fehlt die Liste, wird vor dem Anlegen immer gefragt; kind 3 fragt immer (die Folgeliste ist global, gelesen werden nur drei Relays).
+   *  Eine neu geschriebene Liste bekommt `created_at` = max(jetzt, alt + 1): ein Wert über jetzt steht in der Vorlage, sonst setzt ihn signierenUndSenden. */
   function listeSchreiben(a, dep) {
-    return dep.holen(a.filter).then(evs => {
-      if (!evs || !evs.length) { dep.melden('Die Relays antworten gerade nicht; nichts gesendet.'); return false; }
+    return dep.holen(a.filter).then(r => {
+      const evs = r && Array.isArray(r.evs) ? r.evs : null;
+      if (!evs || r.alle !== true) { dep.melden('Nicht alle Relays haben geantwortet; nichts gesendet.'); return false; }
+      if (!evs.length) { dep.melden('Die Relays antworten gerade nicht; nichts gesendet.'); return false; }
       const passt = e => !!e && e.kind === a.kind && e.pubkey === dep.ich && (a.kind === 3 || tagWert(e, 'd') === a.d);
       const alt = [...evs.filter(passt), dep.sitzung].filter(passt).sort((x, y) => y.created_at - x.created_at)[0] || null;
       if (alt && dep.merken) dep.merken(alt);
       let neu = alt || a.basis || null, anders = false;
       for (const t of a.tags) { const n = listeErgaenzen(neu, a.kind, a.d, t); if (n) { neu = n; anders = true; } }   // bisherige Einträge bleiben, neue kommen dazu
       if (!anders) { dep.melden(a.schon); return false; }
+      if (alt && Number.isFinite(alt.created_at) && alt.created_at + 1 > Math.floor(Date.now() / 1000)) neu = Object.assign({}, neu, { created_at: alt.created_at + 1 });   // Relays behalten sonst die alte Fassung
       const datum = alt ? new Date(alt.created_at * 1000).toLocaleDateString('de-DE') : '';
-      const frage = a.kind === 3 && alt ? `Gefunden: Folgeliste vom ${datum} mit ${tagWerte(alt, 'p').length} Einträgen. Sie wird um ${a.nameText} ergänzt und neu veröffentlicht. Folgst du anderswo mehr Personen, gehen diese Einträge verloren. Fortfahren?` : alt ? '' : a.frage || '';
+      const frage = a.kind === 3 && alt ? `Gefunden: Folgeliste vom ${datum} mit ${tagWerte(alt, 'p').length} Einträgen. Sie wird um ${a.nameText} ergänzt und neu veröffentlicht. Folgst du anderswo mehr Personen, gehen diese Einträge verloren. Fortfahren?` : alt ? '' : a.frage || 'Auf den Relays liegt diese Liste noch nicht. Eine neue öffentliche Liste anlegen?';
       if (frage && !dep.fragen(frage)) return false;
       return dep.senden(neu, a.erfolg);
     });
@@ -5686,9 +5692,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     } else if (was === 'sammlungSpeichern') {
       const vorlage = sammlungListe(saF, saTreffer), d = tagWert(vorlage, 'd'), neueA = vorlage.tags.filter(t => t[0] === 'a');
       if (!neueA.length) { toast('Die Sammlung ist leer; nichts gespeichert.'); return Promise.resolve(false); }
-      lauf = listeSchreiben({ filter: { kinds: [30004], authors: [ICH.hex], '#d': [d], limit: 1 }, kind: 30004, d, tags: neueA, basis: { kind: 30004, content: '', tags: vorlage.tags.filter(t => t[0] !== 'a') }, schon: 'Diese Sammlung ist schon gespeichert.', erfolg: 'Sammlung gespeichert; du findest sie unter „Mein Profil“.' }, dep(eigeneSammlung(d)));
+      lauf = listeSchreiben({ filter: { kinds: [30004], authors: [ICH.hex], '#d': [d], limit: 1 }, kind: 30004, d, tags: neueA, basis: { kind: 30004, content: '', tags: vorlage.tags.filter(t => t[0] !== 'a') }, frage: 'Diese Sammlung liegt noch nicht auf den Relays. Als neue öffentliche Liste unter deinem Schlüssel veröffentlichen?', schon: 'Diese Sammlung ist schon gespeichert.', erfolg: 'Sammlung gespeichert; du findest sie unter „Mein Profil“.' }, dep(eigeneSammlung(d)));
     } else if (was === 'zurSammlung' && adrOk) {
-      lauf = listeSchreiben({ filter: { kinds: [30004], authors: [ICH.hex], '#d': ['sammlung'], limit: 1 }, kind: 30004, d: 'sammlung', tags: [['a', ziel]], basis: { kind: 30004, content: '', tags: [['title', 'Meine Sammlung']] }, schon: 'Das Material ist schon in deiner Sammlung.', erfolg: 'In deine Sammlung aufgenommen.' }, dep(eigeneSammlung('sammlung')));
+      lauf = listeSchreiben({ filter: { kinds: [30004], authors: [ICH.hex], '#d': ['sammlung'], limit: 1 }, kind: 30004, d: 'sammlung', tags: [['a', ziel]], basis: { kind: 30004, content: '', tags: [['title', 'Meine Sammlung']] }, frage: 'Zu deinem Schlüssel liegt noch keine Liste „Meine Sammlung“ vor. Eine neue öffentliche Liste anlegen?', schon: 'Das Material ist schon in deiner Sammlung.', erfolg: 'In deine Sammlung aufgenommen.' }, dep(eigeneSammlung('sammlung')));
     }
     if (!lauf) { akZeichnen(); return Promise.resolve(false); }
     akLaeuft = true;

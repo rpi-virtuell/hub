@@ -86,9 +86,9 @@ Deno.test('hubSenden: drei Relays, zählt nur OK mit true und passender id, schl
 
 Deno.test('listeSchreiben: ohne Antwort nichts, fehlende Liste fragt, Sitzungskopie gewinnt, kind 3 fragt immer, Sammlung wird ergänzt', async () => {
   const ls = bau('listeSchreiben', fn('listeErgaenzen')), ich = 'aa'.repeat(32), B = 'bb'.repeat(32), C = 'cc'.repeat(32), D = 'dd'.repeat(32);
-  const lauf = async (evs: any[], a: any, sitzung: any = null, ja = true) => {
+  const lauf = async (evs: any[], a: any, sitzung: any = null, ja = true, alle = true) => {
     const r = { gesendet: [] as any[], fragen: [] as string[], meldungen: [] as string[] };
-    const ok = await ls(a, { ich, sitzung, holen: () => Promise.resolve(evs), senden: (v: any) => { r.gesendet.push(v); return Promise.resolve(true); }, fragen: (q: string) => { r.fragen.push(q); return ja; }, melden: (m: string) => r.meldungen.push(m), merken: () => {} });
+    const ok = await ls(a, { ich, sitzung, holen: () => Promise.resolve({ evs, alle }), senden: (v: any) => { r.gesendet.push(v); return Promise.resolve(true); }, fragen: (q: string) => { r.fragen.push(q); return ja; }, melden: (m: string) => r.meldungen.push(m), merken: () => {} });
     return Object.assign(r, { ok });
   };
   const gesund = { kind: 0, pubkey: 'ff'.repeat(32), created_at: 1, tags: [], content: '{}' };
@@ -118,6 +118,65 @@ Deno.test('listeSchreiben: ohne Antwort nichts, fehlende Liste fragt, Sitzungsko
   assertEquals(z.fragen.length, 0); assertEquals(z.gesendet[0].tags, [['d', 'sammlung'], ['title', 'Meine Sammlung'], ['a', '30142:' + B + ':x'], ['a', '30142:' + B + ':y']], 'bestehende Sammlung ergänzt, nicht ersetzt');
   const doppelt = await lauf([gesund, samm], { ...zur, tags: [['a', '30142:' + B + ':x']] });
   assertEquals(doppelt.gesendet.length, 0); assertEquals(doppelt.meldungen, ['schon drin']);
+});
+
+Deno.test('listeSchreiben: ein schweigendes Relay sendet nichts, Sammlung ohne Liste fragt, created_at über der alten Fassung', async () => {
+  const daten = s.slice(s.indexOf('  const RELAYS ='), s.indexOf('  /** Datenstand sichtbar'));
+  const ich = 'aa'.repeat(32), B = 'bb'.repeat(32), C = 'cc'.repeat(32), FO = 'ff'.repeat(32);
+  const alt = { id: '11'.repeat(32), kind: 30000, pubkey: ich, created_at: 10, content: '', tags: [['d', 'communities'], ['p', B]] };
+  const gesund = { id: '22'.repeat(32), kind: 0, pubkey: FO, created_at: 1, tags: [], content: '{}' };
+  const aufbau = (stumm: string[]) => {
+    const socks: any[] = [];
+    class WS {
+      url: string; onopen: any; onmessage: any; onerror: any; onclose: any; zu = false;
+      constructor(u: string) { this.url = u; socks.push(this); queueMicrotask(() => this.onopen && this.onopen()); }
+      send(x: string) {
+        const [, sub] = JSON.parse(x); if (stumm.includes(this.url)) return;   // stumm: weder EVENT noch EOSE, nur die Zeitgrenze
+        const m = (d: unknown) => queueMicrotask(() => this.onmessage && this.onmessage({ data: JSON.stringify(d) }));
+        m(['EVENT', sub, gesund]); if (this.url.includes('rpi')) m(['EVENT', sub, alt]); m(['EOSE', sub]);
+      }
+      close() { this.zu = true; }
+    }
+    const ss = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
+    const kurz = (f: any, ms: number) => setTimeout(f, Math.min(ms, 20));
+    const api = new Function('WebSocket', 'sessionStorage', 'setTimeout', 'tagWert', 'tagWerte', 'istHex64', daten + `const FO_HEX = '${FO}';` + fn('frischHolen') + fn('listeErgaenzen') + fn('listeSchreiben') + '; return { frischHolen, listeSchreiben };')(WS, ss, kurz, tagWert, tagWerte, istHex64);
+    return { api, socks };
+  };
+  const beitreten = { filter: { kinds: [30000], authors: [ich], '#d': ['communities'], limit: 1 }, kind: 30000, d: 'communities', tags: [['p', C]], frage: 'neu?', schon: 'schon', erfolg: 'ok' };
+  const lauf = async (stumm: string[], a: any = beitreten, ja = true) => {
+    const { api, socks } = aufbau(stumm), r = { gesendet: [] as any[], fragen: [] as string[], meldungen: [] as string[], socks };
+    await api.listeSchreiben(a, { ich, sitzung: null, holen: api.frischHolen, senden: (v: any) => { r.gesendet.push(v); return Promise.resolve(true); }, fragen: (q: string) => { r.fragen.push(q); return ja; }, melden: (m: string) => r.meldungen.push(m), merken: () => {} });
+    return r;
+  };
+  const still = await lauf(['wss://amb-relay.edufeed.org']);
+  assertEquals(still.socks.length, 3, 'alle drei Relays gefragt');
+  assertEquals(still.gesendet.length, 0); assertEquals(still.fragen.length, 0); assertEquals(still.meldungen, ['Nicht alle Relays haben geantwortet; nichts gesendet.']);
+  const ohneListe = await lauf(['wss://relay-rpi.edufeed.org']);   // gerade das Relay mit der Liste schweigt
+  assertEquals(ohneListe.gesendet.length, 0); assertEquals(ohneListe.fragen.length, 0, 'kein „noch keine Liste“, wenn ein Relay fehlt');
+  const voll = await lauf([]);
+  assertEquals(voll.fragen.length, 0); assertEquals(voll.gesendet[0].tags, [['d', 'communities'], ['p', B], ['p', C]], 'alle antworten: alte Liste ergänzt');
+  assert(!('created_at' in voll.gesendet[0]), 'alte Fassung liegt zurück: Zeit setzt erst das Signieren');
+  // kind 30004 ohne vorhandene Liste fragt (Meine Sammlung und gespeicherte Sammlung), Nein sendet nichts
+  const ls = bau('listeSchreiben', fn('listeErgaenzen')), ihr = (evs: any[], ja: boolean) => {
+    const r = { gesendet: [] as any[], fragen: [] as string[] };
+    return { r, dep: { ich, sitzung: null, holen: () => Promise.resolve({ evs, alle: true }), senden: (v: any) => { r.gesendet.push(v); return Promise.resolve(true); }, fragen: (q: string) => { r.fragen.push(q); return ja; }, melden: () => {}, merken: () => {} } };
+  };
+  const a = fn('aktion');
+  assert(/d: 'sammlung', tags: \[\['a', ziel\]\], basis: [^\n]*?frage: '[^']+'/.test(a) && /kind: 30004, d, tags: neueA, basis: [^\n]*?frage: '[^']+'/.test(a), 'beide 30004-Aufrufe tragen eine Frage');
+  const zur = { filter: {}, kind: 30004, d: 'sammlung', tags: [['a', '30142:' + B + ':y']], basis: { kind: 30004, content: '', tags: [['title', 'Meine Sammlung']] }, schon: 'schon', erfolg: 'ok' };
+  for (const fall of [{ ...zur, frage: 'Sammlung neu?' }, zur]) {
+    const nein = ihr([gesund], false); await ls(fall, nein.dep);
+    assertEquals(nein.r.fragen.length, 1, 'fehlende 30004-Liste fragt, auch ohne eigene Frage'); assertEquals(nein.r.gesendet.length, 0);
+  }
+  // created_at = max(jetzt, alt + 1)
+  const zukunft = Math.floor(Date.now() / 1000) + 3600, neuer = { ...alt, created_at: zukunft };
+  const z = ihr([gesund, neuer], true); await ls(beitreten, z.dep);
+  assertEquals(z.r.gesendet[0].created_at, zukunft + 1, 'liegt die alte Fassung in der Zukunft, kommt die neue eine Sekunde danach');
+  const su = new Function('ICH', 'window', 'hubSenden', 'toast', 'akAufnehmen', 'istHex64', fn('signierenUndSenden') + '; return signierenUndSenden;');
+  const signiert: any[] = [], sende = su({ kann: true, hex: ich }, { nostr: { signEvent: (e: any) => { signiert.push(e); return Promise.resolve({ ...e, id: '33'.repeat(32), sig: 'x' }); } } }, () => Promise.resolve(3), () => {}, () => {}, istHex64);
+  const jetzt = Math.floor(Date.now() / 1000);
+  await sende({ kind: 30000, tags: [], created_at: zukunft + 1 }, 'ok'); await sende({ kind: 30000, tags: [] }, 'ok'); await sende({ kind: 30000, tags: [], created_at: 5 }, 'ok');
+  assertEquals(signiert[0].created_at, zukunft + 1); assert(signiert[1].created_at >= jetzt && signiert[2].created_at >= jetzt, 'sonst jetzt');
 });
 
 Deno.test('aktion: Reaktion und Zusage nur mit 64-Hex-Event-Kennung', () => {
