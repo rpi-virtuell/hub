@@ -25,17 +25,19 @@ Deno.test('Beziehungsgefüge: Signaturen, Abfrage, Doku', async () => {
 
 Deno.test('bzBauen: Kanten nur aus gültigen Bezügen', () => {
   const bz = bau('bzBauen', fn('aTagLesen') + fn('repostZiel') + fn('bzVerbinde') + fn('bzZeit'));
-  const A = 'aa'.repeat(32), B = 'bb'.repeat(32), C = 'cc'.repeat(32), ID = 'dd'.repeat(32);
-  const mat = { id: ID, kind: 30142, pubkey: A, created_at: 10, tags: [['d', 'm1'], ['h', C]] };
+  const A = 'aa'.repeat(32), B = 'bb'.repeat(32), C = 'cc'.repeat(32), ID = 'dd'.repeat(32), F = '99'.repeat(32), G = '88'.repeat(32);
+  const mat = { id: ID, kind: 30142, pubkey: A, created_at: 10, tags: [['d', 'm1'], ['h', C], ['h', F]] };
   const term = { id: 'ee'.repeat(32), kind: 31923, pubkey: A, created_at: 11, tags: [['d', 't1'], ['start', '1800000000'], ['p', B]] };
   const q = { materialien: [mat], beitraege: [], termine: [term], reposts: [{ kind: 16, pubkey: B, created_at: 12, tags: [['a', `30142:${A}:m1`], ['h', C]] }, { kind: 16, pubkey: B, created_at: 13, tags: [['e', 'ff'.repeat(32)]] }],
-    mitgliedschaften: [{ kind: 30000, pubkey: B, created_at: 14, tags: [['d', 'communities'], ['p', C], ['p', 'kaputt']] }],
+    mitgliedschaften: [{ kind: 30000, pubkey: B, created_at: 14, tags: [['d', 'communities'], ['p', C], ['p', 'kaputt'], ['p', F]] }, { kind: 30000, pubkey: G, created_at: 14, tags: [['d', 'communities'], ['p', F]] }],
     zusagen: [{ kind: 31925, pubkey: B, created_at: 15, tags: [['a', `31923:${A}:t1`], ['status', 'declined']] }, { kind: 31925, pubkey: B, created_at: 16, tags: [['a', `31923:${A}:t1`], ['status', 'accepted']] }],
     reaktionen: [{ kind: 7, pubkey: B, created_at: 17, content: '-', tags: [['e', ID]] }, { kind: 7, pubkey: B, created_at: 18, content: '+', tags: [['e', ID]] }],
     personenListe: [], communities: [C] };
   const { ents, kanten } = bz(q);
   assert(ents.has('p:' + A) && ents.has('p:' + B) && ents.has('c:' + C) && ents.has(`m:30142:${A}:m1`) && ents.has(`e:31923:${A}:t1`), 'Entitäten');
   assert(!ents.has('p:kaputt') && !ents.has('c:kaputt'), 'kaputter Schlüssel ergibt nichts');
+  assert(!ents.has('c:' + F) && !ents.has('p:' + F) && !kanten.has('c:' + F) && !kanten.has('p:' + F), 'gültiger fremder Schlüssel in p- oder h-Tag ergibt weder Community noch Kante');
+  assert(!ents.has('p:' + G) && !kanten.has('p:' + G), 'Liste nur mit fremden Schlüsseln: keine Person, keine Kante');
   const n = (id: string) => [...(kanten.get(id) || [])].sort();
   assertEquals(n(`m:30142:${A}:m1`), ['c:' + C, 'p:' + A, 'p:' + B].sort(), 'Material: Autor, h-Community, Repost-Community bleibt C, Reaktion B');
   assertEquals(n(`e:31923:${A}:t1`), ['p:' + A, 'p:' + B].sort(), 'Termin: Autor, p-Tag, Zusage (declined zählt nicht)');

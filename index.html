@@ -2801,7 +2801,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const ents = new Map(), kanten = new Map(), adr = new Map(), byId = new Map();
     const comm = new Set((q.communities || []).filter(istHex64));
     const nimm = (id, typ, pk, extra) => { if (!ents.has(id)) ents.set(id, Object.assign({ id, typ, pk }, extra)); return id; };
-    const community = pk => istHex64(pk) ? nimm('c:' + pk, 'community', pk) : null;
+    const community = pk => comm.has(pk) ? nimm('c:' + pk, 'community', pk) : null;   // nur bekannte Communities (Hub-Schlüssel und Autoren von kind 10222), fremde Schlüssel ergeben nichts
     const person = pk => !istHex64(pk) ? null : comm.has(pk) ? community(pk) : nimm('p:' + pk, 'person', pk);   // Community-Schlüssel sind nie Personen
     const neueste = liste => {
       const neu = new Map();
@@ -2825,7 +2825,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       if (!stoff) tagWerte(ev, 'p').forEach(p => bzVerbinde(kanten, id, person(p)));
     }
     for (const ev of neueste((q.mitgliedschaften || []).filter(e => e.kind === 30000 && tagWert(e, 'd') === 'communities'))) {
-      const ziele = tagWerte(ev, 'p').filter(istHex64);
+      const ziele = tagWerte(ev, 'p').filter(h => comm.has(h));
       if (ziele.length) { const von = person(ev.pubkey); ziele.forEach(c => bzVerbinde(kanten, von, community(c))); }
     }
     const ziel = ev => {   // erster gültiger a-Tag, sonst erster e-Tag, der auf ein bekanntes Event zeigt
