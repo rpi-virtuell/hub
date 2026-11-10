@@ -15,7 +15,10 @@ Deno.test('Beziehungsgefüge: Signaturen, Abfrage, Doku', async () => {
   const l = fn('bzLaden');
   assert(/hubFetch\('beziehungen', \[/.test(l) && /kinds: \[30000\], '#d': \['communities'\], limit: 300/.test(l) && /kinds: \[10222\], limit: 60/.test(l) && /kinds: \[31925\], limit: 200/.test(l) && /kinds: \[7\], '#k': \['30142', '30023', '31922', '31923'\]/.test(l), 'fünf Filter in einem Aufruf');
   assert(/relay-rpi\.edufeed\.org/.test(l) && !/amb-relay/.test(l) && !/purplepag/.test(html) && !/groups\.edufeed\.org/.test(html), 'Relays');
-  assert((l.match(/hubFetch\(/g) || []).length === 1, 'ein REQ');
+  const aufrufe = l.match(/hubFetch\(/g) || [];
+  assert(aufrufe.length === 2, 'höchstens zwei Abfragen: die Beziehungsabfrage und eine abhängige Profilabfrage');
+  const nach = l.slice(l.indexOf("hubFetch('beziehungen:profile'"));
+  assert(/hubFetch\('beziehungen:profile', \[\{ kinds: \[0\], authors: fehlend, limit: 150 \}\]/.test(nach) && /slice\(0, 150\)/.test(l) && !/kinds: \[(?!0\])/.test(nach.split('\n')[0]), 'zweite Abfrage: nur kind 0 mit authors, höchstens 150');
   const d = await Deno.readTextFile(new URL('../docs/daten.md', import.meta.url));
   assert(/bzBauen/.test(d) && /31925/.test(d) && /ohne Rollenprüfung/.test(d), 'docs/daten.md');
 });
@@ -47,4 +50,45 @@ Deno.test('bzNachbarn und bzPunkte', () => {
   assertEquals(nb(kanten, ents, 'p:a', 'community').map((e: any) => e.id), ['c:b']);
   assertEquals(nb(kanten, ents, 'p:a', null).length, 2);
   assertEquals(pt(ents, kanten, 'p:a', null), 4); assertEquals(pt(ents, kanten, 'p:a', 'a'), 104); assertEquals(pt(ents, kanten, 'c:b', null), 1); assertEquals(pt(ents, kanten, 'm:x', null), 0);
+});
+
+Deno.test('Ökosystem: Ansicht, Route, drei Zustände, Karten maskiert', () => {
+  assert(/id="v-oekosystem" data-stand="nachbau:/.test(html), 'Ansicht mit Stand-Zeile');
+  assert(/'oekosystem'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)) && /ozOpen\(/.test(s), 'Route');
+  const o = fn('ozOpen');
+  assert(/bzLaden\(\)/.test(o) && /bzBauen\(bzQuellen\(\)\)/.test(o + fn('ozBauen')) && /Stand vom/.test(o + fn('datenstand')) && /ohne Rollenprüfung/.test(o) && /können gerade nicht geladen werden/.test(o), 'Zustände');
+  const k = fn('ozKarte');
+  assert(/esc\(/.test(k) && /sichereUrl\(/.test(k) && /kurzHash\(/.test(k) && /aria-pressed/.test(k) && /Das bist du/.test(k), 'Karte');
+  assert(/function ozSichtbar\(ent\)/.test(s) && /HUB_C/.test(fn('ozSichtbar')), 'Sichtbarkeit kennt den Zuschnitt');
+  assert(/'hub\.home': \{[^}]*#oekosystem/.test(s), 'Konsole: Home führt ins Ökosystem');
+});
+
+Deno.test('Communities live: cyAus, Partnerkacheln, RpiCommunity ausgeblendet', () => {
+  const ca = bau('cyAus', "const C = { kooperieren: '#000' }; const kurzHash = () => 'abcd1234';");
+  const ev = { kind: 10222, pubkey: 'ab'.repeat(32), created_at: 1, tags: [['r', 'wss://relay.edufeed.org']] };
+  const c = ca(ev, { name: '<b>Kreis</b>', about: 'x'.repeat(200), picture: 'javascript:x' });
+  assertEquals(c.hex, 'ab'.repeat(32)); assertEquals(c.n, '<b>Kreis</b>'); assert(c.bio.length <= 92 && c.bild === '' && c.live === true);
+  const cy = fn('cyRender');
+  assert(/cy-partner/.test(cy) && /Partner ohne eigenen Schlüssel/.test(cy), 'Partnerkacheln');
+  assert(/npub1gc2zfp/.test(s) && /ausgeblendet|RpiCommunity/.test(block(/const CY_HEX[\s\S]*?\n  \]\)?;/) + fn('cyLaden')), 'RpiCommunity ausgeblendet');
+  assert(html.includes('id="v-communities" data-stand="stand:26.10.2026 · Texte teils Beispiel"'), 'Startwert bleibt');
+});
+
+Deno.test('ozHinweis: Hinweiszeile in einem Zug, ohne doppelte Umhüllung', () => {
+  const h = bau('ozHinweis');
+  assertEquals(h({ n: 3, filter: false, wahl: '', nachbarn: false, quelle: 3 }), '3 Einträge');
+  assertEquals(h({ n: 1, filter: false, wahl: '', nachbarn: false, quelle: 1 }), '1 Eintrag');
+  assertEquals(h({ n: 200, filter: false, wahl: '', nachbarn: false, quelle: 200 }), '80 von 200 Einträgen');
+  assertEquals(h({ n: 0, filter: true, wahl: '', nachbarn: false, quelle: 5 }), 'Nichts gefunden.');
+  assertEquals(h({ n: 0, filter: true, wahl: 'X', nachbarn: false, quelle: 5 }), '„X“ gewählt · nichts gefunden');
+  assertEquals(h({ n: 90, filter: false, wahl: 'X', nachbarn: false, quelle: 90 }), '„X“ gewählt · 80 von 90 weitere');
+  assertEquals(h({ n: 4, filter: false, wahl: 'X', nachbarn: true, quelle: 4 }), '4 verbunden mit „X“');
+  assertEquals(h({ n: 0, filter: false, wahl: 'X', nachbarn: true, quelle: 0 }), 'Keine Verbindung zu „X“');
+  assertEquals(h({ n: 0, filter: true, wahl: 'X', nachbarn: true, quelle: 4 }), 'Nichts gefunden.');
+  assertEquals(h({ n: 2, filter: true, wahl: 'X', nachbarn: true, quelle: 4 }), '2 von 4 verbunden mit „X“');
+});
+
+Deno.test('cyLaden: keine eigene Profilabfrage, Konten stehen in der Beziehungsabfrage', () => {
+  assert(!/hubFetch\(/.test(fn('cyLaden')) && !/communities:profile/.test(s), 'cyLaden holt nichts nach');
+  assert(/daten\.communities\.map\(ev => ev\.pubkey\), \.\.\.daten\.mitgliedschaften/.test(fn('bzLaden')), 'Community-Konten stehen vorn in der Profilabfrage von bzLaden');
 });

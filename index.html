@@ -19,6 +19,7 @@
   --ka-labor:#FEEFD9;--ka-labor-text:#7A4300;--ka-institut:#DDF1F0;--ka-institut-text:#00605C;
   /* Personen: Initialen und Chips auf dem Hellton von kooperieren; Text 4,5:1 auf Fläche, paper und card */
   --pe-hell:#FAE1EA;--pe-text:#7A1A3E;
+  --oz-hell:var(--t-koop);--oz-text:var(--x-koop);
   --mp:#00726D;--mp-dark:#004E4A;--mp-l1:#8FD3CE;--mp-l2:#3FA9A2;--mp-soft:#E3F2F1;
   /* rpi-virtuell.de (Blocksy-Palette: Farbe 1 Leitfarbe, Farbe 5 Hellton); Textfarbe abgedunkelt, 4,5:1 auch auf dem Hellton */
   --rv:#0072AA;--rv-x:#00669A;--rv-soft:#DFE8ED;
@@ -756,6 +757,60 @@ relihub-steuerkonsole[hidden]{display:none}
 @media (prefers-reduced-motion:reduce){.cy-in{transition:none}}
 @media (max-width:640px){.cy-bar input{margin-left:0;width:100%}.cy-head h1{font-size:38px}}
 
+/* ---------- Ökosystem: Explorer mit vier Reihen (ADR-0009); Farbe „kooperieren“ ---------- */
+.oz-wrap{max-width:1180px;margin:0 auto;padding:6px clamp(16px,4vw,40px) 70px}
+.oz-wrap h1{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:46px;line-height:1;margin:10px 0 8px}
+.oz-sub{margin:0 0 14px;color:var(--muted);max-width:62ch}
+.oz-meldung{margin:0 0 12px;font-size:14px;color:var(--oz-text)}
+.oz-meldung:empty{display:none}
+.oz-auswahl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;background:var(--oz-hell);color:var(--oz-text);border-radius:16px;padding:10px 16px;margin:0 0 18px}
+.oz-auswahl[hidden]{display:none}
+.oz-auswahl b{font-size:18px;color:var(--ink)}
+.oz-auswahl .oz-typ{font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
+.oz-auswahl a{color:var(--oz-text);font-weight:600}
+.oz-auswahl button{margin-left:auto;font:inherit;font-size:15px;font-weight:600;border:1.5px solid var(--oz-text);background:#fff;color:var(--oz-text);border-radius:999px;padding:4px 14px;cursor:pointer}
+.oz-reihe{margin:0 0 20px}
+.oz-kopf{display:flex;align-items:center;gap:10px}
+.oz-kopf h2{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:26px;line-height:1.1;margin:0}
+.oz-lupe,.oz-tausch{display:inline-grid;place-items:center;width:34px;height:34px;border:1.5px solid var(--line);background:var(--card);color:var(--oz-text);border-radius:50%;cursor:pointer;padding:0;font:inherit;font-size:16px}
+.oz-lupe svg{width:17px;height:17px}
+.oz-lupe[aria-expanded="true"]{background:var(--oz-hell)}
+.oz-kopf input{font:inherit;font-size:15px;border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;min-width:0;width:min(240px,100%);background:var(--card)}
+.oz-kopf input[hidden]{display:none}
+.oz-tausch{margin-left:auto}
+.oz-hinweis{margin:2px 0 8px;font-size:14px;color:var(--muted)}
+.oz-bahn{display:flex;gap:14px;align-items:stretch}
+.oz-fokus{flex:0 0 auto}
+.oz-spur{display:flex;gap:14px;overflow-x:auto;padding:8px 6px 14px;flex:1;min-width:0}
+.oz-leer{margin:0;padding:12px 0;color:var(--muted);font-size:15px}
+.oz-karte{flex:0 0 190px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:12px;cursor:pointer;position:relative}
+.oz-karte:hover{border-color:var(--c-koop)}
+.oz-karte:focus-visible{outline:3px solid var(--c-hub);outline-offset:2px}
+.oz-karte[aria-pressed="true"]{background:var(--oz-hell);border-color:var(--oz-text);box-shadow:0 0 0 2px var(--oz-text)}
+.oz-event,.oz-material{border-radius:6px;transform:rotate(-1.2deg)}
+.oz-material{transform:rotate(1deg)}
+.oz-bild{position:relative;display:grid;place-items:center;width:64px;height:64px;overflow:hidden;background:hsl(var(--oz-h,330) 55% 88%);color:hsl(var(--oz-h,330) 60% 20%);font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:24px}
+.oz-bild img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.oz-person .oz-bild{border-radius:50%}
+.oz-community .oz-bild{clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.oz-event .oz-bild,.oz-material .oz-bild{border-radius:4px;width:100%;height:84px}
+.oz-pille{font-size:12.5px;font-weight:600;color:var(--oz-text);background:var(--oz-hell);border-radius:999px;padding:2px 9px}
+.oz-karte[aria-pressed="true"] .oz-pille{background:#fff}
+.oz-name{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:19px;line-height:1.15;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.oz-untertitel{font-size:13.5px;line-height:1.35;color:var(--muted);overflow-wrap:anywhere}
+.oz-minis{display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin-top:auto}
+.oz-mini{display:inline-grid;place-items:center;position:relative;overflow:hidden;width:24px;height:24px;border-radius:50%;font-size:10px;font-weight:700;background:hsl(var(--oz-h,330) 55% 88%);color:hsl(var(--oz-h,330) 60% 20%)}
+.oz-mini img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.oz-mehr{font-size:12px;color:var(--muted);margin-left:3px}
+/* Communities live: Partnerkacheln ohne eigenen Schlüssel */
+.cy-trenn{grid-column:1/-1;font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:24px;margin:12px 0 0}
+.cy-partner{cursor:default;height:300px}
+.cy-partner .cy-f{background:var(--card);border-style:dashed}
+.cy-partner .cy-back{background:var(--t-koop)}
+.cy-hinweis{font-size:13px;font-weight:600;color:var(--x-koop);background:var(--t-koop);border-radius:999px;padding:2px 10px;margin-top:10px}
+.cy-av img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:70px;height:70px;border-radius:50%;object-fit:cover;z-index:2}
+@media (max-width:640px){.oz-wrap h1{font-size:38px}.oz-bahn{flex-direction:column}.oz-karte{flex-basis:160px}.oz-kopf{flex-wrap:wrap}}
+
 /* ---------- relilab: Termine via Nostr ---------- */
 .rt{max-width:1180px;margin:0 auto;padding:22px 20px 80px}
 .rt-crumb{font-size:13px;color:#5F6670;margin:0 0 10px}.rt-crumb a{color:#B23BD8;text-decoration:none;font-weight:500}
@@ -1108,6 +1163,25 @@ a.kat-card:hover{border-color:var(--c-koop)}
   </main>
   <footer class="hub-foot"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> reli_hub · ein Vorhaben von FOERBICO · Prototyp</footer>
   <relihub-steuerkonsole id="cyFlower" floating size="58" popover-size="210" context="hub-communities"></relihub-steuerkonsole>
+</div>
+
+<!-- ===================== Ansicht: Ökosystem (Beziehungsgefüge, ADR-0009) ===================== -->
+<div class="view" id="v-oekosystem" data-stand="nachbau:Gefüge laden">
+  <header class="hub-top">
+    <a class="brand" href="#start"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg>reli_hub</a>
+    <span class="sp"></span>
+    <nav><a href="#communities">Communities</a><a href="#kooperieren/personen">Personen</a><a class="btn btn-profil" href="#profil">Mein Profil</a></nav>
+  </header>
+  <p class="stand" aria-live="polite"></p>
+  <main class="oz-wrap">
+    <h1>Ökosystem</h1>
+    <p class="oz-sub">Menschen, Termine, Communities und Materialien, wie sie miteinander zusammenhängen. Tippe eine Karte an: Die anderen Reihen zeigen, was mit ihr verbunden ist.</p>
+    <p class="oz-meldung" id="ozMeldung" role="status"></p>
+    <div class="oz-auswahl" id="ozAuswahl" hidden></div>
+    <div id="ozReihen"></div>
+  </main>
+  <footer class="hub-foot"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> reli_hub · ein Vorhaben von FOERBICO · Prototyp</footer>
+  <relihub-steuerkonsole id="ozFlower" floating size="58" popover-size="210" context="hub-communities"></relihub-steuerkonsole>
 </div>
 
 <!-- ===================== Ansicht 7: Community-Raum ===================== -->
@@ -2445,6 +2519,9 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   // Quellen sind die Caches der anderen Ansichten; neu geholt wird nur, was sie nicht tragen (bzLaden: eine Abfrage). Kanten gelten wie geteilt, ohne Rollenprüfung.
   let bzDaten = null, bzLauf = null;   // Antwort (gehalten, wenn nicht leer), laufende Abfrage
   let HUB_C = null;   // Zuschnitt auf eine Community (Hex oder null); gefüllt ab ADR-0009 Zuschnitt
+  const ICH = { hex: null, kann: false };   // Anmeldestand, gefüllt von der Anmeldung (Hex des Schlüssels, ob signiert werden kann)
+  let ozGefuege = null, ozLive = false;   // Gefüge der Ökosystem-Ansicht { ents, kanten } und ob es vom Relay kommt
+  const cyProfile = new Map();   // Profile (profilAus) der Community-Konten aus cyLaden
   /** Mitgliedschaften, Community-Konten, deren Profile, Zusagen und Reaktionen in einer Abfrage; einmal je Sitzung (leere Antwort wird nicht gehalten) */
   function bzLaden() {
     if (bzDaten) return Promise.resolve(bzDaten);
@@ -2473,8 +2550,16 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
         communities: neueste(art(10222)), profile: neueste(art(0)), zusagen: neueste(art(31925)),
         reaktionen: art(7).filter(ev => istHex64(ev.pubkey))
       };
-      if (daten.antwort) bzDaten = daten; else bzLauf = null;   // ohne Antwort beim nächsten Aufruf erneut versuchen
-      return daten;
+      if (!daten.antwort) { bzLauf = null; return daten; }   // ohne Antwort beim nächsten Aufruf erneut versuchen
+      // eine abhängige Nachfrage: Profile der Mitglieder (Community-Konten, Absender der Mitgliedslisten mit bekannter Community), Zusagenden und Reagierenden; ohne Antwort bleibt die erste Antwort heil
+      const bekannt = new Set([...CO_SCHLUESSEL.map(c => c.hex), ...daten.communities.map(ev => ev.pubkey)]), habe = new Set(daten.profile.map(ev => ev.pubkey));
+      const fehlend = [...new Set([...daten.communities.map(ev => ev.pubkey), ...daten.mitgliedschaften.filter(ev => tagWerte(ev, 'p').some(h => bekannt.has(h))).map(ev => ev.pubkey), ...daten.zusagen.map(ev => ev.pubkey), ...daten.reaktionen.map(ev => ev.pubkey)].filter(pk => istHex64(pk) && !habe.has(pk)))].slice(0, 150);
+      const nach = fehlend.length ? hubFetch('beziehungen:profile', [{ kinds: [0], authors: fehlend, limit: 150 }], { relays: ['wss://relay.edufeed.org', 'wss://relay-rpi.edufeed.org'] }) : Promise.resolve([]);
+      return nach.then(extra => {
+        daten.profile = neueste([...daten.profile, ...extra.filter(ev => ev && ev.kind === 0)]);
+        bzDaten = daten;
+        return daten;
+      }, () => { bzDaten = daten; return daten; });
     });
     return bzLauf;
   }
@@ -2579,7 +2664,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const p = peDaten && peDaten.profile && peDaten.profile.get(hex);
     if (p) return p;
     const ev = bzDaten && bzDaten.profile.find(e => e.pubkey === hex);
-    return ev ? profilAus(ev) : null;
+    return ev ? profilAus(ev) : (cyProfile.get(hex) || null);
   }
   /** Anzeigename einer Entität, schon maskiert: Profilname, bei Communities sonst Hub-Name, sonst gekürzter npub */
   function bzName(ent) {
@@ -2603,7 +2688,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   const EX = {
     'hub': { fn:'reli_hub', t:'Deine Steuerkonsole', p:'Der reli_hub ist deine Steuerkonsole in der vernetzten Welt der digitalen Religionspädagogik. Überall, wo du dieses Symbol findest, bist du im Netzwerk unterwegs. Dein Profil nimmst du überall hin mit.', subs:['hub.profil','hub.home'] },
     'hub.profil': { fn:'reli_hub › mein Profil', t:'Mein Profil', p:'Mit deinem Profil wird der reli_hub zu deinem persönlichen Ausgangspunkt: deine Communities, neue Materialien zu deinen Themen und passende Veranstaltungen. Ein Schlüssel öffnet alle angeschlossenen Seiten.', go:['Mit Nostr-Schlüssel anmelden','#profil'] },
-    'hub.home': { fn:'reli_hub › Home', t:'Home', p:'Die Startseite des reli_hub – ohne Anmeldung. Hier erfährst du, was der Hub ist und welche Seiten zu ihm gehören.', go:['Zum Ökosystem','#partner'] },
+    'hub.home': { fn:'reli_hub › Home', t:'Home', p:'Die Startseite des reli_hub – ohne Anmeldung. Hier erfährst du, was der Hub ist und welche Seiten zu ihm gehören.', go:['Zum Ökosystem','#oekosystem'] },
     'finden': { fn:'finden', t:'Material, Fortbildungen und Beiträge', p:'Geprüftes, offen lizenziertes Material, digitale Fortbildungen und Artikel aus deinen Communities – an einem Ort auffindbar. Lehr- und Lerninhalte liegen im Materialpool, Beiträge kommen aus Communities und Instanzen.', subs:['finden.material','finden.fortbildungen','finden.beitraege'] },
     'finden.material': { fn:'finden › Material', t:'Material', p:'Finde aktuelles, redaktionell geprüftes Material zu deinen Themen und deiner Zielgruppe.', go:['Zum Materialpool','#materialpool'], p2:'Du kannst dir daraus auch eine Sammlung zusammenstellen und mitnehmen.', go2:['Sammlung zusammenstellen','#finden/sammlung'] },
     'finden.beitraege': { fn:'finden › Beiträge', t:'Artikel und Nachrichten', p:'Artikel und Nachrichten aus deinen Communities und Instanzen. Lehr- und Lerninhalte findest du im Materialpool.', go:['Zu den Artikeln','#profil?zu=artikel'] },
@@ -2694,10 +2779,13 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   ];
   const TINT = { finden:cssVar('--t-finden'), erstellen:cssVar('--t-erstellen'), kooperieren:cssVar('--t-koop'), hub:cssVar('--t-hub') };
   const TINK = { finden:X.finden, erstellen:X.erstellen, kooperieren:X.kooperieren, hub:X.hub };
-  document.getElementById('pgrid').innerHTML = PARTNERS.map(([n, d, k, ab, href, back, tag]) =>
-    `<a class="pcard" href="${href || '#'}" ${href ? '' : `data-todo="${n}"`} style="--bk:${TINT[k]};--bt:${TINK[k]}" aria-label="${n}: ${back}"><span class="pin">`
-    + `<span class="pface"><span class="cc" style="background:${C[k]};color:${T[k]}">${ab}</span><span><b>${n}</b><small>${d}</small>${tag ? `<span class="tag">${tag}</span>` : ''}</span></span>`
-    + `<span class="pface pback"><p>${back}</p><em>${href ? 'Ansehen ›' : 'Mehr ›'}</em></span></span></a>`).join('');
+  const PARTNER_MIT_SCHLUESSEL = ['reliGlobal', 'Konfi-Arbeit bundesweit', 'Friedensarbeit EKD', 'edufeed'];   // Einträge von PARTNERS mit eigenem Schlüssel (Community-Konto, Schlüsselliste)
+  document.getElementById('pgrid').innerHTML = PARTNERS.map(([n, d, k, ab, href, back, tag]) => {
+    const partner = !href && !PARTNER_MIT_SCHLUESSEL.includes(n), marke = partner ? 'Partner' + (tag ? ' · ' + tag : '') : tag;   // Partner nur ohne eigenen Schlüssel; Einträge mit Schlüssel sind Communities. Ohne Seite im Hub führen beide zu den Communities
+    return `<a class="pcard${partner ? ' partner' : ''}" href="${href || '#communities'}" style="--bk:${TINT[k]};--bt:${TINK[k]}" aria-label="${n}: ${back}"><span class="pin">`
+    + `<span class="pface"><span class="cc" style="background:${C[k]};color:${T[k]}">${ab}</span><span><b>${n}</b><small>${d}</small>${marke ? `<span class="tag">${marke}</span>` : ''}</span></span>`
+    + `<span class="pface pback"><p>${back}</p><em>${href ? 'Ansehen ›' : 'Zu den Communities ›'}</em></span></span></a>`;
+  }).join('');
   // Auf Touch-Geräten: erstes Antippen dreht die Karte, zweites öffnet sie
   document.getElementById('pgrid').addEventListener('click', e => {
     const c = e.target.closest('.pcard'); if (!c || !matchMedia('(hover: none)').matches || c.classList.contains('flip')) return;
@@ -3526,6 +3614,57 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   ];
   const cyFollow = new Set(CY.filter(c => c.mine).map(c => c.id));
   let cyFilter = 'alle', cyQ = '';
+  // Communities live: Konten mit kind:10222 vom Relay (ADR-0009); bekannte Schlüssel behalten die Kennung der eingebetteten Karte, damit #community?c=<id> weiter gilt.
+  // Die RpiCommunity (Vorläufer von rpi-virtuell, Entscheidung 04.11.2026) ist ausgeblendet; der Schaufenster-Schlüssel oercommunity hat keine 10222 und bleibt eingebettet.
+  const CY_AUS = new Set([npubToHex('npub1gc2zfp85vqe57snsevxn4u9emsq7t4l283r2p83al0s0yzujaljq466thz')]);
+  const CY_HEX = new Map([
+    ...CO_SCHLUESSEL.filter(c => c.id !== 'oercommunity').map(c => [c.hex, c.id]),
+    [npubToHex('npub1jt62efpmw02uuj58fqzgss2nxe2wvsjx48x6etvdrpa4prtp8l2s0zld3w'), 'konfi'],
+    [npubToHex('npub1vsnck0crdcjdczggrlp7ng7tn6fawpdauts2wdwetsnh8s7dkcqsumc7zj'), 'frieden'],
+    [npubToHex('npub10dxgwerwfmjsyu9lq97pxdu4q0w3efycykhv3a9j2ut7y5l4xhkqyclpt8'), 'kuru'],
+    [npubToHex('npub1dnyvcxlxnpvk5r0xt7r0ww5046l4pjnd22k3adjndzf3zgl3qshqhsk6et'), 'agdm'],
+    [npubToHex('npub1vkn99j7kufchmgcly98lg9uexfste9epxe6jhgdt20wn4adzrvpqxhac4w'), 'kph'],
+    [npubToHex('npub1wak8hljj3szpe5g3fmak6jqspvhyn4867flrq8anlq7xfg5xjn6qtmtpsw'), 'rpi'],
+    [npubToHex('npub1deah5w4wj5ke43580cp4n33zx8433gevey5xv8lfxxzf8qwyl3ss06nnst'), 'campuscom']
+  ]);
+  let cyDaten = null, cyLauf = null, cyLaufNr = 0, cyBz = null;   // Antwort (gehalten, wenn Konten da sind), laufende Abfrage, Zähler gegen späte Antworten, Gefüge für die Mitgliederzahlen
+  /** Community-Eintrag aus einem kind:10222 und dem rohen Profil (kind:0, schon geparst) oder null; Texte bleiben roh, die Karten maskieren beim Ausgeben */
+  function cyAus(ev, profil, mitglieder) {
+    const p = profil || {}, hex = ev.pubkey, kurz = hex.slice(0, 8);
+    const txt = (x, n) => typeof x === 'string' ? x.trim().slice(0, n) : '';
+    const n = txt(p.display_name, 80) || txt(p.name, 80) || 'Community ' + kurz, about = txt(p.about, 600);
+    const ab = (n.match(/[\p{L}\p{N}]+/gu) || []).slice(0, 2).map(w => w[0]).join('').toUpperCase() || kurz.slice(0, 2);
+    return { id: kurz, hex, n, ab, col: C.kooperieren, ty: 'netz', bio: about ? (about.length > 90 ? about.slice(0, 90).trimEnd() + '…' : about) : 'Keine Biografie verfügbar', back: about || 'Keine Biografie verfügbar', m: mitglieder || 0, bild: sichereUrl(txt(p.picture, 500)), live: true };
+  }
+  /** Communities live aus dem Beziehungsgefüge (bzLaden) und einer abhängigen Nachfrage nach den Profilen der übrigen Konten; einmal je Sitzung, ohne Antwort `antwort: false` */
+  function cyLaden() {
+    if (cyDaten) return Promise.resolve(cyDaten);
+    if (cyLauf) return cyLauf;
+    cyLauf = bzLaden().then(bz => {
+      if (!bz.antwort) { cyLauf = null; return { antwort: false, liste: [] }; }
+      const konten = bz.communities.filter(ev => istHex64(ev.pubkey) && !CY_AUS.has(ev.pubkey));   // RpiCommunity ausgeblendet
+      {   // Profile stehen schon in bz.profile (bzLaden holt auch die der Community-Konten)
+        const neu = new Map();
+        for (const ev of bz.profile) {
+          if (!ev || ev.kind !== 0 || !istHex64(ev.pubkey)) continue;
+          const alt = neu.get(ev.pubkey); if (!alt || ev.created_at > alt.created_at) neu.set(ev.pubkey, ev);
+        }
+        const roh = new Map();
+        neu.forEach((ev, pk) => { try { const c = JSON.parse(ev.content); if (c && typeof c === 'object') roh.set(pk, c); } catch (e) {} const pa = profilAus(ev); if (pa) cyProfile.set(pk, pa); });
+        const liste = konten.map(ev => {
+          const c = cyAus(ev, roh.get(ev.pubkey)), emb = CY.find(x => x.id === CY_HEX.get(ev.pubkey));
+          if (!emb) return c;
+          const mitProfil = roh.has(ev.pubkey) && (roh.get(ev.pubkey).display_name || roh.get(ev.pubkey).name);
+          return Object.assign({}, emb, { hex: ev.pubkey, bild: c.bild, live: true, m: 0 }, mitProfil ? { n: c.n, ab: c.ab, bio: c.bio, back: c.back } : {});
+        });
+        cyDaten = { antwort: true, liste };
+        return cyDaten;
+      }
+    });
+    return cyLauf;
+  }
+  /** Zahl der Mitglieder (Personen mit Kante zur Community) im zuletzt gebauten Gefüge */
+  function cyMitglieder(hex) { return cyBz ? bzNachbarn(cyBz.kanten, cyBz.ents, 'c:' + hex, 'person').length : 0; }
   function cyBtn(c) { const on = cyFollow.has(c.id); return `<button type="button" class="cy-follow${on ? ' on' : ''}" data-cyf="${c.id}">${on ? (c.mine === 'Mitglied' ? 'Mitglied ✓' : 'Folge ich ✓') : 'Folgen'}</button>`; }
   // Newsletter einer Community: auf Nostr je Eintrag ein Web-Lesezeichen nach NIP-B0 (kind 39701) vom Community-Schlüssel, Tag newsletter
   const nlLink = x => x[2] ? `<a href="${x[2]}" target="_blank" rel="noopener">anmelden ›</a>` : `<a href="#" data-todo="Anmeldung zum ${x[0]}">anmelden ›</a>`;
@@ -3536,16 +3675,41 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   }
   { const nb = document.getElementById('rtNl'); if (nb) nb.outerHTML = nlBox(); }
   function cyRel(c) { if (!c.inst) return ''; return c.inst[1] ? `<a class="cy-rel" href="#${c.inst[1]}">↔ Instanz: ${c.inst[0]} ›</a>` : `<span class="cy-rel">↔ Instanz: ${c.inst[0]}</span>`; }
-  function cyAv(c) { return `<div class="cy-av" style="--av:${c.col}"><span class="${c.id === 'relilab' ? 'rl' : ''}" style="background:${c.col};color:${c.tx || '#fff'}">${c.id === 'relilab' ? '#' : c.ab}</span></div>`; }
-  function cyCards(list, ctxRel) { return list.map(c => `<div class="cy-card" ${ctxRel ? `id="cy-${c.id}"` : `data-rid="cy-${c.id}"`} tabindex="0" aria-label="${c.n}">
+  function cyAv(c) { return `<div class="cy-av" style="--av:${c.col}"><span class="${c.id === 'relilab' ? 'rl' : ''}" style="background:${c.col};color:${c.tx || '#fff'}">${c.id === 'relilab' ? '#' : esc(c.ab)}</span>${c.bild ? `<img src="${esc(c.bild)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</div>`; }
+  /** Kacheln; `art` (nur Partner ohne Schlüssel): { klasse, hinweis } ersetzt Folgen-, Raum- und Katalog-Knopf durch den Hinweis. Alle Texte über esc. */
+  function cyCards(list, ctxRel, art) { return list.map(c => {
+    const nm = esc(c.n), eigen = c.live && !CY.some(x => x.id === c.id), ziel = eigen ? 'oekosystem?wahl=' + encodeURIComponent('c:' + c.hex) : '';
+    const hinweis = art ? `<span class="cy-hinweis">${esc(art.hinweis)}</span>` : '', seite = art ? PARTNERS.find(x => x[0] === c.n && x[4]) : null;
+    const raum = art ? (seite ? `<a class="cy-katalog" href="${esc(seite[4])}">Zur Seite ›</a>` : '') : ziel ? `<a class="cy-follow open" href="#${esc(ziel)}">Im Ökosystem zeigen ›</a>` : `<button type="button" class="cy-follow open" data-cyopen="${esc(c.id)}">Community-Raum öffnen ›</button>`;
+    const meta = art ? '' : `<div class="meta">${c.m} Mitglieder${c.series ? ' · ' + c.series.map(x => x[1]).filter(Boolean)[0] : ''}</div>`;
+    return `<div class="cy-card${art ? ' ' + art.klasse : ''}" ${ctxRel ? `id="cy-${esc(c.id)}"` : `data-rid="cy-${esc(c.id)}"`}${ziel ? ` data-ziel="${esc(ziel)}"` : ''} tabindex="0" aria-label="${nm}">
       <div class="cy-in">
-        <div class="cy-f">${cyAv(c)}<h3>${c.n}${c.ver ? SHIELD : ''}</h3><p class="cy-bio">${c.bio}</p>${c.series ? `<div class="cy-ser">${c.series.map(x => `<span>Serie: ${x[0]}</span>`).join('')}</div>` : ''}${c.nl ? `<div class="cy-nl">${c.nl.map(x => `<span>Newsletter: ${x[0]}</span>`).join('')}</div>` : ''}${ctxRel ? cyRel(c) : ''}<span style="flex:1"></span>${cyBtn(c)}</div>
-        <div class="cy-f cy-back"><small>Über die Community</small><h3>${c.n}</h3><p>${c.back}</p><div class="meta">${c.m} Mitglieder${c.series ? ' · ' + c.series.map(x => x[1]).filter(Boolean)[0] : ''}</div>${ctxRel ? cyRel(c) : ''}<span style="flex:1"></span><button type="button" class="cy-follow open" data-cyopen="${c.id}">Community-Raum öffnen ›</button>${CO_SCHLUESSEL.some(x => x.id === c.id) ? `<a class="cy-katalog" href="#community?c=${c.id}&zu=katalog">Katalog ›</a>` : ''}${cyBtn(c)}</div>
-      </div></div>`).join('') || '<p class="cy-empty">Keine Community gefunden.</p>'; }
+        <div class="cy-f">${cyAv(c)}<h3>${nm}${c.ver ? SHIELD : ''}</h3><p class="cy-bio">${esc(c.bio)}</p>${hinweis}${c.series ? `<div class="cy-ser">${c.series.map(x => `<span>Serie: ${x[0]}</span>`).join('')}</div>` : ''}${c.nl ? `<div class="cy-nl">${c.nl.map(x => `<span>Newsletter: ${x[0]}</span>`).join('')}</div>` : ''}${ctxRel && !art ? cyRel(c) : ''}<span style="flex:1"></span>${art ? '' : cyBtn(c)}</div>
+        <div class="cy-f cy-back"><small>Über die Community</small><h3>${nm}</h3><p>${esc(c.back)}</p>${meta}${hinweis}${ctxRel && !art ? cyRel(c) : ''}<span style="flex:1"></span>${raum}${!art && !eigen && CO_SCHLUESSEL.some(x => x.id === c.id) ? `<a class="cy-katalog" href="#community?c=${esc(c.id)}&zu=katalog">Katalog ›</a>` : ''}${art ? '' : cyBtn(c)}</div>
+      </div></div>`; }).join('') || '<p class="cy-empty">Keine Community gefunden.</p>'; }
+  /** Liste der Communities: mit Antwort die Live-Einträge (nach Mitgliedern), dahinter Partnerkacheln der eingebetteten Einträge ohne Schlüssel (cy-partner); ohne Antwort der eingebettete Stand vom 26.10.2026 */
   function cyRender() {
-    const list = CY.filter(c => (cyFilter === 'alle' || (cyFilter === 'meine' ? cyFollow.has(c.id) : c.ty === cyFilter)) && c.n.toLowerCase().includes(cyQ));
-    document.getElementById('cyGrid').innerHTML = cyCards(list, true);
+    const art = { klasse: 'cy-partner', hinweis: 'Partner ohne eigenen Schlüssel im Datenraum' };
+    const passt = c => (cyFilter === 'alle' || (cyFilter === 'meine' ? cyFollow.has(c.id) : c.ty === cyFilter)) && c.n.toLowerCase().includes(cyQ);
+    const live = cyDaten && cyDaten.liste.length ? cyDaten.liste : null;
+    if (!live) document.getElementById('cyGrid').innerHTML = cyCards(CY.filter(passt), true);
+    else {
+      live.forEach(c => { c.m = cyMitglieder(c.hex); });
+      const ids = new Set([...CY_HEX.values(), 'oercommunity']), partner = CY.filter(c => !ids.has(c.id));
+      const vorn = [...live].sort((a, b) => b.m - a.m || a.n.localeCompare(b.n, 'de')).filter(passt), schau = CY.filter(c => c.id === 'oercommunity' && passt(c)), hinten = partner.filter(passt);
+      document.getElementById('cyGrid').innerHTML = cyCards([...vorn, ...schau], true) + (hinten.length ? `<h2 class="cy-trenn">${esc(art.hinweis)}</h2>` + cyCards(hinten, true, art) : '');
+      datenstand('v-communities', 'live', `${live.length} Communities · ${partner.length} Partner ohne Schlüssel`);
+    }
     if (typeof rlCommRender === 'function') rlCommRender();
+  }
+  /** Ansicht öffnen: Konten live holen (einmal je Sitzung); ohne Antwort bleibt der eingebettete Stand */
+  function cyOpen() {
+    const lauf = ++cyLaufNr;
+    cyLaden().then(d => {
+      if (lauf !== cyLaufNr) return;
+      if (!d.antwort || !d.liste.length) { datenstand('v-communities', 'stand', '26.10.2026 · Texte teils Beispiel'); return; }
+      cyBz = bzBauen(bzQuellen()); cyRender();
+    }, () => {});
   }
   cyRender();
   document.querySelector('#v-communities .cy-bar').addEventListener('click', e => {
@@ -3561,6 +3725,8 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const c = e.target.closest('.cy-card'); if (!c) return;
     // Touch: erstes Antippen dreht die Kachel, zweites öffnet den Community-Raum. Maus: Klick öffnet direkt.
     if (matchMedia('(hover: none)').matches && !c.classList.contains('flip')) { document.querySelectorAll('.cy-card.flip').forEach(x => x.classList.remove('flip')); c.classList.add('flip'); return; }
+    if (c.classList.contains('cy-partner')) return;   // Partner ohne Schlüssel: kein Raum
+    if (c.dataset.ziel) { go(c.dataset.ziel); return; }   // Community ohne eigene Karte im Hub: im Ökosystem zeigen
     go('community?c=' + c.id.slice(3));
   });
   function cyFocus(id) {
@@ -3570,6 +3736,207 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const el = document.getElementById('cy-' + id); if (!el) return;
     setTimeout(() => { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('hl', 'flip'); setTimeout(() => el.classList.remove('hl', 'flip'), 2600); }, 80);
   }
+
+  // ---------- Ökosystem: Explorer mit vier Reihen (ADR-0009, Farbe „kooperieren“) ----------
+  // Eine Reihe je Typ (Menschen, Termine, Communities, Materialien). Wer eine Karte wählt, sieht in den anderen Reihen nur, was mit ihr verbunden ist.
+  // Ohne Antwort des Relays zeigt die Ansicht die Schnappschuss-Einträge ohne Kanten und sagt es; Kanten gelten wie geteilt, ohne Rollenprüfung.
+  const OZ_STANDARD = ['person', 'event', 'community', 'material'];
+  const OZ_TITEL = { person: 'Menschen', event: 'Termine', community: 'Communities', material: 'Materialien' };
+  const OZ_ART = { person: 'Mensch', event: 'Termin', community: 'Community', material: 'Material' };
+  let ozReihenFolge = OZ_STANDARD.slice(), ozWahl = '', ozLauf = 0, ozMeldung = '';
+  const ozFilter = { person: '', event: '', community: '', material: '' }, ozOffen = new Set();
+  const ozIni = n => peIni(String(n).replace(/(^|\s)[^\p{L}\p{N}\s&]+(?=\s|$)/gu, ' '));   // Initialen ohne alleinstehende Satzzeichen („R-“ aus „reliGlobal - …“)
+  const ozEntesc = t => String(t).replace(/&(amp|lt|gt|quot);/g, (m, k) => ({ amp: '&', lt: '<', gt: '>', quot: '"' }[k]));
+  /** Jüngstes Datum der eingebetteten Schnappschüsse (TT.MM.JJJJ) */
+  function ozStandDatum() {
+    return [RT_STAND, OC_STAND, '26.10.2026', '22.10.2026'].sort((a, b) => b.split('.').reverse().join('').localeCompare(a.split('.').reverse().join('')))[0];
+  }
+  /** Gefüge aus den eingebetteten Beständen (Materialien MP, Termine RT_RAW, Beiträge OC_RAW, Communities CY), bewusst ohne Kanten und ohne Personen */
+  function ozSchnappschuss() {
+    const ents = new Map(), hexe = new Map([...CY_HEX].map(([hex, id]) => [id, hex]));
+    bzBauen({ materialien: [], beitraege: OC_RAW, termine: RT_RAW, communities: [] }).ents.forEach((e, id) => { if (e.typ === 'material' || e.typ === 'event') ents.set(id, e); });
+    MP.forEach((x, i) => ents.set('m:mp:' + i, { id: 'm:mp:' + i, typ: 'material', pk: '', titel: x[0], sub: x[1] }));
+    CY.forEach(c => { const hex = hexe.get(c.id) || '', id = 'c:' + (hex || 'cy-' + c.id); ents.set(id, { id, typ: 'community', pk: hex, cy: c }); });
+    return { ents, kanten: new Map() };
+  }
+  /** Gefüge aus den Caches (bzQuellen); Profilbilder der Personen und Communities fließen in die Gewichte (bzPunkte) */
+  function ozBauen() {
+    const g = bzBauen(bzQuellen());
+    g.ents.forEach(e => { if (e.typ === 'person' || e.typ === 'community') { const p = bzProfil(e.pk); if (p && sichereUrl(p.bild)) e.bild = sichereUrl(p.bild); } });
+    ozGefuege = g; ozLive = true;
+    return g;
+  }
+  /** Soll der Eintrag in den Reihen erscheinen? Personen nur mit Profilname und Kante (oder als der Angemeldete), Communities immer, Termine bis einen Tag nach dem Ende, Beiträge nur mit Community-Bezug; mit Zuschnitt HUB_C nur, was zu ihr gehört */
+  function ozSichtbar(ent) {
+    const g = ozGefuege; if (!g) return false;
+    const k = id => g.kanten.get(id) || new Set(), jetzt = Date.now() / 1000;
+    if (ozLive && HUB_C) {
+      const z = 'c:' + HUB_C;
+      if (ent.typ === 'community') { if (ent.id !== z) return false; }
+      else if (!k(ent.id).has(z) && !(ent.typ !== 'person' && k('p:' + ent.pk).has(z))) return false;
+    }
+    if (ent.typ === 'community') return true;
+    if (ent.typ === 'person') { const p = bzProfil(ent.pk); return !!(ICH.hex && ent.pk === ICH.hex) || !!(ozLive && p && p.name && k(ent.id).size > 0); }
+    if (ent.typ === 'event') return Math.max(ent.start || 0, ent.ende || 0) >= jetzt - 86400;
+    if (!ozLive || !ent.ev || ent.ev.kind !== 30023) return true;
+    const liste = peDaten && peDaten.liste ? tagWerte(peDaten.liste, 'p') : [];
+    return [...k(ent.id), ...k('p:' + ent.pk)].some(i => i.startsWith('c:')) || liste.includes(ent.pk);
+  }
+  /** Anzeigename, schon maskiert */
+  function ozName(e) {
+    if (e.cy) return esc(e.cy.n);
+    if (e.titel) return esc(e.titel);
+    if (e.typ === 'person' || e.typ === 'community') return bzName(e);
+    return e.ev.kind === 30142 ? esc(mpMaterial(e.ev).t) : esc(tagWert(e.ev, 'title') || tagWert(e.ev, 'name') || tagWert(e.ev, 'd'));
+  }
+  /** Untertitel, höchstens 90 Zeichen, maskiert */
+  function ozUntertitel(e) {
+    const kurz = t => { const x = String(t || '').replace(/\s+/g, ' ').trim(); return esc(x.length > 90 ? x.slice(0, 90).trimEnd() + '…' : x); };
+    if (e.sub) return esc(e.sub);
+    if (e.cy) return kurz(e.cy.bio);
+    if (e.typ === 'person' || e.typ === 'community') { const p = bzProfil(e.pk); return p ? kurz(ozEntesc(p.about)) : ''; }
+    return kurz(e.typ === 'event' ? tagWert(e.ev, 'summary') || e.ev.content : tagWert(e.ev, 'description') || tagWert(e.ev, 'summary') || e.ev.content);
+  }
+  /** Bild-Adresse (noch ungeprüft): Profilbild bei Personen und Communities, sonst das image-Tag */
+  function ozBild(e) {
+    if (e.cy) return '';
+    if (e.typ === 'person' || e.typ === 'community') return (bzProfil(e.pk) || {}).bild || '';
+    return e.ev ? tagWert(e.ev, 'image') : '';
+  }
+  /** Eine Karte (HTML-String); Form je Typ über die Klasse, Platzhalter mit Initialen in einer Farbe aus dem Hash der Kennung */
+  function ozKarte(id) {
+    const g = ozGefuege, e = g && g.ents.get(id); if (!e) return '';
+    const nm = ozName(e), bild = sichereUrl(ozBild(e)), farbe = parseInt(kurzHash(id).slice(0, 3), 16) % 360;
+    const nb = typ => bzNachbarn(g.kanten, g.ents, id, typ);
+    let pille;
+    if (e.typ === 'person') pille = ICH.hex && e.pk === ICH.hex ? 'Das bist du' : nb('community').length + (nb('community').length === 1 ? ' Community' : ' Communities');
+    else if (e.typ === 'community') pille = ozLive ? nb('person').length + (nb('person').length === 1 ? ' Mitglied' : ' Mitglieder') : 'Community';
+    else if (e.typ === 'event') pille = e.start ? new Date(e.start * 1000).toLocaleDateString('de-DE') : 'Termin';
+    else pille = (e.ev && ambFeld(e.ev, 'learningResourceType').label) || (e.sub ? 'Material' : 'Beitrag');
+    const verbunden = [...nb('person'), ...nb('community')].filter(ozSichtbar);
+    const minis = verbunden.slice(0, 5).map(v => { const b = sichereUrl(ozBild(v)); return `<span class="oz-mini" style="--oz-h:${parseInt(kurzHash(v.id).slice(0, 3), 16) % 360}" title="${ozName(v)}">${ozIni(ozName(v))}${b ? `<img src="${esc(b)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`; }).join('');
+    const mehr = verbunden.length > 5 ? `<span class="oz-mehr">+${verbunden.length - 5}</span>` : '';
+    const gewaehlt = id === ozWahl;
+    return `<button type="button" class="oz-karte oz-${e.typ}" data-wahl="${esc(id)}" aria-pressed="${gewaehlt}" style="--oz-h:${farbe}">`
+      + `<span class="oz-bild" aria-hidden="true">${ozIni(nm)}${bild ? `<img src="${esc(bild)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`
+      + `<span class="oz-pille">${esc(pille)}</span><b class="oz-name">${nm}</b><span class="oz-untertitel">${ozUntertitel(e)}</span>`
+      + (minis ? `<span class="oz-minis" aria-hidden="true">${minis}${mehr}</span>` : '') + `</button>`;
+  }
+  /** Reihenfolge ohne Auswahl und bei Nachbarn: Personen und Communities nach bzPunkte, Beiträge, Termine und Materialien mit Community-Bezug zuerst, dann Datum (Termine aufsteigend, Materialien absteigend) */
+  function ozSortiert(liste, typ) {
+    const g = ozGefuege, name = e => ozEntesc(ozName(e));
+    if (typ === 'person' || typ === 'community') return liste.map(e => [bzPunkte(g.ents, g.kanten, e.id, ICH.hex), e]).sort((a, b) => b[0] - a[0] || name(a[1]).localeCompare(name(b[1]), 'de')).map(x => x[1]);
+    const bezug = e => [...(g.kanten.get(e.id) || []), ...(g.kanten.get('p:' + e.pk) || [])].some(i => i.startsWith('c:')) ? 1 : 0;
+    const datum = e => typ === 'event' ? e.start || 0 : e.ev ? (e.ev.kind === 30142 ? mpMaterial(e.ev).datum : +tagWert(e.ev, 'published_at') || e.ev.created_at) : 0;
+    return liste.map(e => [bezug(e), datum(e), e]).sort((a, b) => b[0] - a[0] || (typ === 'event' ? a[1] - b[1] : b[1] - a[1])).map(x => x[2]);
+  }
+  /** Hinweiszeile einer Reihe in einem Zug: n gezeigte Treffer (Spur zeigt höchstens 80), filter gesetzt, wahl = maskierter Name der Auswahl, nachbarn = Reihe zeigt Verbundenes, quelle = Zahl vor dem Textfilter */
+  function ozHinweis(a) {
+    const zahl = a.n > 80 ? `80 von ${a.n}` : `${a.n}`;
+    if (a.nachbarn) return !a.quelle ? `Keine Verbindung zu „${a.wahl}“` : !a.n ? 'Nichts gefunden.' : a.filter ? `${zahl} von ${a.quelle} verbunden mit „${a.wahl}“` : `${zahl} verbunden mit „${a.wahl}“`;
+    if (a.wahl) return !a.n ? `„${a.wahl}“ gewählt · ${a.filter ? 'nichts gefunden' : 'keine weiteren'}` : `„${a.wahl}“ gewählt · ${zahl} weitere`;
+    return !a.n ? (a.filter ? 'Nichts gefunden.' : 'Keine Einträge') : a.n > 80 ? `80 von ${a.n} Einträgen` : `${a.n} ${a.n === 1 ? 'Eintrag' : 'Einträge'}`;
+  }
+  /** Teile der Reihe `i`: Hinweiszeile, Fokuskarte (die gewählte, in der Reihe ihres Typs) und Spur (höchstens 80 Karten) */
+  function ozTeile(i) {
+    const g = ozGefuege, typ = ozReihenFolge[i], wahl = ozWahl ? g.ents.get(ozWahl) : null, nachbarn = !!wahl && wahl.typ !== typ;
+    const q = ozFilter[typ].trim().toLowerCase();
+    const quelle = (nachbarn ? bzNachbarn(g.kanten, g.ents, wahl.id, typ) : [...g.ents.values()].filter(e => e.typ === typ && (!wahl || e.id !== wahl.id))).filter(ozSichtbar);
+    const liste = ozSortiert(quelle.filter(e => !q || ozEntesc(ozName(e) + ' ' + ozUntertitel(e)).toLowerCase().includes(q)), typ);
+    const hinweis = ozHinweis({ n: liste.length, filter: !!q, wahl: wahl ? ozName(wahl) : '', nachbarn, quelle: quelle.length });
+    return { hinweis, fokus: wahl && !nachbarn ? ozKarte(wahl.id) : '', spur: liste.slice(0, 80).map(e => ozKarte(e.id)).join('') || '<p class="oz-leer">Hier ist nichts zu sehen.</p>' };
+  }
+  const OZ_LUPE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>';
+  /** Reihe `i` mit Kopf (Titel, Lupe mit Filterfeld, Tauschknopf), Hinweiszeile, Fokuskarte und Spur */
+  function ozReihe(i) {
+    const typ = ozReihenFolge[i], t = ozTeile(i), offen = ozOffen.has(typ), titel = OZ_TITEL[typ], naechste = OZ_TITEL[ozReihenFolge[i + 1]];
+    return `<section class="oz-reihe" data-reihe="${i}" aria-label="${titel}"><div class="oz-kopf"><h2>${titel}</h2>`
+      + `<button type="button" class="oz-lupe" data-lupe="${typ}" aria-expanded="${offen}" aria-label="${titel} filtern">${OZ_LUPE}</button>`
+      + `<input type="search" data-filter="${typ}" value="${esc(ozFilter[typ])}" placeholder="filtern" aria-label="${titel} filtern"${offen ? '' : ' hidden'}>`
+      + (i < 3 ? `<button type="button" class="oz-tausch" data-tausch="${i}" title="${titel} und ${naechste} tauschen" aria-label="${titel} und ${naechste} tauschen">⇅</button>` : '')
+      + `</div><p class="oz-hinweis" data-hinweis>${t.hinweis}</p><div class="oz-bahn"><div class="oz-fokus">${t.fokus}</div><div class="oz-spur">${t.spur}</div></div></section>`;
+  }
+  /** Adresse „Bei edufeed ansehen“ der Auswahl oder leer: Community und Material bei edufeed.org beziehungsweise im Hub, Person im Hub, Termin bei edufeed */
+  function ozLink(e) {
+    const npub = istHex64(e.pk) ? bech32('npub', e.pk.match(/../g).map(h => parseInt(h, 16))) : '';
+    if (e.typ === 'community') return npub ? 'https://edufeed.org/c/' + npub : '';
+    if (e.typ === 'person') return npub ? '#person?p=' + npub : '';
+    if (!e.ev) return '';
+    if (e.typ === 'event') return sichereUrl(evToTermin(e.ev).u);
+    const d = tagWert(e.ev, 'd');
+    if (e.ev.kind === 30142) return `#materialpool?d=${encodeURIComponent(d)}&p=${e.pk}`;
+    return sichereUrl(e.pk === FO_HEX ? beitragUrl(e.ev) : 'https://edufeed.org/' + naddr(d, e.pk, e.ev.kind));
+  }
+  /** Auswahlzeile über den Reihen: Typ, Name, Link, Knopf ✕ */
+  function ozAuswahlRender() {
+    const el = document.getElementById('ozAuswahl'), e = ozGefuege && ozWahl ? ozGefuege.ents.get(ozWahl) : null;
+    if (!e) { el.hidden = true; el.innerHTML = ''; return; }
+    const href = ozLink(e), extern = /^https?:/.test(href);
+    el.innerHTML = `<span class="oz-typ">${OZ_ART[e.typ]}</span><b>${ozName(e)}</b>` + (href ? `<a href="${esc(href)}"${extern ? ' target="_blank" rel="noopener"' : ''}>Bei edufeed ansehen ›</a>` : '') + `<button type="button" data-aufheben aria-label="Auswahl aufheben">✕</button>`;
+    el.hidden = false;
+  }
+  function ozRender() {
+    if (!ozGefuege) return;
+    document.getElementById('ozReihen').innerHTML = ozReihenFolge.map((_, i) => ozReihe(i)).join('');
+    ozAuswahlRender();
+    document.getElementById('ozMeldung').textContent = ozMeldung;
+  }
+  /** Route zur Auswahl und Reihenfolge schreiben, ohne nach oben zu springen */
+  function ozRoute() {
+    const p = [];
+    if (ozWahl) p.push('wahl=' + encodeURIComponent(ozWahl));
+    if (ozReihenFolge.join() !== OZ_STANDARD.join()) p.push('reihen=' + ozReihenFolge.join(','));
+    CUR = 'oekosystem' + (p.length ? '?' + p.join('&') : '');
+    try { history.pushState(null, '', '#' + CUR); } catch (e) {}
+    ozRender();
+  }
+  /** Karte wählen (die gewählte noch einmal wählen hebt auf), `id` leer hebt auf */
+  function ozWaehlen(id) {
+    ozWahl = id && id !== ozWahl ? id : '';
+    ozRoute();
+    const k = ozWahl && [...document.querySelectorAll('#v-oekosystem .oz-karte')].find(b => b.dataset.wahl === ozWahl); if (k) k.focus();
+  }
+  function ozOpen(qs) {
+    const p = new URLSearchParams(qs || ''), r = (p.get('reihen') || '').split(',');
+    ozReihenFolge = r.length === 4 && OZ_STANDARD.every(t => r.includes(t)) ? r : OZ_STANDARD.slice();
+    ozWahl = p.get('wahl') || '';
+    const lauf = ++ozLauf;
+    if (!ozGefuege) { ozGefuege = ozSchnappschuss(); ozLive = false; datenstand('v-oekosystem', 'stand', ozStandDatum()); }
+    ozMeldung = ozLive ? '' : 'Verbindungen werden geladen …';
+    ozRender();
+    Promise.all([mpLaden(), ocLaden(), kalLaden(), peLaden(), bzLaden(), ...CO_SCHLUESSEL.map(k => coLaden(k.hex))]).then(r => cyLaden().then(() => r)).then(r => {
+      if (lauf !== ozLauf) return;   // späte Antwort einer früheren Öffnung
+      if (!r[4].antwort) {
+        if (!ozLive) datenstand('v-oekosystem', 'stand', ozStandDatum());
+        ozMeldung = 'Verbindungen können gerade nicht geladen werden'; ozRender(); return;
+      }
+      const g = ozBauen();
+      ozMeldung = '';
+      datenstand('v-oekosystem', 'live', `${[...g.ents.values()].filter(ozSichtbar).length} Einträge · ${[...g.kanten.values()].reduce((a, s) => a + s.size, 0) / 2} Kanten · ohne Rollenprüfung`);
+      ozRender();
+    }, () => {});
+  }
+  document.getElementById('v-oekosystem').addEventListener('click', e => {
+    const w = e.target.closest('[data-wahl]'), t = e.target.closest('[data-tausch]'), l = e.target.closest('[data-lupe]');
+    if (w) { ozWaehlen(w.dataset.wahl); return; }
+    if (e.target.closest('[data-aufheben]')) { ozWaehlen(''); return; }
+    if (t) {
+      const i = +t.dataset.tausch; [ozReihenFolge[i], ozReihenFolge[i + 1]] = [ozReihenFolge[i + 1], ozReihenFolge[i]];
+      ozRoute(); const n = document.querySelector(`#v-oekosystem [data-tausch="${i}"]`); if (n) n.focus(); return;
+    }
+    if (l) {
+      const typ = l.dataset.lupe, inp = document.querySelector(`#v-oekosystem [data-filter="${typ}"]`), auf = !ozOffen.has(typ);
+      if (auf) ozOffen.add(typ); else ozOffen.delete(typ);
+      l.setAttribute('aria-expanded', auf); inp.hidden = !auf; if (auf) inp.focus();
+    }
+  });
+  document.getElementById('v-oekosystem').addEventListener('input', e => {
+    const f = e.target.closest('[data-filter]'); if (!f) return;
+    ozFilter[f.dataset.filter] = f.value;   // nur Hinweis, Fokuskarte und Spur der Reihe neu zeichnen, damit das Feld den Fokus behält
+    const sec = f.closest('.oz-reihe'), t = ozTeile(+sec.dataset.reihe);
+    sec.querySelector('[data-hinweis]').innerHTML = t.hinweis; sec.querySelector('.oz-fokus').innerHTML = t.fokus; sec.querySelector('.oz-spur').innerHTML = t.spur;
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && ozWahl && document.getElementById('v-oekosystem').classList.contains('on')) ozWaehlen(''); });
 
   // ---------- Community-Räume (Funktionen nach edufeed.org; Inhalte Beispieldaten, relilab nach Screenshot) ----------
   const CR_ICON = {
@@ -4519,13 +4886,14 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const [viewRaw, qs] = raw.split('?');
     const [view, sub] = viewRaw.split('/');
     const finden = view === 'finden' && sub ? (['sammlung', 'fortbildungen'].includes(sub) ? sub : null) : view === 'kooperieren' && sub ? (sub === 'personen' ? sub : null) : undefined;   // finden/<sub>, kooperieren/<sub> → Ansicht v-<sub>
-    const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell', 'person'].includes(view) ? view : 'start');
+    const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell', 'person', 'oekosystem'].includes(view) ? view : 'start');
     if (finden === null) toast('Diese Seite gibt es nicht.');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
-    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'Fortbildungen', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
+    document.title = { start: 'reli_hub', profil: 'reli_hub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'Fortbildungen', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'reli_hub · Communities', oekosystem: 'reli_hub · Ökosystem', community: 'reli_hub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des reli_hub' }[v];
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || 'relilab', pp.get('zu') === 'katalog' ? 'katalog' : pp.get('tab')); }
     leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v === 'fortbildungen' ? 'rpi-virtuell' : v);
-    if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); }
+    if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); cyOpen(); }
+    if (v === 'oekosystem') ozOpen(qs);
     if (v === 'oercommunity') ocOpen(sub);
     if (v === 'relilab') rlShow(qs);
     if (v === 'rpi-virtuell') rvOpen(qs);
