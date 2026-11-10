@@ -25,17 +25,19 @@ Deno.test('Beziehungsgefüge: Signaturen, Abfrage, Doku', async () => {
 
 Deno.test('bzBauen: Kanten nur aus gültigen Bezügen', () => {
   const bz = bau('bzBauen', fn('aTagLesen') + fn('repostZiel') + fn('bzVerbinde') + fn('bzZeit'));
-  const A = 'aa'.repeat(32), B = 'bb'.repeat(32), C = 'cc'.repeat(32), ID = 'dd'.repeat(32);
-  const mat = { id: ID, kind: 30142, pubkey: A, created_at: 10, tags: [['d', 'm1'], ['h', C]] };
+  const A = 'aa'.repeat(32), B = 'bb'.repeat(32), C = 'cc'.repeat(32), ID = 'dd'.repeat(32), F = '99'.repeat(32), G = '88'.repeat(32);
+  const mat = { id: ID, kind: 30142, pubkey: A, created_at: 10, tags: [['d', 'm1'], ['h', C], ['h', F]] };
   const term = { id: 'ee'.repeat(32), kind: 31923, pubkey: A, created_at: 11, tags: [['d', 't1'], ['start', '1800000000'], ['p', B]] };
   const q = { materialien: [mat], beitraege: [], termine: [term], reposts: [{ kind: 16, pubkey: B, created_at: 12, tags: [['a', `30142:${A}:m1`], ['h', C]] }, { kind: 16, pubkey: B, created_at: 13, tags: [['e', 'ff'.repeat(32)]] }],
-    mitgliedschaften: [{ kind: 30000, pubkey: B, created_at: 14, tags: [['d', 'communities'], ['p', C], ['p', 'kaputt']] }],
+    mitgliedschaften: [{ kind: 30000, pubkey: B, created_at: 14, tags: [['d', 'communities'], ['p', C], ['p', 'kaputt'], ['p', F]] }, { kind: 30000, pubkey: G, created_at: 14, tags: [['d', 'communities'], ['p', F]] }],
     zusagen: [{ kind: 31925, pubkey: B, created_at: 15, tags: [['a', `31923:${A}:t1`], ['status', 'declined']] }, { kind: 31925, pubkey: B, created_at: 16, tags: [['a', `31923:${A}:t1`], ['status', 'accepted']] }],
     reaktionen: [{ kind: 7, pubkey: B, created_at: 17, content: '-', tags: [['e', ID]] }, { kind: 7, pubkey: B, created_at: 18, content: '+', tags: [['e', ID]] }],
     personenListe: [], communities: [C] };
   const { ents, kanten } = bz(q);
   assert(ents.has('p:' + A) && ents.has('p:' + B) && ents.has('c:' + C) && ents.has(`m:30142:${A}:m1`) && ents.has(`e:31923:${A}:t1`), 'Entitäten');
   assert(!ents.has('p:kaputt') && !ents.has('c:kaputt'), 'kaputter Schlüssel ergibt nichts');
+  assert(!ents.has('c:' + F) && !ents.has('p:' + F) && !kanten.has('c:' + F) && !kanten.has('p:' + F), 'gültiger fremder Schlüssel in p- oder h-Tag ergibt weder Community noch Kante');
+  assert(!ents.has('p:' + G) && !kanten.has('p:' + G), 'Liste nur mit fremden Schlüsseln: keine Person, keine Kante');
   const n = (id: string) => [...(kanten.get(id) || [])].sort();
   assertEquals(n(`m:30142:${A}:m1`), ['c:' + C, 'p:' + A, 'p:' + B].sort(), 'Material: Autor, h-Community, Repost-Community bleibt C, Reaktion B');
   assertEquals(n(`e:31923:${A}:t1`), ['p:' + A, 'p:' + B].sort(), 'Termin: Autor, p-Tag, Zusage (declined zählt nicht)');
@@ -74,6 +76,21 @@ Deno.test('Communities live: cyAus, Partnerkacheln, RpiCommunity ausgeblendet', 
   assert(html.includes('id="v-communities" data-stand="stand:26.10.2026 · Texte teils Beispiel"'), 'Startwert bleibt');
 });
 
+Deno.test('Communities live: echter Knopf „Beitreten“ statt Beispiel-Folgen, keine Persona', () => {
+  const stubs = "const cyBtn = c => '<button data-cyf=\"' + c.id + '\">Folgen</button>'; const akKnopf = (was, ziel, label) => '<button data-ak=\"' + was + '\" data-ziel=\"' + ziel + '\">' + label + '</button>';"
+    + "const cyAv = () => ''; const cyRel = () => ''; const SHIELD = ''; const PARTNERS = []; const CY = [{ id: 'relilab' }]; const CO_SCHLUESSEL = [{ id: 'relilab' }];";
+  const cc = bau('cyCards', stubs), H = 'ab'.repeat(32);
+  const mitSchluessel = cc([{ id: 'relilab', n: 'relilab', bio: '', back: '', m: 3, hex: H, live: true, mine: 'Mitglied' }], true, null, true);
+  assert(mitSchluessel.includes(`data-ak="beitreten" data-ziel="${H}"`) && !/data-cyf/.test(mitSchluessel) && !/Mitglied ✓|Folge ich/.test(mitSchluessel), 'live mit Schlüssel: Beitreten, keine Persona');
+  const ohne = cc([{ id: 'oercommunity', n: 'OER', bio: '', back: '', m: 0, mine: 'folge ich' }], true, null, true);
+  assert(!/data-cyf|data-ak/.test(ohne), 'live ohne Schlüssel: kein Knopf');
+  assert(/data-cyf/.test(cc([{ id: 'relilab', n: 'relilab', bio: '', back: '', m: 3 }], true)), 'eingebetteter Stand: Beispiel-Knopf bleibt');
+  const r = fn('cyRender');
+  assert(/cyCards\(\[\.\.\.vorn, \.\.\.schau\], true, null, true\)/.test(r) && /live \? !!\(istHex64\(c\.hex\) && akZustand\('beitreten', c\.hex\)\) : cyFollow\.has\(c\.id\)/.test(r), 'live: echter Knopf und „meine“ aus der eigenen Mitgliedsliste');
+  assert(/\$\{hx \? '' : `<button type="button" class="cr-fol/.test(fn('crRender')), 'Raum mit Schlüssel: kein Beispiel-Folgen');
+  assert(/'communities'\) cyRender\(\)/.test(fn('akZeichnen')), 'nach dem Beitreten neu zeichnen');
+});
+
 Deno.test('ozHinweis: Hinweiszeile in einem Zug, ohne doppelte Umhüllung', () => {
   const h = bau('ozHinweis');
   assertEquals(h({ n: 3, filter: false, wahl: '', nachbarn: false, quelle: 3 }), '3 Einträge');
@@ -103,6 +120,35 @@ Deno.test('pkEintrag: Sätze je Kind, Kommentar als Text, ohne Ziel null', () =>
   assertEquals(pe({ id: 'k2', kind: 7, pubkey: A, created_at: 6, content: '+', tags: [['e', 'ff'.repeat(32)]] }, g), null, 'ohne Ziel null');
   const r = pe({ id: 'k3', kind: 16, pubkey: A, created_at: 7, tags: [['a', `30142:${A}:m1`], ['h', C]] }, g);
   assert(r && /geteilt/.test(r.html) && r.bezug.includes('c:' + C) && r.bezug.includes('p:' + A), 'Repost mit Community');
+});
+
+Deno.test('Protokoll live: nur Brauchbares, gekappt, Ökosystem nur bei geändertem Gefüge', () => {
+  const pb = bau('pkBrauchbar', fn('aTagLesen') + fn('repostZiel'));
+  const A = 'aa'.repeat(32), C = 'cc'.repeat(32), F = '99'.repeat(32), M = 'dd'.repeat(32), comm = new Set([C]);
+  const g = { ents: new Map([[`m:30142:${A}:m1`, { id: `m:30142:${A}:m1`, typ: 'material', pk: A, ev: { id: M, kind: 30142, pubkey: A, tags: [['d', 'm1']] } }], ['c:' + C, { id: 'c:' + C, typ: 'community', pk: C }]]), kanten: new Map() };
+  const ev = (kind: number, tags: string[][], content = 'x', id = 'e' + Math.random()) => ({ id, kind, pubkey: A, created_at: 1, content, tags });
+  assert(pb(ev(1, [['h', C]]), g, comm), 'kind 1 in bekannter Community');
+  assert(!pb(ev(1, []), g, comm) && !pb(ev(1, [['h', F]]), g, comm) && !pb(ev(1, [['h', C]], '  '), g, comm), 'kind 1 ohne bekannte Community oder ohne Text fällt weg');
+  assert(!pb(ev(4, [['h', C]]), g, comm) && !pb(ev(30001, [['d', 'x']]), g, comm), 'Kinds, die das Protokoll nicht zeigt');
+  assert(pb(ev(7, [['e', M]], '+'), g, comm) && pb(ev(7, [['a', `30142:${A}:m1`]], '+'), g, comm), 'Reaktion auf bekanntes Ziel');
+  assert(!pb(ev(7, [['e', 'ff'.repeat(32)]], '+'), g, comm) && !pb(ev(31925, [['a', `31923:${A}:t9`], ['status', 'accepted']]), g, comm), 'Reaktion und Zusage ohne bekanntes Ziel fallen weg');
+  assert(pb(ev(1111, [['A', `30142:${A}:m1`]], 'gut'), g, comm) && !pb(ev(1111, [['A', `30142:${A}:m1`]], ''), g, comm), 'Kommentar nur mit Ziel und Text');
+  assert(pb(ev(16, [['a', `30142:${A}:m1`], ['h', C]]), g, comm) && !pb(ev(16, [['e', 'ff'.repeat(32)]]), g, comm), 'Repost nur mit bekanntem Ziel');
+  assert(pb(ev(30000, [['d', 'communities'], ['p', C]]), g, comm) && !pb(ev(30000, [['d', 'communities'], ['p', F]]), g, comm) && !pb(ev(30000, [['d', 'andere'], ['p', C]]), g, comm), 'Beitritt nur zu bekannter Community');
+  assert(pb(ev(30142, [['d', 'neu']]), g, comm) && !pb(ev(30142, []), g, comm), 'eigene Inhalte mit d');
+  assert(pb(ev(7, [['e', 'ff'.repeat(32)]], '+'), null, comm), 'vor dem ersten Gefüge zählt nur die Form');
+  const kap = bau('pkKappen'), ich = 'ee'.repeat(32);
+  const liste = Array.from({ length: 700 }, (_, i) => ({ id: 'i' + i, pubkey: i === 3 ? ich : A })), gesehen = new Set(liste.map((e) => e.id)), marke = new Map(liste.map((e) => [e.id, 1]));
+  kap(liste, gesehen, marke, 500, ich);
+  assertEquals(liste.length, 500); assert(liste.some((e) => e.id === 'i3'), 'eigenes Event bleibt');
+  assertEquals(liste[1].id, 'i201', 'die ältesten fremden gehen zuerst'); assertEquals(liste.at(-1)!.id, 'i699');
+  assertEquals(gesehen.size, 500); assert(gesehen.has('i699') && !gesehen.has('i0'), 'gesehene Kennungen: älteste hinaus');
+  assert(!marke.has('i0') && marke.has('i699'), 'Marken mit ihrem Event');
+  const le = fn('pkLiveEvent'), bu = fn('pkBuendeln'), nz = fn('ozNachzeichnen');
+  assert(/pkBrauchbar\(ev, /.test(le) && le.indexOf('pkBrauchbar') < le.indexOf('pkNeu.push'), 'pkLiveEvent verwirft vor dem Sammeln');
+  assert(/pkKappen\(pkLive, pkGesehen, pkMarke, PK_MAX, ICH\.hex\)/.test(bu) && /const PK_MAX = 500/.test(s), 'pkBuendeln kappt');
+  assert(/bzMass\(ozGefuege\) !== vorher\) ozNachzeichnen\(\)/.test(bu) && !/ozRender\(\)/.test(bu), 'Ökosystem nur bei geändertem Gefüge');
+  assert(/input, select, textarea/.test(nz) && /ozVeraltet = true/.test(nz), 'nicht bei Fokus in einem Eingabefeld');
 });
 
 Deno.test('Mitmachen: Ansicht, Abfrage, Zustände, Protokoll im Ökosystem', () => {

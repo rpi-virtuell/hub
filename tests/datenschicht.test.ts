@@ -104,3 +104,47 @@ Deno.test('hubAbonnieren: eine Verbindung je Relay, since gesetzt, Wiederverbind
   assert(offen.length <= 3 + 5, 'höchstens fünf Wiederverbindungen');
   api.hubAbbestellen('t'); assertEquals(api.hubAbos.size, 0);
 });
+
+Deno.test('hubBuendeln: ein REQ je Relay für alle Aufrufe, Antwort je Aufruf aufgeteilt und zwischengespeichert; coLaden findet danach den Cache', async () => {
+  const H1 = '11'.repeat(32), H2 = '22'.repeat(32), H3 = '33'.repeat(32);
+  const E1 = { id: 'e1', kind: 30142, pubkey: 'aa'.repeat(32), created_at: 5, tags: [['d', 'm'], ['h', H1]] };
+  const E2 = { id: 'e2', kind: 16, pubkey: 'bb'.repeat(32), created_at: 6, tags: [['a', `30142:${'aa'.repeat(32)}:m`], ['h', H2]] };
+  const E3 = { id: 'e3', kind: 0, pubkey: H1, created_at: 1, tags: [], content: '{}' };
+  const E4 = { id: 'e4', kind: 30004, pubkey: H3, created_at: 7, tags: [['d', 'katalog']] };
+  const socks: any[] = [];
+  class WS {
+    url: string; onopen: any; onmessage: any; onerror: any; onclose: any; sent: any[] = [];
+    constructor(u: string) { this.url = u; socks.push(this); queueMicrotask(() => this.onopen && this.onopen()); }
+    send(x: string) {
+      const req = JSON.parse(x); this.sent.push(req);
+      const m = (d: unknown) => queueMicrotask(() => this.onmessage && this.onmessage({ data: JSON.stringify(d) }));
+      for (const ev of [E1, E2, E3, E4]) m(['EVENT', req[1], ev]); m(['EOSE', req[1]]);
+    }
+    close() {}
+  }
+  const ablage: Record<string, string> = {};
+  const ss = { getItem: (k: string) => ablage[k] ?? null, setItem: (k: string, v: string) => { ablage[k] = v; }, removeItem: (k: string) => { delete ablage[k]; } };
+  const fnSrc = (name: string) => s.match(new RegExp(`  function ${name}\\([^)]*\\) \\{[\\s\\S]*?\\n  \\}`))![0];
+  const istHex64 = (x: string) => /^[0-9a-f]{64}$/.test(x || '');
+  const tagWert = (ev: any, n: string) => (ev.tags.find((t: string[]) => t[0] === n) || [])[1] || '';
+  const tagWerte = (ev: any, n: string) => ev.tags.filter((t: string[]) => t[0] === n).map((t: string[]) => t[1]);
+  const api = new Function('WebSocket', 'sessionStorage', 'istHex64', 'tagWert', 'tagWerte', 'sichereUrl', datenschicht
+    + `const CO_SCHLUESSEL = [{ hex: '${H1}' }, { hex: '${H2}' }, { hex: '${H3}', eigene: true }]; const coDaten = new Map(); const ocLaden = () => Promise.resolve({ seiten: new Map(), beitraege: [], termine: [] });`
+    + fnSrc('aTagLesen') + fnSrc('listeEintraege') + fnSrc('entferntAus') + fnSrc('coLaden') + '; return { hubFetch, hubBuendeln, coLaden, coDaten };')(WS, ss, istHex64, tagWert, tagWerte, (u: string) => u);
+  // zwei einfache Aufrufe
+  const [p1, p2] = api.hubBuendeln('b', () => [api.hubFetch('t1', [{ kinds: [30142], '#h': [H1] }, { kinds: [0], authors: [H1], limit: 1 }]), api.hubFetch('t2', [{ kinds: [16], '#h': [H2] }])]);
+  const [r1, r2] = await Promise.all([p1, p2]);
+  assertEquals(socks.length, 3, 'ein Socket je Relay für beide Aufrufe'); assert(socks.every((w) => w.sent.length === 1 && w.sent[0].length === 2 + 3), 'ein REQ mit allen Filtern');
+  assertEquals(r1.map((e: any) => e.id).sort(), ['e1', 'e3']); assertEquals(r2.map((e: any) => e.id), ['e2'], 'Antwort je Aufruf nach seinen Filtern');
+  assert(ablage['relihub:t1'] && ablage['relihub:t2'] && !ablage['relihub:b'], 'Zwischenspeicher je Aufruf, keiner für die Sammelabfrage');
+  assertEquals(await api.hubFetch('t1', [{}]), r1); assertEquals(socks.length, 3, 'späterer Einzelaufruf aus dem Cache');
+  // die Community-Abfragen der Ökosystem-Ansicht
+  const vorher = socks.length;
+  const laeufe = api.hubBuendeln('communities', () => [H1, H2, H3].map((h) => api.coLaden(h)));
+  const daten = await Promise.all(laeufe);
+  assertEquals(socks.length - vorher, 3, 'drei Communities, ein REQ je Relay');
+  assertEquals(socks.at(-1).sent[0].length, 2 + 5 + 5 + 1, 'alle Filter in einem REQ');
+  assertEquals(daten[0].direkt.map((e: any) => e.id), ['e1']); assertEquals(daten[1].reposts.map((e: any) => e.id), ['e2']); assertEquals(daten[2].listen.length, 1, 'eigene Community: Liste aus der Sammelabfrage');
+  assertEquals(daten[0].antwort, true); assertEquals(daten[1].antwort, true);
+  assert(api.coLaden(H1) === laeufe[0] && api.coLaden(H2) === laeufe[1], 'coLaden(hex) findet den Cache warm'); assertEquals(socks.length - vorher, 3);
+});
