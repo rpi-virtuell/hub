@@ -52,7 +52,7 @@ Deno.test('sammlungListe: d aus Filter, höchstens 100 Einträge, kein Hub-Name'
 Deno.test('Aktionen: nur mit Signer, frisch holen, Relays zählen, kein nsec', () => {
   assert(/const ICH = \{ hex: null, kann: false \}/.test(s) && /window\.nostr/.test(fn('anmelden')) && !/nsec/.test(s.replace(/nsec1…|kein nsec|nie nach einem nsec/g, '')), 'NIP-07, kein nsec im Skript');
   const a = fn('aktion');
-  assert(/listeErgaenzen\(/.test(a) && /authors: \[ICH\.hex\]/.test(a) && /kinds: \[3\]/.test(a) && /kinds: \[30000\]/.test(a) && /kind: 31925/.test(a) && /kind: 7/.test(a) && /sammlungListe\(/.test(a), 'alle Aktionen über Listen-Ergänzung und Vorlagen');
+  assert(/listeSchreiben\(/.test(a) && /listeErgaenzen\(/.test(fn('listeSchreiben')) && /authors: \[ICH\.hex\]/.test(a) && /kinds: \[3\]/.test(a) && /kinds: \[30000\]/.test(a) && /kind: 31925/.test(a) && /kind: 7/.test(a) && /sammlungListe\(/.test(a), 'alle Aktionen über Listen-Ergänzung und Vorlagen');
   const su = fn('signierenUndSenden');
   assert(/ICH\.kann/.test(su) && /Signieren abgebrochen/.test(su) && /Kein Relay hat/.test(su) && /angenommen von/.test(su), 'Zustände');
   assert(/function hubSenden\(ev\)/.test(s) && /'OK'/.test(fn('hubSenden')) && /RELAYS/.test(fn('hubSenden')), 'Senden an die drei Relays mit OK');
@@ -82,4 +82,46 @@ Deno.test('hubSenden: drei Relays, zählt nur OK mit true und passender id, schl
   assertEquals(socks.length, 3); assert(socks.every((w) => w.zu), 'jede Verbindung geschlossen');
   assert(socks.every((w) => w.gesendet.length === 1 && w.gesendet[0][0] === 'EVENT' && w.gesendet[0][1].id === ev.id), 'je Relay einmal EVENT');
   assert(Date.now() - t0 < 2000, 'löst nach der Zeitgrenze auf');
+});
+
+Deno.test('listeSchreiben: ohne Antwort nichts, fehlende Liste fragt, Sitzungskopie gewinnt, kind 3 fragt immer, Sammlung wird ergänzt', async () => {
+  const ls = bau('listeSchreiben', fn('listeErgaenzen')), ich = 'aa'.repeat(32), B = 'bb'.repeat(32), C = 'cc'.repeat(32), D = 'dd'.repeat(32);
+  const lauf = async (evs: any[], a: any, sitzung: any = null, ja = true) => {
+    const r = { gesendet: [] as any[], fragen: [] as string[], meldungen: [] as string[] };
+    const ok = await ls(a, { ich, sitzung, holen: () => Promise.resolve(evs), senden: (v: any) => { r.gesendet.push(v); return Promise.resolve(true); }, fragen: (q: string) => { r.fragen.push(q); return ja; }, melden: (m: string) => r.meldungen.push(m), merken: () => {} });
+    return Object.assign(r, { ok });
+  };
+  const gesund = { kind: 0, pubkey: 'ff'.repeat(32), created_at: 1, tags: [], content: '{}' };
+  const beitreten = { filter: {}, kind: 30000, d: 'communities', tags: [['p', C]], frage: 'neu?', schon: 'schon', erfolg: 'ok' };
+  const leer = await lauf([], beitreten);
+  assertEquals(leer.gesendet.length, 0); assert(/antworten gerade nicht/.test(leer.meldungen[0]), 'leere Antwort sendet nichts');
+  const nein = await lauf([gesund], beitreten, null, false);
+  assertEquals(nein.fragen, ['neu?']); assertEquals(nein.gesendet.length, 0, 'fehlende Liste: erst fragen, Nein sendet nichts');
+  const ja = await lauf([gesund], beitreten);
+  assertEquals(ja.gesendet[0].tags, [['d', 'communities'], ['p', C]]);
+  const alt = { kind: 30000, pubkey: ich, created_at: 10, content: '', tags: [['d', 'communities'], ['p', B]] };
+  const sitz = { kind: 30000, pubkey: ich, created_at: 20, content: '', tags: [['d', 'communities'], ['p', B], ['p', D]] };
+  const s1 = await lauf([gesund, alt], beitreten, sitz);
+  assertEquals(s1.fragen.length, 0); assertEquals(s1.gesendet[0].tags, [['d', 'communities'], ['p', B], ['p', D], ['p', C]], 'Sitzungskopie ist neuer und gewinnt');
+  const s2 = await lauf([gesund, sitz], beitreten, alt);
+  assertEquals(s2.gesendet[0].tags, [['d', 'communities'], ['p', B], ['p', D], ['p', C]], 'frische Antwort ist neuer und gewinnt');
+  const k3alt = { kind: 3, pubkey: ich, created_at: 1700000000, content: 'r', tags: [['p', B], ['p', D]] };
+  const folgen = { filter: {}, kind: 3, d: null, tags: [['p', C]], nameText: 'Name', frage: 'keine Liste?', schon: 'schon', erfolg: 'ok' };
+  const k3nein = await lauf([gesund, k3alt], folgen, null, false);
+  assertEquals(k3nein.gesendet.length, 0); assert(/^Gefunden: Folgeliste vom .+ mit 2 Einträgen\. Sie wird um Name ergänzt und neu veröffentlicht\. Folgst du anderswo mehr Personen, gehen diese Einträge verloren\. Fortfahren\?$/.test(k3nein.fragen[0]), 'kind 3 fragt auch mit Liste');
+  const k3ja = await lauf([gesund, k3alt], folgen);
+  assertEquals(k3ja.gesendet[0], { kind: 3, content: 'r', tags: [['p', B], ['p', D], ['p', C]] });
+  assertEquals((await lauf([gesund], folgen, null, false)).fragen, ['keine Liste?']);
+  const samm = { kind: 30004, pubkey: ich, created_at: 5, content: '', tags: [['d', 'sammlung'], ['title', 'Meine Sammlung'], ['a', '30142:' + B + ':x']] };
+  const zur = { filter: {}, kind: 30004, d: 'sammlung', tags: [['a', '30142:' + B + ':y']], basis: { kind: 30004, content: '', tags: [['title', 'Meine Sammlung']] }, schon: 'schon drin', erfolg: 'ok' };
+  const z = await lauf([gesund, samm], zur);
+  assertEquals(z.fragen.length, 0); assertEquals(z.gesendet[0].tags, [['d', 'sammlung'], ['title', 'Meine Sammlung'], ['a', '30142:' + B + ':x'], ['a', '30142:' + B + ':y']], 'bestehende Sammlung ergänzt, nicht ersetzt');
+  const doppelt = await lauf([gesund, samm], { ...zur, tags: [['a', '30142:' + B + ':x']] });
+  assertEquals(doppelt.gesendet.length, 0); assertEquals(doppelt.meldungen, ['schon drin']);
+});
+
+Deno.test('aktion: Reaktion und Zusage nur mit 64-Hex-Event-Kennung', () => {
+  const a = fn('aktion');
+  assert(/!istHex64\(ev\.id\)/.test(a) && /fehlt die Event-Kennung/.test(a), 'ohne e-Tag kein kind 7 und kein kind 31925');
+  assert(!/\.\.\.\(istHex64\(ev\.id\) \? \[\['e'/.test(a), 'e-Tag nicht mehr optional');
 });

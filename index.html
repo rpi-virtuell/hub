@@ -5586,6 +5586,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   /** Gesendetes Event in die Quellen der Sitzung: Protokoll (pkLive), eigene Listen und Inhalte; Gefüge und Protokoll neu */
   function akAufnehmen(ev) {
     if (!pkGesehen.has(ev.id)) { pkGesehen.add(ev.id); pkLive.push(ev); pkMarke.set(ev.id, Date.now()); }
+    if (!ichDaten && (ev.kind === 3 || ev.kind === 30000)) ichDaten = { antwort: false, profil: null, liste: null, kontakte: null };   // Sitzungskopie auch dann halten, wenn das Profil noch lädt (ichLaden übernimmt die neuere)
     ichListeMerken(ev);
     if (ev.kind === 3 || ev.kind === 30000) { try { sessionStorage.removeItem('relihub:ich:' + ICH.hex); } catch (e) {} }   // nach dem Neuladen nicht die alte Liste aus dem Zwischenspeicher
     if (ichInhalte && [30004, 30142, 30023, 31923].includes(ev.kind)) ichInhalte.evs = [ev, ...ichInhalte.evs];
@@ -5638,50 +5639,56 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const p = bzProfil(hex), k = CO_SCHLUESSEL.find(x => x.hex === hex), c = CY.find(x => x.id === CY_HEX.get(hex));
     return p ? p.name : k ? esc(k.n) : c ? esc(c.n.replace(/­/g, '')) : esc(zuschnittNpub(hex).slice(0, 12) + '…');
   }
-  /** Eine Aktion auf Klick: folgen, beitreten, zusagen, vielleicht, gefaellt, sammlungSpeichern, zurSammlung. Listen vorher frisch holen und ergänzen. Liefert true, wenn gesendet wurde. */
+  /** Liste frisch von den Relays: am Zwischenspeicher vorbei (Name mit Zeitstempel, danach entfernt); der zweite Filter belegt, dass ein Relay geantwortet hat */
+  function frischHolen(filter) {
+    const name = 'ich:frisch:' + Date.now();
+    return hubFetch(name, [filter, { kinds: [0], authors: [FO_HEX], limit: 1 }]).then(evs => { try { sessionStorage.removeItem('relihub:' + name); } catch (e) {} return evs; });
+  }
+  /** Eine Liste (kind 3, 30000, 30004) ergänzen und senden. `a`: { filter, kind, d, tags, basis, frage, schon, erfolg, nameText }; `dep`: { ich, sitzung, holen(filter), senden(vorlage, erfolg), fragen(text), melden(html), merken(ev) }.
+   *  Grundlage ist die neuere von frischer Antwort und Sitzungskopie; ohne Antwort wird nichts gesendet; fehlt die Liste, wird vor dem Anlegen gefragt; kind 3 fragt immer (die Folgeliste ist global, gelesen werden nur drei Relays). */
+  function listeSchreiben(a, dep) {
+    return dep.holen(a.filter).then(evs => {
+      if (!evs || !evs.length) { dep.melden('Die Relays antworten gerade nicht; nichts gesendet.'); return false; }
+      const passt = e => !!e && e.kind === a.kind && e.pubkey === dep.ich && (a.kind === 3 || tagWert(e, 'd') === a.d);
+      const alt = [...evs.filter(passt), dep.sitzung].filter(passt).sort((x, y) => y.created_at - x.created_at)[0] || null;
+      if (alt && dep.merken) dep.merken(alt);
+      let neu = alt || a.basis || null, anders = false;
+      for (const t of a.tags) { const n = listeErgaenzen(neu, a.kind, a.d, t); if (n) { neu = n; anders = true; } }   // bisherige Einträge bleiben, neue kommen dazu
+      if (!anders) { dep.melden(a.schon); return false; }
+      const datum = alt ? new Date(alt.created_at * 1000).toLocaleDateString('de-DE') : '';
+      const frage = a.kind === 3 && alt ? `Gefunden: Folgeliste vom ${datum} mit ${tagWerte(alt, 'p').length} Einträgen. Sie wird um ${a.nameText} ergänzt und neu veröffentlicht. Folgst du anderswo mehr Personen, gehen diese Einträge verloren. Fortfahren?` : alt ? '' : a.frage || '';
+      if (frage && !dep.fragen(frage)) return false;
+      return dep.senden(neu, a.erfolg);
+    });
+  }
+  /** Eine Aktion auf Klick: folgen, beitreten, zusagen, vielleicht, gefaellt, sammlungSpeichern, zurSammlung. Listen über listeSchreiben (frisch geholt, ergänzt). Liefert true, wenn gesendet wurde. */
   function aktion(was, ziel) {
     if (!ICH.kann || !ICH.hex || !window.nostr) { toast('Zum Mitmachen bitte mit Schlüssel anmelden.'); return Promise.resolve(false); }   // auch nach dem Neuladen ohne Erweiterung nichts holen
     if (akLaeuft) { toast('Einen Moment, die vorige Aktion läuft noch.'); return Promise.resolve(false); }
     const adrOk = /^\d+:[0-9a-f]{64}:.+$/.test(ziel || ''), ev = adrOk ? AK_ZIEL.get(ziel) : null;
     const titel = ev ? esc(tagWert(ev, 'title') || tagWert(ev, 'name') || 'ohne Titel') : '';
-    const frisch = filter => {   // am Zwischenspeicher vorbei (Name mit Zeitstempel); der zweite Filter belegt, dass ein Relay geantwortet hat
-      const name = 'ich:frisch:' + Date.now();
-      return hubFetch(name, [filter, { kinds: [0], authors: [FO_HEX], limit: 1 }]).then(evs => { try { sessionStorage.removeItem('relihub:' + name); } catch (e) {} return evs; });
-    };
-    const neueste = (evs, kind, d) => evs.filter(e => e && e.kind === kind && e.pubkey === ICH.hex && (kind === 3 || tagWert(e, 'd') === d)).sort((a, b) => b.created_at - a.created_at)[0] || null;
-    const ergaenzen = (filter, kind, d, tag, o) => frisch(filter).then(evs => {
-      if (!evs.length) { toast('Die Relays antworten gerade nicht; nichts gesendet.'); return false; }
-      const alt = neueste(evs, kind, d);
-      ichListeMerken(alt);
-      if (!alt && o.frage && !confirm(o.frage)) return false;
-      const neu = listeErgaenzen(alt || o.basis || null, kind, d, tag);
-      if (!neu) { toast(o.schon); return false; }
-      return signierenUndSenden(neu, o.erfolg);
-    });
+    const text = html => String(html).replace(/&(lt|gt|quot|amp);/g, m => ({ '&lt;': '<', '&gt;': '>', '&quot;': '"', '&amp;': '&' }[m]));   // für confirm (Klartext)
+    const eigeneSammlung = d => pkLive.filter(e => e.kind === 30004 && e.pubkey === ICH.hex && tagWert(e, 'd') === d).sort((x, y) => y.created_at - x.created_at)[0] || null;
+    const dep = sitzung => ({ ich: ICH.hex, sitzung, holen: frischHolen, senden: signierenUndSenden, fragen: t => confirm(t), melden: toast, merken: ichListeMerken });
     let lauf = null;
     if (was === 'folgen' && istHex64(ziel) && ziel !== ICH.hex) {
-      lauf = ergaenzen({ kinds: [3], authors: [ICH.hex], limit: 1 }, 3, null, ['p', ziel], { frage: 'Auf den Relays liegt noch keine Folgeliste zu deinem Schlüssel. Eine neue anlegen? Folgst du schon Menschen in einer anderen Nostr-App, deren Liste hier fehlt, würde sie durch die neue ersetzt.', schon: `Du folgst ${akName(ziel)} schon.`, erfolg: `Du folgst jetzt ${akName(ziel)}.` });
+      lauf = listeSchreiben({ filter: { kinds: [3], authors: [ICH.hex], limit: 1 }, kind: 3, d: null, tags: [['p', ziel]], nameText: text(akName(ziel)), frage: 'Auf den Relays liegt noch keine Folgeliste zu deinem Schlüssel. Eine neue anlegen? Folgst du schon Menschen in einer anderen Nostr-App, deren Liste hier fehlt, würde sie durch die neue ersetzt.', schon: `Du folgst ${akName(ziel)} schon.`, erfolg: `Du folgst jetzt ${akName(ziel)}.` }, dep(ichDaten && ichDaten.kontakte));
     } else if (was === 'beitreten' && istHex64(ziel)) {
-      lauf = ergaenzen({ kinds: [30000], authors: [ICH.hex], '#d': ['communities'], limit: 1 }, 30000, 'communities', ['p', ziel], { frage: 'Zu deinem Schlüssel gibt es noch keine Liste deiner Communities. Eine neue anlegen?', schon: `Du bist schon Mitglied in ${akName(ziel)}.`, erfolg: `${akName(ziel)} beigetreten.` });
+      lauf = listeSchreiben({ filter: { kinds: [30000], authors: [ICH.hex], '#d': ['communities'], limit: 1 }, kind: 30000, d: 'communities', tags: [['p', ziel]], frage: 'Zu deinem Schlüssel gibt es noch keine Liste deiner Communities. Eine neue anlegen?', schon: `Du bist schon Mitglied in ${akName(ziel)}.`, erfolg: `${akName(ziel)} beigetreten.` }, dep(ichDaten && ichDaten.liste));
+    } else if ((was === 'zusagen' || was === 'vielleicht' || was === 'gefaellt') && ev && !istHex64(ev.id)) {
+      toast('Zu diesem Eintrag fehlt die Event-Kennung; hier geht das nicht.');   // NIP-25 und NIP-52 brauchen das e-Tag
     } else if ((was === 'zusagen' || was === 'vielleicht') && ev && !akZustand(was, ziel)) {
-      const tags = [['d', 'rsvp-' + ziel], ['a', ziel], ...(istHex64(ev.id) ? [['e', ev.id]] : []), ['p', ev.pubkey], ['status', was === 'zusagen' ? 'accepted' : 'tentative']];
+      const tags = [['d', 'rsvp-' + ziel], ['a', ziel], ['e', ev.id], ['p', ev.pubkey], ['status', was === 'zusagen' ? 'accepted' : 'tentative']];
       lauf = signierenUndSenden({ kind: 31925, tags }, was === 'zusagen' ? `Zugesagt: ${titel}.` : `Vielleicht: ${titel}.`);
     } else if (was === 'gefaellt' && ev && !akZustand(was, ziel)) {
-      const tags = [...(istHex64(ev.id) ? [['e', ev.id]] : []), ['p', ev.pubkey], ['a', ziel], ['k', String(ev.kind)]];
+      const tags = [['e', ev.id], ['p', ev.pubkey], ['a', ziel], ['k', String(ev.kind)]];
       lauf = signierenUndSenden({ kind: 7, content: '+', tags }, `Gefällt dir: ${titel}.`);
     } else if (was === 'sammlungSpeichern') {
       const vorlage = sammlungListe(saF, saTreffer), d = tagWert(vorlage, 'd'), neueA = vorlage.tags.filter(t => t[0] === 'a');
       if (!neueA.length) { toast('Die Sammlung ist leer; nichts gespeichert.'); return Promise.resolve(false); }
-      lauf = frisch({ kinds: [30004], authors: [ICH.hex], '#d': [d], limit: 1 }).then(evs => {
-        if (!evs.length) { toast('Die Relays antworten gerade nicht; nichts gesendet.'); return false; }
-        const alt = neueste(evs, 30004, d);
-        let neu = alt || { kind: 30004, content: '', tags: vorlage.tags.filter(t => t[0] !== 'a') }, anders = !alt;
-        for (const t of neueA) { const n = listeErgaenzen(neu, 30004, d, t); if (n) { neu = n; anders = true; } }   // bisherige Einträge bleiben, neue kommen dazu
-        if (!anders) { toast('Diese Sammlung ist schon gespeichert.'); return false; }
-        return signierenUndSenden(neu, 'Sammlung gespeichert; du findest sie unter „Mein Profil“.');
-      });
+      lauf = listeSchreiben({ filter: { kinds: [30004], authors: [ICH.hex], '#d': [d], limit: 1 }, kind: 30004, d, tags: neueA, basis: { kind: 30004, content: '', tags: vorlage.tags.filter(t => t[0] !== 'a') }, schon: 'Diese Sammlung ist schon gespeichert.', erfolg: 'Sammlung gespeichert; du findest sie unter „Mein Profil“.' }, dep(eigeneSammlung(d)));
     } else if (was === 'zurSammlung' && adrOk) {
-      lauf = ergaenzen({ kinds: [30004], authors: [ICH.hex], '#d': ['sammlung'], limit: 1 }, 30004, 'sammlung', ['a', ziel], { basis: { kind: 30004, content: '', tags: [['title', 'Meine Sammlung']] }, schon: 'Das Material ist schon in deiner Sammlung.', erfolg: 'In deine Sammlung aufgenommen.' });
+      lauf = listeSchreiben({ filter: { kinds: [30004], authors: [ICH.hex], '#d': ['sammlung'], limit: 1 }, kind: 30004, d: 'sammlung', tags: [['a', ziel]], basis: { kind: 30004, content: '', tags: [['title', 'Meine Sammlung']] }, schon: 'Das Material ist schon in deiner Sammlung.', erfolg: 'In deine Sammlung aufgenommen.' }, dep(eigeneSammlung('sammlung')));
     }
     if (!lauf) { akZeichnen(); return Promise.resolve(false); }
     akLaeuft = true;
