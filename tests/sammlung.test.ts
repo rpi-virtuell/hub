@@ -86,7 +86,7 @@ Deno.test('shortcodeAus und kontextprofilAus', () => {
   const out = sc({ c: 'religlobal', fach: ['Ethik'], stufe: [], lizenz: 'offen', q: ['Frieden"x'] });
   assert(/^\[amb_nostr_search /.test(out) && /community="npub12atlg/.test(out) && /search="Friedenx"/.test(out) && /Lizenzfilter: offen/.test(out) && !/fixed_level/.test(out));
   const j = JSON.parse(kp({ c: '', fach: ['Ethik'], stufe: ['Primarstufe'], lizenz: '', q: ['Frieden'] }));
-  assertEquals(j.actions['finden.material'].params, { thema: ['Frieden'], stufe: ['Primarstufe'] }); assertEquals(j.sammlung.community, null);
+  assertEquals(j.actions['material.finden'].params, { thema: ['Frieden'], stufe: ['Primarstufe'] }); assertEquals(j.sammlung.community, null);
 });
 
 Deno.test('Sammlung: Ansicht, Route, keine eigene Abfrage, drei Ausgänge', async () => {

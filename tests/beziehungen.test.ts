@@ -58,11 +58,11 @@ Deno.test('Ökosystem: Ansicht, Route, drei Zustände, Karten maskiert', () => {
   assert(/id="v-oekosystem" data-stand="nachbau:/.test(html), 'Ansicht mit Stand-Zeile');
   assert(/'oekosystem'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)) && /ozOpen\(/.test(s), 'Route');
   const o = fn('ozOpen');
-  assert(/bzLaden\(\)/.test(o) && /bzBauen\(bzQuellen\(\)\)/.test(o + fn('ozBauen')) && /Stand vom/.test(o + fn('datenstand')) && /ohne Rollenprüfung/.test(o) && /können gerade nicht geladen werden/.test(o), 'Zustände');
+  assert(/bzLaden\(\)/.test(fn('ozQuellenLaden')) && /ozQuellenLaden\(\)/.test(o) && /bzBauen\(bzQuellen\(\)\)/.test(o + fn('ozBauen')) && /Stand vom/.test(o + fn('datenstand')) && /ohne Rollenprüfung/.test(o) && /können gerade nicht geladen werden/.test(o), 'Zustände');
   const k = fn('ozKarte');
   assert(/esc\(/.test(k) && /sichereUrl\(/.test(k) && /kurzHash\(/.test(k) && /aria-pressed/.test(k) && /Das bist du/.test(k), 'Karte');
   assert(/function ozSichtbar\(ent\)/.test(s) && /HUB_C/.test(fn('ozSichtbar')), 'Sichtbarkeit kennt den Zuschnitt');
-  assert(/'hub\.home': \{[^}]*#oekosystem/.test(s), 'Konsole: Home führt ins Ökosystem');
+  assert(/'ich\.start': \{[^}]*#oekosystem/.test(s), 'Konsole: Überblick führt ins Ökosystem');
 });
 
 Deno.test('Communities live: cyAus, Partnerkacheln, RpiCommunity ausgeblendet', () => {

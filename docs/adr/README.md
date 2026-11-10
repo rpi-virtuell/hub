@@ -36,3 +36,4 @@ Regeln: Deutsch; Produktsicht (keine Projektverwaltung, keine Berichtsbezüge); 
 | [0007](0007-inhalte-aus-events.md) | Inhalte aus Events: Seiten, Beiträge, Materialien, Lizenzstand | angenommen |
 | [0008](0008-community-inhalte-und-listen.md) | Community-Inhalte und Listen: Kataloge, Sammlung, Fortbildungskalender, Personen | angenommen |
 | [0009](0009-beziehungsgefuege-mitmachen-anmeldung.md) | Beziehungsgefüge, Mitmachen, Zuschnitt, Anmeldung | angenommen |
+| [0010](0010-vier-plus-ich.md) | Vier plus ich: Konsole nach Menschen, Communities, Materialien, Terminen und „ich“; Graustufen; Startseite mit Vorschau und Themen | angenommen als Entwurfsrunde |

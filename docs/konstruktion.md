@@ -24,30 +24,35 @@ Drei Begriffe tragen das Konzept:
 
 Die Datenebene darunter ist Nostr/edufeed: Materialien, Termine und Beiträge sind signierte Ereignisse auf Relays, die jede Instanz anzeigen kann. Der Hub organisiert also drei Ebenen: Navigation (Konsole), Identität (Profil), Daten (Relays).
 
-## Funktionsmodell: fünf Funktionen, zwölf Aktionen
+## Funktionsmodell: vier plus ich
 
-Das Vokabular des gesamten Prototyps ist eine kleine, feste Ontologie: fünf Funktionen im Kreis (im Uhrzeigersinn ab oben, 72° Abstand), jede mit Farbe, Tönung und zwei bis drei Unteraktionen. Alles andere (Konsole, Erklärkarte, Partnerkacheln, Panel-Symbole, Kontextprofile, Routen) referenziert diese Aktions-IDs.
+Das Vokabular des gesamten Prototyps ist eine kleine, feste Ontologie ([ADR-0010](adr/0010-vier-plus-ich.md)): fünf Kreise (im Uhrzeigersinn ab oben, 72° Abstand), oben „ich“, dann Menschen, Communities, Materialien, Termine. Jeder Kreis hat Farbe, Tönung und zwei bis vier Knospen. Alles andere (Konsole, Erklärkarte, Panel-Symbole, Kontextprofile) referenziert diese Aktions-IDs.
 
-| Funktion | Farbe | Unteraktion (ID) | Route im Hub | Ziel im Prototyp |
+| Element | Farbe | Knospe (ID) | Richtung | Ziel im Prototyp |
 | --- | --- | --- | --- | --- |
-| reli\_hub | #233E99 (blau) | hub.profil | /profil | Ansicht Profil (setzt „angemeldet“) |
-|  |  | hub.home | / | Ansicht Start |
-| finden | #008C86 (türkis) | finden.material | /finden/materialpool | Ansicht Materialpool, mit Vorauswahl-Parametern |
-|  |  | finden.fortbildungen | /finden/fortbildungen | Fortbildungskalender über alle Quellen (Ansicht v-fortbildungen) |
-| erstellen | #F39200 (orange) | erstellen.schreibtisch | /erstellen/schreibtisch | Ansicht relidesk, Tab Schreibtisch |
-|  |  | erstellen.labor | /erstellen/labor | Ansicht relilab |
-| kooperieren | #D6336C (pink) | kooperieren.communities | /kooperieren/communities | Ansicht Communities |
-|  |  | kooperieren.personen | /kooperieren/personen | Ansicht Personen (nur wer in der Personen-Liste steht) |
-| veröffentlichen | #7B4FB8 (violett) | veroeffentlichen.lerninhalte | /veroeffentlichen/lerninhalte | Editor Lerninhalt (Bereichswahl, dann 7 Schritte) |
-|  |  | veroeffentlichen.termin | /veroeffentlichen/termin | Editor Termin |
-|  |  | veroeffentlichen.beitrag | /veroeffentlichen/beitrag | Editor Beitrag (Markdown) |
+| ich | blau | ich.profil | – | Ansicht Profil |
+|  |  | ich.interessen | – | Themenfeld der Startseite |
+|  |  | ich.start | – | Überblick (Ökosystem) |
+| Menschen | pink | menschen.finden | hinaus | Ansicht Personen |
+|  |  | menschen.zeigen | hinein | Profil, ohne Anmeldung der Anmeldedialog |
+| Communities | violett | communities.finden | hinaus | Ansicht Communities |
+|  |  | communities.mitmachen | hinein | Raum Mitmachen |
+|  |  | communities.gruenden | hinein, hellgrau | Hinweis und Verweis auf edufeed |
+| Materialien | petrol | material.finden | hinaus | Ansicht Materialpool, mit Vorauswahl-Parametern |
+|  |  | material.beitraege | hinaus | Artikel im Profil |
+|  |  | material.teilen | hinein | Editor Lerninhalt (Bereichswahl, dann 7 Schritte); Editor Beitrag über die Karte |
+|  |  | material.schreibtisch | hinein, dunkelgrau | Ansicht relidesk, Tab Schreibtisch, mit Hinweis |
+| Termine | orange | termine.finden | hinaus | Fortbildungskalender über alle Quellen (Ansicht v-fortbildungen) |
+|  |  | termine.eintragen | hinein | Editor Termin |
 
 Regeln, die sich aus dem Code ablesen lassen:
 
-- Die vier Funktionen finden, erstellen, kooperieren, veröffentlichen haben keine eigene Zielseite. Ein Klick auf den Kreis löst nur das Ereignis aus; die Konsole zeigt dann die Knospen. Nur „hub“ navigiert selbst.
-- erstellen und veröffentlichen sind als „mit Profil“ markiert (Schloss-Badge). finden und kooperieren sind ohne Anmeldung zugänglich.
-- Jede Funktion hat eine Hellton-Variante (`--t-finden` usw.) für Hintergründe, Chips und Kartenrückseiten. Die Partnerkacheln tragen die Farbe der Funktion, die sie primär bedienen (Materialpool = finden, relilab und relidesk = erstellen, Communities = kooperieren, CI und edufeed = hub).
-- Jede Aktion hat eine Erklärung (`EX`): Funktionspfad, Titel, ein Absatz, Weiter-Buttons. Diese Texte sind die eigentliche Produktbeschreibung des Hub und tauchen identisch in der Erklärkarte der Startseite und in den Toasts auf.
+- Die vier Elemente Menschen, Communities, Materialien, Termine haben keine eigene Zielseite. Ein Klick auf den Kreis löst nur das Ereignis aus; die Konsole zeigt dann die Knospen. Nur „ich“ navigiert selbst.
+- Knospen hinein sind als „mit Profil“ markiert (Schloss-Badge), soweit sie schreiben. Knospen hinaus sind ohne Anmeldung zugänglich.
+- Graue Knospen sind noch nicht gebaut: dunkelgrau (`stand: 'spaeter'`) heißt später gedacht, hellgrau (`stand: 'offen'`) heißt gewollt und noch nicht gebaut.
+- Die Startseite zeigt in der Karte eines Elements bis zu vier echte Einträge (`stVorschau`), gefiltert nach den Themen aus dem Feld über der Konsole (`themenAus`, `themaPasst`, Speicher `relihub-themen`).
+- Jede Funktion hat eine Hellton-Variante (`--t-finden` usw.) für Hintergründe, Chips und Kartenrückseiten. Die Töne tragen noch die früheren Namen (`--t-finden`, `--t-koop` usw.); die Partnerkacheln nutzen sie als Farbnamen.
+- Jede Aktion hat eine Erklärung (`EX`): Titel, ein Absatz, Weiter-Buttons. Diese Texte sind die eigentliche Produktbeschreibung des Hub und tauchen identisch in der Erklärkarte der Startseite und in den Toasts auf.
 
 ## Die Steuerkonsole als Web Component
 
@@ -67,7 +72,7 @@ Die Konsole ist als eigenständiges Custom Element `<relihub-steuerkonsole>` geb
 | compact / floating | Kleinform in Kopfzeile bzw. schwebend unten rechts, klappt auf | floating auf allen Unterseiten |
 | popover-size / popover-align | Größe und Ausrichtung der aufgeklappten Form | 210 |
 
-**Kontextprofile** sind der Mechanismus, der dieselbe Konsole seitenabhängig macht. `RelihubSteuerkonsole.registerContext(name, profil)` nimmt entgegen: ein globales `target`, globale `params` (werden an alle Ziel-URLs angehängt), pro Aktion `params`, `href` (anderes Ziel) oder `handler` (eigene Funktion; `return false` verhindert die Navigation), und einen Profil-weiten `handler`. Die eingebaute Doku nennt als Beispiel ein Profil „narrt“, das finden.material mit den Themen „antisemitismuskritisch, rassismuskritisch“ vorbelegt.
+**Kontextprofile** sind der Mechanismus, der dieselbe Konsole seitenabhängig macht. `RelihubSteuerkonsole.registerContext(name, profil)` nimmt entgegen: ein globales `target`, globale `params` (werden an alle Ziel-URLs angehängt), pro Aktion `params`, `href` (anderes Ziel) oder `handler` (eigene Funktion; `return false` verhindert die Navigation), und einen Profil-weiten `handler`. Die eingebaute Doku nennt als Beispiel ein Profil „narrt“, das material.finden mit den Themen „antisemitismuskritisch, rassismuskritisch“ vorbelegt.
 
 **Ereignis**: jeder Klick löst `relihub-action` aus (bubbles, composed, cancelable) mit `detail = { action, label, url, context }`. Damit kann eine Gastseite die Konsole nutzen, ohne ihren Code zu kennen.
 
@@ -177,7 +182,7 @@ Die Datei heißt `_5`, also mindestens fünf Iterationen. Die Schichtung im Code
 
 **P1 · Die Steuerkonsole als Komponente**
 
-> Mache aus dem Logo ein wiederverwendbares Steuerelement `<relihub-steuerkonsole>` als Web Component mit Shadow DOM, reinem SVG, ohne externe Dateien. Fünf Kreise mit Radius 100, Mittenabstand 98, Farben: reli\_hub #233E99, finden #008C86, erstellen #F39200, kooperieren #D6336C, veröffentlichen #7B4FB8. Beim Überfahren springt ein Kreis heraus; beim Klick wachsen Unteroptionen als „Knospen“ (alternativ Variante „scheibe“). Unteraktionen: hub.profil, hub.home; finden.material, finden.fortbildungen; erstellen.schreibtisch, erstellen.labor; kooperieren.communities, kooperieren.personen; veroeffentlichen.lerninhalte, veroeffentlichen.termin, veroeffentlichen.beitrag. Jeder Klick löst ein DOM-Ereignis `relihub-action` aus. Attribute: size, variant, context, base-url, target, config-src, demo, compact, floating, popover-size, popover-align. Kontextprofile über `registerContext(name, {target, params, actions, handler})`, damit dieselbe Konsole auf jeder Seite anderes auslösen kann. Tastatur- und Screenreader-tauglich, Gestaltung über CSS-Variablen. Schreibe die Einbindungs-Dokumentation als Kommentar in die Datei.
+> Mache aus dem Logo ein wiederverwendbares Steuerelement `<relihub-steuerkonsole>` als Web Component mit Shadow DOM, reinem SVG, ohne externe Dateien. Fünf Kreise mit Radius 100, Mittenabstand 98, Farben: reli\_hub #233E99, finden #008C86, erstellen #F39200, kooperieren #D6336C, veröffentlichen #7B4FB8. Beim Überfahren springt ein Kreis heraus; beim Klick wachsen Unteroptionen als „Knospen“ (alternativ Variante „scheibe“). Unteraktionen: ich.profil, ich.start; material.finden, termine.finden; material.schreibtisch, erstellen.labor; communities.finden, menschen.finden; material.teilen, termine.eintragen, veroeffentlichen.beitrag. Jeder Klick löst ein DOM-Ereignis `relihub-action` aus. Attribute: size, variant, context, base-url, target, config-src, demo, compact, floating, popover-size, popover-align. Kontextprofile über `registerContext(name, {target, params, actions, handler})`, damit dieselbe Konsole auf jeder Seite anderes auslösen kann. Tastatur- und Screenreader-tauglich, Gestaltung über CSS-Variablen. Schreibe die Einbindungs-Dokumentation als Kommentar in die Datei.
 
 **P2 · Startseite mit Erklärkarte**
 
@@ -185,7 +190,7 @@ Die Datei heißt `_5`, also mindestens fünf Iterationen. Die Schichtung im Code
 
 **P3 · Profilseite**
 
-> Baue die Profilseite (angemeldet) für die Persona Luca Beispiel mit Interessen Schöpfung, Friedenspädagogik, KI im Religionsunterricht, Sekundarstufe I, @relilab. Panels: Neue Materialien für dich (mit „warum“-Begründung und Quelle), News aus deinem Netz, Meine Communities, Passende Veranstaltungen, Weiterarbeiten (Schreibtisch im relidesk, Labor im relilab). Die Konsole schwebt klein unten rechts; im Kontext hub-profil übergibt finden.material die Interessen als Parameter an den Materialpool.
+> Baue die Profilseite (angemeldet) für die Persona Luca Beispiel mit Interessen Schöpfung, Friedenspädagogik, KI im Religionsunterricht, Sekundarstufe I, @relilab. Panels: Neue Materialien für dich (mit „warum“-Begründung und Quelle), News aus deinem Netz, Meine Communities, Passende Veranstaltungen, Weiterarbeiten (Schreibtisch im relidesk, Labor im relilab). Die Konsole schwebt klein unten rechts; im Kontext hub-profil übergibt material.finden die Interessen als Parameter an den Materialpool.
 
 **P4 · Nachbau Materialpool**
 
@@ -193,7 +198,7 @@ Die Datei heißt `_5`, also mindestens fünf Iterationen. Die Schichtung im Code
 
 **P5 · Nachbau relilab, dann relilab-Termine via Nostr**
 
-> Baue relilab.org nach (Magenta-Pink, Roboto/Oswald, Hero mit Blobs und Claim „… ist, was du draus machst!“, Monatskalender, Instagram-Kacheln, Suchformular). Konsole im Kontext relilab: erstellen.labor bleibt hier, finden.material übergibt thema=Digitalität. Ergänze dann eine Unterseite „relilab-Termine via Nostr“: Liste und Monatsansicht, Suche, Filter-Chips, Quellenangabe mit npubs (relilab, relilab-impuls, relilab-Termine-Bot), .ics-Export der gefilterten Termine, kopierbarer Filter-Link, „+ Termin eintragen“ öffnet den Termin-Editor. Verwende den beigefügten Schnappschuss der NIP-52-Ereignisse (kind 31923).
+> Baue relilab.org nach (Magenta-Pink, Roboto/Oswald, Hero mit Blobs und Claim „… ist, was du draus machst!“, Monatskalender, Instagram-Kacheln, Suchformular). Konsole im Kontext relilab: erstellen.labor bleibt hier, material.finden übergibt thema=Digitalität. Ergänze dann eine Unterseite „relilab-Termine via Nostr“: Liste und Monatsansicht, Suche, Filter-Chips, Quellenangabe mit npubs (relilab, relilab-impuls, relilab-Termine-Bot), .ics-Export der gefilterten Termine, kopierbarer Filter-Link, „+ Termin eintragen“ öffnet den Termin-Editor. Verwende den beigefügten Schnappschuss der NIP-52-Ereignisse (kind 31923).
 
 **P6 · Nachbau relidesk**
 
@@ -236,11 +241,11 @@ Hub-Ergänzungen: Vermerk „Teil des reli_hub“, Profil-Link, schwebende Konso
 
 ## Kontextprofil <name>
 params (global): <z. B. quelle=<name>>
-finden.material: params <thema=…>
-finden.fortbildungen: <intern | später>
-erstellen.schreibtisch / erstellen.labor: <intern | Toast „Du bist bereits …“ | später>
-kooperieren.communities: <Hub | eingebettet mit Filter auf Communities dieser Instanz>
-veroeffentlichen.termin / .lerninhalte / .beitrag: Editor mit Kontext-Badge <name>, Vorbelegungen <Tags, Organisation, Bereich>
+material.finden: params <thema=…>
+termine.finden: <intern | später>
+material.schreibtisch / erstellen.labor: <intern | Toast „Du bist bereits …“ | später>
+communities.finden: <Hub | eingebettet mit Filter auf Communities dieser Instanz>
+termine.eintragen / .lerninhalte / .beitrag: Editor mit Kontext-Badge <name>, Vorbelegungen <Tags, Organisation, Bereich>
 hub: Start oder Profil je nach Anmeldezustand
 
 ## Daten
