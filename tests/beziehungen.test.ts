@@ -15,7 +15,10 @@ Deno.test('Beziehungsgefüge: Signaturen, Abfrage, Doku', async () => {
   const l = fn('bzLaden');
   assert(/hubFetch\('beziehungen', \[/.test(l) && /kinds: \[30000\], '#d': \['communities'\], limit: 300/.test(l) && /kinds: \[10222\], limit: 60/.test(l) && /kinds: \[31925\], limit: 200/.test(l) && /kinds: \[7\], '#k': \['30142', '30023', '31922', '31923'\]/.test(l), 'fünf Filter in einem Aufruf');
   assert(/relay-rpi\.edufeed\.org/.test(l) && !/amb-relay/.test(l) && !/purplepag/.test(html) && !/groups\.edufeed\.org/.test(html), 'Relays');
-  assert((l.match(/hubFetch\(/g) || []).length === 1, 'ein REQ');
+  const aufrufe = l.match(/hubFetch\(/g) || [];
+  assert(aufrufe.length === 2, 'höchstens zwei Abfragen: die Beziehungsabfrage und eine abhängige Profilabfrage');
+  const nach = l.slice(l.indexOf("hubFetch('beziehungen:profile'"));
+  assert(/hubFetch\('beziehungen:profile', \[\{ kinds: \[0\], authors: fehlend, limit: 150 \}\]/.test(nach) && /slice\(0, 150\)/.test(l) && !/kinds: \[(?!0\])/.test(nach.split('\n')[0]), 'zweite Abfrage: nur kind 0 mit authors, höchstens 150');
   const d = await Deno.readTextFile(new URL('../docs/daten.md', import.meta.url));
   assert(/bzBauen/.test(d) && /31925/.test(d) && /ohne Rollenprüfung/.test(d), 'docs/daten.md');
 });

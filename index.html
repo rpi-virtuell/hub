@@ -2519,7 +2519,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   // Quellen sind die Caches der anderen Ansichten; neu geholt wird nur, was sie nicht tragen (bzLaden: eine Abfrage). Kanten gelten wie geteilt, ohne Rollenprüfung.
   let bzDaten = null, bzLauf = null;   // Antwort (gehalten, wenn nicht leer), laufende Abfrage
   let HUB_C = null;   // Zuschnitt auf eine Community (Hex oder null); gefüllt ab ADR-0009 Zuschnitt
-  let ICH = '';   // angemeldeter Schlüssel (Hex) oder leer; die Anmeldung folgt
+  const ICH = { hex: null, kann: false };   // Anmeldestand, gefüllt von der Anmeldung (Hex des Schlüssels, ob signiert werden kann)
   let ozGefuege = null, ozLive = false;   // Gefüge der Ökosystem-Ansicht { ents, kanten } und ob es vom Relay kommt
   const cyProfile = new Map();   // Profile (profilAus) der Community-Konten aus cyLaden
   /** Mitgliedschaften, Community-Konten, deren Profile, Zusagen und Reaktionen in einer Abfrage; einmal je Sitzung (leere Antwort wird nicht gehalten) */
@@ -2550,8 +2550,16 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
         communities: neueste(art(10222)), profile: neueste(art(0)), zusagen: neueste(art(31925)),
         reaktionen: art(7).filter(ev => istHex64(ev.pubkey))
       };
-      if (daten.antwort) bzDaten = daten; else bzLauf = null;   // ohne Antwort beim nächsten Aufruf erneut versuchen
-      return daten;
+      if (!daten.antwort) { bzLauf = null; return daten; }   // ohne Antwort beim nächsten Aufruf erneut versuchen
+      // eine abhängige Nachfrage: Profile der Mitglieder (Absender der Mitgliedslisten mit bekannter Community), Zusagenden und Reagierenden; ohne Antwort bleibt die erste Antwort heil
+      const bekannt = new Set([...CO_SCHLUESSEL.map(c => c.hex), ...daten.communities.map(ev => ev.pubkey)]), habe = new Set(daten.profile.map(ev => ev.pubkey));
+      const fehlend = [...new Set([...daten.mitgliedschaften.filter(ev => tagWerte(ev, 'p').some(h => bekannt.has(h))).map(ev => ev.pubkey), ...daten.zusagen.map(ev => ev.pubkey), ...daten.reaktionen.map(ev => ev.pubkey)].filter(pk => istHex64(pk) && !habe.has(pk)))].slice(0, 150);
+      const nach = fehlend.length ? hubFetch('beziehungen:profile', [{ kinds: [0], authors: fehlend, limit: 150 }], { relays: ['wss://relay.edufeed.org', 'wss://relay-rpi.edufeed.org'] }) : Promise.resolve([]);
+      return nach.then(extra => {
+        daten.profile = neueste([...daten.profile, ...extra.filter(ev => ev && ev.kind === 0)]);
+        bzDaten = daten;
+        return daten;
+      }, () => { bzDaten = daten; return daten; });
     });
     return bzLauf;
   }
@@ -2771,11 +2779,12 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   ];
   const TINT = { finden:cssVar('--t-finden'), erstellen:cssVar('--t-erstellen'), kooperieren:cssVar('--t-koop'), hub:cssVar('--t-hub') };
   const TINK = { finden:X.finden, erstellen:X.erstellen, kooperieren:X.kooperieren, hub:X.hub };
+  const PARTNER_MIT_SCHLUESSEL = ['reliGlobal', 'Konfi-Arbeit bundesweit', 'Friedensarbeit EKD', 'edufeed'];   // Einträge von PARTNERS mit eigenem Schlüssel (Community-Konto, Schlüsselliste)
   document.getElementById('pgrid').innerHTML = PARTNERS.map(([n, d, k, ab, href, back, tag]) => {
-    const partner = !href, marke = partner ? 'Partner' + (tag ? ' · ' + tag : '') : tag;   // ohne eigene Seite im Hub: Partner, führt zu den Communities
+    const partner = !href && !PARTNER_MIT_SCHLUESSEL.includes(n), marke = partner ? 'Partner' + (tag ? ' · ' + tag : '') : tag;   // Partner nur ohne eigenen Schlüssel; Einträge mit Schlüssel sind Communities. Ohne Seite im Hub führen beide zu den Communities
     return `<a class="pcard${partner ? ' partner' : ''}" href="${href || '#communities'}" style="--bk:${TINT[k]};--bt:${TINK[k]}" aria-label="${n}: ${back}"><span class="pin">`
     + `<span class="pface"><span class="cc" style="background:${C[k]};color:${T[k]}">${ab}</span><span><b>${n}</b><small>${d}</small>${marke ? `<span class="tag">${marke}</span>` : ''}</span></span>`
-    + `<span class="pface pback"><p>${back}</p><em>${partner ? 'Zu den Communities ›' : 'Ansehen ›'}</em></span></span></a>`;
+    + `<span class="pface pback"><p>${back}</p><em>${href ? 'Ansehen ›' : 'Zu den Communities ›'}</em></span></span></a>`;
   }).join('');
   // Auf Touch-Geräten: erstes Antippen dreht die Karte, zweites öffnet sie
   document.getElementById('pgrid').addEventListener('click', e => {
@@ -3769,7 +3778,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
       else if (!k(ent.id).has(z) && !(ent.typ !== 'person' && k('p:' + ent.pk).has(z))) return false;
     }
     if (ent.typ === 'community') return true;
-    if (ent.typ === 'person') { const p = bzProfil(ent.pk); return !!(ICH && ent.pk === ICH) || !!(ozLive && p && p.name && k(ent.id).size > 0); }
+    if (ent.typ === 'person') { const p = bzProfil(ent.pk); return !!(ICH.hex && ent.pk === ICH.hex) || !!(ozLive && p && p.name && k(ent.id).size > 0); }
     if (ent.typ === 'event') return Math.max(ent.start || 0, ent.ende || 0) >= jetzt - 86400;
     if (!ozLive || !ent.ev || ent.ev.kind !== 30023) return true;
     const liste = peDaten && peDaten.liste ? tagWerte(peDaten.liste, 'p') : [];
@@ -3802,7 +3811,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
     const nm = ozName(e), bild = sichereUrl(ozBild(e)), farbe = parseInt(kurzHash(id).slice(0, 3), 16) % 360;
     const nb = typ => bzNachbarn(g.kanten, g.ents, id, typ);
     let pille;
-    if (e.typ === 'person') pille = ICH && e.pk === ICH ? 'Das bist du' : nb('community').length + (nb('community').length === 1 ? ' Community' : ' Communities');
+    if (e.typ === 'person') pille = ICH.hex && e.pk === ICH.hex ? 'Das bist du' : nb('community').length + (nb('community').length === 1 ? ' Community' : ' Communities');
     else if (e.typ === 'community') pille = ozLive ? nb('person').length + (nb('person').length === 1 ? ' Mitglied' : ' Mitglieder') : 'Community';
     else if (e.typ === 'event') pille = e.start ? new Date(e.start * 1000).toLocaleDateString('de-DE') : 'Termin';
     else pille = (e.ev && ambFeld(e.ev, 'learningResourceType').label) || (e.sub ? 'Material' : 'Beitrag');
@@ -3818,7 +3827,7 @@ a:focus-visible,button.cfg:focus-visible{outline:3px solid currentColor;outline-
   /** Reihenfolge ohne Auswahl und bei Nachbarn: Personen und Communities nach bzPunkte, Beiträge, Termine und Materialien mit Community-Bezug zuerst, dann Datum (Termine aufsteigend, Materialien absteigend) */
   function ozSortiert(liste, typ) {
     const g = ozGefuege, name = e => ozEntesc(ozName(e));
-    if (typ === 'person' || typ === 'community') return liste.map(e => [bzPunkte(g.ents, g.kanten, e.id, ICH), e]).sort((a, b) => b[0] - a[0] || name(a[1]).localeCompare(name(b[1]), 'de')).map(x => x[1]);
+    if (typ === 'person' || typ === 'community') return liste.map(e => [bzPunkte(g.ents, g.kanten, e.id, ICH.hex), e]).sort((a, b) => b[0] - a[0] || name(a[1]).localeCompare(name(b[1]), 'de')).map(x => x[1]);
     const bezug = e => [...(g.kanten.get(e.id) || []), ...(g.kanten.get('p:' + e.pk) || [])].some(i => i.startsWith('c:')) ? 1 : 0;
     const datum = e => typ === 'event' ? e.start || 0 : e.ev ? (e.ev.kind === 30142 ? mpMaterial(e.ev).datum : +tagWert(e.ev, 'published_at') || e.ev.created_at) : 0;
     return liste.map(e => [bezug(e), datum(e), e]).sort((a, b) => b[0] - a[0] || (typ === 'event' ? a[1] - b[1] : b[1] - a[1])).map(x => x[2]);
