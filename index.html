@@ -2327,12 +2327,14 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   const RELAYS = ['wss://relay.edufeed.org', 'wss://relay-rpi.edufeed.org', 'wss://amb-relay.edufeed.org'];
   const TIMEOUT_MS = 8000; const MAX_CONN = 3; const RETRY_MS = 60000;
   const hubWarte = []; let laufend = 0;   // Warteschlange wartender Sockets, Zahl offener Sockets
+  let hubSammler = null;   // offene Sammelabfrage von hubBuendeln (Liste der angemeldeten Aufrufe), sonst null
   /** Holt Events je Ansicht; Cache in sessionStorage `relihub:<name>`. Löst immer auf (bei Fehlern mit dem bis dahin Empfangenen), nie ab.
    *  `opts.bericht`: am Cache vorbei, ohne Cache-Eintrag, Ergebnis `{ events, alle }`; `alle` ist true, wenn jedes Relay mit EOSE geendet hat (NOTICE, CLOSED, Fehler und Zeitgrenze zählen nicht). */
   function hubFetch(name, filters, opts = {}) {
     const key = 'relihub:' + name, relays = (opts.relays || RELAYS).filter(r => RELAYS.includes(r));
     let cache = null; try { cache = opts.bericht ? null : JSON.parse(sessionStorage.getItem(key)); } catch (e) {}
     if (cache && Date.now() - cache.t < RETRY_MS) return Promise.resolve(cache.events);   // innerhalb von RETRY_MS kein Netz
+    if (hubSammler && !opts.bericht) return new Promise(resolve => hubSammler.push({ key, filters, relays, resolve }));   // innerhalb von hubBuendeln: geht mit den anderen in einem REQ hinaus
     const got = new Map();
     const relay = url => new Promise(resolve => {
       const start = () => {
@@ -2357,6 +2359,27 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       try { sessionStorage.setItem(key, JSON.stringify({ t: Date.now(), events })); } catch (e) {}   // ohne Speicher: kein Cache, sonst gleich
       return events;
     });
+  }
+  /** Passt ein Event auf einen Nostr-Filter (ids, kinds, authors, #x, since, until; limit zählt nur am Relay)? */
+  function passtFilter(ev, f) {
+    if (!ev || !f) return false;
+    if ((f.ids && !f.ids.includes(ev.id)) || (f.kinds && !f.kinds.includes(ev.kind)) || (f.authors && !f.authors.includes(ev.pubkey))) return false;
+    if ((f.since && !(ev.created_at >= f.since)) || (f.until && !(ev.created_at <= f.until))) return false;
+    return Object.keys(f).every(k => k[0] !== '#' || (Array.isArray(ev.tags) && ev.tags.some(t => Array.isArray(t) && t[0] === k.slice(1) && f[k].includes(t[1]))));
+  }
+  /** Sammelabfrage: alle hubFetch-Aufrufe, die `fn` synchron auslöst (ohne Cache-Treffer), gehen als ein REQ je Relay unter `name` hinaus (Filter unverändert, also auch jedes limit je Filter);
+   *  die Antwort wird je Aufruf mit passtFilter aufgeteilt und unter dessen Namen zwischengespeichert wie eine Einzelantwort. Liefert, was `fn` liefert. */
+  function hubBuendeln(name, fn) {
+    const teile = [], vorher = hubSammler;
+    hubSammler = teile;
+    try { return fn(); } finally {
+      hubSammler = vorher;
+      if (teile.length) hubFetch(name, teile.flatMap(t => t.filters), { relays: [...new Set(teile.flatMap(t => t.relays))], bericht: true }).then(({ events }) => teile.forEach(t => {
+        const evs = events.filter(ev => t.filters.some(f => passtFilter(ev, f)));
+        try { sessionStorage.setItem(t.key, JSON.stringify({ t: Date.now(), events: evs })); } catch (e) {}
+        t.resolve(evs);
+      }));
+    }
   }
   // Dauerhafte Subscription: nur das Aktivitätsprotokoll hält eine; je Relay höchstens eine Verbindung, nie für Listen oder Inhalte (docs/daten.md)
   const hubAbos = new Map();   // Name → Halter { schliessen }
@@ -2622,10 +2645,10 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       .map(listeEintraege).sort((a, b) => (b.d === 'katalog') - (a.d === 'katalog') || b.stand - a.stand);
     let lauf;
     if (eigene) {
-      lauf = ocLaden().then(oc => hubFetch('community:' + hex, [{ kinds: [30004], authors: [hex], limit: 20 }], { relays: ['wss://relay-rpi.edufeed.org', 'wss://relay.edufeed.org'] }).then(listen => {
+      lauf = Promise.all([ocLaden(), hubFetch('community:' + hex, [{ kinds: [30004], authors: [hex], limit: 20 }], { relays: ['wss://relay-rpi.edufeed.org', 'wss://relay.edufeed.org'] })]).then(([oc, listen]) => {   // beide sofort, damit hubBuendeln die Listenabfrage mitnimmt
         const direkt = [...oc.seiten.values(), ...oc.beitraege, ...oc.termine];
         return { antwort: direkt.length > 0 || listen.length > 0, direkt, reposts: [], listen: listenAus(neueste(listen)), entfernt: new Set() };
-      }));
+      });
     } else {
       lauf = hubFetch('community:' + hex, [
         { kinds: [30142, 30023, 31923], '#h': [hex], limit: 150 },
@@ -4109,7 +4132,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (!ozGefuege) { ozGefuege = ozSchnappschuss(); ozLive = false; datenstand('v-oekosystem', 'stand', ozStandDatum()); }
     ozMeldung = ozLive ? '' : 'Verbindungen werden geladen …';
     ozRender();
-    Promise.all([mpLaden(), ocLaden(), kalLaden(), peLaden(), bzLaden(), ...CO_SCHLUESSEL.map(k => coLaden(k.hex))]).then(r => cyLaden().then(() => r)).then(r => {
+    Promise.all([mpLaden(), ocLaden(), kalLaden(), peLaden(), bzLaden(), ...hubBuendeln('communities', () => CO_SCHLUESSEL.map(k => coLaden(k.hex)))]).then(r => cyLaden().then(() => r)).then(r => {   // die fünf Community-Abfragen als eine
       if (lauf !== ozLauf) return;   // späte Antwort einer früheren Öffnung
       if (!r[4].antwort) {
         if (!ozLive) datenstand('v-oekosystem', 'stand', ozStandDatum());
@@ -4326,7 +4349,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   function pkAnstossen() {
     pkStart();
     const lauf = ++pkLaufNr;
-    Promise.all([mpLaden(), ocLaden(), kalLaden(), peLaden(), bzLaden(), pkLaden(), ...CO_SCHLUESSEL.map(k => coLaden(k.hex))]).then(() => cyLaden()).catch(() => {}).then(() => {
+    Promise.all([mpLaden(), ocLaden(), kalLaden(), peLaden(), bzLaden(), pkLaden(), ...hubBuendeln('communities', () => CO_SCHLUESSEL.map(k => coLaden(k.hex)))]).then(() => cyLaden()).catch(() => {}).then(() => {
       if (lauf !== pkLaufNr) return;   // späte Antwort einer früheren Öffnung
       pkBerechnen(); pkGeladen = true; pkAktualisieren();
     });
