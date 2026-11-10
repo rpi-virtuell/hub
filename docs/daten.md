@@ -198,6 +198,32 @@ Rückfall: Fehlt die Liste, zeigt die Seite die Teamseite aus dem Schaufenster (
 
 Offen: Der Link „Bei edufeed ansehen“ (`https://edufeed.org/<npub>`) steht nur als Text, bis die Route der App für Profile geklärt ist.
 
+## Beziehungsgefüge
+
+Das Beziehungsgefüge verbindet Personen, Communities, Materialien und Beiträge sowie Termine zu einem Graphen (Entitäten `p:<hex>`, `c:<hex>`, `m:<kind>:<pk>:<d>`, `e:<kind>:<pk>:<d>`; Kanten ungerichtet). Es hat keine eigene Ansicht, spätere Ansichten lesen es.
+
+**Quellen aus den Caches:** `bzQuellen()` sammelt ohne Netz, was die anderen Ansichten schon geholt haben: Materialpool (`mpDaten`), Beiträge, Seiten und Termine der Schaufenster-Schlüssel (`ocDaten`), die direkten Inhalte und Reposts je Community (`coLaden`), die Termine des Kalenders (`kalLaden`) und die Personen-Liste (`peDaten`). Fehlende Caches ergeben leere Listen.
+
+**Eine Abfrage:** `bzLaden()` holt, was die Caches nicht tragen, einmal je Sitzung in einem `REQ` je Relay (`relay.edufeed.org`, `relay-rpi.edufeed.org`): `{kinds:[30000], '#d':['communities'], limit:300}` (Mitgliedschaften), `{kinds:[10222], limit:60}` (Community-Konten), `{kinds:[0], authors:<Hex der Hub-Communities und der Kalender-Quellen, höchstens 60>, limit:60}` (deren Profile, weil `peLaden` nur die Personen der Liste kennt), `{kinds:[31925], limit:200}` (Zusagen) und `{kinds:[7], '#k':['30142','30023','31922','31923'], limit:200}` (Reaktionen). Eine leere Antwort wird nicht gehalten.
+
+**Kantenregeln** (`bzBauen(q)`, rein): je Adresse zählt das neueste `created_at`; Schlüssel ohne 64 Hex-Zeichen erzeugen weder Entität noch Kante; Schlüssel aus `q.communities` sind immer Communities.
+
+| Quelle | Kante |
+| --- | --- |
+| Material, Beitrag, Termin | Inhalt und Autor |
+| `h`-Tag eines Inhalts | Inhalt und jede genannte Community |
+| `p`-Tag eines Termins | Termin und jede genannte Person |
+| `kind:30000` `d=communities` | Absender und jede Community aus den `p`-Tags |
+| Repost (6, 16) mit `h`-Tags | Ziel (über `repostZiel`, nur wenn das Ziel in den Quellen liegt) und jede Community aus den `h`-Tags |
+| Zusage `31925` mit `status` `accepted` oder `tentative` | Ziel und Absender |
+| Reaktion `7` mit Inhalt außer `-` | Ziel und Absender |
+
+Das Ziel von Zusage und Reaktion ist der erste gültige `a`-Tag, sonst der erste `e`-Tag, der auf einen bekannten Inhalt zeigt. `bzPunkte` ordnet Personen (3 je Community, bis 5 für Materialien, bis 4 für Termine, 2 mit Profilbild, 100 für den Angemeldeten) und Communities (Zahl der Personen); das Profilbild kommt aus dem Feld `bild` der Entität, das die Ansicht aus `bzProfil` setzt.
+
+**Regel ohne Rollenprüfung:** Kanten aus `h`-Tags gelten wie „geteilt“, ohne Rollenprüfung; das Gruppen-Relay wird nie gelesen. Mitgliedschaft allein macht niemanden in der Personen-Ansicht sichtbar.
+
+**Grenze:** Zusagen und Reaktionen sind nur die neuesten 200 je Art; ältere Beziehungen fehlen im Gefüge.
+
 ## Schnappschuss erneuern
 
 ```bash
