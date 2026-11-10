@@ -62,7 +62,6 @@ Die Konsole ist als eigenständiges Custom Element `<relihub-steuerkonsole>` geb
 | context | Name eines Kontextprofils | hub-start, hub-profil, hub-communities, hub-community, rpi-materialpool, relilab, relidesk |
 | base-url | Adresse des Hub | Platzhalter https://relihub.example |
 | target | \_self oder \_blank | – |
-| config-src | JSON-Datei mit Kontextprofil zum Nachladen | – (vorgesehen) |
 | demo | nur Ereignis, keine Navigation | – |
 | compact / floating | Kleinform in Kopfzeile bzw. schwebend unten rechts, klappt auf | floating auf allen Unterseiten |
 | popover-size / popover-align | Größe und Ausrichtung der aufgeklappten Form | 210 |
@@ -127,6 +126,16 @@ Seit Etappe 4 zeigt der Hub, was Communities teilen, und listet Termine und Pers
 - **Fortbildungskalender** (`#finden/fortbildungen`): Termine fester Quellen plus die der Hub-Communities (`h`), nie global; Labor und Institut sind ein Merkmal, dazu online, Anmeldung und kostenfrei. Fehlende Angaben heißen „keine Angabe“; erreicht eine Gruppe die Relay-Grenze, steht das in der Stand-Zeile.
 - **Personen** (`#kooperieren/personen`) zeigt nur, wen die Personen-Liste (`kind:30000`, `d=personen`) nennt; die Liste ist das Einverständnis, Mitgliedschaft allein führt niemanden auf, Bots fehlen. Die Einzelseite `#person?p=<npub>` ist eine eigene Route und zeigt Profil, Mitgliedschaften und Veröffentlichungen; `#profil` bleibt die Persona. Fehlt die Liste, bleibt die Teamseite als Rückfall.
 - **Folgen, Speichern als Liste, Redaktionsoberfläche** sind sichtbar und deaktiviert, bis die Anmeldung mit Schlüssel da ist.
+
+### Beziehungsgefüge, Mitmachen, Zuschnitt, Anmeldung (Etappe 5a)
+
+Seit Etappe 5a verbindet der Hub Menschen, Termine, Communities und Materialien zu einem Gefüge, lässt sich auf eine Community zuschneiden und schreibt mit Anmeldung (Begründung: [ADR-0009](adr/0009-beziehungsgefuege-mitmachen-anmeldung.md), Abfragen: [daten.md](daten.md)):
+
+- **Ökosystem** (`#oekosystem`): vier Reihen (Menschen, Termine, Communities, Materialien) mit Auswahl und Nachbarn aus dem Beziehungsgefüge. Die Kanten stammen aus den Events selbst; eine Abfrage plus eine Profilabfrage, der Rest aus den Zwischenspeichern der Ansichten. Personen nur mit Profil und Kante, ohne Rollenprüfung. Ohne Antwort bleiben die Schnappschuss-Einträge ohne Kanten.
+- **Communities live**: aus `kind:10222` und `kind:0`; Partner ohne Schlüssel bleiben Kacheln.
+- **Mitmachen** (`#mitmachen`): Protokoll (einzige dauerhafte Subscription je Relay, nur lesend) und Gespräche (Kommentare werden gelesen, geschrieben wird in der edufeed-App). Im relilab als Tab eingebunden, dort stehen auch Materialien und Menschen.
+- **Zuschnitt** (`?c=<npub>`): Datenfilter auf alle Ansichten, Markierung in der Leiste; die Seite „Eigene Instanz“ zeigt Vorschau, Link, Kontextprofil und Shortcode.
+- **Anmeldung** (`#anmelden`): NIP-07 oder „nur ansehen“, nie ein `nsec`. Folgen, Beitreten, Zusagen, Gefällt mir und Sammlung speichern sind je ein Klick; Listen werden frisch geholt und ergänzt, Folgen fragt immer.
 
 ## Instanzen und Communities
 
@@ -250,12 +259,13 @@ Der Prototyp markiert selbst, wo er aufhört. Diese Stellen sind zugleich die Pu
 
 | Stelle | Stand im Prototyp | Was zu beschreiben wäre |
 | --- | --- | --- |
-| Folgen | Knopf bei den Personen sichtbar, deaktiviert | braucht Signer und Anmeldung: Kontaktliste (NIP-02) des Nutzers, Rückmeldung in der Ansicht |
-| Abonnieren als Nostr-Liste | Sammlung zeigt nur den kopierbaren Filter, „Als Nostr-Liste speichern“ deaktiviert | Signer-Fluss, der die Liste (`kind:30004`) schreibt |
+| Folgen | über die Anmeldung gebaut (Etappe 5a); fragt immer, weil der Hub nur drei Relays liest | Folgeliste auf mehr Relays prüfen oder Abgleich mit anderen Apps |
+| Abonnieren als Nostr-Liste | gebaut: „Als Nostr-Liste speichern“ schreibt `kind:30004`, ergänzt eine bestehende Liste | Abonnieren aus anderen Apps, Teilen der Liste |
 | Redaktionsoberfläche für Kuratierungslisten | Listen pflegt das Team bis dahin in der edufeed-App | Oberfläche im Hub, sobald die Anmeldung steht (Stufe B) |
-| Anmeldung | „Mit Nostr-Schlüssel anmelden“ ist ein Link auf die Profilseite | Signer-Fluss (NIP-07/NIP-46), Profil aus kind 0, Interessen als Tags |
+| Schreiben von Kommentaren im Hub | Kommentare werden gelesen, geschrieben wird in der edufeed-App | Stufe C: Editor im Hub oder Sprung in die App |
+| Konsole als eigenständiges Skript | Konsole steckt in `index.html` | Plan 5b: eigene Datei, liest denselben `?c=`-Zuschnitt |
+| Anmeldung | gebaut: NIP-07 oder „nur ansehen“, kein Bunker im Hub | NIP-46 nur, wenn die Schlüsselhaltung im Tab geklärt ist |
 | Materialdaten | eingebetteter Schnappschuss, Relay-Adressen nur im Fuß | Live-Abfrage über die genannten Relays; AMB-Felder, die das „warum“ der Empfehlungen speisen |
-| config-src | Attribut vorgesehen, nicht genutzt | Kontextprofile als JSON pro Partner, damit Einbindung ohne JavaScript-Kenntnis möglich ist |
 | Lerninhalt-Editor | nur Bereiche Schule und Konfi-Arbeit freigeschaltet | Vokabulare je Bildungsbereich (SKOS), Lizenzen, Einordnungsfelder |
 | Community gründen, Interessen bearbeiten, Merkliste | data-todo | Nostr-Entsprechungen (Gruppen, Listen) und wo sie im Hub erscheinen |
 | Partner ohne Nachbau | relimentar, narrt, reliGlobal, Konfi-Arbeit, Friedensarbeit EKD, InkRV, CI, edufeed nur als Kacheln | je Partner das Template aus dem vorigen Abschnitt ausfüllen; reliGlobal und KuRU sind als Communities bereits angelegt |

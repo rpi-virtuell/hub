@@ -35,3 +35,4 @@ Regeln: Deutsch; Produktsicht (keine Projektverwaltung, keine Berichtsbezüge); 
 | [0006](0006-live-daten-mit-rueckfall.md) | Live-Daten mit Schnappschuss als Rückfall, Kennzeichnung „Nachbau“ (ersetzt Punkt 1 von ADR-0002) | angenommen |
 | [0007](0007-inhalte-aus-events.md) | Inhalte aus Events: Seiten, Beiträge, Materialien, Lizenzstand | angenommen |
 | [0008](0008-community-inhalte-und-listen.md) | Community-Inhalte und Listen: Kataloge, Sammlung, Fortbildungskalender, Personen | angenommen |
+| [0009](0009-beziehungsgefuege-mitmachen-anmeldung.md) | Beziehungsgefüge, Mitmachen, Zuschnitt, Anmeldung | angenommen |
