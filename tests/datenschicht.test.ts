@@ -84,3 +84,23 @@ Deno.test('speicher: ohne localStorage null beim Lesen, kein Fehler beim Schreib
   assertEquals(speicher('relihub-modus'), null);
   assertEquals(speicher('relihub-modus', 'direkt'), null);   // wirft nicht
 });
+
+Deno.test('hubAbonnieren: eine Verbindung je Relay, since gesetzt, Wiederverbinden begrenzt, gleicher Name ersetzt', async () => {
+  const block = (re: RegExp) => (s.match(re) || [''])[0];
+  const offen: any[] = [];
+  class WS { url: string; onopen: any; onmessage: any; onclose: any; onerror: any; sent: string[] = []; closed = false;
+    constructor(u: string) { this.url = u; offen.push(this); setTimeout(() => this.onopen && this.onopen(), 0); }
+    send(m: string) { this.sent.push(m); } close() { this.closed = true; setTimeout(() => this.onclose && this.onclose(), 0); } }
+  const src = block(/  const hubAbos = new Map\(\);[\s\S]*?  function hubAbbestellen\(name\) \{[\s\S]*?\n  \}/);
+  const api = new Function('WebSocket', 'setTimeout', src + '; return { hubAbonnieren, hubAbbestellen, hubAbos };')(WS, (f: any, ms: number) => setTimeout(f, Math.min(ms, 5)));
+  const status: number[] = [];
+  api.hubAbonnieren('t', [{ kinds: [7] }], { relays: ['wss://a', 'wss://b'], beiEvent: () => {}, beiStatus: (n: number) => status.push(n) });
+  await new Promise(r => setTimeout(r, 20));
+  assertEquals(offen.length, 2); assert(offen.every(w => /"since":\d{10}/.test(w.sent[0])), 'since gesetzt'); assertEquals(status.at(-1), 2);
+  api.hubAbonnieren('t', [{ kinds: [7] }], { relays: ['wss://a'], beiEvent: () => {}, beiStatus: () => {} });
+  await new Promise(r => setTimeout(r, 20));
+  assert(offen[0].closed && offen[1].closed, 'gleicher Name schließt die vorige');
+  for (let i = 0; i < 8; i++) { offen.at(-1).close(); await new Promise(r => setTimeout(r, 30)); }
+  assert(offen.length <= 3 + 5, 'höchstens fünf Wiederverbindungen');
+  api.hubAbbestellen('t'); assertEquals(api.hubAbos.size, 0);
+});

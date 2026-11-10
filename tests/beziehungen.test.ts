@@ -92,3 +92,25 @@ Deno.test('cyLaden: keine eigene Profilabfrage, Konten stehen in der Beziehungsa
   assert(!/hubFetch\(/.test(fn('cyLaden')) && !/communities:profile/.test(s), 'cyLaden holt nichts nach');
   assert(/daten\.communities\.map\(ev => ev\.pubkey\), \.\.\.daten\.mitgliedschaften/.test(fn('bzLaden')), 'Community-Konten stehen vorn in der Profilabfrage von bzLaden');
 });
+
+Deno.test('pkEintrag: Sätze je Kind, Kommentar als Text, ohne Ziel null', () => {
+  const pe = bau('pkEintrag', fn('aTagLesen') + fn('repostZiel') + "const bzProfil = () => null; const bech32 = () => 'npub1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'; const CO_SCHLUESSEL = [];");
+  const A = 'aa'.repeat(32), C = 'cc'.repeat(32);
+  const ents = new Map([[`m:30142:${A}:m1`, { id: `m:30142:${A}:m1`, typ: 'material', ev: { kind: 30142, pubkey: A, tags: [['d', 'm1'], ['name', 'Gen 1 <b>']] }, pk: A }], ['c:' + C, { id: 'c:' + C, typ: 'community', pk: C }]]);
+  const g = { ents, kanten: new Map() };
+  const k = pe({ id: 'k1', kind: 1111, pubkey: A, created_at: 5, content: '<script>x</script> gut', tags: [['K', '30142'], ['A', `30142:${A}:m1`], ['a', `30142:${A}:m1`]] }, g);
+  assert(k && /hat zu/.test(k.html) && /&lt;script&gt;/.test(k.html) && !/<script/.test(k.html) && /Gen 1 &lt;b&gt;/.test(k.html), 'Kommentar maskiert');
+  assertEquals(pe({ id: 'k2', kind: 7, pubkey: A, created_at: 6, content: '+', tags: [['e', 'ff'.repeat(32)]] }, g), null, 'ohne Ziel null');
+  const r = pe({ id: 'k3', kind: 16, pubkey: A, created_at: 7, tags: [['a', `30142:${A}:m1`], ['h', C]] }, g);
+  assert(r && /geteilt/.test(r.html) && r.bezug.includes('c:' + C) && r.bezug.includes('p:' + A), 'Repost mit Community');
+});
+
+Deno.test('Mitmachen: Ansicht, Abfrage, Zustände, Protokoll im Ökosystem', () => {
+  assert(/id="v-mitmachen" data-stand="nachbau:/.test(html) && /'mitmachen'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'Ansicht und Route');
+  const l = fn('pkLaden');
+  assert(/hubFetch\('mitmachen', \[\{ kinds: \[1111\], '#K': \['30142', '30023', '31922', '31923'\], limit: 100 \}, \{ kinds: \[1\], '#h': CO_SCHLUESSEL\.map/.test(l), 'zwei Filter, feste Mengen');
+  const r = fn('pkRender');
+  assert(/Noch kein Gespräch/.test(r) && /antworten gerade nicht|Relays nicht erreichbar/.test(r) && /keine Live-Verbindung/.test(r) && /Protokoll verbunden mit/.test(r), 'Zustände');
+  assert(/hubAbonnieren\('protokoll', \[\{ kinds: PK_KINDS/.test(s) && /id="ozProtokoll"/.test(html), 'Subscription und Streifen');
+  assert(!/mdSeite\(/.test(r) && !/mdSeite\(/.test(fn('pkEintrag')), 'Kommentare nie als Markdown');
+});

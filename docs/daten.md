@@ -11,11 +11,12 @@ Umsetzung von [ADR-0006](adr/0006-live-daten-mit-rueckfall.md). Die Datenschicht
 | `MAX_CONN` | 3 | höchstens drei WebSockets gleichzeitig; weitere warten in einer Warteschlange |
 | `RETRY_MS` | 60000 | innerhalb einer Minute liefert eine erneute Abfrage derselben Ansicht den Zwischenspeicher, ohne Netz |
 
-Die Relays weisen Adressen ab, die viele Anfragen schnell hintereinander stellen. Deshalb gilt: ein `REQ` je Relay und Ansicht (alle Filter der Ansicht in einem `REQ`), nie eine Subscription je Eintrag.
+Die Relays weisen Adressen ab, die viele Anfragen schnell hintereinander stellen. Deshalb gilt: ein `REQ` je Relay und Ansicht (alle Filter der Ansicht in einem `REQ`), nie eine Subscription je Eintrag. Einzige Ausnahme ist die Subscription für das Aktivitätsprotokoll (unten).
 
 ## Funktionen
 
 - `hubFetch(name, filters, opts)` → `Promise<Event[]>`: sendet die Filter als ein `REQ` an jedes Relay aus `opts.relays` (Standard: alle `RELAYS`), sammelt `EVENT`s, dedupliziert nach `id` und schließt bei `EOSE` oder nach `TIMEOUT_MS`. Bei `NOTICE`, `CLOSED` oder Verbindungsfehler schließt der Socket, und das bis dahin Empfangene zählt. Das Versprechen löst immer auf, nie ab; im schlechtesten Fall mit `[]`. Das Ergebnis liegt in `sessionStorage` unter `relihub:<name>` als `{t, events}`; ist der Speicher gesperrt (privates Fenster), läuft alles ohne Zwischenspeicher.
+- `hubAbonnieren(name, filters, opts)` → `{ schliessen() }` und `hubAbbestellen(name)`: dauerhafte Subscription, siehe „Subscription für das Protokoll“. Sie zählt nicht gegen `MAX_CONN`.
 - `datenstand(viewId, zustand, info)`: schreibt die Stand-Zeile `<p class="stand">` der Ansicht: `live · <info>`, `Stand vom <info>` oder `Nachbau · <info>`.
 - `npubToHex(npub)`: Bech32 nach NIP-19, liefert 64 Hex-Zeichen.
 - `evToTermin(ev)`: NIP-52-Event (kind 31923) → Termin-Objekt der relilab-Ansicht (`id` aus dem `d`-Tag, Titel, Start, Ende, Kurztext aus `summary`, Ort, `t`-Tags, Bild und Anmeldelink aus `r` nur mit `http(s)://`, sonst leer (`sichereUrl`), Absender über `RT_SRC`, `naddr` und edufeed-Link).
@@ -29,6 +30,7 @@ Jede Ansicht außer der Startseite trägt direkt unter ihrer Kopfzeile eine Stan
 | `v-profil` | Nachbau · Persona Luca Beispiel | keine, Persona |
 | `v-communities` | Stand vom 26.10.2026 · Texte teils Beispiel → live | eingebettete Liste, dann `cyLaden()` (Konten mit `kind:10222` aus `bzLaden()`); „live · <n> Communities · <m> Partner ohne Schlüssel“ |
 | `v-oekosystem` | Nachbau · Gefüge laden → Stand vom (jüngstes Schnappschuss-Datum) → live | Schnappschüsse (`MP`, `RT_RAW`, `OC_RAW`, `CY`) ohne Kanten, dann `bzLaden()` und die Caches der anderen Ansichten |
+| `v-mitmachen` | Nachbau · Protokoll verbinden → live · <n> Aktivitäten · <k> Kommentare · Protokoll verbunden mit <r> von 2 Relays (ohne Verbindung mit „· keine Live-Verbindung“); ohne Antwort „Nachbau · Relays nicht erreichbar“ | Quellen von `bzQuellen()`, Abfrage `mitmachen` (`pkLaden()`), Subscription `protokoll` |
 | `v-community` | Nachbau · Beispielinhalte | Beispielinhalte (Beiträge, Chat), keine Datenquelle |
 | `v-materialpool` | Stand vom 22.10.2026 → live | eingebettete Liste (`MP`), dann `mpLaden()` |
 | `v-relilab` | Stand vom `RT_STAND` → live | Schnappschuss, dann `hubFetch('relilab-termine', …)` |
@@ -248,6 +250,34 @@ Das Ziel von Zusage und Reaktion ist der erste gültige `a`-Tag, sonst der erste
 `cyLaden()` liest einmal je Sitzung aus `bzDaten.communities` (`kind:10222`) und `bzDaten.profile`; Die Profile der Konten holt schon die abhängige Profilabfrage von `bzLaden` (Community-Konten stehen vorn); `cyLaden` stellt keine eigene Abfrage. `cyAus(ev, profil)` macht daraus einen Eintrag (`id` = Hex-Präfix 8, `hex`, Name und Beschreibung roh, Bild nur über `sichereUrl`, Mitglieder aus dem Gefüge). Bekannte Schlüssel (`CY_HEX`, Hex → Kennung) behalten die Kennung der eingebetteten Karte, damit `#community?c=<id>` weiter gilt; die RpiCommunity ist ausgeblendet (Entscheidung 04.11.2026), der Schaufenster-Schlüssel `oercommunity` hat keine `10222` und bleibt eingebettet.
 
 `cyRender()` zeigt die Live-Einträge nach Mitgliederzahl, dahinter die eingebetteten Einträge ohne Schlüssel als Partnerkacheln (`cy-partner`, Hinweis „Partner ohne eigenen Schlüssel im Datenraum“, ohne Folgen-, Raum- und Katalog-Knopf). Stand-Zeile: `live · <n> Communities · <m> Partner ohne Schlüssel`; ohne Antwort bleibt der eingebettete Stand vom 26.10.2026. Live-Communities ohne eigene Karte im Hub öffnen im Ökosystem (`#oekosystem?wahl=c:<hex>`).
+
+### Subscription für das Protokoll
+
+`hubAbonnieren('protokoll', [{ kinds: PK_KINDS }], { relays, beiEvent, beiStatus })` ist die einzige dauerhafte Verbindung des Hubs. `PK_KINDS` = `30142, 30023, 31922, 31923, 31925, 7, 16, 30000, 1111, 1`. Regeln:
+
+- **Eine Verbindung je Relay**, nur zu `relay.edufeed.org` und `relay-rpi.edufeed.org`; je Relay ein `REQ` mit den Filtern plus `since` = Startzeit der Subscription, also nur neue Events.
+- **Wiederverbinden** nach einem Abbruch nach `4000 · (Versuch + 1)` ms, höchstens fünfmal je Relay; danach bleibt das Relay getrennt (die Stand-Zeile zählt die verbundenen Relays, ohne eine Verbindung steht „· keine Live-Verbindung“).
+- **Derselbe Name ersetzt die vorige Subscription** (Halter `hubAbos`); `hubAbbestellen(name)` schließt und löscht. Es gibt nur den Namen `protokoll`; er gilt für die Sitzung (Verlassen der Ansicht schließt ihn nicht, Neuladen baut ihn neu auf).
+- **Nie für Listen oder Inhalte**: Karten, Reihen und Detailansichten holen weiter über `hubFetch`.
+
+Die Live-Events sammelt `pkLiveEvent` (`pkNeu`), nach 600 ms bündelt `pkBuendeln` sie in `pkLive`; `bzQuellen()` trägt sie nach (`bzDaten` und `coDaten` bleiben unverändert), das Gefüge wird neu gebaut und Ökosystem und Mitmachen werden neu gezeichnet. Neue Zeilen tragen die Klasse `neu`.
+
+### Verbraucher: Mitmachen
+
+`#mitmachen?c=<Community>` (Kennung, Hex oder `alle`; ohne Angabe gilt der Zuschnitt `HUB_C`) zeigt links das Protokoll (neueste 80 Zeilen mit relativer Zeit) und rechts die Gespräche. `pkRender(root, c)` zeichnet in eine beliebige Wurzel (relilab bindet den Raum als Tab mit `c=relilab` ein). Quellen: alle Events von `bzQuellen()` (Materialien, Beiträge, Termine, Reposts, Mitgliedslisten, Zusagen, Reaktionen), die Abfrage `mitmachen` und die Live-Events.
+
+`pkLaden()` stellt einmal je Sitzung einen `REQ` je Relay (`relay.edufeed.org`, `relay-rpi.edufeed.org`) mit zwei Filtern: Kommentare `kinds: [1111]` mit `#K` in `30142, 30023, 31922, 31923` (limit 100) und kurze Beiträge `kinds: [1]` mit `#h` aus den fünf Community-Schlüsseln (limit 100). Eine leere Antwort wird nicht gehalten.
+
+`pkEintrag(ev, gefuege)` macht aus einem Event eine Zeile `{ id, zeit, bezug, html }` oder `null`. Das Ziel eines Events kommt aus dem `a`- (oder `A`-) Tag, sonst aus dem `e`-Tag, jeweils nur, wenn es im Gefüge steht; ohne Ziel ergibt sich `null`, außer bei eigenen Inhalten und kurzen Beiträgen mit bekannter Community im `h`-Tag. `bezug` nennt alle verlinkten Entitäts-IDs und den Autor; der Community-Filter lässt eine Zeile zu, wenn `bezug` die Community oder eine mit ihr verbundene Entität enthält. Alle Texte laufen durch `esc`, Kommentare und Beiträge erscheinen als Text, nie als Markdown; Links führen nur auf Hub-Routen (`#oekosystem?wahl=…`, `#materialpool?d=…`, `#person?p=…`, `#community?c=…`).
+
+| Zustand | Stand-Zeile |
+| --- | --- |
+| vor der Antwort | `Nachbau · Protokoll verbinden` |
+| Antwort | `live · <n> Aktivitäten · <k> Kommentare · Protokoll verbunden mit <r> von 2 Relays` |
+| Antwort, keine Verbindung der Subscription | wie oben mit Zusatz „· keine Live-Verbindung“ |
+| keine Antwort | `Nachbau · Relays nicht erreichbar` („Die Relays antworten gerade nicht.“) |
+
+Ohne Gespräche zeigt die rechte Spalte „Noch kein Gespräch zu Materialien, Terminen oder Beiträgen des Ökosystems. Der erste Kommentar entsteht in der edufeed-App.“ mit Link auf `https://edufeed.org`. Das Ökosystem zeigt über `#ozProtokoll` die neuesten acht Zeilen mit dem Link „Alle im Raum Mitmachen ›“.
 
 ## Schnappschuss erneuern
 
