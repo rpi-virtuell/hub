@@ -833,45 +833,108 @@ relihub-steuerkonsole[hidden]{display:none}
 .oz-sub{margin:0 0 14px;color:var(--muted);max-width:62ch}
 .oz-meldung{margin:0 0 12px;font-size:14px;color:var(--oz-text)}
 .oz-meldung:empty{display:none}
-.oz-auswahl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;background:var(--oz-hell);color:var(--oz-text);border-radius:16px;padding:10px 16px;margin:0 0 18px}
-.oz-auswahl[hidden]{display:none}
-.oz-auswahl b{font-size:18px;color:var(--ink)}
-.oz-auswahl .oz-typ{font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
-.oz-auswahl a{color:var(--oz-text);font-weight:600}
-.oz-auswahl button{margin-left:auto;font:inherit;font-size:15px;font-weight:600;border:1.5px solid var(--oz-text);background:#fff;color:var(--oz-text);border-radius:999px;padding:4px 14px;cursor:pointer}
-.oz-reihe{margin:0 0 20px}
-.oz-kopf{display:flex;align-items:center;gap:10px}
-.oz-kopf h2{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:26px;line-height:1.1;margin:0}
-.oz-lupe,.oz-tausch{display:inline-grid;place-items:center;width:34px;height:34px;border:1.5px solid var(--line);background:var(--card);color:var(--oz-text);border-radius:50%;cursor:pointer;padding:0;font:inherit;font-size:16px}
-.oz-lupe svg{width:17px;height:17px}
-.oz-lupe[aria-expanded="true"]{background:var(--oz-hell)}
-.oz-kopf input{font:inherit;font-size:15px;border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;min-width:0;width:min(240px,100%);background:var(--card)}
-.oz-kopf input[hidden]{display:none}
-.oz-tausch{margin-left:auto}
-.oz-hinweis{margin:2px 0 8px;font-size:14px;color:var(--muted)}
-.oz-bahn{display:flex;gap:14px;align-items:stretch}
-.oz-fokus{flex:0 0 auto}
-.oz-spur{display:flex;gap:14px;overflow-x:auto;padding:8px 6px 14px;flex:1;min-width:0}
-.oz-leer{margin:0;padding:12px 0;color:var(--muted);font-size:15px}
-.oz-karte{flex:0 0 190px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:12px;cursor:pointer;position:relative}
-.oz-karte:hover{border-color:var(--c-koop)}
-.oz-karte:focus-visible{outline:3px solid var(--c-hub);outline-offset:2px}
-.oz-karte[aria-pressed="true"]{background:var(--oz-hell);border-color:var(--oz-text);box-shadow:0 0 0 2px var(--oz-text)}
-.oz-event,.oz-material{border-radius:6px;transform:rotate(-1.2deg)}
-.oz-material{transform:rotate(1deg)}
-.oz-bild{position:relative;display:grid;place-items:center;width:64px;height:64px;overflow:hidden;background:hsl(var(--oz-h,330) 55% 88%);color:hsl(var(--oz-h,330) 60% 20%);font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:24px}
-.oz-bild img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.oz-person .oz-bild{border-radius:50%}
-.oz-community .oz-bild{clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
-.oz-event .oz-bild,.oz-material .oz-bild{border-radius:4px;width:100%;height:84px}
-.oz-pille{font-size:12.5px;font-weight:600;color:var(--oz-text);background:var(--oz-hell);border-radius:999px;padding:2px 9px}
-.oz-karte[aria-pressed="true"] .oz-pille{background:#fff}
-.oz-name{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:19px;line-height:1.15;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.oz-untertitel{font-size:13.5px;line-height:1.35;color:var(--muted);overflow-wrap:anywhere}
-.oz-minis{display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin-top:auto}
-.oz-mini{display:inline-grid;place-items:center;position:relative;overflow:hidden;width:24px;height:24px;border-radius:50%;font-size:10px;font-weight:700;background:hsl(var(--oz-h,330) 55% 88%);color:hsl(var(--oz-h,330) 60% 20%)}
-.oz-mini img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.oz-mehr{font-size:12px;color:var(--muted);margin-left:3px}
+.oz-meldung{min-height:21px}
+/* Ökosystem als Blume (ADR-0012): Typfarben wie im Logo, Suche blau */
+#v-oekosystem [data-typ="person"]{--tc:var(--c-koop);--tx:var(--x-koop);--tt:var(--t-koop)}
+#v-oekosystem [data-typ="community"]{--tc:var(--c-ver);--tx:var(--x-ver);--tt:var(--t-ver)}
+#v-oekosystem [data-typ="material"]{--tc:var(--c-finden);--tx:var(--x-finden);--tt:var(--t-finden)}
+#v-oekosystem [data-typ="event"]{--tc:var(--c-erstellen);--tx:var(--x-erstellen);--tt:var(--t-erstellen)}
+#v-oekosystem [data-typ="suche"]{--tc:var(--c-hub);--tx:var(--x-hub);--tt:var(--t-hub)}
+.bl-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.bl-trail{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:34px;margin:0 0 4px}
+.bl-trail .lbl{font-size:13px;color:var(--muted);margin-right:2px}
+.bl-chip{display:inline-flex;align-items:center;gap:6px;max-width:230px;font:inherit;font-size:13.5px;font-weight:600;color:var(--tx);background:var(--tt);border:1.5px solid transparent;border-radius:999px;padding:3px 11px 3px 9px;cursor:pointer}
+.bl-chip i{flex:0 0 9px;height:9px;border-radius:50%;background:var(--tc)}
+.bl-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bl-chip[aria-current="true"]{border-color:var(--tc);cursor:default}
+.bl-trail .sep{color:#bdb9ad;font-weight:700}
+.bl-wrap{position:relative;width:100%;margin:0 0 26px}
+.bl-stage{position:absolute;left:0;top:0;width:1100px;transform-origin:0 0}
+.bl-pw{position:absolute;filter:drop-shadow(0 6px 9px rgba(29,29,27,.16))}
+.bl-pw[data-typ="suche"]{z-index:3}
+.bl-petal{position:absolute;inset:0;background:var(--tt);overflow:hidden}
+.bl-edge{position:absolute;inset:0;pointer-events:none;z-index:4}
+.bl-edge path{fill:none;stroke:var(--tc);stroke-width:8;stroke-linejoin:round}
+.bl-hd{position:absolute;z-index:3}
+.bl-hd .row,.bl-shead{display:flex;align-items:center;gap:7px}
+.bl-shead{min-height:26px}
+.bl-hd i.d{flex:0 0 12px;height:12px;border-radius:50%;background:var(--tc)}
+.bl-hd h2{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:24px;line-height:1;margin:0;color:var(--tx)}
+.bl-count{font-size:12.5px;font-weight:600;color:var(--tx);background:rgba(255,255,255,.75);border-radius:999px;padding:1px 9px;white-space:nowrap}
+.bl-all{margin-left:auto;white-space:nowrap;flex:none;font:inherit;font-size:13px;font-weight:600;color:var(--tx);background:none;border:0;cursor:pointer;padding:2px}
+.bl-all:hover{text-decoration:underline}
+.bl-note{margin:3px 0 0;font-size:12px;color:var(--muted);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bl-list{position:absolute;inset:0;z-index:1;overflow-x:hidden;overflow-y:auto;scrollbar-width:none;overscroll-behavior:contain;
+  -webkit-mask-image:linear-gradient(to bottom,transparent var(--m1,0),#000 calc(var(--m1,0px) + 14px),#000 calc(100% - var(--m2,0px) - 22px),transparent calc(100% - var(--m2,0px)));
+          mask-image:linear-gradient(to bottom,transparent var(--m1,0),#000 calc(var(--m1,0px) + 14px),#000 calc(100% - var(--m2,0px) - 22px),transparent calc(100% - var(--m2,0px)))}
+.bl-list::-webkit-scrollbar{display:none}
+.bl-list:focus-visible{outline:3px solid var(--c-hub);outline-offset:-6px}
+.bl-empty{margin:4px 0;padding:12px;border:1.5px dashed rgba(29,29,27,.18);border-radius:14px;color:var(--muted);font-size:14px;text-align:center}
+.bl-rest{border:0}
+.bl-row{display:flex;align-items:center;gap:9px;width:100%;text-align:left;font:inherit;color:var(--ink);background:none;border:0;border-radius:12px;padding:5px 6px;cursor:pointer;margin:0}
+.bl-row:hover{background:rgba(255,255,255,.8)}
+.bl-row:focus-visible,.bl-chip:focus-visible,.bl-all:focus-visible,.bl-clear:focus-visible,.bl-mehr:focus-visible{outline:3px solid var(--c-hub);outline-offset:-2px}
+.bl-row .t{min-width:0;display:flex;flex-direction:column}
+.bl-row b{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:17px;line-height:1.1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.bl-row small{font-size:12px;color:var(--muted);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bl-row[aria-selected="true"]{background:rgba(255,255,255,.9);box-shadow:inset 0 0 0 2px var(--c-hub)}
+.bl-sugg{margin:2px 6px 4px;font-size:12px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--tx)}
+.bl-av{position:relative;overflow:hidden;flex:0 0 36px;width:36px;height:36px;display:grid;place-items:center;background:hsl(var(--oz-h,330) 55% 88%);color:hsl(var(--oz-h,330) 60% 20%);font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:15px}
+.bl-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bl-av[data-typ="person"]{border-radius:50%}
+.bl-av[data-typ="community"]{clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.bl-av[data-typ="material"]{border-radius:6px}
+.bl-av[data-typ="event"]{border-radius:6px;background:var(--tt);color:var(--tx);line-height:1;text-align:center;font-size:11px}
+.bl-av[data-typ="event"] b{display:block;font-size:16px;font-family:"Barlow Condensed",sans-serif}
+.bl-petal [data-typ="event"].bl-av{background:rgba(255,255,255,.8)}
+.bl-clear{margin-left:auto;font:inherit;font-size:13px;font-weight:600;color:var(--ink);background:#fff;border:1.5px solid rgba(29,29,27,.15);border-radius:999px;padding:2px 11px;cursor:pointer;white-space:nowrap}
+.bl-clear:hover{border-color:var(--c-koop)}
+.bl-clear[hidden]{display:none}
+.bl-search{position:relative;margin-top:6px}
+.bl-search input{width:100%;font:inherit;font-size:15.5px;color:var(--ink);border:2px solid rgba(32,58,143,.35);border-radius:999px;padding:8px 14px 8px 38px;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23203A8F' stroke-width='2.2' stroke-linecap='round'><circle cx='10.5' cy='10.5' r='6.5'/><path d='m15.5 15.5 5 5'/></svg>") 12px 50%/18px no-repeat}
+.bl-search input:focus{border-color:var(--c-hub);outline:none;box-shadow:0 0 0 3px rgba(32,58,143,.18)}
+/* Kelch: der gewählte Eintrag und was du mit ihm tun kannst */
+.bl-calyx{position:absolute;z-index:10;outline:none;border-radius:50%;background:#fff;box-shadow:0 0 0 9px var(--paper),0 8px 22px rgba(29,29,27,.25);display:grid;place-items:center;text-align:center}
+.bl-calyx::before{content:"";position:absolute;inset:0;border-radius:50%;border:6px solid var(--tc);transition:border-color .4s;pointer-events:none}
+.bl-cc{width:76%;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bl-cc .bl-av{flex-basis:46px;width:46px;height:46px;font-size:19px}
+.bl-cc .bl-av[data-typ="event"]{font-size:11px}
+.bl-cc .bl-av[data-typ="event"] b{font-size:19px}
+.bl-cc .pill{font-size:12px;font-weight:600;color:var(--tx);background:var(--tt);border-radius:999px;padding:1px 10px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bl-cc h2{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:22px;line-height:1.06;margin:0;color:var(--tx);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.bl-cc .stat{font-size:12px;font-weight:600;color:var(--muted);line-height:1.25}
+.bl-cc .big{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:44px;line-height:1;color:var(--x-hub)}
+.bl-cc p{margin:0;font-size:13px;color:var(--muted);line-height:1.3}
+.bl-cc .an-zeile{margin:3px 0 0;gap:6px;justify-content:center}
+.bl-cc .an-knopf{align-items:center}
+.bl-cc .an-knopf button{min-height:34px;padding:4px 14px;font-size:13.5px;border-radius:999px}
+.bl-cc .an-knopf small{font-size:11px;line-height:1.15}
+.bl-cc .an-knopf + .an-knopf small{display:none}
+.bl-mehr{font-size:13px;font-weight:600;color:var(--tx)}
+#ozAlle{border:0;border-radius:24px;padding:0;width:min(560px,calc(100vw - 28px));max-height:min(720px,calc(100vh - 40px));box-shadow:0 24px 70px rgba(29,29,27,.3);color:var(--ink);background:#fff}
+#ozAlle::backdrop{background:rgba(29,29,27,.38)}
+#ozAlle .dh{display:flex;align-items:center;gap:10px;padding:16px 18px 8px;position:sticky;top:0;background:#fff}
+#ozAlle .dh h2{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:26px;margin:0;color:var(--tx)}
+#ozAlle .dh button.x{margin-left:auto;font:inherit;font-size:22px;line-height:1;background:none;border:0;cursor:pointer;padding:4px 8px;border-radius:10px}
+#ozAlle .df{padding:0 18px 8px}
+#ozAlle .df input{width:100%;font:inherit;font-size:15px;border:1.5px solid var(--line);border-radius:999px;padding:8px 16px}
+#ozAlle .dl{padding:2px 10px 16px;overflow:auto;max-height:calc(min(720px,100vh - 40px) - 130px)}
+#ozAlle .bl-row:hover,#ozAlle .bl-count{background:var(--tt)}
+/* Schmale Schirme: Kelch und Blätter untereinander */
+@media (max-width:760px){
+  .bl-wrap{height:auto!important}
+  .bl-stage{position:static;width:auto;height:auto!important;transform:none!important;display:flex;flex-direction:column;gap:12px}
+  .bl-pw{position:static!important;width:auto!important;height:auto!important;filter:none}
+  .bl-petal{position:static;clip-path:none!important;-webkit-clip-path:none!important;border-radius:20px;border-left:7px solid var(--tc);padding:6px 6px 8px}
+  .bl-edge{display:none}
+  .bl-hd{position:static!important;width:auto!important;padding:8px 8px 4px}
+  .bl-list{position:static!important;inset:auto;padding:0 2px!important;max-height:300px;-webkit-mask-image:none;mask-image:none}
+  .bl-pw[data-typ="suche"]{order:-2}
+  .bl-calyx{position:relative!important;left:auto!important;top:auto!important;width:auto!important;height:auto!important;border-radius:20px;box-shadow:0 2px 10px rgba(29,29,27,.14);padding:14px 10px;order:-1}
+  .bl-calyx::before{border-radius:20px;border-width:0 0 0 7px}
+  .bl-cc{width:100%}
+}
+@media (prefers-reduced-motion:reduce){.bl-calyx::before{transition:none}}
 /* Anmeldung (NIP-07): Farbe „hub“; Knöpfe zum Mitmachen zeigen Zustand, Aktion oder Hinweis */
 .an-dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;border:0;border-radius:14px;padding:22px 24px;color:var(--ink);background:var(--card);box-shadow:0 20px 60px rgba(0,0,0,.25)}
 .an-dialog::backdrop{background:rgba(29,29,27,.45)}
@@ -910,7 +973,7 @@ relihub-steuerkonsole[hidden]{display:none}
 .cy-partner .cy-back{background:var(--t-koop)}
 .cy-hinweis{font-size:13px;font-weight:600;color:var(--x-koop);background:var(--t-koop);border-radius:999px;padding:2px 10px;margin-top:10px}
 .cy-av img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:70px;height:70px;border-radius:50%;object-fit:cover;z-index:2}
-@media (max-width:640px){.oz-wrap h1{font-size:38px}.oz-bahn{flex-direction:column}.oz-karte{flex-basis:160px}.oz-kopf{flex-wrap:wrap}}
+@media (max-width:640px){.oz-wrap h1{font-size:38px}}
 
 /* ---------- relilab: Termine via Nostr ---------- */
 .rt{max-width:1180px;margin:0 auto;padding:22px 20px 80px}
@@ -1161,7 +1224,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
     <span class="sp"></span>
     <nav>
       <a href="#hilfe">Hilfe</a>
-      <a href="#partner">Ökosystem</a>
+      <a href="#oekosystem">Ökosystem</a>
       <a class="btn btn-profil" href="#profil">Anmelden</a>
     </nav>
   </header>
@@ -1278,7 +1341,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
   <header class="hub-top">
     <a class="brand" href="#start"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg>reli_hub</a>
     <span class="sp"></span>
-    <nav><a href="#partner">Ökosystem</a><a class="btn btn-profil" href="#profil" id="cyProf">Mein Profil</a></nav>
+    <nav><a href="#oekosystem">Ökosystem</a><a class="btn btn-profil" href="#profil" id="cyProf">Mein Profil</a></nav>
   </header>
   <p class="stand" aria-live="polite"></p>
   <main class="cy-wrap">
@@ -1307,10 +1370,15 @@ a.kat-card:hover{border-color:var(--c-koop)}
   <p class="stand" aria-live="polite"></p>
   <main class="oz-wrap">
     <h1>Ökosystem</h1>
-    <p class="oz-sub">Menschen, Termine, Communities und Materialien, wie sie miteinander zusammenhängen. Tippe eine Karte an: Die anderen Reihen zeigen, was mit ihr verbunden ist.</p>
+    <p class="oz-sub">Im Kelch liegt, was du gewählt hast. Die Blätter ringsum zeigen, womit es verbunden ist. Tippe einen Eintrag an, um ihn in den Kelch zu holen, oder suche im oberen Blatt.</p>
+    <nav class="bl-trail" id="ozWeg" aria-label="Bisheriger Weg"></nav>
     <p class="oz-meldung" id="ozMeldung" role="status"></p>
-    <div class="oz-auswahl" id="ozAuswahl" hidden></div>
-    <div id="ozReihen"></div>
+    <div class="bl-wrap" id="ozRahmen"><div class="bl-stage" id="ozBuehne"></div></div>
+    <dialog id="ozAlle" aria-labelledby="ozAlleTitel">
+      <div class="dh"><h2 id="ozAlleTitel"></h2><span class="bl-count" id="ozAlleZahl"></span><button type="button" class="x" data-alle-zu aria-label="Schließen">×</button></div>
+      <div class="df"><input type="search" id="ozAlleFilter" placeholder="in dieser Liste filtern" aria-label="Liste filtern"></div>
+      <div class="dl" id="ozAlleListe"></div>
+    </dialog>
     <section class="pk-streifen" id="ozProtokoll" aria-label="Was gerade passiert" hidden></section>
   </main>
   <footer class="hub-foot"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> reli_hub · ein Vorhaben von FOERBICO · Prototyp</footer>
@@ -4197,14 +4265,18 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     setTimeout(() => { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('hl', 'flip'); setTimeout(() => el.classList.remove('hl', 'flip'), 2600); }, 80);
   }
 
-  // ---------- Ökosystem: Explorer mit vier Reihen (ADR-0009, Farbe „kooperieren“) ----------
-  // Eine Reihe je Typ (Menschen, Termine, Communities, Materialien). Wer eine Karte wählt, sieht in den anderen Reihen nur, was mit ihr verbunden ist.
+  // ---------- Ökosystem: Blume mit Kelch (ADR-0009, ADR-0012) ----------
+  // Im Kelch liegt der gewählte Eintrag, die vier Blätter (Menschen, Communities, Materialien, Termine) zeigen, womit er verbunden ist; das obere Blatt sucht.
   // Ohne Antwort des Relays zeigt die Ansicht die Schnappschuss-Einträge ohne Kanten und sagt es; Kanten gelten wie geteilt, ohne Rollenprüfung.
-  const OZ_STANDARD = ['person', 'event', 'community', 'material'];
+  const OZ_TYPEN = ['person', 'community', 'material', 'event'];
   const OZ_TITEL = { person: 'Menschen', event: 'Termine', community: 'Communities', material: 'Materialien' };
   const OZ_ART = { person: 'Mensch', event: 'Termin', community: 'Community', material: 'Material' };
-  let ozReihenFolge = OZ_STANDARD.slice(), ozWahl = '', ozLauf = 0, ozMeldung = '';
-  const ozFilter = { person: '', event: '', community: '', material: '' }, ozOffen = new Set();
+  const OZ_EINZAHL = { person: 'Person', event: 'Termin', community: 'Community', material: 'Material' };
+  const OZ_WINKEL = { suche: 0, person: 72, community: 144, material: 216, event: 288 };   // Lage wie im Logo
+  const OZ_G = { cx: 550, cy: 548, r0: 64, lang: 470, breit: 370, kelch: 130, w: 240, h: 276 };   // Bühnenmaße: Mitte, Blattbeginn, Länge, Breite, Kelchradius, nutzbarer Bereich im Blatt
+  const OZ_MAX = 60, OZ_MONATE = ['JAN', 'FEB', 'MÄR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DEZ'];
+  const ozSchmal = () => matchMedia('(max-width:760px)').matches;
+  let ozWahl = '', ozLauf = 0, ozMeldung = '', ozWeg = [], ozListen = {}, ozMass = 1, ozBlaetter = null, ozKelchEl = null, ozTreffer = [], ozMarkiert = 0, ozAlleTyp = '', ozGezeichnet = null;
   const ozIni = n => peIni(String(n).replace(/(^|\s)[^\p{L}\p{N}\s&]+(?=\s|$)/gu, ' '));   // Initialen ohne alleinstehende Satzzeichen („R-“ aus „reliGlobal - …“)
   const ozEntesc = t => String(t).replace(/&(amp|lt|gt|quot);/g, (m, k) => ({ amp: '&', lt: '<', gt: '>', quot: '"' }[k]));
   /** Jüngstes Datum der eingebetteten Schnappschüsse (TT.MM.JJJJ) */
@@ -4263,24 +4335,23 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (e.typ === 'person' || e.typ === 'community') return (bzProfil(e.pk) || {}).bild || '';
     return e.ev ? tagWert(e.ev, 'image') : '';
   }
-  /** Eine Karte (HTML-String); Form je Typ über die Klasse, Platzhalter mit Initialen in einer Farbe aus dem Hash der Kennung */
-  function ozKarte(id) {
-    const g = ozGefuege, e = g && g.ents.get(id); if (!e) return '';
-    const nm = ozName(e), bild = sichereUrl(ozBild(e)), farbe = parseInt(kurzHash(id).slice(0, 3), 16) % 360;
-    const nb = typ => bzNachbarn(g.kanten, g.ents, id, typ);
-    let pille;
-    if (e.typ === 'person') pille = ICH.hex && e.pk === ICH.hex ? 'Das bist du' : nb('community').length + (nb('community').length === 1 ? ' Community' : ' Communities');
-    else if (e.typ === 'community') pille = ozLive ? nb('person').length + (nb('person').length === 1 ? ' Mitglied' : ' Mitglieder') : 'Community';
-    else if (e.typ === 'event') pille = e.start ? new Date(e.start * 1000).toLocaleDateString('de-DE') : 'Termin';
-    else pille = (e.ev && ambFeld(e.ev, 'learningResourceType').label) || (e.sub ? 'Material' : 'Beitrag');
-    const verbunden = [...nb('person'), ...nb('community')].filter(ozSichtbar);
-    const minis = verbunden.slice(0, 5).map(v => { const b = sichereUrl(ozBild(v)); return `<span class="oz-mini" style="--oz-h:${parseInt(kurzHash(v.id).slice(0, 3), 16) % 360}" title="${ozName(v)}">${ozIni(ozName(v))}${b ? `<img src="${esc(b)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`; }).join('');
-    const mehr = verbunden.length > 5 ? `<span class="oz-mehr">+${verbunden.length - 5}</span>` : '';
-    const gewaehlt = id === ozWahl;
-    return `<button type="button" class="oz-karte oz-${e.typ}" data-wahl="${esc(id)}" aria-pressed="${gewaehlt}" style="--oz-h:${farbe}">`
-      + `<span class="oz-bild" aria-hidden="true">${ozIni(nm)}${bild ? `<img src="${esc(bild)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`
-      + `<span class="oz-pille">${esc(pille)}</span><b class="oz-name">${nm}</b><span class="oz-untertitel">${ozUntertitel(e)}</span>`
-      + (minis ? `<span class="oz-minis" aria-hidden="true">${minis}${mehr}</span>` : '') + `</button>`;
+  /** Kurzangabe unter dem Namen: Zahl der Communities oder Mitglieder, Datum, Art des Materials */
+  function ozPille(e) {
+    const g = ozGefuege, nb = typ => bzNachbarn(g.kanten, g.ents, e.id, typ).filter(ozSichtbar).length;
+    if (e.typ === 'person') return ICH.hex && e.pk === ICH.hex ? 'Das bist du' : nb('community') + (nb('community') === 1 ? ' Community' : ' Communities');
+    if (e.typ === 'community') return ozLive ? nb('person') + (nb('person') === 1 ? ' Mitglied' : ' Mitglieder') : 'Community';
+    if (e.typ === 'event') return e.start ? new Date(e.start * 1000).toLocaleDateString('de-DE') : 'Termin';
+    return (e.ev && ambFeld(e.ev, 'learningResourceType').label) || (e.sub ? 'Material' : 'Beitrag');
+  }
+  /** Marke eines Eintrags (HTML-String): Form je Typ, Termine als Kalenderblatt, sonst Initialen in einer Farbe aus dem Hash der Kennung und darüber das Bild */
+  function ozMarke(e) {
+    if (e.typ === 'event') { const d = e.start ? new Date(e.start * 1000) : null; return `<span class="bl-av" data-typ="event" aria-hidden="true">${d ? `<span><b>${d.getDate()}</b>${OZ_MONATE[d.getMonth()]}</span>` : '·'}</span>`; }
+    const bild = sichereUrl(ozBild(e));
+    return `<span class="bl-av" data-typ="${e.typ}" style="--oz-h:${parseInt(kurzHash(e.id).slice(0, 3), 16) % 360}" aria-hidden="true">${ozIni(ozName(e))}${bild ? `<img src="${esc(bild)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`;
+  }
+  /** Eine Zeile in einem Blatt (HTML-String); `note` (schon maskiert) ersetzt die Kurzangabe */
+  function ozZeile(e, note, extra) {
+    return `<button type="button" class="bl-row" data-wahl="${esc(e.id)}" data-typ="${e.typ}"${extra || ''}>${ozMarke(e)}<span class="t"><b>${ozName(e)}</b><small>${note || esc(ozPille(e))}</small></span></button>`;
   }
   /** Reihenfolge ohne Auswahl und bei Nachbarn: Personen und Communities nach bzPunkte, Beiträge, Termine und Materialien mit Community-Bezug zuerst, dann Datum (Termine aufsteigend, Materialien absteigend) */
   function ozSortiert(liste, typ) {
@@ -4290,31 +4361,73 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const datum = e => typ === 'event' ? e.start || 0 : e.ev ? (e.ev.kind === 30142 ? mpMaterial(e.ev).datum : +tagWert(e.ev, 'published_at') || e.ev.created_at) : 0;
     return liste.map(e => [bezug(e), datum(e), e]).sort((a, b) => b[0] - a[0] || (typ === 'event' ? a[1] - b[1] : b[1] - a[1])).map(x => x[2]);
   }
-  /** Hinweiszeile einer Reihe in einem Zug: n gezeigte Treffer (Spur zeigt höchstens 80), filter gesetzt, wahl = maskierter Name der Auswahl, nachbarn = Reihe zeigt Verbundenes, quelle = Zahl vor dem Textfilter */
-  function ozHinweis(a) {
-    const zahl = a.n > 80 ? `80 von ${a.n}` : `${a.n}`;
-    if (a.nachbarn) return !a.quelle ? `Keine Verbindung zu „${a.wahl}“` : !a.n ? 'Nichts gefunden.' : a.filter ? `${zahl} von ${a.quelle} verbunden mit „${a.wahl}“` : `${zahl} verbunden mit „${a.wahl}“`;
-    if (a.wahl) return !a.n ? `„${a.wahl}“ gewählt · ${a.filter ? 'nichts gefunden' : 'keine weiteren'}` : `„${a.wahl}“ gewählt · ${zahl} weitere`;
-    return !a.n ? (a.filter ? 'Nichts gefunden.' : 'Keine Einträge') : a.n > 80 ? `80 von ${a.n} Einträgen` : `${a.n} ${a.n === 1 ? 'Eintrag' : 'Einträge'}`;
+  /** Ähnliche Einträge desselben Typs: wer über gemeinsame Nachbarn mit `id` verbunden ist, als [Kennung, Zahl der gemeinsamen Nachbarn], die meisten zuerst */
+  function ozAehnlich(kanten, ents, id, typ) {
+    const zahl = new Map();
+    (kanten.get(id) || []).forEach(n => (kanten.get(n) || []).forEach(x => { const e = ents.get(x); if (x !== id && e && e.typ === typ) zahl.set(x, (zahl.get(x) || 0) + 1); }));
+    return [...zahl].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
   }
-  /** Teile der Reihe `i`: Hinweiszeile, Fokuskarte (die gewählte, in der Reihe ihres Typs) und Spur (höchstens 80 Karten) */
-  function ozTeile(i) {
-    const g = ozGefuege, typ = ozReihenFolge[i], wahl = ozWahl ? g.ents.get(ozWahl) : null, nachbarn = !!wahl && wahl.typ !== typ;
-    const q = ozFilter[typ].trim().toLowerCase();
-    const quelle = (nachbarn ? bzNachbarn(g.kanten, g.ents, wahl.id, typ) : [...g.ents.values()].filter(e => e.typ === typ && (!wahl || e.id !== wahl.id))).filter(ozSichtbar);
-    const liste = ozSortiert(quelle.filter(e => !q || ozEntesc(ozName(e) + ' ' + ozUntertitel(e)).toLowerCase().includes(q)), typ);
-    const hinweis = ozHinweis({ n: liste.length, filter: !!q, wahl: wahl ? ozName(wahl) : '', nachbarn, quelle: quelle.length });
-    return { hinweis, fokus: wahl && !nachbarn ? ozKarte(wahl.id) : '', spur: liste.slice(0, 80).map(e => ozKarte(e.id)).join('') || '<p class="oz-leer">Hier ist nichts zu sehen.</p>' };
+  /** Inhalt eines Blatts: ohne Auswahl alle sichtbaren Einträge des Typs, bei fremdem Typ die Nachbarn der Auswahl, im Blatt des eigenen Typs die ähnlich Verbundenen */
+  function ozListe(typ) {
+    const g = ozGefuege, wahl = ozWahl ? g.ents.get(ozWahl) : null;
+    if (!wahl) return { art: 'start', zeilen: ozSortiert([...g.ents.values()].filter(e => e.typ === typ && ozSichtbar(e)), typ).map(e => ({ e })) };
+    if (wahl.typ !== typ) return { art: 'nachbar', zeilen: ozSortiert(bzNachbarn(g.kanten, g.ents, wahl.id, typ).filter(ozSichtbar), typ).map(e => ({ e })) };
+    const direkt = ozSortiert(bzNachbarn(g.kanten, g.ents, wahl.id, typ).filter(ozSichtbar), typ), schon = new Set(direkt.map(e => e.id));   // im Blatt des eigenen Typs: erst direkt Verbundene, dann ähnlich Verbundene
+    return { art: 'aehnlich', zeilen: [...direkt.map(e => ({ e, note: 'direkt verbunden' })), ...ozAehnlich(g.kanten, g.ents, wahl.id, typ).filter(x => !schon.has(x[0])).map(([id, n]) => ({ e: g.ents.get(id), note: n + ' gemeinsam' })).filter(x => ozSichtbar(x.e))] };
   }
-  const OZ_LUPE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>';
-  /** Reihe `i` mit Kopf (Titel, Lupe mit Filterfeld, Tauschknopf), Hinweiszeile, Fokuskarte und Spur */
-  function ozReihe(i) {
-    const typ = ozReihenFolge[i], t = ozTeile(i), offen = ozOffen.has(typ), titel = OZ_TITEL[typ], naechste = OZ_TITEL[ozReihenFolge[i + 1]];
-    return `<section class="oz-reihe" data-reihe="${i}" aria-label="${titel}"><div class="oz-kopf"><h2>${titel}</h2>`
-      + `<button type="button" class="oz-lupe" data-lupe="${typ}" aria-expanded="${offen}" aria-label="${titel} filtern">${OZ_LUPE}</button>`
-      + `<input type="search" data-filter="${typ}" value="${esc(ozFilter[typ])}" placeholder="filtern" aria-label="${titel} filtern"${offen ? '' : ' hidden'}>`
-      + (i < 3 ? `<button type="button" class="oz-tausch" data-tausch="${i}" title="${titel} und ${naechste} tauschen" aria-label="${titel} und ${naechste} tauschen">⇅</button>` : '')
-      + `</div><p class="oz-hinweis" data-hinweis>${t.hinweis}</p><div class="oz-bahn"><div class="oz-fokus">${t.fokus}</div><div class="oz-spur">${t.spur}</div></div></section>`;
+  /** Form eines Blatts: Ei mit schmalem Ansatz, um `winkel` Grad um die Mitte gedreht. Liefert Lage und Größe des Rahmens, den Pfad darin und die Ecke des nutzbaren Bereichs (um den Schwerpunkt) */
+  function ozBlattForm(winkel) {
+    const G = OZ_G, h = G.breit / 2, l = G.lang, a = winkel * Math.PI / 180;
+    const dreh = p => [G.cx + p[0] * Math.cos(a) - (p[1] - G.r0) * Math.sin(a), G.cy + p[0] * Math.sin(a) + (p[1] - G.r0) * Math.cos(a)];
+    const bogen = [[[0, 0], [.56 * h, -.05 * l], [h, -.28 * l], [h, -.6 * l]], [[h, -.6 * l], [h, -.86 * l], [.44 * h, -l], [0, -l]], [[0, -l], [-.44 * h, -l], [-h, -.86 * l], [-h, -.6 * l]], [[-h, -.6 * l], [-h, -.28 * l], [-.56 * h, -.05 * l], [0, 0]]].map(s => s.map(dreh));
+    const auf = (p, t) => { const u = 1 - t; return [0, 1].map(i => u * u * u * p[0][i] + 3 * u * u * t * p[1][i] + 3 * u * t * t * p[2][i] + t * t * t * p[3][i]); };
+    const pkt = []; bogen.forEach(s => { for (let k = 0; k <= 24; k++) pkt.push(auf(s, k / 24)); });
+    let fl = 0, sx = 0, sy = 0;
+    pkt.forEach((p, i) => { const q = pkt[(i + 1) % pkt.length], kr = p[0] * q[1] - q[0] * p[1]; fl += kr; sx += (p[0] + q[0]) * kr; sy += (p[1] + q[1]) * kr; });
+    fl /= 2; sx /= 6 * fl; sy /= 6 * fl;
+    const x = Math.floor(Math.min(...pkt.map(p => p[0]))) - 4, y = Math.floor(Math.min(...pkt.map(p => p[1]))) - 4;
+    const w = Math.ceil(Math.max(...pkt.map(p => p[0]))) + 4 - x, hh = Math.ceil(Math.max(...pkt.map(p => p[1]))) + 4 - y;
+    const f = p => (p[0] - x).toFixed(1) + ' ' + (p[1] - y).toFixed(1);
+    return { x, y, w, h: hh, d: 'M' + f(bogen[0][0]) + bogen.map(s => ' C' + f(s[1]) + ' ' + f(s[2]) + ' ' + f(s[3])).join('') + ' Z', sx: sx - x - G.w / 2, sy: sy - y - G.h / 2 };
+  }
+  /** Bühne einmal aufbauen: fünf Blätter (Suche oben, dann die vier Typen), Kelch in der Mitte. Das Suchblatt wird danach nie neu gebaut, damit das Feld den Fokus behält */
+  function ozBuehne() {
+    if (ozBlaetter) return;
+    const buehne = document.getElementById('ozBuehne'), G = OZ_G; let unten = 0; ozBlaetter = {};
+    ['suche', ...OZ_TYPEN].forEach(k => {
+      const f = ozBlattForm(OZ_WINKEL[k]), w = document.createElement('div'); unten = Math.max(unten, f.y + f.h);
+      w.className = 'bl-pw'; w.dataset.typ = k; w.style.cssText = `left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px`;
+      w.innerHTML = `<section class="bl-petal" aria-label="${k === 'suche' ? 'Suche' : OZ_TITEL[k]}" style="clip-path:path('${f.d}');-webkit-clip-path:path('${f.d}')"><svg class="bl-edge" width="${f.w}" height="${f.h}" viewBox="0 0 ${f.w} ${f.h}" aria-hidden="true"><path d="${f.d}"/></svg>`
+        + `<div class="bl-hd" style="left:${f.sx.toFixed(1)}px;top:${f.sy.toFixed(1)}px;width:${G.w}px"></div><div class="bl-list" tabindex="0"></div></section>`;
+      buehne.appendChild(w);
+      ozBlaetter[k] = { f, kopf: w.querySelector('.bl-hd'), liste: w.querySelector('.bl-list') };
+    });
+    ozKelchEl = document.createElement('div'); ozKelchEl.className = 'bl-calyx'; ozKelchEl.tabIndex = -1; ozKelchEl.setAttribute('role', 'group'); ozKelchEl.setAttribute('aria-label', 'Gewählter Eintrag');
+    ozKelchEl.style.cssText = `left:${G.cx - G.kelch}px;top:${G.cy - G.kelch}px;width:${2 * G.kelch}px;height:${2 * G.kelch}px`;
+    buehne.appendChild(ozKelchEl); buehne.dataset.h = Math.ceil(unten + 14); buehne.style.height = buehne.dataset.h + 'px';
+    const s = ozBlaetter.suche;
+    s.kopf.innerHTML = `<div class="bl-shead"><i class="d"></i><h2>Suche</h2><button type="button" class="bl-clear" data-aufheben hidden>Auswahl aufheben ✕</button></div>`
+      + `<div class="bl-search"><label class="bl-sr" for="ozSuche">Im Ökosystem suchen</label><input id="ozSuche" type="search" autocomplete="off" placeholder="Name oder Titel …" aria-controls="ozTreffer"></div>`;
+    s.liste.id = 'ozTreffer'; s.liste.setAttribute('role', 'listbox'); s.liste.setAttribute('aria-label', 'Suchergebnisse');
+  }
+  /** Liste eines Blatts so einrücken, dass die Zeilen im nutzbaren Bereich der Blattform stehen (auf schmalen Schirmen ohne Blattform: nichts) */
+  function ozPolster(k) {
+    const b = ozBlaetter[k], l = b.liste, f = b.f;
+    if (ozSchmal()) { l.style.cssText = ''; return; }
+    const oben = f.sy + b.kopf.offsetHeight + 6, unten = f.h - f.sy - OZ_G.h;
+    l.style.paddingTop = oben + 'px'; l.style.paddingLeft = f.sx + 'px'; l.style.paddingRight = (f.w - f.sx - OZ_G.w) + 'px'; l.style.paddingBottom = (unten + 26) + 'px';
+    l.style.setProperty('--m1', oben + 'px'); l.style.setProperty('--m2', unten + 'px');
+  }
+  /** Ein Blatt zeichnen: Kopf mit Zahl und „Alle ›“, Hinweiszeile, höchstens OZ_MAX Zeilen */
+  function ozBlatt(typ) {
+    const l = ozListen[typ], n = l.zeilen.length, b = ozBlaetter[typ], wahl = ozWahl ? ozGefuege.ents.get(ozWahl) : null, nm = wahl ? ozName(wahl) : '', titel = OZ_TITEL[typ];
+    const hinweis = !wahl ? (typ === 'person' || typ === 'community' ? 'Am stärksten vernetzt zuerst' : typ === 'event' ? 'Nächste Termine zuerst' : 'Neueste zuerst') : l.art === 'aehnlich' ? `Direkt oder über Gemeinsames verbunden mit „${nm}“` : `Verbunden mit „${nm}“`;
+    b.kopf.innerHTML = `<div class="row"><i class="d"></i><h2>${titel}</h2><span class="bl-count">${n}</span>${n > 5 ? `<button type="button" class="bl-all" data-alle="${typ}" aria-label="Alle ${titel} anzeigen">Alle ›</button>` : ''}</div><p class="bl-note">${hinweis}</p>`;
+    const oben = ozGezeichnet === ozWahl ? b.liste.scrollTop : 0;   // nur bei neuer Auswahl nach oben springen, nicht beim Nachzeichnen
+    b.liste.innerHTML = n ? l.zeilen.slice(0, OZ_MAX).map(x => ozZeile(x.e, x.note)).join('') + (n > OZ_MAX ? `<p class="bl-empty bl-rest">… und ${n - OZ_MAX} weitere unter „Alle ›“</p>` : '')
+      : `<p class="bl-empty">${!wahl ? 'Keine Einträge.' : l.art === 'aehnlich' ? `Keine ähnlich verbundenen ${titel}.` : `Keine Verbindung zu „${nm}“.`}</p>`;
+    b.liste.setAttribute('aria-label', titel + (wahl ? ' zu ' + ozEntesc(nm) : ''));
+    ozPolster(typ); b.liste.scrollTop = oben;
   }
   /** Adresse „Bei edufeed ansehen“ der Auswahl oder leer: Community und Material bei edufeed.org beziehungsweise im Hub, Person im Hub, Termin bei edufeed */
   function ozLink(e) {
@@ -4327,47 +4440,118 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (e.ev.kind === 30142) return `#materialpool?d=${encodeURIComponent(d)}&p=${e.pk}`;
     return sichereUrl(e.pk === FO_HEX ? beitragUrl(e.ev) : 'https://edufeed.org/' + naddr(d, e.pk, e.ev.kind));
   }
-  /** Auswahlzeile über den Reihen: Typ, Name, Link, Knopf ✕ */
-  function ozAuswahlRender() {
-    const el = document.getElementById('ozAuswahl'), e = ozGefuege && ozWahl ? ozGefuege.ents.get(ozWahl) : null;
-    if (!e) { el.hidden = true; el.innerHTML = ''; return; }
-    const href = ozLink(e), extern = /^https?:/.test(href);
-    const adr = e.ev ? akMerken(e.ev) : '';
+  /** Zahl der sichtbaren Nachbarn je Typ als Satzteil („3 Communities · 1 Termin“) */
+  function ozZahlen(e, alle) {
+    const g = ozGefuege;
+    return OZ_TYPEN.map(t => { const n = bzNachbarn(g.kanten, g.ents, e.id, t).filter(ozSichtbar).length; return n || alle ? n + ' ' + (n === 1 ? OZ_EINZAHL[t] : OZ_TITEL[t]) : ''; }).filter(Boolean);
+  }
+  /** Kelch: der gewählte Eintrag mit Marke (Termine ohne, ihr Datum steht in der Kurzangabe), Art, Name, Zahl der Verbindungen und dem, was du mit ihm tun kannst (Folgen, Beitreten, Zusagen, Gefällt mir, Ansehen); ohne Auswahl die Zahl der Einträge */
+  function ozKelch() {
+    const g = ozGefuege, e = ozWahl ? g.ents.get(ozWahl) : null;
+    ozKelchEl.dataset.typ = e ? e.typ : 'suche';
+    if (!e) { ozKelchEl.innerHTML = `<div class="bl-cc"><span class="big">${[...g.ents.values()].filter(ozSichtbar).length}</span><h2>Einträge im Ökosystem</h2><p>Noch nichts gewählt. Tippe einen Eintrag an oder suche oben.</p></div>`; return; }
+    const href = ozLink(e), extern = /^https?:/.test(href), adr = e.ev ? akMerken(e.ev) : '';
     const ak = e.typ === 'person' && istHex64(e.pk) ? akKnopf('folgen', e.pk, 'Folgen') : e.typ === 'community' && istHex64(e.pk) ? akKnopf('beitreten', e.pk, 'Beitreten')
       : e.typ === 'event' && adr ? akKnopf('zusagen', adr, 'Zusagen') + akKnopf('vielleicht', adr, 'Vielleicht') : e.typ === 'material' && adr ? akKnopf('gefaellt', adr, 'Gefällt mir') : '';
-    el.innerHTML = `<span class="oz-typ">${OZ_ART[e.typ]}</span><b>${ozName(e)}</b>` + (href ? `<a href="${esc(href)}"${extern ? ' target="_blank" rel="noopener"' : ''}>Bei edufeed ansehen ›</a>` : '') + (ak ? `<span class="an-zeile">${ak}</span>` : '') + `<button type="button" data-aufheben aria-label="Auswahl aufheben">✕</button>`;
-    el.hidden = false;
+    ozKelchEl.innerHTML = `<div class="bl-cc">${e.typ === 'event' ? '' : ozMarke(e)}<span class="pill">${OZ_ART[e.typ]} · ${esc(ozPille(e))}</span><h2>${ozName(e)}</h2><span class="stat">${ozZahlen(e).join(' · ') || 'Noch keine Verbindungen'}</span>`
+      + (ak ? `<span class="an-zeile">${ak}</span>` : '') + (href ? `<a class="bl-mehr" href="${esc(href)}"${extern ? ' target="_blank" rel="noopener"' : ''}>${extern ? 'Bei edufeed ansehen' : 'Ansehen'} ›</a>` : '') + `</div>`;
+  }
+  /** Weg: die letzten sieben gewählten Einträge als Kette, der aktuelle ist markiert */
+  function ozWegRender() {
+    const g = ozGefuege, weg = ozWeg.map((id, i) => [g.ents.get(id), i]).filter(x => x[0]);
+    document.getElementById('ozWeg').innerHTML = !weg.length ? '' : '<span class="lbl">Weg:</span>' + weg.map(([e, i], k) => {
+      const hier = e.id === ozWahl && i === ozWeg.length - 1;
+      return (k ? '<span class="sep" aria-hidden="true">›</span>' : '') + `<button type="button" class="bl-chip" data-typ="${e.typ}" data-weg="${i}"${hier ? ' aria-current="true"' : ''} title="${ozName(e)}"><i></i><span>${ozName(e)}</span></button>`;
+    }).join('');
+  }
+  /** Suchblatt: ohne Eingabe acht Vorschläge (die am stärksten Vernetzten, höchstens zwei je Typ), sonst Treffer im Namen (Wortanfang zuerst, dann nach Zahl der Verbindungen, höchstens 50) */
+  function ozSucheRender() {
+    const g = ozGefuege, feld = document.getElementById('ozSuche'), q = feld.value.trim().toLowerCase(), grad = e => (g.kanten.get(e.id) || new Set()).size;
+    const sicht = [...g.ents.values()].filter(ozSichtbar), name = e => ozEntesc(ozName(e)).toLowerCase();
+    let kopf;
+    if (q.length < 2) {
+      const je = {}; ozTreffer = [];
+      sicht.map(e => [grad(e), name(e), e]).sort((a, b) => b[0] - a[0] || a[1].localeCompare(b[1], 'de')).forEach(x => { const t = x[2].typ; if (ozTreffer.length < 8 && (je[t] || 0) < 2) { je[t] = (je[t] || 0) + 1; ozTreffer.push(x[2]); } });
+      kopf = ozTreffer.length ? 'Vorschläge' : '';
+    } else {
+      const alle = sicht.map(e => [name(e).indexOf(q), grad(e), e]).filter(x => x[0] >= 0).sort((a, b) => (a[0] ? 1 : 0) - (b[0] ? 1 : 0) || b[1] - a[1]);
+      ozTreffer = alle.slice(0, 50).map(x => x[2]); kopf = alle.length ? alle.length + ' Treffer' : '';
+    }
+    if (ozMarkiert >= ozTreffer.length) ozMarkiert = 0;
+    const l = ozBlaetter.suche.liste;
+    l.innerHTML = (kopf ? `<p class="bl-sugg">${kopf}</p>` : '') + (ozTreffer.length ? ozTreffer.map((e, k) => ozZeile(e, `${OZ_ART[e.typ]} · ${esc(ozPille(e))}`, ` role="option" aria-selected="${q.length >= 2 && k === ozMarkiert}"`)).join('')
+      : `<p class="bl-empty">${q.length < 2 ? 'Noch keine Einträge.' : 'Kein Treffer. Versuch einen anderen Namen oder Titel.'}</p>`);
+    l.scrollTop = 0; ozPolster('suche');
+  }
+  /** Liste „Alle ›“ eines Blatts im Dialog, mit eigenem Filter */
+  function ozAlleFuellen() {
+    const q = document.getElementById('ozAlleFilter').value.trim().toLowerCase();
+    const zeilen = ozListen[ozAlleTyp].zeilen.filter(x => !q || ozEntesc(ozName(x.e) + ' ' + ozUntertitel(x.e)).toLowerCase().includes(q));
+    document.getElementById('ozAlleListe').innerHTML = zeilen.length ? zeilen.map(x => ozZeile(x.e, x.note)).join('') : '<p class="bl-empty">Nichts gefunden.</p>';
+  }
+  function ozAlleOeffnen(typ) {
+    const d = document.getElementById('ozAlle'), wahl = ozWahl ? ozGefuege.ents.get(ozWahl) : null;
+    ozAlleTyp = typ; d.dataset.typ = typ;
+    document.getElementById('ozAlleTitel').innerHTML = OZ_TITEL[typ] + (wahl ? ` zu „${ozName(wahl)}“` : '');
+    document.getElementById('ozAlleZahl').textContent = ozListen[typ].zeilen.length;
+    document.getElementById('ozAlleFilter').value = '';
+    ozAlleFuellen(); d.showModal();
+  }
+  /** Bühne an die Breite anpassen: unter 1100 Pixeln verkleinern, auf schmalen Schirmen stehen die Blätter untereinander */
+  function ozPassen() {
+    if (!ozBlaetter) return;
+    const rahmen = document.getElementById('ozRahmen'), buehne = document.getElementById('ozBuehne');
+    if (ozSchmal()) { buehne.style.transform = ''; buehne.style.left = ''; buehne.style.height = ''; rahmen.style.height = ''; ozMass = 1; }
+    else {
+      const w = rahmen.clientWidth; if (!w) return;
+      ozMass = Math.min(1, w / 1100);
+      buehne.style.height = buehne.dataset.h + 'px'; buehne.style.transform = `scale(${ozMass})`; buehne.style.left = Math.max(0, (w - 1100 * ozMass) / 2) + 'px'; rahmen.style.height = (buehne.dataset.h * ozMass) + 'px';
+    }
+    Object.keys(ozBlaetter).forEach(ozPolster);
+  }
+  /** Der gewählte Eintrag wandert von seiner Zeile (`von`: deren Rechteck) in den Kelch, die Blätter blenden nach; ohne Bewegung, wenn das System es so will */
+  function ozFliegen(von) {
+    if (!von || !ozWahl || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    const karte = ozKelchEl.querySelector('.bl-cc'); if (!karte || !karte.animate) return;
+    const r = karte.getBoundingClientRect(), dx = von.left + von.width / 2 - (r.left + r.width / 2), dy = von.top + von.height / 2 - (r.top + r.height / 2), s = Math.max(.3, Math.min(1, von.width / Math.max(r.width, 1)));
+    karte.animate([{ transform: `translate(${dx / ozMass}px,${dy / ozMass}px) scale(${s})`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 460, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    OZ_TYPEN.forEach(t => ozBlaetter[t].liste.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 380, delay: 120, easing: 'ease-out', fill: 'backwards' }));
   }
   function ozRender() {
     if (!ozGefuege) return;
-    document.getElementById('ozReihen').innerHTML = ozReihenFolge.map((_, i) => ozReihe(i)).join('');
-    ozAuswahlRender();
-    document.getElementById('ozMeldung').textContent = ozMeldung;
-    pkStreifen();
+    ozBuehne();
+    OZ_TYPEN.forEach(t => { ozListen[t] = ozListe(t); ozBlatt(t); });
+    ozGezeichnet = ozWahl;
+    ozKelch(); ozWegRender(); ozSucheRender();
+    const e = ozWahl ? ozGefuege.ents.get(ozWahl) : null;
+    document.querySelector('#v-oekosystem [data-aufheben]').hidden = !e;
+    document.getElementById('ozMeldung').textContent = ozMeldung || (e ? `Gewählt: ${OZ_ART[e.typ]} „${ozEntesc(ozName(e))}“. Verbunden: ${ozZahlen(e, true).join(', ')}.` : '');
+    pkStreifen(); ozPassen();
   }
-  /** Route zur Auswahl und Reihenfolge schreiben, ohne nach oben zu springen */
+  /** Route zur Auswahl schreiben, ohne nach oben zu springen */
   function ozRoute() {
-    const p = [];
-    if (ozWahl) p.push('wahl=' + encodeURIComponent(ozWahl));
-    if (ozReihenFolge.join() !== OZ_STANDARD.join()) p.push('reihen=' + ozReihenFolge.join(','));
-    CUR = 'oekosystem' + (p.length ? '?' + p.join('&') : '');
+    CUR = 'oekosystem' + (ozWahl ? '?wahl=' + encodeURIComponent(ozWahl) : '');
     try { history.pushState(null, '', '#' + CUR); } catch (e) {}
     ozRender();
   }
-  /** Karte wählen (die gewählte noch einmal wählen hebt auf), `id` leer hebt auf */
-  function ozWaehlen(id) {
+  /** Auswahl in den Weg aufnehmen (höchstens sieben, nicht doppelt hintereinander) */
+  function ozWegMerken() {
+    if (ozWahl && ozWeg[ozWeg.length - 1] !== ozWahl) { ozWeg.push(ozWahl); if (ozWeg.length > 7) ozWeg.shift(); }
+  }
+  /** Eintrag in den Kelch holen (den gewählten noch einmal wählen hebt auf), `id` leer hebt auf; `von` ist das Rechteck der angetippten Zeile */
+  function ozWaehlen(id, von) {
     ozWahl = id && id !== ozWahl ? id : '';
-    ozRoute();
-    const k = ozWahl && [...document.querySelectorAll('#v-oekosystem .oz-karte')].find(b => b.dataset.wahl === ozWahl); if (k) k.focus();
+    ozWegMerken(); ozRoute(); ozFliegen(von);
+    if (ozWahl && ozSchmal()) ozKelchEl.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth' });   // auf schmalen Schirmen steht der Kelch über den Blättern
+    else if (ozWahl) ozKelchEl.focus({ preventScroll: true });
   }
   /** Alle Quellen des Gefüges laden (jede hält ihre Antwort je Sitzung); r[4] ist die Antwort von bzLaden. Die fünf Community-Abfragen laufen als eine. */
   function ozQuellenLaden() {
     return Promise.all([mpLaden(), ocLaden(), kalLaden(), peLaden(), bzLaden(), ...hubBuendeln('communities', () => CO_SCHLUESSEL.map(k => coLaden(k.hex)))]).then(r => cyLaden().then(() => r));
   }
   function ozOpen(qs) {
-    const p = new URLSearchParams(qs || ''), r = (p.get('reihen') || '').split(',');
-    ozReihenFolge = r.length === 4 && OZ_STANDARD.every(t => r.includes(t)) ? r : OZ_STANDARD.slice();
-    ozWahl = p.get('wahl') || '';
+    ozWahl = new URLSearchParams(qs || '').get('wahl') || '';
+    ozWegMerken();
     const lauf = ++ozLauf;
     if (!ozGefuege) { ozGefuege = ozSchnappschuss(); ozLive = false; datenstand('v-oekosystem', 'stand', ozStandDatum()); }
     ozMeldung = ozLive ? '' : 'Verbindungen werden geladen …';
@@ -4386,27 +4570,37 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     }, () => {});
   }
   document.getElementById('v-oekosystem').addEventListener('click', e => {
-    const w = e.target.closest('[data-wahl]'), t = e.target.closest('[data-tausch]'), l = e.target.closest('[data-lupe]');
+    const w = e.target.closest('[data-wahl]'), a = e.target.closest('[data-alle]'), c = e.target.closest('[data-weg]'), d = document.getElementById('ozAlle');
     if (w && w.tagName === 'A') return;   // Links aus dem Protokoll: der Router öffnet die Auswahl
-    if (w) { ozWaehlen(w.dataset.wahl); return; }
-    if (e.target.closest('[data-aufheben]')) { ozWaehlen(''); return; }
-    if (t) {
-      const i = +t.dataset.tausch; [ozReihenFolge[i], ozReihenFolge[i + 1]] = [ozReihenFolge[i + 1], ozReihenFolge[i]];
-      ozRoute(); const n = document.querySelector(`#v-oekosystem [data-tausch="${i}"]`); if (n) n.focus(); return;
+    if (w) {
+      const von = w.getBoundingClientRect(); if (d.open) d.close();
+      if (w.closest('#ozTreffer')) { document.getElementById('ozSuche').value = ''; ozMarkiert = 0; }
+      ozWaehlen(w.dataset.wahl, von); return;
     }
-    if (l) {
-      const typ = l.dataset.lupe, inp = document.querySelector(`#v-oekosystem [data-filter="${typ}"]`), auf = !ozOffen.has(typ);
-      if (auf) ozOffen.add(typ); else ozOffen.delete(typ);
-      l.setAttribute('aria-expanded', auf); inp.hidden = !auf; if (auf) inp.focus();
-    }
+    if (e.target.closest('[data-aufheben]')) { ozWaehlen(''); document.getElementById('ozSuche').focus({ preventScroll: true }); return; }
+    if (a) { ozAlleOeffnen(a.dataset.alle); return; }
+    if (c && !c.hasAttribute('aria-current')) { const i = +c.dataset.weg, id = ozWeg[i]; ozWeg = ozWeg.slice(0, i); ozWahl = ''; ozWaehlen(id); return; }
+    if (e.target.closest('[data-alle-zu]') || e.target === d) d.close();
   });
   document.getElementById('v-oekosystem').addEventListener('input', e => {
-    const f = e.target.closest('[data-filter]'); if (!f) return;
-    ozFilter[f.dataset.filter] = f.value;   // nur Hinweis, Fokuskarte und Spur der Reihe neu zeichnen, damit das Feld den Fokus behält
-    const sec = f.closest('.oz-reihe'), t = ozTeile(+sec.dataset.reihe);
-    sec.querySelector('[data-hinweis]').innerHTML = t.hinweis; sec.querySelector('.oz-fokus').innerHTML = t.fokus; sec.querySelector('.oz-spur').innerHTML = t.spur;
+    if (e.target.id === 'ozSuche') { ozMarkiert = 0; ozSucheRender(); }
+    if (e.target.id === 'ozAlleFilter') ozAlleFuellen();
   });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && ozWahl && document.getElementById('v-oekosystem').classList.contains('on')) ozWaehlen(''); });
+  document.getElementById('v-oekosystem').addEventListener('keydown', e => {   // Pfeiltasten und Eingabe im Suchfeld
+    if (e.target.id !== 'ozSuche') return;
+    if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && ozTreffer.length) {
+      e.preventDefault(); ozMarkiert = (ozMarkiert + (e.key === 'ArrowDown' ? 1 : -1) + ozTreffer.length) % ozTreffer.length;
+      ozBlaetter.suche.liste.querySelectorAll('.bl-row').forEach((b, k) => { b.setAttribute('aria-selected', k === ozMarkiert); if (k === ozMarkiert) b.scrollIntoView({ block: 'nearest' }); });
+    } else if (e.key === 'Enter' && e.target.value.trim().length >= 2 && ozTreffer.length) {
+      e.preventDefault(); const von = e.target.getBoundingClientRect(), id = ozTreffer[ozMarkiert].id; e.target.value = ''; ozMarkiert = 0; ozWahl = ''; ozWaehlen(id, von);
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape' || !ozWahl || !document.getElementById('v-oekosystem').classList.contains('on')) return;
+    if (document.getElementById('ozAlle').open || (e.target.id === 'ozSuche' && e.target.value)) return;   // Escape schließt erst den Dialog oder leert das Suchfeld
+    ozWaehlen('');
+  });
+  window.addEventListener('resize', () => { if (document.getElementById('v-oekosystem').classList.contains('on')) ozPassen(); });
   document.getElementById('v-oekosystem').addEventListener('focusout', () => {   // zurückgestelltes Neuzeichnen, wenn der Fokus das Ökosystem verlässt
     if (ozVeraltet) setTimeout(() => { if (ozVeraltet) ozNachzeichnen(); }, 0);   // prüft selbst, ob jetzt ein Feld darin den Fokus hat
   });
