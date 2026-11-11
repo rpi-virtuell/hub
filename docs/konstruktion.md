@@ -144,7 +144,7 @@ Seit Etappe 4 zeigt der Hub, was Communities teilen, und listet Termine und Pers
 
 Seit Etappe 5a verbindet der Hub Menschen, Termine, Communities und Materialien zu einem Gefüge, lässt sich auf eine Community zuschneiden und schreibt mit Anmeldung (Begründung: [ADR-0009](adr/0009-beziehungsgefuege-mitmachen-anmeldung.md), Abfragen: [daten.md](daten.md)):
 
-- **Ökosystem** (`#oekosystem`): vier Reihen (Menschen, Termine, Communities, Materialien) mit Auswahl und Nachbarn aus dem Beziehungsgefüge. Die Kanten stammen aus den Events selbst; eine Abfrage plus eine Profilabfrage, der Rest aus den Zwischenspeichern der Ansichten. Personen nur mit Profil und Kante, ohne Rollenprüfung. Ohne Antwort bleiben die Schnappschuss-Einträge ohne Kanten.
+- **Ökosystem** (`#oekosystem`): eine Blume mit Kelch (ADR-0012). Im Kelch liegt der gewählte Eintrag mit den Knöpfen zum Mitmachen, vier Blätter (Menschen, Communities, Materialien, Termine) zeigen die Nachbarn aus dem Beziehungsgefüge, das obere Blatt sucht. Die Kanten stammen aus den Events selbst; eine Abfrage plus eine Profilabfrage, der Rest aus den Zwischenspeichern der Ansichten. Personen nur mit Profil und Kante, ohne Rollenprüfung. Ohne Antwort bleiben die Schnappschuss-Einträge ohne Kanten.
 - **Communities live**: aus `kind:10222` und `kind:0`; Partner ohne Schlüssel bleiben Kacheln.
 - **Mitmachen** (`#mitmachen`): Protokoll (einzige dauerhafte Subscription je Relay, nur lesend) und Gespräche (Kommentare werden gelesen, geschrieben wird in der edufeed-App). Im relilab als Tab eingebunden, dort stehen auch Materialien und Menschen.
 - **Zuschnitt** (`?c=<npub>`): Datenfilter auf alle Ansichten, Markierung in der Leiste; die Seite „Eigene Instanz“ zeigt Vorschau, Link, Kontextprofil und Shortcode.

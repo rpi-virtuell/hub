@@ -38,3 +38,4 @@ Regeln: Deutsch; Produktsicht (keine Projektverwaltung, keine Berichtsbezüge); 
 | [0009](0009-beziehungsgefuege-mitmachen-anmeldung.md) | Beziehungsgefüge, Mitmachen, Zuschnitt, Anmeldung | angenommen |
 | [0010](0010-vier-plus-ich.md) | Vier plus ich: Konsole nach Menschen, Communities, Materialien, Terminen und „ich“; Graustufen; Startseite mit Vorschau und Themen | angenommen als Entwurfsrunde |
 | [0011](0011-matrix-dinge-und-aktionsformen.md) | Matrix aus Dingen und Aktionsformen: drei Ebenen, konkrete Knospen, umkehrbare Sicht, „Ich möchte“ in der Mitte | Entwurf |
+| [0012](0012-oekosystem-als-blume.md) | Ökosystem als Blume mit Kelch: gewählter Eintrag in der Mitte, Verbundenes in den Blättern, Handlungen im Kelch | Entwurf |

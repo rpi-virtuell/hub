@@ -54,13 +54,13 @@ Deno.test('bzNachbarn und bzPunkte', () => {
   assertEquals(pt(ents, kanten, 'p:a', null), 4); assertEquals(pt(ents, kanten, 'p:a', 'a'), 104); assertEquals(pt(ents, kanten, 'c:b', null), 1); assertEquals(pt(ents, kanten, 'm:x', null), 0);
 });
 
-Deno.test('Ökosystem: Ansicht, Route, drei Zustände, Karten maskiert', () => {
+Deno.test('Ökosystem: Ansicht, Route, drei Zustände, Zeilen maskiert', () => {
   assert(/id="v-oekosystem" data-stand="nachbau:/.test(html), 'Ansicht mit Stand-Zeile');
   assert(/'oekosystem'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)) && /ozOpen\(/.test(s), 'Route');
   const o = fn('ozOpen');
   assert(/bzLaden\(\)/.test(fn('ozQuellenLaden')) && /ozQuellenLaden\(\)/.test(o) && /bzBauen\(bzQuellen\(\)\)/.test(o + fn('ozBauen')) && /Stand vom/.test(o + fn('datenstand')) && /ohne Rollenprüfung/.test(o) && /können gerade nicht geladen werden/.test(o), 'Zustände');
-  const k = fn('ozKarte');
-  assert(/esc\(/.test(k) && /sichereUrl\(/.test(k) && /kurzHash\(/.test(k) && /aria-pressed/.test(k) && /Das bist du/.test(k), 'Karte');
+  const k = fn('ozZeile') + fn('ozMarke') + fn('ozPille');
+  assert(/esc\(e\.id\)/.test(k) && /sichereUrl\(/.test(k) && /kurzHash\(/.test(k) && /esc\(ozPille\(e\)\)/.test(k) && /Das bist du/.test(k), 'Zeile');
   assert(/function ozSichtbar\(ent\)/.test(s) && /HUB_C/.test(fn('ozSichtbar')), 'Sichtbarkeit kennt den Zuschnitt');
   assert(/'ich\.start': \{[^}]*#oekosystem/.test(s), 'Konsole: Überblick führt ins Ökosystem');
 });
@@ -91,18 +91,22 @@ Deno.test('Communities live: echter Knopf „Beitreten“ statt Beispiel-Folgen,
   assert(/'communities'\) cyRender\(\)/.test(fn('akZeichnen')), 'nach dem Beitreten neu zeichnen');
 });
 
-Deno.test('ozHinweis: Hinweiszeile in einem Zug, ohne doppelte Umhüllung', () => {
-  const h = bau('ozHinweis');
-  assertEquals(h({ n: 3, filter: false, wahl: '', nachbarn: false, quelle: 3 }), '3 Einträge');
-  assertEquals(h({ n: 1, filter: false, wahl: '', nachbarn: false, quelle: 1 }), '1 Eintrag');
-  assertEquals(h({ n: 200, filter: false, wahl: '', nachbarn: false, quelle: 200 }), '80 von 200 Einträgen');
-  assertEquals(h({ n: 0, filter: true, wahl: '', nachbarn: false, quelle: 5 }), 'Nichts gefunden.');
-  assertEquals(h({ n: 0, filter: true, wahl: 'X', nachbarn: false, quelle: 5 }), '„X“ gewählt · nichts gefunden');
-  assertEquals(h({ n: 90, filter: false, wahl: 'X', nachbarn: false, quelle: 90 }), '„X“ gewählt · 80 von 90 weitere');
-  assertEquals(h({ n: 4, filter: false, wahl: 'X', nachbarn: true, quelle: 4 }), '4 verbunden mit „X“');
-  assertEquals(h({ n: 0, filter: false, wahl: 'X', nachbarn: true, quelle: 0 }), 'Keine Verbindung zu „X“');
-  assertEquals(h({ n: 0, filter: true, wahl: 'X', nachbarn: true, quelle: 4 }), 'Nichts gefunden.');
-  assertEquals(h({ n: 2, filter: true, wahl: 'X', nachbarn: true, quelle: 4 }), '2 von 4 verbunden mit „X“');
+Deno.test('Ökosystem als Blume: Kelch, fünf Blätter, ähnlich Verbundene, Aktionen im Kelch', () => {
+  assert(/id="ozBuehne"/.test(html) && /id="ozWeg"/.test(html) && /<dialog id="ozAlle"/.test(html) && !/id="ozReihen"/.test(html) && !/oz-karte/.test(html), 'Bühne, Weg und Dialog statt Reihen');
+  assert(/\['suche', \.\.\.OZ_TYPEN\]/.test(fn('ozBuehne')) && /const OZ_TYPEN = \['person', 'community', 'material', 'event'\]/.test(s) && /bl-calyx/.test(fn('ozBuehne')), 'fünf Blätter und Kelch');
+  const ae = bau('ozAehnlich');
+  const ents = new Map(['p:a', 'p:b', 'p:c', 'c:x', 'c:y', 'm:1'].map((id) => [id, { id, typ: id[0] === 'p' ? 'person' : id[0] === 'c' ? 'community' : 'material' }]));
+  const kanten = new Map<string, Set<string>>();
+  [['p:a', 'c:x'], ['p:a', 'c:y'], ['p:b', 'c:x'], ['p:b', 'c:y'], ['p:c', 'c:y'], ['p:a', 'm:1']].forEach(([x, y]) => { for (const [u, v] of [[x, y], [y, x]]) { if (!kanten.has(u)) kanten.set(u, new Set()); kanten.get(u)!.add(v); } });
+  assertEquals(ae(kanten, ents, 'p:a', 'person'), [['p:b', 2], ['p:c', 1]]);
+  assertEquals(ae(kanten, ents, 'c:x', 'community'), [['c:y', 2]]);
+  assertEquals(ae(kanten, ents, 'm:1', 'material'), []);
+  const l = fn('ozListe');
+  assert(/art: 'start'/.test(l) && /art: 'nachbar'/.test(l) && /ozAehnlich\(/.test(l) && (l.match(/ozSichtbar/g) || []).length >= 4 && /direkt verbunden/.test(l), 'drei Arten, jede mit Sichtbarkeitsregel');
+  const k = fn('ozKelch');
+  assert(/akKnopf\('folgen'/.test(k) && /akKnopf\('beitreten'/.test(k) && /akKnopf\('zusagen'/.test(k) && /akKnopf\('vielleicht'/.test(k) && /akKnopf\('gefaellt'/.test(k) && /esc\(href\)/.test(k) && /rel="noopener"/.test(k), 'Aktionen und Link im Kelch');
+  assert(/prefers-reduced-motion/.test(fn('ozFliegen')) && /ozWeg\.length > 7/.test(fn('ozWegMerken')) && /'\?wahl=' \+ encodeURIComponent\(ozWahl\)/.test(fn('ozRoute')), 'Bewegung abschaltbar, Weg begrenzt, Route');
+  assert(/@media \(max-width:760px\)\{\s*\.bl-wrap/.test(html) && /max-width:760px/.test(s.slice(s.indexOf('const ozSchmal'), s.indexOf('const ozSchmal') + 80)), 'schmale Schirme: Blätter untereinander');
 });
 
 Deno.test('cyLaden: keine eigene Profilabfrage, Konten stehen in der Beziehungsabfrage', () => {

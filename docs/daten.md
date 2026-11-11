@@ -236,7 +236,7 @@ Das Ziel von Zusage und Reaktion ist der erste gültige `a`-Tag, sonst der erste
 
 ### Verbraucher: Ökosystem
 
-`#oekosystem?wahl=<id>&reihen=person,event,community,material` zeigt vier Reihen (Menschen, Termine, Communities, Materialien). `wahl` ist eine Entitäts-ID des Gefüges (maskiert mit `encodeURIComponent`), `reihen` die Reihenfolge der vier Reihen; Tauschknöpfe zwischen den Reihen und die Auswahl schreiben beides in die Route (ohne nach oben zu springen).
+`#oekosystem?wahl=<id>` zeigt eine Blume ([ADR-0012](adr/0012-oekosystem-als-blume.md)): im Kelch den gewählten Eintrag, in vier Blättern Menschen, Communities, Materialien und Termine, im oberen Blatt die Suche. `wahl` ist eine Entitäts-ID des Gefüges (maskiert mit `encodeURIComponent`); jede Wahl schreibt sie in die Route (ohne nach oben zu springen). Ein altes `reihen=` wird ignoriert.
 
 `ozOpen(qs)` zeigt sofort die Schnappschuss-Einträge (Materialien `MP`, Termine `RT_RAW`, Beiträge `OC_RAW`, Communities `CY`) ohne Kanten und ohne Personen, mit `Stand vom <jüngstes Datum>`. Dann läuft `Promise.all([mpLaden(), ocLaden(), kalLaden(), peLaden(), bzLaden(), …coLaden(<die fünf Schlüssel>)])`, danach `cyLaden()` (ohne eigene Abfrage, aus `bzDaten`) und `bzBauen(bzQuellen())`. Ein Lauf-Zähler verwirft späte Antworten.
 
@@ -252,7 +252,11 @@ Das Ziel von Zusage und Reaktion ist der erste gültige `a`-Tag, sonst der erste
 
 **Sichtbarkeit** (`ozSichtbar`): Personen nur mit Profilname und mindestens einer Kante (oder als der Angemeldete); Communities immer; Termine nur, wenn Ende oder Beginn nicht älter als ein Tag sind; Beiträge (`kind:30023`) nur mit Community-Bezug (eigene Kante oder Kante des Autors) oder mit Autor in der Personen-Liste; bei gesetztem Zuschnitt `HUB_C` nur Einträge mit Kante zu dieser Community oder von einem Autor mit dieser Kante. Profile kommen aus `bzProfil` (Personen-Ansicht, Beziehungsabfrage, Community-Konten); Personen, deren Profil keine der Quellen trägt, bleiben unsichtbar. Bilder nur über `sichereUrl`, alle Texte über `esc`.
 
-**Reihen** (`ozReihe(i)`): ohne Auswahl Personen und Communities nach `bzPunkte`, Termine und Materialien mit Community-Bezug zuerst, dann Datum (Termine aufsteigend, Materialien absteigend), höchstens 80 je Reihe; mit Auswahl in den anderen Reihen die Nachbarn vom Typ der Reihe („<n> verbunden mit „<Name>““ oder „Keine Verbindung zu „<Name>““), in der Reihe ihres Typs als Fokuskarte. Die Auswahlzeile (`#ozAuswahl`) nennt Typ und Name, verlinkt „Bei edufeed ansehen ›“ und hebt die Auswahl mit ✕ oder Escape auf.
+**Blätter** (`ozListe(typ)`): ohne Auswahl Personen und Communities nach `bzPunkte`, Termine und Materialien mit Community-Bezug zuerst, dann Datum (Termine aufsteigend, Materialien absteigend); mit Auswahl in den fremden Blättern die Nachbarn („Verbunden mit „<Name>““ oder „Keine Verbindung zu „<Name>““), im Blatt des eigenen Typs erst die direkt Verbundenen, dann die ähnlich Verbundenen (`ozAehnlich`: gemeinsame Nachbarn, „<n> gemeinsam“). Ein Blatt zeigt höchstens 60 Zeilen (`OZ_MAX`), „Alle ›“ öffnet die ganze Liste im Dialog `#ozAlle` mit Filter.
+
+**Kelch** (`ozKelch()`): Art, Kurzangabe, Name, Zahl der sichtbaren Nachbarn je Typ, die Knöpfe zum Mitmachen (`akKnopf`: Folgen, Beitreten, Zusagen, Vielleicht, Gefällt mir) und der Link zur Detailseite (im Hub „Ansehen ›“, sonst „Bei edufeed ansehen ›“). „Auswahl aufheben ✕“ im Suchblatt oder Escape leeren den Kelch. Ohne Auswahl steht dort die Zahl der sichtbaren Einträge.
+
+**Suche** (`ozSucheRender()`): ohne Eingabe acht Vorschläge (die am stärksten Vernetzten, höchstens zwei je Typ), ab zwei Zeichen Treffer im Namen, Wortanfang zuerst, höchstens 50; Pfeiltasten und Eingabe wählen. **Weg** (`ozWeg`): die letzten sieben Stationen als Kette, nur in der Sitzung. Die Bühne (`ozBuehne`) entsteht einmal, `ozRender` zeichnet nur Blätter, Kelch, Weg und Trefferliste neu; `ozPassen` verkleinert sie unter 1100 Pixeln, unter 760 Pixeln stehen Suche, Kelch und Blätter untereinander.
 
 ### Verbraucher: Communities (live)
 
