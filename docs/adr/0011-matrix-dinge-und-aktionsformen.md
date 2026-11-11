@@ -11,34 +11,36 @@ Für die Dinge spricht, dass Menschen mit einem Gegenstand im Kopf kommen und si
 Beide Ordnungen beschreiben dieselbe Matrix, nur mit vertauschten Achsen.
 
 ## Entscheidung
-1. **Die Blätter sind die vier Dinge, die Knospen sind die vier Aktionsformen.** Jedes Blatt trägt vier Knospen in fester Reihenfolge: sehen, zeigen, erarbeiten, in Kontakt treten. Zusammen mit der Mitte ergibt sich ein Satz: Ich möchte Material finden.
-2. **Das Zeichen zeigt die Form, das Wort bleibt konkret.** In jeder Knospe steht ein Zeichen für die Aktionsform: Auge, Pfeil nach oben, Stift, Sprechblase. Die Beschriftung nennt die konkrete Handlung, etwa „finden“, „teilen“, „bearbeiten“, „kommentieren“. Farben bleiben den Blättern und den Graustufen vorbehalten.
-3. **Die Belegung.**
+1. **Drei Ebenen.** Die Aktionsform leitet: sehen, zeigen, erarbeiten, in Kontakt treten. Die Knospe benennt konkret mit Verb und Ding. Unter jeder Knospe liegen zwei bis vier Handlungen, von niedrigschwellig nach verbindlich geordnet.
+2. **Die Blätter sind die vier Dinge, die Knospen die vier Aktionsformen.** Jedes Blatt trägt vier Knospen in fester Reihenfolge. In der Mitte der Blume steht „Ich möchte“. Mit Blatt und Knospe ergibt sich ein Satz: Ich möchte Materialien suchen.
+3. **Ein Zeichen je Aktionsform, überall gleich.** Auge für sehen, Pfeil nach oben für zeigen, Stift für erarbeiten, Sprechblase für Kontakt. Farben bleiben den Blättern und den Graustufen vorbehalten.
+4. **Die Belegung.** Hellgrau heißt gewollt und noch nicht gebaut, dunkelgrau heißt später gedacht.
 
    | Ich möchte … | sehen | zeigen | erarbeiten | in Kontakt treten |
    |---|---|---|---|---|
-   | Menschen | finden | mich zeigen | Profil pflegen | folgen |
-   | Communities | finden | empfehlen (hellgrau) | gründen (hellgrau) | mitmachen |
-   | Materialien | finden | teilen | bearbeiten (dunkelgrau) | kommentieren |
-   | Termine | finden | eintragen | planen (hellgrau) | zusagen |
+   | Menschen | Menschen entdecken | mich vorstellen | zusammenarbeiten (hellgrau) | Menschen folgen |
+   | Communities | Communities entdecken | Community vorstellen (hellgrau) | Community aufbauen | mitmachen |
+   | Materialien | Materialien suchen | Material teilen | Material weiterentwickeln | Rückmeldung geben |
+   | Termine | Termine finden | Termin ankündigen | Termin vorbereiten (hellgrau) | teilnehmen |
 
-4. **Die Knospe „Beiträge“ entfällt.** Beiträge lesen hängt an „Material finden“, einen Beitrag schreiben an „Material teilen“.
-5. **Die Spalte „sehen“ gilt für alle vier Dinge und bleibt ohne Anmeldung.** Wer nur schauen will, kann dabei bleiben. Menschen und Communities sind trotzdem sichtbar, weil das Entdecken zum Hub gehört.
-6. **Graustufen folgen der Matrix.** Grau ist, was in der Matrix steht und noch nicht gebaut ist.
-7. **„ich“ steht außerhalb der Matrix.** Das obere Blatt trägt Profil, Themen und Überblick.
-8. **Das Ereignis nennt die Form.** `relihub-action` trägt im Detail `form` mit `sehen`, `zeigen`, `erarbeiten` oder `kontakt`. `RelihubSteuerkonsole.formen` listet die Formen. Die Konsole trägt Version 0.9.0.
+5. **Die Handlungen je Knospe** stehen als Knöpfe in der Erklärkarte. Beispiele: Unter „Rückmeldung geben“ liegen Gefällt mir, Kommentieren und Autor:in folgen. Unter „Material weiterentwickeln“ liegen die Sammlung und, dunkelgrau, das Bearbeiten und Remixen. Unter „Community aufbauen“ liegen der Zuschnitt, das Gründen bei edufeed und, hellgrau, das Auswählen von Inhalten.
+6. **Regeln für Zweifelsfälle.** Merken gehört zu sehen. In eine Community teilen gehört zu zeigen. Eine Sammlung gehört zu erarbeiten, weil daraus etwas Neues entsteht. Kontakt ist eine Leiter: reagieren, kommentieren, sich verbinden.
+7. **Die Spalte „sehen“ gilt für alle vier Dinge und bleibt ohne Anmeldung.** Wer nur schauen will, kann dabei bleiben. Menschen und Communities sind trotzdem sichtbar, weil das Entdecken zum Hub gehört.
+8. **Die Matrix ist umkehrbar.** Ein Umschalter auf der Startseite zeigt sie von den Aktionsformen her: Dann sind sehen, zeigen, erarbeiten und Kontakt die Blätter, und die vier Dinge sind die Knospen in der Farbe ihres Dings. Kennungen, Ziele und Karten bleiben dieselben. Die Wahl bleibt im Browser (`relihub-sicht`) und gilt für alle Konsolen der Seite.
+9. **Die Knospe „Beiträge“ entfällt.** Beiträge lesen hängt an „Materialien suchen“, einen Beitrag schreiben an „Material teilen“.
+10. **„ich“ steht außerhalb der Matrix.** Das obere Blatt trägt Profil, Themen und Überblick, in beiden Sichten.
+11. **Schnittstelle.** `relihub-action` trägt im Detail `form` und `sicht`. Das Attribut `sicht="formen"` schaltet die Konsole um. `RelihubSteuerkonsole.formen` listet die Formen. Die Konsole trägt Version 0.10.0.
 
 ## Folgen
-- Sechzehn Knospen statt elf. Auf kleinen Schirmen stehen vier Knospen eng, die Beschriftung rückt bei Bedarf nach innen.
-- Neue Kennungen: `menschen.pflegen`, `menschen.folgen`, `communities.empfehlen`, `material.kommentieren`, `termine.planen`, `termine.zusagen`. `material.beitraege` entfällt ohne Alias.
-- Folgen, zusagen und kommentieren führen zu den Ansichten, in denen diese Handlungen schon gebaut sind: Personen, Kalender, Raum Mitmachen.
-- Screenreader hören zur Knospe die Aktionsform, wenn sie vom Wort abweicht.
+- Sechzehn Knospen statt elf. Auf kleinen Schirmen tragen die Knospen nur das Verb, in der Sicht von den Aktionsformen nur das Ding.
+- Neue Kennungen: `menschen.zusammen`, `menschen.folgen`, `communities.vorstellen`, `communities.aufbauen`, `material.rueckmeldung`, `termine.vorbereiten`, `termine.teilnehmen`. `material.beitraege`, `communities.gruenden` entfallen ohne Alias.
+- Die Knospen der Spalte Kontakt führen zu den Ansichten, in denen diese Handlungen schon gebaut sind: Personen, Ökosystem, Kalender, Raum Mitmachen.
+- Screenreader hören zur Knospe die Aktionsform.
+- Die Blätter der zweiten Sicht haben eigene Blautöne. Sie sind ein erster Vorschlag.
 
 ## Offen
-- Sollen die Knospen einheitlich „sehen, zeigen, erarbeiten, in Kontakt treten“ heißen, oder bleibt das konkrete Wort?
-- „Mich zeigen“ und „Profil pflegen“ führen heute an denselben Ort. Trägt die Unterscheidung, oder gehört in die Zelle etwas anderes, etwa gemeinsam arbeiten?
-- Ein Umschalter, der dieselbe Matrix von den Aktionsformen her zeigt: bauen oder nicht?
-- „Ich möchte“ als Schrift in der Mitte der Blume.
-- Die Leiste als dritte Achse: Sie zeigt Orte. Aus Ding und Aktion wird mit ihr die Frage, wo ich finde und wohin ich teile.
-- Die Annahme, dass Nutzende vom Ding her denken, ist nicht geprüft. Ein Erstklick-Test mit wenigen Personen würde sie klären.
+- Die vier Zeichen am einzelnen Eintrag: Jede Material- und Terminkachel könnte dieselbe kleine Reihe tragen, denn gehandelt wird am Eintrag. Noch nicht gebaut.
+- Welche Sicht ist die Voreinstellung? Ein Erstklick-Test mit wenigen Personen und beiden Sichten würde es klären.
+- Die Leiste als dritte Achse: Sie zeigt Orte. Aus Ding und Aktion wird mit ihr die Frage, wo ich suche und wohin ich teile.
+- Farben und Formensprache der Blätter in der Sicht von den Aktionsformen.
 - Institutionen haben in der Matrix noch keinen Ort.

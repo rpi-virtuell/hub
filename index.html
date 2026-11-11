@@ -137,6 +137,9 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .explain .hint{font-size:14px;color:var(--muted)}
 .explain.anim{animation:pop .28s cubic-bezier(.3,1.3,.5,1)}
 /* ---------- Startseite: Themenfeld und Vorschau, vier plus ich (ADR-0010) ---------- */
+.st-sicht{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;margin:6px auto 14px;font-size:14px;color:var(--muted)}
+.st-sicht button{font:inherit;font-weight:600;min-height:36px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;color:inherit;cursor:pointer}
+.st-sicht button[aria-pressed="true"]{background:#203A8F;border-color:#203A8F;color:#fff}
 .st-themen{position:relative;z-index:1;max-width:460px;margin:18px auto 0;text-align:left}
 .st-themen label{display:block;font-weight:600;font-size:15px;margin:0 0 6px;color:var(--x-hub)}
 .st-themen-zeile{display:flex;gap:8px}
@@ -1176,6 +1179,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
       <p class="st-chips" id="stThemenChips" aria-live="polite"></p>
     </form>
     <div class="flower-wrap"><relihub-steuerkonsole id="startFlower" size="320" context="hub-start" variant="knospen"></relihub-steuerkonsole></div>
+    <div class="st-sicht" id="stSicht" role="group" aria-label="Ordnung der Konsole"><span>Ich denke von</span><button type="button" data-sicht="dinge" aria-pressed="true">den Dingen her</button><button type="button" data-sicht="formen" aria-pressed="false">dem Tun her</button></div>
     <div class="explain" id="explain" aria-live="polite"></div>
   </section>
 
@@ -1793,11 +1797,13 @@ a.kat-card:hover{border-color:var(--c-koop)}
  *
  * AKTIONEN (vier plus ich)
  *   ich · ich.profil · ich.interessen · ich.start ·
- *   menschen · menschen.finden · menschen.zeigen · menschen.pflegen · menschen.folgen ·
- *   communities · communities.finden · communities.empfehlen · communities.gruenden · communities.mitmachen ·
- *   material · material.finden · material.teilen · material.schreibtisch · material.kommentieren ·
- *   termine · termine.finden · termine.eintragen · termine.planen · termine.zusagen
+ *   menschen · menschen.finden · menschen.zeigen · menschen.zusammen · menschen.folgen ·
+ *   communities · communities.finden · communities.vorstellen · communities.aufbauen · communities.mitmachen ·
+ *   material · material.finden · material.teilen · material.schreibtisch · material.rueckmeldung ·
+ *   termine · termine.finden · termine.eintragen · termine.vorbereiten · termine.teilnehmen
  *   (je Ding vier Knospen in der Reihenfolge sehen, zeigen, erarbeiten, in Kontakt treten)
+ *   Attribut sicht="formen": dieselbe Matrix von den Aktionsformen her; die Blätter heißen dann
+ *   sehen · zeigen · erarbeiten · kontakt, die Knospen behalten ihre Kennungen.
  *   menschen, communities, material und termine haben keine eigene Zielseite:
  *   Ihr Klick löst nur das Ereignis aus. "ich" navigiert (je nach Kontext zur Start-
  *   oder Profilseite). Knospen mit Graustufe (detail.stand = "spaeter" | "offen") sind
@@ -1836,31 +1842,37 @@ a.kat-card:hover{border-color:var(--c-koop)}
   // stand: 'spaeter' (dunkelgrau, später gedacht) oder 'offen' (hellgrau, gewollt und noch nicht gebaut).
   const GRAU = { spaeter: { fill: '#5F6672', text: '#FFFFFF' }, offen: { fill: '#C9CED6', text: '#2B2F36' } };
   const FORMEN = {
-    sehen: { label: 'sehen', d: 'M-12 0 Q0 -11 12 0 Q0 11 -12 0 Z M-3 0 A3 3 0 1 0 3 0 A3 3 0 1 0 -3 0' },
-    zeigen: { label: 'zeigen', d: 'M0 7 V-10 M-7 -3 L0 -10 L7 -3 M-10 11 H10' },
-    erarbeiten: { label: 'erarbeiten', d: 'M-10 10 L-7 2 L4 -9 L9 -4 L-2 7 Z' },
-    kontakt: { label: 'in Kontakt treten', d: 'M-11 -9 H11 V5 H-1 L-7 11 V5 H-11 Z' }
+    sehen: { label: 'sehen', blatt: 'sehen', color: '#3558A8', d: 'M-12 0 Q0 -11 12 0 Q0 11 -12 0 Z M-3 0 A3 3 0 1 0 3 0 A3 3 0 1 0 -3 0' },
+    zeigen: { label: 'zeigen', blatt: 'zeigen', color: '#2F74B5', d: 'M0 7 V-10 M-7 -3 L0 -10 L7 -3 M-10 11 H10' },
+    erarbeiten: { label: 'erarbeiten', blatt: 'erarbeiten', color: '#4B57A6', d: 'M-10 10 L-7 2 L4 -9 L9 -4 L-2 7 Z' },
+    kontakt: { label: 'in Kontakt treten', blatt: 'Kontakt', color: '#27628F', d: 'M-11 -9 H11 V5 H-1 L-7 11 V5 H-11 Z' }
   };
   const FORM_ORDER = ['sehen', 'zeigen', 'erarbeiten', 'kontakt'];
+  // label: Verb plus Ding; kurz: nur das Verb, für enge Schirme
   const FUNCS = [
     { id: 'ich', label: 'ich', color: '#203A8F', text: '#FFFFFF', self: true,
       subs: [{ id: 'ich.profil', label: 'mein Profil' }, { id: 'ich.interessen', label: 'meine Themen' }, { id: 'ich.start', label: 'Überblick' }] },
     { id: 'menschen', label: 'Menschen', color: '#D6336C', text: '#FFFFFF',
-      subs: [{ id: 'menschen.finden', label: 'finden', form: 'sehen' }, { id: 'menschen.zeigen', label: 'mich zeigen', form: 'zeigen' }, { id: 'menschen.pflegen', label: 'Profil pflegen', form: 'erarbeiten' }, { id: 'menschen.folgen', label: 'folgen', form: 'kontakt' }] },
+      subs: [{ id: 'menschen.finden', label: 'Menschen entdecken', kurz: 'entdecken', form: 'sehen' }, { id: 'menschen.zeigen', label: 'mich vorstellen', kurz: 'vorstellen', form: 'zeigen' }, { id: 'menschen.zusammen', label: 'zusammenarbeiten', kurz: 'kooperieren', form: 'erarbeiten', stand: 'offen' }, { id: 'menschen.folgen', label: 'Menschen folgen', kurz: 'folgen', form: 'kontakt' }] },
     { id: 'communities', label: 'Communities', color: '#7B4FB8', text: '#FFFFFF',
-      subs: [{ id: 'communities.finden', label: 'finden', form: 'sehen' }, { id: 'communities.empfehlen', label: 'empfehlen', form: 'zeigen', stand: 'offen' }, { id: 'communities.gruenden', label: 'gründen', form: 'erarbeiten', stand: 'offen' }, { id: 'communities.mitmachen', label: 'mitmachen', form: 'kontakt' }] },
+      subs: [{ id: 'communities.finden', label: 'Communities entdecken', kurz: 'entdecken', form: 'sehen' }, { id: 'communities.vorstellen', label: 'Community vorstellen', kurz: 'vorstellen', form: 'zeigen', stand: 'offen' }, { id: 'communities.aufbauen', label: 'Community aufbauen', kurz: 'aufbauen', form: 'erarbeiten' }, { id: 'communities.mitmachen', label: 'mitmachen', kurz: 'mitmachen', form: 'kontakt' }] },
     { id: 'material', label: 'Materialien', color: '#007A75', text: '#FFFFFF',
-      subs: [{ id: 'material.finden', label: 'finden', form: 'sehen' }, { id: 'material.teilen', label: 'teilen', form: 'zeigen' }, { id: 'material.schreibtisch', label: 'bearbeiten', form: 'erarbeiten', stand: 'spaeter' }, { id: 'material.kommentieren', label: 'kommentieren', form: 'kontakt' }] },
+      subs: [{ id: 'material.finden', label: 'Materialien suchen', kurz: 'suchen', form: 'sehen' }, { id: 'material.teilen', label: 'Material teilen', kurz: 'teilen', form: 'zeigen' }, { id: 'material.schreibtisch', label: 'Material weiterentwickeln', kurz: 'bearbeiten', form: 'erarbeiten' }, { id: 'material.rueckmeldung', label: 'Rückmeldung geben', kurz: 'reagieren', form: 'kontakt' }] },
     { id: 'termine', label: 'Termine', color: '#FFA500', text: '#2B1A00',
-      subs: [{ id: 'termine.finden', label: 'finden', form: 'sehen' }, { id: 'termine.eintragen', label: 'eintragen', form: 'zeigen' }, { id: 'termine.planen', label: 'planen', form: 'erarbeiten', stand: 'offen' }, { id: 'termine.zusagen', label: 'zusagen', form: 'kontakt' }] }
+      subs: [{ id: 'termine.finden', label: 'Termine finden', kurz: 'finden', form: 'sehen' }, { id: 'termine.eintragen', label: 'Termin ankündigen', kurz: 'ankündigen', form: 'zeigen' }, { id: 'termine.vorbereiten', label: 'Termin vorbereiten', kurz: 'vorbereiten', form: 'erarbeiten', stand: 'offen' }, { id: 'termine.teilnehmen', label: 'teilnehmen', kurz: 'teilnehmen', form: 'kontakt' }] }
   ];
-  FUNCS.forEach((f, i) => {
+  // Zweite Sicht auf dieselbe Matrix (ADR-0011): Blätter sind die Aktionsformen, Knospen die vier Dinge. Kennungen und Ziele bleiben gleich.
+  const FUNCS_F = [FUNCS[0]].concat(FORM_ORDER.map(k => ({ id: k, label: FORMEN[k].blatt, color: FORMEN[k].color, text: '#FFFFFF', form: k,
+    subs: FUNCS.slice(1).map(f => Object.assign({ ding: f.id }, f.subs.find(u => u.form === k))) })));
+  const DING = {}; FUNCS.forEach(f => { DING[f.id] = f; });
+  [FUNCS, FUNCS_F].forEach(liste => liste.forEach((f, i) => {
     const a = (-90 + 72 * i) * Math.PI / 180;
     f.ux = Math.cos(a); f.uy = Math.sin(a);
     f.cx = D * f.ux; f.cy = D * f.uy;
     f.light = mix(f.color, '#FFFFFF', 0.22);
     f.ink = mix(f.color, '#000000', 0.4);
-  });
+  }));
+  const ALLE = FUNCS.concat(FUNCS_F.slice(1));
 
   const ROUTES = {
     'ich': '/',
@@ -1869,23 +1881,24 @@ a.kat-card:hover{border-color:var(--c-koop)}
     'ich.start': '/',
     'menschen.finden': '/menschen',
     'menschen.zeigen': '/profil',
-    'menschen.pflegen': '/profil/bearbeiten',
+    'menschen.zusammen': '/menschen/zusammenarbeiten',
     'menschen.folgen': '/menschen/folgen',
     'communities.finden': '/communities',
-    'communities.empfehlen': '/communities/empfehlen',
-    'communities.gruenden': '/communities/neu',
+    'communities.vorstellen': '/communities/vorstellen',
+    'communities.aufbauen': '/communities/neu',
     'communities.mitmachen': '/mitmachen',
     'material.finden': '/material',
     'material.teilen': '/material/neu',
     'material.schreibtisch': '/material/schreibtisch',
-    'material.kommentieren': '/material/kommentare',
+    'material.rueckmeldung': '/material/rueckmeldung',
     'termine.finden': '/termine',
     'termine.eintragen': '/termine/neu',
-    'termine.planen': '/termine/planen',
-    'termine.zusagen': '/termine/zusagen'
+    'termine.vorbereiten': '/termine/vorbereiten',
+    'termine.teilnehmen': '/termine/teilnehmen',
+    'sehen': '/sehen', 'zeigen': '/zeigen', 'erarbeiten': '/erarbeiten', 'kontakt': '/kontakt'
   };
   const LABELS = {}, STAND = {}, FORM = {};
-  FUNCS.forEach(f => { LABELS[f.id] = f.label; (f.subs || []).forEach(s => { LABELS[s.id] = s.label; if (s.stand) STAND[s.id] = s.stand; if (s.form) FORM[s.id] = s.form; }); });
+  ALLE.forEach(f => { LABELS[f.id] = f.label; (f.subs || []).forEach(s => { LABELS[s.id] = s.label; if (s.stand) STAND[s.id] = s.stand; if (s.form) FORM[s.id] = s.form; }); });
   const DEFAULT_BASE = 'https://relihub.example';
   const CONTEXTS = { standard: {} };
 
@@ -1963,7 +1976,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 `;
 
   class RelihubSteuerkonsoleElement extends HTMLElement {
-    static get observedAttributes() { return ['size', 'variant', 'context', 'base-url', 'target', 'compact', 'floating', 'popover-size', 'popover-align']; }
+    static get observedAttributes() { return ['size', 'variant', 'context', 'base-url', 'target', 'compact', 'floating', 'popover-size', 'popover-align', 'sicht']; }
     constructor() {
       super();
       this.attachShadow({ mode: 'open' });
@@ -1975,7 +1988,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     /* Farben aus dem Dokument übernehmen (--relihub-c-<id>, --relihub-text-<id>); fehlen sie, bleiben die eingebauten Werte */
     applyTheme() {
       const cs = getComputedStyle(this);
-      FUNCS.forEach(f => {
+      ALLE.forEach(f => {
         const c = cs.getPropertyValue('--relihub-c-' + f.id).trim(), t = cs.getPropertyValue('--relihub-text-' + f.id).trim(), x = cs.getPropertyValue('--relihub-x-' + f.id).trim();
         if (/^#[0-9a-fA-F]{6}$/.test(c)) f.color = c.toUpperCase();
         if (/^#[0-9a-fA-F]{6}$/.test(t)) f.text = t.toUpperCase();
@@ -2025,6 +2038,8 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     attributeChangedCallback(name) {
       if (name === 'open') return; if (this.shadowRoot.firstChild) this.render(); }
     get ctx() { return this.getAttribute('context') || 'standard'; }
+    get sicht() { return this.getAttribute('sicht') === 'formen' ? 'formen' : 'dinge'; }
+    get funcs() { return this.sicht === 'formen' ? FUNCS_F : FUNCS; }
     get variant() { return this.getAttribute('variant') === 'scheibe' ? 'scheibe' : 'knospen'; }
 
     render() {
@@ -2043,7 +2058,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         btn.className = 'mini'; btn.type = 'button';
         btn.setAttribute('aria-label', 'reli_hub-Steuerkonsole öffnen'); btn.setAttribute('aria-expanded', 'false');
         const mini = el('svg', { viewBox: `${-VB} ${-VB} ${2 * VB} ${2 * VB}`, 'aria-hidden': 'true' }, btn);
-        FUNCS.forEach(f => el('circle', { cx: f.cx, cy: f.cy, r: R, fill: f.color }, mini));
+        this.funcs.forEach(f => el('circle', { cx: f.cx, cy: f.cy, r: R, fill: f.color }, mini));
         btn.addEventListener('click', () => {
           // Ein Klick direkt nach dem Öffnen per Überfahren (oder Antippen) soll nicht gleich wieder schließen
           if (this.hasAttribute('open') && Date.now() - (this._openedAt || 0) > 600) this.closePop(0); else this.openPop();
@@ -2053,7 +2068,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         const popEl = document.createElement('div');
         popEl.className = 'popover';
         popEl.setAttribute('data-align', this.getAttribute('popover-align') === 'left' ? 'left' : 'right');
-        const cap = document.createElement('span'); cap.className = 'cap'; cap.textContent = 'Vier plus ich'; popEl.appendChild(cap);   // Konsole = vier Elemente plus ich, Leiste = Orte
+        const cap = document.createElement('span'); cap.className = 'cap'; cap.textContent = this.sicht === 'formen' ? 'Ich möchte …' : 'Vier plus ich'; popEl.appendChild(cap);   // Konsole = vier Elemente plus ich, Leiste = Orte
         const box = document.createElement('div'); box.className = 'fbox';
         popEl.appendChild(box); root.appendChild(popEl);
         holder = box;
@@ -2062,17 +2077,23 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       this.svg = svg;
       const base = el('g', { class: 'base' }, svg);
       this.baseEls = new Map();
-      FUNCS.forEach(f => { this.baseEls.set(f.id, el('circle', { cx: f.cx, cy: f.cy, r: R, fill: f.color }, base)); });
+      this.funcs.forEach(f => { this.baseEls.set(f.id, el('circle', { cx: f.cx, cy: f.cy, r: R, fill: f.color }, base)); });
+      // Sicht von den Aktionsformen: das Zeichen der Form steht schon auf dem Blatt
+      this.funcs.forEach(f => { if (f.form) el('path', { class: 'zeichen', d: FORMEN[f.form].d, transform: `translate(${(f.cx + 46 * f.ux).toFixed(1)} ${(f.cy + 46 * f.uy).toFixed(1)}) scale(2.3)`, fill: 'none', stroke: '#FFFFFF', 'stroke-width': 2.4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 0.92, 'pointer-events': 'none' }, base); });
       this.ov = el('g', { class: 'ov' }, svg);
+      // Mitte: „Ich möchte“ – mit Blatt und Knospe ergibt sich ein Satz (Ich möchte Materialien suchen)
+      const mitte = el('g', { class: 'mitte', 'pointer-events': 'none', 'aria-hidden': 'true' }, svg);
+      el('rect', { x: -66, y: -19, width: 132, height: 38, rx: 19, fill: '#FFFFFF', 'fill-opacity': 0.94 }, mitte);
+      this.text(mitte, 'Ich möchte', 0, 1, 23, '#1B2440', 'lbl');
 
       // Zugängliche Links (für Tastatur und Screenreader) – steuern dieselbe Grafik
       const nav = document.createElement('nav');
       nav.className = 'sr'; nav.setAttribute('aria-label', 'reli_hub');
-      FUNCS.forEach(f => {
+      this.funcs.forEach(f => {
         [f.id].concat((f.subs || []).map(s => s.id)).forEach(act => {
           const a = document.createElement('a');
           a.href = resolve(act, this.ctx, this).url;
-          a.textContent = (act.includes('.') ? `${f.label}: ${LABELS[act]}` : f.label) + (FORM[act] && FORMEN[FORM[act]].label !== LABELS[act] ? `, ${FORMEN[FORM[act]].label}` : '') + (STAND[act] === 'spaeter' ? ' (später)' : STAND[act] === 'offen' ? ' (noch nicht gebaut)' : '');
+          a.textContent = (!act.includes('.') ? (f.form ? 'Ich möchte ' + FORMEN[f.form].label : f.label) : FORM[act] ? `${LABELS[act]}, ${FORMEN[FORM[act]].label}` : `${f.label}: ${LABELS[act]}`) + (STAND[act] === 'spaeter' ? ' (später)' : STAND[act] === 'offen' ? ' (noch nicht gebaut)' : '');
           a.addEventListener('focus', () => { this.cancelClose(); this.openPop(); this.kbdAction = act; this.activate(f, true); });
           a.addEventListener('blur', () => { this.kbdAction = null; this.scheduleClose(); this.closePop(300); });
           a.addEventListener('click', e => { e.preventDefault(); this.fire(act); });
@@ -2094,12 +2115,12 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       return p.matrixTransform(this.svg.getScreenCTM().inverse());
     }
     exclusive(p) {
-      const inside = FUNCS.filter(f => Math.hypot(p.x - f.cx, p.y - f.cy) <= R);
+      const inside = this.funcs.filter(f => Math.hypot(p.x - f.cx, p.y - f.cy) <= R);
       return inside.length === 1 ? inside[0] : null;
     }
     // Kreis, dessen Rand höchstens slack entfernt ist – nur wenn genau einer in Frage kommt
     nearest(p, slack) {
-      const near = FUNCS.filter(f => Math.hypot(p.x - f.cx, p.y - f.cy) - R <= slack);
+      const near = this.funcs.filter(f => Math.hypot(p.x - f.cx, p.y - f.cy) - R <= slack);
       return near.length === 1 ? near[0] : null;
     }
     onMove(e) {
@@ -2135,7 +2156,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     activate(f, fromKbd) {
       if (this.active === f) { this.markKbd(); return; }
       this.active = f;
-      FUNCS.forEach(g => this.baseEls.get(g.id).classList.toggle('dim', g === f));
+      this.funcs.forEach(g => this.baseEls.get(g.id).classList.toggle('dim', g === f));
       const ov = this.ov; ov.innerHTML = '';
       const pop = el('g', { class: 'pop' }, ov);
       pop.style.transform = `translate(${f.cx}px,${f.cy}px) scale(1)`;
@@ -2167,19 +2188,29 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         f.subs.forEach((s, k) => {
           const a = ang + (n === 1 ? 0 : (k - (n - 1) / 2) * (2 * spread / (n - 1)));
           const dist = R + 26, bx = dist * Math.cos(a), by = dist * Math.sin(a);
-          const bud = el('g', { class: 'bud act', 'data-action': s.id, style: `--hl:${f.light}` }, pop);
+          const far = s.ding ? DING[s.ding] : f;   // Sicht von den Aktionsformen: die Knospe trägt die Farbe ihres Dings
+          const eng = window.matchMedia && window.matchMedia('(max-width:640px)').matches;
+          const bud = el('g', { class: 'bud act', 'data-action': s.id, style: `--hl:${far.light}` }, pop);
           bud.style.transform = 'translate(0px,0px) scale(.2)';
           bud.style.opacity = '0';
           el('circle', { class: 'hit', r: HIT, fill: 'transparent' }, bud); // unter dem sichtbaren Kreis: größere Trefferfläche
           const grau = GRAU[s.stand];   // Graustufe statt Bereichsfarbe: noch nicht gebaut
           if (grau) bud.setAttribute('data-stand', s.stand);
           if (s.form) bud.setAttribute('data-form', s.form);
-          el('circle', { r: 31, fill: grau ? grau.fill : f.color, stroke: '#FFFFFF', 'stroke-width': 3 }, bud);
-          el('path', { d: s.form ? FORMEN[s.form].d : 'M-6 -10 L5 0 L-6 10', fill: 'none', stroke: grau ? grau.text : f.text, 'stroke-width': 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'pointer-events': 'none' }, bud);
+          el('circle', { r: 31, fill: grau ? grau.fill : far.color, stroke: '#FFFFFF', 'stroke-width': 3 }, bud);
+          el('path', { d: s.form ? FORMEN[s.form].d : 'M-6 -10 L5 0 L-6 10', fill: 'none', stroke: grau ? grau.text : far.text, 'stroke-width': 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'pointer-events': 'none' }, bud);
           const lx = 44 * Math.cos(a), ly = 44 * Math.sin(a);
-          const anchor = Math.cos(a) > 0.35 ? 'start' : Math.cos(a) < -0.35 ? 'end' : 'middle';
-          const t = this.text(bud, s.label, lx, ly + (Math.abs(Math.cos(a)) <= 0.35 ? Math.sign(Math.sin(a)) * 10 : 0), 25, f.ink, 'out');
+          // Bei vier Knospen stehen zwei dicht nebeneinander: ihre Namen laufen voneinander weg statt mittig darunter
+          const mittig = n > 3 ? 0.12 : 0.35;
+          const anchor = Math.cos(a) > mittig ? 'start' : Math.cos(a) < -mittig ? 'end' : 'middle';
+          const t = this.text(bud, eng && s.kurz ? (s.ding ? DING[s.ding].label : s.kurz) : s.label, lx, ly + (Math.abs(Math.cos(a)) <= 0.35 ? Math.sign(Math.sin(a)) * 10 : 0), 25, f.ink, 'out');
           t.setAttribute('text-anchor', anchor);
+          const worte = t.textContent.split(' ');
+          if (worte.length === 2) {   // Verb plus Ding: zweizeilig, neben der Knospe mittig, darüber nach oben, darunter nach unten
+            const erste = anchor !== 'middle' ? '-0.52em' : Math.sin(a) < 0 ? '-1.05em' : '0';
+            t.textContent = '';
+            worte.forEach((w, i) => { const ts = el('tspan', { x: lx, dy: i ? '1.05em' : erste }, t); ts.textContent = w; });
+          }
           this.fitLabel(t, f, bx + lx, a, anchor, lx);
           let gemessen = false;   // nach dem Aufspringen am echten Ort nachmessen: nichts ragt über den Bildschirmrand
           bud.addEventListener('transitionend', e => { if (gemessen || e.propertyName !== 'transform') return; gemessen = true; this.nachruecken(t); });
@@ -2214,7 +2245,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         t.setAttribute('font-size', 20);
         shift = messen();
         if (!shift) return;
-        const teile = t.textContent.split(' ');
+        const teile = t.children.length ? [] : t.textContent.split(' ');
         if (teile.length === 2) {   // zwei Wörter: zweizeilig neben der Knospe
           t.textContent = '';
           teile.forEach((w, i) => { const ts = el('tspan', { x: t.getAttribute('x'), dy: i ? '1.05em' : '-0.52em' }, t); ts.textContent = w; });
@@ -2222,7 +2253,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
           if (!shift) return;
           t.textContent = teile.join(' ');
         }
-        t.setAttribute('x', lx + shift / k);
+        [t, ...t.children].forEach(n => n.setAttribute('x', lx + shift / k));
         t.setAttribute('y', (Math.sin(a) >= -0.2 ? 1 : -1) * 54);
       } catch (e) { /* Messung nicht möglich – Beschriftung bleibt, wo sie ist */ }
     }
@@ -2258,26 +2289,26 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 
     fire(action) {
       const r = resolve(action, this.ctx, this);
-      const detail = { action, label: LABELS[action], url: r.url, context: this.ctx, stand: STAND[action] || null, form: FORM[action] || null };
+      const detail = { action, label: LABELS[action], url: r.url, context: this.ctx, stand: STAND[action] || null, form: FORM[action] || null, sicht: this.sicht };
       this.closePop(0);
       if (r.handler && r.handler(detail) === false) return;
       const ok = this.dispatchEvent(new CustomEvent('relihub-action', { detail, bubbles: true, composed: true, cancelable: true }));
       if (!ok || this.hasAttribute('demo')) return;
       // Bereiche mit Knospen (Menschen, Communities, Materialien, Termine) haben keine eigene Zielseite:
       // Ihr Klick löst nur das Ereignis aus (z. B. für eine Erläuterung), navigiert aber nicht.
-      if (FUNCS.some(f => f.id === action && f.subs && !f.self)) return;
+      if (ALLE.some(f => f.id === action && f.subs && !f.self)) return;
       if (r.target === '_self') window.location.href = r.url;
       else window.open(r.url, r.target, 'noopener');
     }
   }
 
   const RelihubSteuerkonsole = {
-    version: '0.9.0',
+    version: '0.10.0',
     routes: ROUTES,
     contexts: CONTEXTS,
     functions: FUNCS.map(f => ({ id: f.id, label: f.label, color: f.color, subs: (f.subs || []).map(s => ({ ...s })) })),
     grau: GRAU,
-    formen: FORM_ORDER.map(id => ({ id, label: FORMEN[id].label })),
+    formen: FORM_ORDER.map(id => ({ id, label: FORMEN[id].label, blatt: FORMEN[id].blatt, color: FORMEN[id].color })),
     registerContext(name, profile) {
       CONTEXTS[name] = profile || {};
       document.querySelectorAll('relihub-steuerkonsole').forEach(n => { if (n.getAttribute('context') === name) n.render(); });
@@ -3002,29 +3033,37 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     'ich.profil': { t:'Mein Profil', p:'Mit deinem Profil wird der reli_hub zu deinem persönlichen Ausgangspunkt: deine Communities, neue Materialien zu deinen Themen und passende Termine. Ein Schlüssel öffnet alle angeschlossenen Seiten.', go:['Mit Nostr-Schlüssel anmelden','#profil'] },
     'ich.interessen': { t:'Meine Themen', p:'Trag ein paar Schlagworte ein, zum Beispiel #Frieden oder #Konfi. Die Vorschau auf dieser Seite richtet sich danach. Die Themen bleiben in diesem Browser.', go:['Themen eintragen','#start?zu=themen'] },
     'ich.start': { t:'Überblick', p:'Alle vier auf einen Blick: Menschen, Communities, Materialien und Termine mit ihren Verbindungen.', go:['Zum Überblick','#oekosystem'] },
-    'menschen': { t:'Wer hier arbeitet', p:'Menschen, die Religion unterrichten, vermitteln und erforschen. Finde, wer zu deinen Themen arbeitet, und zeig dich selbst.', subs:['menschen.finden','menschen.zeigen','menschen.pflegen','menschen.folgen'] },
-    'menschen.finden': { t:'Menschen finden', p:'Entdecke, wer zu deinen Themen arbeitet. Folge Profilen und nimm Kontakt auf.', go:['Menschen entdecken','#kooperieren/personen'] },
-    'menschen.zeigen': { t:'Mich zeigen', p:'Mit einem Profil wirst du für andere sichtbar: mit deinen Themen, deinen Materialien und deinen Communities.', lock:true, go:['Profil anlegen','#profil'] },
-    'menschen.pflegen': { t:'Profil pflegen', p:'Halte aktuell, was andere von dir sehen: Name, Bild, Themen und was du gerade anbietest.', lock:true, go:['Zum Profil','#profil'] },
-    'menschen.folgen': { t:'Menschen folgen', p:'Folge Menschen, deren Arbeit dich interessiert. Dann siehst du, was sie teilen. Folgen braucht ein Profil.', go:['Zu den Menschen','#kooperieren/personen'] },
-    'communities': { t:'Gruppen von Menschen', p:'Communities sind Zusammenschlüsse von Menschen zu einem Thema oder für eine Zielgruppe. Finde eine, mach mit oder gründe eine eigene.', subs:['communities.finden','communities.empfehlen','communities.gruenden','communities.mitmachen'], mehr:[['Ins relilab, das Labor','#relilab']] },
-    'communities.finden': { t:'Communities finden', p:'Verschaffe dir einen Überblick über religionspädagogische Communities und suche Verbündete.', go:['Communities entdecken','#communities'] },
-    'communities.empfehlen': { t:'Community empfehlen', p:'Eine Community anderen zeigen und weiterempfehlen ist gewollt und im Hub noch nicht gebaut.', grau:'offen', go:['Communities ansehen','#communities'] },
-    'communities.mitmachen': { t:'Mitmachen', p:'Was gerade besprochen und geteilt wird, steht im Raum Mitmachen. Beitreten, zusagen und kommentieren brauchen ein Profil.', go:['Raum Mitmachen','#mitmachen'] },
-    'communities.gruenden': { t:'Community gründen', p:'Eine eigene Community zu gründen ist gewollt und im Hub noch nicht gebaut. Bis dahin geht es bei edufeed.', grau:'offen', go:['Bei edufeed ansehen','https://edufeed.org'] },
-    'material': { t:'Was geteilt wird', p:'Unterrichtsmaterial, Lernmodule und Beiträge. Für dich zählt, was du findest, nicht wo es liegt.', subs:['material.finden','material.teilen','material.schreibtisch','material.kommentieren'] },
-    'material.finden': { t:'Material finden', p:'Finde aktuelles, redaktionell geprüftes Material zu deinen Themen und deiner Zielgruppe.', go:['Zum Materialpool','#materialpool'], p2:'Du kannst dir daraus auch eine Sammlung zusammenstellen und mitnehmen.', go2:['Sammlung zusammenstellen','#finden/sammlung'], mehr:[['Beiträge lesen','#profil?zu=artikel']] },
-    'material.teilen': { t:'Material teilen', p:'Mach dein Material sichtbar: Beschreibe es mit Zielgruppe, Thema und Lizenz, und es wird im ganzen Netzwerk gefunden. Oder schreib einen Beitrag aus deiner Praxis.', lock:true, go:['Material eintragen','@lerninhalt'], mehr:[['Beitrag schreiben','@beitrag']] },
-    'material.schreibtisch': { t:'Material bearbeiten', p:'Ein Material auf den eigenen Schreibtisch holen und weiterbearbeiten ist für später gedacht. Der relidesk zeigt, wohin es geht.', grau:'spaeter', go:['Zum relidesk','#relidesk?tab=schreibtisch'] },
-    'material.kommentieren': { t:'Material kommentieren', p:'Sag, was dir an einem Material geholfen hat oder was fehlt. So wird es mit der Zeit besser. Was gerade besprochen wird, steht im Raum Mitmachen.', go:['Raum Mitmachen','#mitmachen'] },
-    'termine': { t:'Wann man sich trifft', p:'Fortbildungen, Werkstätten und Treffen, online oder vor Ort, in einem gemeinsamen Kalender.', subs:['termine.finden','termine.eintragen','termine.planen','termine.zusagen'] },
-    'termine.finden': { t:'Termine finden', p:'Entdecke Fortbildungen religionspädagogischer Institute und Communities, deutschlandweit und meist online.', go:['Zum Kalender','#finden/fortbildungen'] },
-    'termine.eintragen': { t:'Termin eintragen', p:'Bewirb deine Fortbildung oder Veranstaltung: Einmal eingetragen, erscheint sie im gemeinsamen Kalender und auf allen angeschlossenen Seiten, zu denen sie passt.', lock:true, go:['Termin eintragen','@termin'] },
-    'termine.planen': { t:'Termin planen', p:'Einen Termin gemeinsam vorbereiten, mit Abstimmung und Aufgaben, ist gewollt und im Hub noch nicht gebaut.', grau:'offen', go:['Zum Kalender','#finden/fortbildungen'] },
-    'termine.zusagen': { t:'Zusagen', p:'Sag zu oder vielleicht. Andere sehen, wer kommt, und der Termin steht in deinem Profil. Zusagen braucht ein Profil.', go:['Zum Kalender','#finden/fortbildungen'] }
+    'menschen': { t:'Wer hier arbeitet', p:'Menschen, die Religion unterrichten, vermitteln und erforschen. Entdecke, wer zu deinen Themen arbeitet, und stell dich selbst vor.', subs:['menschen.finden','menschen.zeigen','menschen.zusammen','menschen.folgen'] },
+    'menschen.finden': { t:'Menschen entdecken', p:'Schau, wer zu deinen Themen arbeitet, was diese Menschen teilen und in welchen Communities sie sind. Das geht ohne Anmeldung.', go:['Nach Thema suchen','#kooperieren/personen'], mehr:[['Im Überblick ansehen','#oekosystem']] },
+    'menschen.zeigen': { t:'Mich vorstellen', p:'Mit einem Profil wirst du für andere sichtbar: mit deinen Themen, deinen Materialien und deinen Communities.', lock:true, go:['Profil anlegen','#profil'], mehr:[['Themen angeben','#start?zu=themen']] },
+    'menschen.zusammen': { t:'Zusammenarbeiten', p:'Mitstreitende für ein Vorhaben suchen und gemeinsam an etwas arbeiten ist gewollt und im Hub noch nicht gebaut.', grau:'offen', go:['Menschen ansehen','#kooperieren/personen'], mehr:[['Mitstreitende suchen','','offen'],['Gemeinsam arbeiten','','offen']] },
+    'menschen.folgen': { t:'Menschen folgen', p:'Folge Menschen, deren Arbeit dich interessiert. Dann siehst du, was sie teilen.', lock:true, go:['Folgen','#kooperieren/personen'], mehr:[['Anschreiben','','offen']] },
+    'communities': { t:'Gruppen von Menschen', p:'Communities sind Zusammenschlüsse von Menschen zu einem Thema oder für eine Zielgruppe. Entdecke eine, mach mit oder bau eine eigene auf.', subs:['communities.finden','communities.vorstellen','communities.aufbauen','communities.mitmachen'], mehr:[['Ins relilab, das Labor','#relilab']] },
+    'communities.finden': { t:'Communities entdecken', p:'Verschaffe dir einen Überblick über religionspädagogische Communities und lies, was dort gerade läuft. Das geht ohne Anmeldung.', go:['Zur Übersicht','#communities'], mehr:[['Was gerade läuft','#mitmachen']] },
+    'communities.vorstellen': { t:'Community vorstellen', p:'Eine Community anderen zeigen und weiterempfehlen ist gewollt und im Hub noch nicht gebaut.', grau:'offen', go:['Communities ansehen','#communities'], mehr:[['Weiterempfehlen','','offen']] },
+    'communities.aufbauen': { t:'Community aufbauen', p:'Richte für deine Community einen eigenen Zuschnitt des Hubs ein. Eine neue Community gründest du bis auf Weiteres bei edufeed.', lock:true, go:['Zuschnitt einrichten','#eigene-instanz'], mehr:[['Bei edufeed gründen','https://edufeed.org'],['Inhalte auswählen','','offen']] },
+    'communities.mitmachen': { t:'Mitmachen', p:'Tritt einer Community bei und rede mit. Was gerade besprochen und geteilt wird, steht im Raum Mitmachen.', lock:true, go:['Raum Mitmachen','#mitmachen'], mehr:[['Beitreten','#communities']] },
+    'material': { t:'Was geteilt wird', p:'Unterrichtsmaterial, Lernmodule und Beiträge. Für dich zählt, was du findest, nicht wo es liegt.', subs:['material.finden','material.teilen','material.schreibtisch','material.rueckmeldung'] },
+    'material.finden': { t:'Materialien suchen', p:'Suche und filtere aktuelles, redaktionell geprüftes Material zu deinen Themen und deiner Zielgruppe. Das geht ohne Anmeldung.', go:['Suchen und filtern','#materialpool'], mehr:[['Beiträge lesen','#profil?zu=artikel'],['Im Überblick ansehen','#oekosystem']] },
+    'material.teilen': { t:'Material teilen', p:'Mach dein Material sichtbar: Beschreibe es mit Zielgruppe, Thema und Lizenz, und es wird im ganzen Netzwerk gefunden. Beim Eintragen wählst du, in welche Communities du es teilst.', lock:true, go:['Material eintragen','@lerninhalt'], mehr:[['Beitrag schreiben','@beitrag']] },
+    'material.schreibtisch': { t:'Material weiterentwickeln', p:'Stell dir aus Materialien eine Sammlung zusammen und nimm sie mit. Ein Material auf den eigenen Schreibtisch holen und remixen ist für später gedacht.', go:['Sammlung zusammenstellen','#finden/sammlung'], mehr:[['Bearbeiten und remixen','#relidesk?tab=schreibtisch','spaeter']] },
+    'material.rueckmeldung': { t:'Rückmeldung geben', p:'Sag mit einem Klick, dass dir ein Material gefällt, oder schreib, was dir geholfen hat und was fehlt. So wird Material mit der Zeit besser.', lock:true, go:['Gefällt mir sagen','#oekosystem'], mehr:[['Kommentieren','#mitmachen'],['Autor:in folgen','#kooperieren/personen']] },
+    'termine': { t:'Wann man sich trifft', p:'Fortbildungen, Werkstätten und Treffen, online oder vor Ort, in einem gemeinsamen Kalender.', subs:['termine.finden','termine.eintragen','termine.vorbereiten','termine.teilnehmen'] },
+    'termine.finden': { t:'Termine finden', p:'Entdecke Fortbildungen religionspädagogischer Institute und Communities, deutschlandweit und meist online. Das geht ohne Anmeldung.', go:['Zum Kalender','#finden/fortbildungen'], mehr:[['Im Überblick ansehen','#oekosystem']] },
+    'termine.eintragen': { t:'Termin ankündigen', p:'Bewirb deine Fortbildung oder Veranstaltung: Einmal eingetragen, erscheint sie im gemeinsamen Kalender und auf allen angeschlossenen Seiten, zu denen sie passt.', lock:true, go:['Termin eintragen','@termin'] },
+    'termine.vorbereiten': { t:'Termin vorbereiten', p:'Einen Termin gemeinsam planen und Material anhängen ist gewollt und im Hub noch nicht gebaut.', grau:'offen', go:['Zum Kalender','#finden/fortbildungen'], mehr:[['Gemeinsam planen','','offen'],['Material anhängen','','offen']] },
+    'termine.teilnehmen': { t:'Teilnehmen', p:'Sag zu oder vielleicht. Andere sehen, wer kommt, und der Termin steht in deinem Profil.', lock:true, go:['Zusagen im Kalender','#finden/fortbildungen'], mehr:[['Nachfragen','#mitmachen']] },
+    'sehen': { t:'Ich möchte sehen', p:'Schauen, was es gibt, ohne etwas zu müssen. Hinter jedem Material und jedem Termin stehen Menschen und Communities. Alles hier geht ohne Anmeldung.', subs:['menschen.finden','communities.finden','material.finden','termine.finden'] },
+    'zeigen': { t:'Ich möchte zeigen', p:'Sichtbar machen, was du hast und wer du bist: dich selbst, dein Material, deinen Termin.', subs:['menschen.zeigen','communities.vorstellen','material.teilen','termine.eintragen'] },
+    'erarbeiten': { t:'Ich möchte erarbeiten', p:'Aus Vorhandenem etwas Neues machen, allein oder mit anderen. Hier wird Material besser.', subs:['menschen.zusammen','communities.aufbauen','material.schreibtisch','termine.vorbereiten'] },
+    'kontakt': { t:'Ich möchte in Kontakt treten', p:'Reagieren, mitreden, sich verbinden: vom schnellen „Gefällt mir“ bis zur Mitgliedschaft.', subs:['menschen.folgen','communities.mitmachen','material.rueckmeldung','termine.teilnehmen'] }
   };
-  const EX_NAME = {};   // Beschriftungen aus der Konsole: Element und Knospe
-  RelihubSteuerkonsole.functions.forEach(f => { EX_NAME[f.id] = f.label; f.subs.forEach(u => { EX_NAME[u.id] = u.label; }); });
+  const EX_NAME = {}, FORM_VON = {};   // Beschriftungen aus der Konsole: Element und Knospe; Aktionsform je Knospe
+  RelihubSteuerkonsole.functions.forEach(f => { EX_NAME[f.id] = f.label; f.subs.forEach(u => { EX_NAME[u.id] = u.label; if (u.form) FORM_VON[u.id] = u.form; }); });
+  const ORDER_F = ['ich'].concat(RelihubSteuerkonsole.formen.map(f => f.id));   // Sicht von den Aktionsformen (ADR-0011)
+  RelihubSteuerkonsole.formen.forEach(f => { EX_NAME[f.id] = f.blatt; C[f.id] = f.color; T[f.id] = '#FFFFFF'; X[f.id] = f.color; });
+  // Sicht der Konsole: 'dinge' (Blätter sind Menschen, Communities, Materialien, Termine) oder 'formen' (Blätter sind die Aktionsformen)
+  let SICHT = 'dinge';
   const GRAU_MARKE = { spaeter: 'später gedacht', offen: 'noch nicht gebaut' };
   const exEl = document.getElementById('explain');
   // Kleiner Speicher: ein Argument liest, zwei schreiben; ohne localStorage (privates Fenster, gesperrt) einfach null
@@ -3034,13 +3073,22 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   }
   // Tutorialmodus: Knospen auf der Startseite erklären; Direktmodus: Knospen führen sofort zur Aktion
   let MODUS = speicher('relihub-modus') || 'tutorial';
+  /** Sicht der Konsole umschalten: alle Konsolen der Seite zeigen dieselbe Matrix von der gewählten Seite her; bleibt im Browser */
+  function sichtSetzen(sicht, merken) {
+    SICHT = sicht === 'formen' ? 'formen' : 'dinge';
+    if (merken) speicher('relihub-sicht', SICHT);
+    document.querySelectorAll('relihub-steuerkonsole').forEach(k => { if (SICHT === 'formen') k.setAttribute('sicht', 'formen'); else k.removeAttribute('sicht'); });
+    document.querySelectorAll('#stSicht button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sicht === SICHT)));
+    if (document.getElementById('v-start').classList.contains('on')) explainDefault();
+  }
+  document.getElementById('stSicht').addEventListener('click', e => { const b = e.target.closest('button[data-sicht]'); if (b) sichtSetzen(b.dataset.sicht, true); });
   function setModus(m) {
     MODUS = m; speicher('relihub-modus', m);
     if (document.getElementById('v-start').classList.contains('on')) explainDefault();
   }
   function icon(fnKey) {
-    const only = fnKey.split('.')[0];
-    return `<svg class="ic" viewBox="-205 -205 410 410" aria-hidden="true">${ORDER.map((k, i) => {
+    const formen = SICHT === 'formen', only = formen ? (FORM_VON[fnKey] || fnKey.split('.')[0]) : fnKey.split('.')[0];
+    return `<svg class="ic" viewBox="-205 -205 410 410" aria-hidden="true">${(formen ? ORDER_F : ORDER).map((k, i) => {
       const a = (-90 + 72 * i) * Math.PI / 180;
       return `<circle cx="${(98*Math.cos(a)).toFixed(1)}" cy="${(98*Math.sin(a)).toFixed(1)}" r="100" fill="${C[k]}" opacity="${k===only?.95:.13}"/>`;
     }).join('')}</svg>`;
@@ -3054,12 +3102,17 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     exEl.style.borderColor = '';
     const direkt = MODUS === 'direkt';
     const kopf = direkt ? `<h2>Die Konsole führt dich direkt zur Aktion</h2><p>Ein Klick auf eine Knospe öffnet sofort, was dahintersteht. Unter „Hilfe“ zeigt dir die Konsole die Erklärungen wieder. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`
+      : SICHT === 'formen' ? `<h2>Ich möchte …</h2><p>Sehen, zeigen, erarbeiten, in Kontakt treten: Fahre über einen Kreis, und du siehst, womit das geht. Oben stehst du. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`
       : `<h2>Vier Dinge und du</h2><p>Menschen, Communities, Materialien und Termine: Fahre über einen Kreis, und du siehst gleich, was es dazu gibt. Oben stehst du. Sag dort, was dich interessiert. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`;
     const umschalter = direkt ? `<button type="button" class="btn btn-ghost modus" data-modus="tutorial">Konsole wieder erklären lassen</button>` : `<button type="button" class="btn btn-ghost modus" data-modus="direkt">Verstanden, direkt loslegen</button>`;
     exEl.innerHTML = `${icon('none')}<div><p class="fn" style="color:var(--muted)">So funktioniert's</p>${kopf}<div class="acts"><span class="hint">Schon dabei?</span><a class="btn btn-ghost" href="#profil" data-anmelden>Anmelden</a>${umschalter}</div></div>`;
   }
   /** Knopf einer Karte: Ziel '#route', '@editor' (öffnet den Editor) oder 'https://…' (neues Fenster) */
-  function exKnopf(text, ziel, stil, klasse) {
+  function exKnopf(text, ziel, stil, klasse, stand) {
+    if (stand) {   // Handlung, die noch nicht gebaut ist: gestrichelt, mit Ziel nur als Ausblick
+      const g = `class="btn btn-ghost st-grau st-${stand}" title="${GRAU_MARKE[stand]}"`;
+      return ziel ? `<a ${g} href="${ziel}">${text} ›</a>` : `<span ${g} aria-disabled="true">${text}</span>`;
+    }
     const k = `class="btn${klasse ? ' ' + klasse : ''}" style="${stil}"`;
     if (ziel[0] === '@') return `<button type="button" ${k} data-open="${ziel.slice(1)}">${text} ›</button>`;
     return /^https:/.test(ziel) ? `<a ${k} href="${ziel}" target="_blank" rel="noopener">${text} ›</a>` : `<a ${k} href="${ziel}">${text} ›</a>`;
@@ -3070,11 +3123,14 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const key = action.split('.')[0], col = C[key];
     exEl.style.borderColor = e.grau ? 'var(--line)' : col;
     const btnStyle = `background:${col};color:${T[key]}`, geist = `border-color:${col};color:${X[key]}`;
-    const fn = EX_NAME[key] + (action.includes('.') ? ' › ' + EX_NAME[action] : '');
+    const formName = id => RelihubSteuerkonsole.formen.find(f => f.id === id).label;
+    const fn = !action.includes('.') ? (C[key] && ORDER_F.includes(key) && key !== 'ich' ? 'Ich möchte' : EX_NAME[key])
+      : !FORM_VON[action] ? EX_NAME[key] + ' › ' + EX_NAME[action]
+      : SICHT === 'formen' ? 'Ich möchte ' + formName(FORM_VON[action]) + ' › ' + EX_NAME[key] : EX_NAME[key] + ' › ' + formName(FORM_VON[action]);
     const go = e.subs
       ? `<span class="hint">Weiter zu:</span>` + e.subs.map(x => `<button type="button" class="btn btn-ghost${EX[x].grau ? ' st-grau st-' + EX[x].grau : ''}" data-ex="${x}"${EX[x].grau ? '' : ` style="${geist}"`}>${EX_NAME[x]} ›</button>`).join('')
       : exKnopf(e.go[0], e.go[1], e.grau ? '' : btnStyle, e.grau ? 'btn-ghost' : '');
-    const mehr = (e.mehr || []).map(m => exKnopf(m[0], m[1], geist, 'btn-ghost')).join('');
+    const mehr = (e.mehr || []).map(m => exKnopf(m[0], m[1], geist, 'btn-ghost', m[2])).join('');
     const marke = e.grau ? `<span class="st-marke st-${e.grau}">● ${GRAU_MARKE[e.grau]}</span>` : e.lock ? '<span class="badge-lock">● mit Profil</span>' : '';
     const vorschau = action === 'ich' ? stThemenZeile() : ST_TYP[key] && !action.includes('.') ? stVorschauHtml(key) : '';
     exEl.innerHTML = `${icon(action)}<div><p class="fn" style="color:${X[key]}">${fn}</p><h2>${e.t}</h2><p>${e.p}${e.p2 ? ` ${e.p2.replace(e.go2[0], `<a href="${e.go2[1]}" style="color:${X[key]}">${e.go2[0]}</a>`)}` : ''}</p>${vorschau}<div class="acts">${go}${mehr}${marke}</div></div>`;
@@ -5413,10 +5469,10 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 
   // ---------- Kontexte der Steuerkonsole: dieselbe Steuerkonsole, je nach Seite andere Aktionen ----------
   let LOGGED = false;   // abgeleitet aus ICH.hex (ichSetzen im Block „Anmeldung“)
-  const VIEW_OF = { 'material.finden': 'materialpool', 'material.kommentieren': 'mitmachen', 'termine.zusagen': 'finden/fortbildungen', 'menschen.folgen': 'kooperieren/personen', 'ich.profil': 'profil', 'ich.start': 'start', 'material.schreibtisch': 'relidesk?tab=schreibtisch', 'termine.finden': 'finden/fortbildungen', 'menschen.finden': 'kooperieren/personen' };
+  const VIEW_OF = { 'material.finden': 'materialpool', 'material.rueckmeldung': 'oekosystem', 'termine.teilnehmen': 'finden/fortbildungen', 'menschen.folgen': 'kooperieren/personen', 'communities.aufbauen': 'eigene-instanz', 'ich.profil': 'profil', 'ich.start': 'start', 'material.schreibtisch': 'finden/sammlung', 'termine.finden': 'finden/fortbildungen', 'menschen.finden': 'kooperieren/personen' };
   function navTo(view, url) { const q = new URL(url).search; go(view + (q ? (view.includes('?') ? '&' + q.slice(1) : q) : '')); }
   function info(d) {
-    if (!['menschen', 'communities', 'material', 'termine'].includes(d.action)) return false;
+    if (!['menschen', 'communities', 'material', 'termine', 'sehen', 'zeigen', 'erarbeiten', 'kontakt'].includes(d.action)) return false;
     toast(`<b>${d.label}</b> – ${EX[d.action].p}<br>Wähle eine der Knospen.`); return true;
   }
   // Graustufen: dunkel = später gedacht, hell = gewollt und noch nicht gebaut (ADR-0010)
@@ -5430,9 +5486,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (d.action === 'material.teilen') { go('materialpool'); openChooser('materialpool'); return false; }
     if (d.action === 'ich') { go(LOGGED ? 'profil' : 'start'); return false; }
     if (d.action === 'ich.interessen') { go('start?zu=themen'); return false; }
-    if (d.action === 'menschen.zeigen' || d.action === 'menschen.pflegen') { if (LOGGED) go('profil'); else anmelden(); return false; }
+    if (d.action === 'menschen.zeigen') { if (LOGGED) go('profil'); else anmelden(); return false; }
     if (d.action === 'communities.mitmachen') { go('mitmachen'); return false; }
-    if (d.action === 'communities.gruenden') { toast('<b>Community gründen</b> ' + GRAU_TEXT.offen + '. Bis dahin geht es bei edufeed: <code>https://edufeed.org</code>'); return false; }
     if (d.stand === 'offen') { toast(`<b>${EX[d.action] ? EX[d.action].t : d.label}</b> ${GRAU_TEXT.offen}.`); return false; }
     if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); if (d.stand) toast(`<b>${d.label}</b> ${GRAU_TEXT[d.stand]}. Das hier ist ein Ausblick.`); return false; }
     if (info(d)) return false;
@@ -6104,6 +6159,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   }
   window.addEventListener('hashchange', () => { CUR = leseHash(); route(); });
   window.addEventListener('popstate', () => { CUR = leseHash(); route(); });
+  sichtSetzen(speicher('relihub-sicht'));
   themenRender();   // gespeicherte Themen der Startseite
   route();
 })();

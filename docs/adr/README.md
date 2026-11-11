@@ -37,4 +37,4 @@ Regeln: Deutsch; Produktsicht (keine Projektverwaltung, keine Berichtsbezüge); 
 | [0008](0008-community-inhalte-und-listen.md) | Community-Inhalte und Listen: Kataloge, Sammlung, Fortbildungskalender, Personen | angenommen |
 | [0009](0009-beziehungsgefuege-mitmachen-anmeldung.md) | Beziehungsgefüge, Mitmachen, Zuschnitt, Anmeldung | angenommen |
 | [0010](0010-vier-plus-ich.md) | Vier plus ich: Konsole nach Menschen, Communities, Materialien, Terminen und „ich“; Graustufen; Startseite mit Vorschau und Themen | angenommen als Entwurfsrunde |
-| [0011](0011-matrix-dinge-und-aktionsformen.md) | Matrix aus Dingen und Aktionsformen: je Ding vier Knospen für sehen, zeigen, erarbeiten, in Kontakt treten | Entwurf |
+| [0011](0011-matrix-dinge-und-aktionsformen.md) | Matrix aus Dingen und Aktionsformen: drei Ebenen, konkrete Knospen, umkehrbare Sicht, „Ich möchte“ in der Mitte | Entwurf |

@@ -35,20 +35,22 @@ Das Vokabular des gesamten Prototyps ist eine kleine, feste Ontologie ([ADR-0010
 |  |  | ich.start | – | Überblick (Ökosystem) |
 | Menschen | pink | menschen.finden | sehen | Ansicht Personen |
 |  |  | menschen.zeigen | zeigen | Profil, ohne Anmeldung der Anmeldedialog |
-|  |  | menschen.pflegen | erarbeiten | Profil, ohne Anmeldung der Anmeldedialog |
+|  |  | menschen.zusammen | erarbeiten, hellgrau | Hinweis |
 |  |  | menschen.folgen | Kontakt | Ansicht Personen |
 | Communities | violett | communities.finden | sehen | Ansicht Communities |
-|  |  | communities.empfehlen | zeigen, hellgrau | Hinweis |
-|  |  | communities.gruenden | erarbeiten, hellgrau | Hinweis und Verweis auf edufeed |
+|  |  | communities.vorstellen | zeigen, hellgrau | Hinweis |
+|  |  | communities.aufbauen | erarbeiten | Eigene Instanz (Zuschnitt) |
 |  |  | communities.mitmachen | Kontakt | Raum Mitmachen |
 | Materialien | petrol | material.finden | sehen | Ansicht Materialpool, mit Vorauswahl-Parametern; Beiträge lesen über die Karte |
 |  |  | material.teilen | zeigen | Editor Lerninhalt (Bereichswahl, dann 7 Schritte); Editor Beitrag über die Karte |
-|  |  | material.schreibtisch | erarbeiten, dunkelgrau | Ansicht relidesk, Tab Schreibtisch, mit Hinweis |
-|  |  | material.kommentieren | Kontakt | Raum Mitmachen |
+|  |  | material.schreibtisch | erarbeiten | Sammlung; im Kontext relidesk der Schreibtisch |
+|  |  | material.rueckmeldung | Kontakt | Ökosystem (Gefällt mir); Kommentieren im Raum Mitmachen |
 | Termine | orange | termine.finden | sehen | Fortbildungskalender über alle Quellen (Ansicht v-fortbildungen) |
 |  |  | termine.eintragen | zeigen | Editor Termin |
-|  |  | termine.planen | erarbeiten, hellgrau | Hinweis |
-|  |  | termine.zusagen | Kontakt | Fortbildungskalender |
+|  |  | termine.vorbereiten | erarbeiten, hellgrau | Hinweis |
+|  |  | termine.teilnehmen | Kontakt | Fortbildungskalender |
+
+Mit dem Attribut `sicht="formen"` zeigt die Konsole dieselbe Matrix von den Aktionsformen her: Die Blätter heißen dann sehen, zeigen, erarbeiten und Kontakt, die Knospen tragen die Farbe ihres Dings. In der Mitte steht in beiden Sichten „Ich möchte“.
 
 Regeln, die sich aus dem Code ablesen lassen:
 

@@ -106,8 +106,8 @@ Deno.test('Navigation: Tabelle, Farben in der Konsole, Lerninhalte in den Materi
   const c = consoleScript(), s = appScript();
   const d = await Deno.readTextFile(new URL('../docs/navigation.md', import.meta.url));
   assert(/\| Begriff \| Startseite \| Konsole \(Aktion\) \| Ziel \(Route\) \| Leiste \(Instanz\) \| Farbe \| Stand \|/.test(d), 'Tabellenkopf');
-  for (const b of ['Material', 'Fortbildungen', 'Beiträge', 'Schreibtisch', 'Labor', 'Communities', 'Personen', 'Lerninhalte', 'Termin', 'Beitrag', 'Profil', 'Themen', 'Überblick', 'Mitmachen', 'Gründen', 'Start', 'Hilfe']) assert(new RegExp(`\\| ${b} \\|`).test(d), `Zeile ${b} fehlt`);
-  assert(/this\.text\(bud, s\.label[^;]*f\.ink, 'out'\)/.test(c) && !/\.out\{[^}]*fill:/.test(c), 'Knospen nicht in Bereichsfarbe');
+  for (const b of ['Material', 'Fortbildungen', 'Beiträge', 'Schreibtisch', 'Labor', 'Communities', 'Personen', 'Lerninhalte', 'Termin', 'Beitrag', 'Profil', 'Themen', 'Überblick', 'Mitmachen', 'Aufbauen', 'Rückmeldung', 'Teilnehmen', 'Start', 'Hilfe']) assert(new RegExp(`\\| ${b} \\|`).test(d), `Zeile ${b} fehlt`);
+  assert(/this\.text\(bud, [^;]*s\.label[^;]*f\.ink, 'out'\)/.test(c) && !/\.out\{[^}]*fill:/.test(c), 'Knospen nicht in Bereichsfarbe');
   assert(/material\.teilen'\) \{ go\('materialpool'\); openChooser\('materialpool'\)/.test(block(/function standardAktion[\s\S]*?\n  \}/)), 'Lerninhalte springen nicht in den Materialpool');
   const nullZiele = [...block(/const EX = \{[\s\S]*?\n  \};/).matchAll(/go:\['[^']*',null\]/g)].length;
   assert(nullZiele === 0, `offene Ziele in EX: ${nullZiele}`);
