@@ -26,29 +26,34 @@ Die Datenebene darunter ist Nostr/edufeed: Materialien, Termine und Beiträge si
 
 ## Funktionsmodell: vier plus ich
 
-Das Vokabular des gesamten Prototyps ist eine kleine, feste Ontologie ([ADR-0010](adr/0010-vier-plus-ich.md)): fünf Kreise (im Uhrzeigersinn ab oben, 72° Abstand), oben „ich“, dann Menschen, Communities, Materialien, Termine. Jeder Kreis hat Farbe, Tönung und zwei bis vier Knospen. Alles andere (Konsole, Erklärkarte, Panel-Symbole, Kontextprofile) referenziert diese Aktions-IDs.
+Das Vokabular des gesamten Prototyps ist eine kleine, feste Ontologie ([ADR-0010](adr/0010-vier-plus-ich.md)): fünf Kreise (im Uhrzeigersinn ab oben, 72° Abstand), oben „ich“, dann Menschen, Communities, Materialien, Termine. Jeder Kreis hat Farbe und Tönung. Die vier Dinge tragen je vier Knospen, eine pro Aktionsform ([ADR-0011](adr/0011-matrix-dinge-und-aktionsformen.md)); „ich“ trägt drei. Alles andere (Konsole, Erklärkarte, Panel-Symbole, Kontextprofile) referenziert diese Aktions-IDs.
 
-| Element | Farbe | Knospe (ID) | Richtung | Ziel im Prototyp |
+| Element | Farbe | Knospe (ID) | Aktionsform | Ziel im Prototyp |
 | --- | --- | --- | --- | --- |
 | ich | blau | ich.profil | – | Ansicht Profil |
 |  |  | ich.interessen | – | Themenfeld der Startseite |
 |  |  | ich.start | – | Überblick (Ökosystem) |
-| Menschen | pink | menschen.finden | hinaus | Ansicht Personen |
-|  |  | menschen.zeigen | hinein | Profil, ohne Anmeldung der Anmeldedialog |
-| Communities | violett | communities.finden | hinaus | Ansicht Communities |
-|  |  | communities.mitmachen | hinein | Raum Mitmachen |
-|  |  | communities.gruenden | hinein, hellgrau | Hinweis und Verweis auf edufeed |
-| Materialien | petrol | material.finden | hinaus | Ansicht Materialpool, mit Vorauswahl-Parametern |
-|  |  | material.beitraege | hinaus | Artikel im Profil |
-|  |  | material.teilen | hinein | Editor Lerninhalt (Bereichswahl, dann 7 Schritte); Editor Beitrag über die Karte |
-|  |  | material.schreibtisch | hinein, dunkelgrau | Ansicht relidesk, Tab Schreibtisch, mit Hinweis |
-| Termine | orange | termine.finden | hinaus | Fortbildungskalender über alle Quellen (Ansicht v-fortbildungen) |
-|  |  | termine.eintragen | hinein | Editor Termin |
+| Menschen | pink | menschen.finden | sehen | Ansicht Personen |
+|  |  | menschen.zeigen | zeigen | Profil, ohne Anmeldung der Anmeldedialog |
+|  |  | menschen.pflegen | erarbeiten | Profil, ohne Anmeldung der Anmeldedialog |
+|  |  | menschen.folgen | Kontakt | Ansicht Personen |
+| Communities | violett | communities.finden | sehen | Ansicht Communities |
+|  |  | communities.empfehlen | zeigen, hellgrau | Hinweis |
+|  |  | communities.gruenden | erarbeiten, hellgrau | Hinweis und Verweis auf edufeed |
+|  |  | communities.mitmachen | Kontakt | Raum Mitmachen |
+| Materialien | petrol | material.finden | sehen | Ansicht Materialpool, mit Vorauswahl-Parametern; Beiträge lesen über die Karte |
+|  |  | material.teilen | zeigen | Editor Lerninhalt (Bereichswahl, dann 7 Schritte); Editor Beitrag über die Karte |
+|  |  | material.schreibtisch | erarbeiten, dunkelgrau | Ansicht relidesk, Tab Schreibtisch, mit Hinweis |
+|  |  | material.kommentieren | Kontakt | Raum Mitmachen |
+| Termine | orange | termine.finden | sehen | Fortbildungskalender über alle Quellen (Ansicht v-fortbildungen) |
+|  |  | termine.eintragen | zeigen | Editor Termin |
+|  |  | termine.planen | erarbeiten, hellgrau | Hinweis |
+|  |  | termine.zusagen | Kontakt | Fortbildungskalender |
 
 Regeln, die sich aus dem Code ablesen lassen:
 
 - Die vier Elemente Menschen, Communities, Materialien, Termine haben keine eigene Zielseite. Ein Klick auf den Kreis löst nur das Ereignis aus; die Konsole zeigt dann die Knospen. Nur „ich“ navigiert selbst.
-- Knospen hinein sind als „mit Profil“ markiert (Schloss-Badge), soweit sie schreiben. Knospen hinaus sind ohne Anmeldung zugänglich.
+- Knospen, die schreiben, sind als „mit Profil“ markiert (Schloss-Badge). Die Spalte „sehen“ ist ohne Anmeldung zugänglich.
 - Graue Knospen sind noch nicht gebaut: dunkelgrau (`stand: 'spaeter'`) heißt später gedacht, hellgrau (`stand: 'offen'`) heißt gewollt und noch nicht gebaut.
 - Die Startseite zeigt in der Karte eines Elements bis zu vier echte Einträge (`stVorschau`), gefiltert nach den Themen aus dem Feld über der Konsole (`themenAus`, `themaPasst`, Speicher `relihub-themen`).
 - Jede Funktion hat eine Hellton-Variante (`--t-finden` usw.) für Hintergründe, Chips und Kartenrückseiten. Die Töne tragen noch die früheren Namen (`--t-finden`, `--t-koop` usw.); die Partnerkacheln nutzen sie als Farbnamen.

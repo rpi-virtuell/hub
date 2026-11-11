@@ -4,7 +4,7 @@ import { appScript, consoleScript, contrast, html } from './helfer.ts';
 const c = consoleScript(), s = appScript();
 const block = (re: RegExp) => (s.match(re) || [''])[0];
 const fn = (name: string) => block(new RegExp(`  function ${name}\\([^)]*\\) \\{[\\s\\S]*?\\n  \\}`));
-const FUNCS = new Function((c.match(/const FUNCS = \[[\s\S]*?\n  \];/) || [''])[0] + '; return FUNCS;')() as { id: string; label: string; self?: boolean; subs: { id: string; label: string; stand?: string }[] }[];
+const FUNCS = new Function((c.match(/const FUNCS = \[[\s\S]*?\n  \];/) || [''])[0] + '; return FUNCS;')() as { id: string; label: string; self?: boolean; subs: { id: string; label: string; stand?: string; form?: string }[] }[];
 
 Deno.test('Konsole: ich oben, dann Menschen, Communities, Materialien, Termine', () => {
   assertEquals(FUNCS.map((f) => f.id), ['ich', 'menschen', 'communities', 'material', 'termine']);
@@ -12,13 +12,17 @@ Deno.test('Konsole: ich oben, dann Menschen, Communities, Materialien, Termine',
   assert(!/'(hub|finden|erstellen|kooperieren|veroeffentlichen)\.[a-z]+'/.test(c + s), 'frühere Kennungen im Code');
 });
 
-Deno.test('Konsole: jedes der vier Elemente hat eine Knospe hinaus und eine hinein', () => {
+Deno.test('Matrix: jedes der vier Dinge hat vier Knospen in der Reihenfolge der Aktionsformen', () => {
+  const formen = ['sehen', 'zeigen', 'erarbeiten', 'kontakt'];
   for (const f of FUNCS.slice(1)) {
-    const ids = f.subs.map((u) => u.id);
-    assert(ids.includes(f.id + '.finden'), `${f.id}: finden fehlt`);
-    assert(ids.some((i) => /\.(zeigen|mitmachen|teilen|eintragen)$/.test(i)), `${f.id}: Knospe hinein fehlt`);
-    assert(f.subs.length >= 2 && f.subs.length <= 4, `${f.id}: ${f.subs.length} Knospen`);
+    assertEquals(f.subs.map((u) => u.form), formen, `${f.id}: Reihenfolge der Aktionsformen`);
+    assertEquals(f.subs[0].id, f.id + '.finden');
   }
+  assert(FUNCS[0].subs.every((u) => !u.form), '„ich“ steht außerhalb der Matrix');
+  for (const k of formen) assert(new RegExp(`\\n    ${k}: \\{ label: '[^']+', d: '[^']+' \\}`).test(c), `Zeichen für ${k} fehlt`);
+  assert(/'data-form', s\.form/.test(c) && /s\.form \? FORMEN\[s\.form\]\.d/.test(c) && /form: FORM\[action\] \|\| null/.test(c), 'Form fehlt an der Knospe oder im Ereignis');
+  assert(/FORMEN\[FORM\[act\]\]\.label/.test(c), 'Form fehlt im Linktext für Screenreader');
+  assert(/d\.stand === 'offen'\) \{ toast\(/.test(fn('standardAktion')), 'Hellgraue Knospe ohne Hinweis');
 });
 
 Deno.test('Konsole: jede Aktion hat Route, Erklärung und Farben', () => {
@@ -38,7 +42,7 @@ Deno.test('Konsole: jede Aktion hat Route, Erklärung und Farben', () => {
 
 Deno.test('Graustufen: Stand an der Knospe, im Ereignis, in der Karte; lesbar', () => {
   const grau = FUNCS.flatMap((f) => f.subs).filter((u) => u.stand);
-  assertEquals(grau.map((u) => `${u.id}:${u.stand}`).sort(), ['communities.gruenden:offen', 'material.schreibtisch:spaeter']);
+  assertEquals(grau.map((u) => `${u.id}:${u.stand}`).sort(), ['communities.empfehlen:offen', 'communities.gruenden:offen', 'material.schreibtisch:spaeter', 'termine.planen:offen']);
   assert(/const GRAU = \{ spaeter: \{ fill: '#5F6672', text: '#FFFFFF' \}, offen: \{ fill: '#C9CED6', text: '#2B2F36' \} \}/.test(c), 'GRAU');
   assert(contrast('#FFFFFF', '#5F6672') >= 4.5 && contrast('#2B2F36', '#C9CED6') >= 4.5, 'Kontrast der Graustufen');
   assert(/stand: STAND\[action\] \|\| null/.test(c) && /\(später\)/.test(c) && /\(noch nicht gebaut\)/.test(c), 'Stand fehlt im Ereignis oder im Linktext');

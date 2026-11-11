@@ -1793,10 +1793,11 @@ a.kat-card:hover{border-color:var(--c-koop)}
  *
  * AKTIONEN (vier plus ich)
  *   ich · ich.profil · ich.interessen · ich.start ·
- *   menschen · menschen.finden · menschen.zeigen ·
- *   communities · communities.finden · communities.mitmachen · communities.gruenden ·
- *   material · material.finden · material.beitraege · material.teilen · material.schreibtisch ·
- *   termine · termine.finden · termine.eintragen
+ *   menschen · menschen.finden · menschen.zeigen · menschen.pflegen · menschen.folgen ·
+ *   communities · communities.finden · communities.empfehlen · communities.gruenden · communities.mitmachen ·
+ *   material · material.finden · material.teilen · material.schreibtisch · material.kommentieren ·
+ *   termine · termine.finden · termine.eintragen · termine.planen · termine.zusagen
+ *   (je Ding vier Knospen in der Reihenfolge sehen, zeigen, erarbeiten, in Kontakt treten)
  *   menschen, communities, material und termine haben keine eigene Zielseite:
  *   Ihr Klick löst nur das Ereignis aus. "ich" navigiert (je nach Kontext zur Start-
  *   oder Profilseite). Knospen mit Graustufe (detail.stand = "spaeter" | "offen") sind
@@ -1830,20 +1831,28 @@ a.kat-card:hover{border-color:var(--c-koop)}
   const CLOSE_DELAY = 280;
 
   // Vier plus Ich (ADR-0010): oben „ich“, im Uhrzeigersinn Menschen, Communities, Materialien, Termine.
-  // Je Element eine Knospe hinaus (finden) und eine hinein (zeigen, mitmachen, teilen, eintragen).
+  // Matrix (ADR-0011): jedes der vier Dinge trägt vier Knospen in fester Reihenfolge, je eine pro Aktionsform:
+  // sehen, zeigen, erarbeiten, in Kontakt treten. Das Zeichen in der Knospe zeigt die Form, das Wort bleibt konkret.
   // stand: 'spaeter' (dunkelgrau, später gedacht) oder 'offen' (hellgrau, gewollt und noch nicht gebaut).
   const GRAU = { spaeter: { fill: '#5F6672', text: '#FFFFFF' }, offen: { fill: '#C9CED6', text: '#2B2F36' } };
+  const FORMEN = {
+    sehen: { label: 'sehen', d: 'M-12 0 Q0 -11 12 0 Q0 11 -12 0 Z M-3 0 A3 3 0 1 0 3 0 A3 3 0 1 0 -3 0' },
+    zeigen: { label: 'zeigen', d: 'M0 7 V-10 M-7 -3 L0 -10 L7 -3 M-10 11 H10' },
+    erarbeiten: { label: 'erarbeiten', d: 'M-10 10 L-7 2 L4 -9 L9 -4 L-2 7 Z' },
+    kontakt: { label: 'in Kontakt treten', d: 'M-11 -9 H11 V5 H-1 L-7 11 V5 H-11 Z' }
+  };
+  const FORM_ORDER = ['sehen', 'zeigen', 'erarbeiten', 'kontakt'];
   const FUNCS = [
     { id: 'ich', label: 'ich', color: '#203A8F', text: '#FFFFFF', self: true,
       subs: [{ id: 'ich.profil', label: 'mein Profil' }, { id: 'ich.interessen', label: 'meine Themen' }, { id: 'ich.start', label: 'Überblick' }] },
     { id: 'menschen', label: 'Menschen', color: '#D6336C', text: '#FFFFFF',
-      subs: [{ id: 'menschen.finden', label: 'finden' }, { id: 'menschen.zeigen', label: 'mich zeigen' }] },
+      subs: [{ id: 'menschen.finden', label: 'finden', form: 'sehen' }, { id: 'menschen.zeigen', label: 'mich zeigen', form: 'zeigen' }, { id: 'menschen.pflegen', label: 'Profil pflegen', form: 'erarbeiten' }, { id: 'menschen.folgen', label: 'folgen', form: 'kontakt' }] },
     { id: 'communities', label: 'Communities', color: '#7B4FB8', text: '#FFFFFF',
-      subs: [{ id: 'communities.finden', label: 'finden' }, { id: 'communities.mitmachen', label: 'mitmachen' }, { id: 'communities.gruenden', label: 'gründen', stand: 'offen' }] },
+      subs: [{ id: 'communities.finden', label: 'finden', form: 'sehen' }, { id: 'communities.empfehlen', label: 'empfehlen', form: 'zeigen', stand: 'offen' }, { id: 'communities.gruenden', label: 'gründen', form: 'erarbeiten', stand: 'offen' }, { id: 'communities.mitmachen', label: 'mitmachen', form: 'kontakt' }] },
     { id: 'material', label: 'Materialien', color: '#007A75', text: '#FFFFFF',
-      subs: [{ id: 'material.finden', label: 'finden' }, { id: 'material.beitraege', label: 'Beiträge' }, { id: 'material.teilen', label: 'teilen' }, { id: 'material.schreibtisch', label: 'bearbeiten', stand: 'spaeter' }] },
+      subs: [{ id: 'material.finden', label: 'finden', form: 'sehen' }, { id: 'material.teilen', label: 'teilen', form: 'zeigen' }, { id: 'material.schreibtisch', label: 'bearbeiten', form: 'erarbeiten', stand: 'spaeter' }, { id: 'material.kommentieren', label: 'kommentieren', form: 'kontakt' }] },
     { id: 'termine', label: 'Termine', color: '#FFA500', text: '#2B1A00',
-      subs: [{ id: 'termine.finden', label: 'finden' }, { id: 'termine.eintragen', label: 'eintragen' }] }
+      subs: [{ id: 'termine.finden', label: 'finden', form: 'sehen' }, { id: 'termine.eintragen', label: 'eintragen', form: 'zeigen' }, { id: 'termine.planen', label: 'planen', form: 'erarbeiten', stand: 'offen' }, { id: 'termine.zusagen', label: 'zusagen', form: 'kontakt' }] }
   ];
   FUNCS.forEach((f, i) => {
     const a = (-90 + 72 * i) * Math.PI / 180;
@@ -1860,18 +1869,23 @@ a.kat-card:hover{border-color:var(--c-koop)}
     'ich.start': '/',
     'menschen.finden': '/menschen',
     'menschen.zeigen': '/profil',
+    'menschen.pflegen': '/profil/bearbeiten',
+    'menschen.folgen': '/menschen/folgen',
     'communities.finden': '/communities',
-    'communities.mitmachen': '/mitmachen',
+    'communities.empfehlen': '/communities/empfehlen',
     'communities.gruenden': '/communities/neu',
+    'communities.mitmachen': '/mitmachen',
     'material.finden': '/material',
-    'material.beitraege': '/material/beitraege',
     'material.teilen': '/material/neu',
     'material.schreibtisch': '/material/schreibtisch',
+    'material.kommentieren': '/material/kommentare',
     'termine.finden': '/termine',
-    'termine.eintragen': '/termine/neu'
+    'termine.eintragen': '/termine/neu',
+    'termine.planen': '/termine/planen',
+    'termine.zusagen': '/termine/zusagen'
   };
-  const LABELS = {}, STAND = {};
-  FUNCS.forEach(f => { LABELS[f.id] = f.label; (f.subs || []).forEach(s => { LABELS[s.id] = s.label; if (s.stand) STAND[s.id] = s.stand; }); });
+  const LABELS = {}, STAND = {}, FORM = {};
+  FUNCS.forEach(f => { LABELS[f.id] = f.label; (f.subs || []).forEach(s => { LABELS[s.id] = s.label; if (s.stand) STAND[s.id] = s.stand; if (s.form) FORM[s.id] = s.form; }); });
   const DEFAULT_BASE = 'https://relihub.example';
   const CONTEXTS = { standard: {} };
 
@@ -2058,7 +2072,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         [f.id].concat((f.subs || []).map(s => s.id)).forEach(act => {
           const a = document.createElement('a');
           a.href = resolve(act, this.ctx, this).url;
-          a.textContent = (act.includes('.') ? `${f.label}: ${LABELS[act]}` : f.label) + (STAND[act] === 'spaeter' ? ' (später)' : STAND[act] === 'offen' ? ' (noch nicht gebaut)' : '');
+          a.textContent = (act.includes('.') ? `${f.label}: ${LABELS[act]}` : f.label) + (FORM[act] && FORMEN[FORM[act]].label !== LABELS[act] ? `, ${FORMEN[FORM[act]].label}` : '') + (STAND[act] === 'spaeter' ? ' (später)' : STAND[act] === 'offen' ? ' (noch nicht gebaut)' : '');
           a.addEventListener('focus', () => { this.cancelClose(); this.openPop(); this.kbdAction = act; this.activate(f, true); });
           a.addEventListener('blur', () => { this.kbdAction = null; this.scheduleClose(); this.closePop(300); });
           a.addEventListener('click', e => { e.preventDefault(); this.fire(act); });
@@ -2159,13 +2173,16 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
           el('circle', { class: 'hit', r: HIT, fill: 'transparent' }, bud); // unter dem sichtbaren Kreis: größere Trefferfläche
           const grau = GRAU[s.stand];   // Graustufe statt Bereichsfarbe: noch nicht gebaut
           if (grau) bud.setAttribute('data-stand', s.stand);
+          if (s.form) bud.setAttribute('data-form', s.form);
           el('circle', { r: 31, fill: grau ? grau.fill : f.color, stroke: '#FFFFFF', 'stroke-width': 3 }, bud);
-          el('path', { d: 'M-6 -10 L5 0 L-6 10', fill: 'none', stroke: grau ? grau.text : f.text, 'stroke-width': 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'pointer-events': 'none' }, bud);
+          el('path', { d: s.form ? FORMEN[s.form].d : 'M-6 -10 L5 0 L-6 10', fill: 'none', stroke: grau ? grau.text : f.text, 'stroke-width': 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'pointer-events': 'none' }, bud);
           const lx = 44 * Math.cos(a), ly = 44 * Math.sin(a);
           const anchor = Math.cos(a) > 0.35 ? 'start' : Math.cos(a) < -0.35 ? 'end' : 'middle';
           const t = this.text(bud, s.label, lx, ly + (Math.abs(Math.cos(a)) <= 0.35 ? Math.sign(Math.sin(a)) * 10 : 0), 25, f.ink, 'out');
           t.setAttribute('text-anchor', anchor);
           this.fitLabel(t, f, bx + lx, a, anchor, lx);
+          let gemessen = false;   // nach dem Aufspringen am echten Ort nachmessen: nichts ragt über den Bildschirmrand
+          bud.addEventListener('transitionend', e => { if (gemessen || e.propertyName !== 'transform') return; gemessen = true; this.nachruecken(t); });
           requestAnimationFrame(() => requestAnimationFrame(() => {
             bud.style.transform = `translate(${bx}px,${by}px) scale(1)`;
             bud.style.opacity = '1';
@@ -2185,16 +2202,39 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         const m = this.svg.getScreenCTM(); if (!m) return;
         const k = m.a * SC;
         const px = m.a * (f.cx + POP * f.ux + SC * ux) + m.e;
-        const w = t.getComputedTextLength() * k;
-        const left = anchor === 'start' ? px : anchor === 'end' ? px - w : px - w / 2;
         const vw = document.documentElement.clientWidth, pad = 8;
-        let shift = 0;
-        if (left + w > vw - pad) shift = (vw - pad) - (left + w);
-        else if (left < pad) shift = pad - left;
+        const messen = () => {
+          const w = (t.children.length ? Math.max(...[...t.children].map(c => c.getComputedTextLength())) : t.getComputedTextLength()) * k;
+          const left = anchor === 'start' ? px : anchor === 'end' ? px - w : px - w / 2;
+          return left + w > vw - pad ? (vw - pad) - (left + w) : left < pad ? pad - left : 0;
+        };
+        let shift = messen();
         if (!shift) return;
+        // Bei vier Knospen läge eine versetzte Beschriftung unter der Nachbarknospe: erst kleiner setzen
+        t.setAttribute('font-size', 20);
+        shift = messen();
+        if (!shift) return;
+        const teile = t.textContent.split(' ');
+        if (teile.length === 2) {   // zwei Wörter: zweizeilig neben der Knospe
+          t.textContent = '';
+          teile.forEach((w, i) => { const ts = el('tspan', { x: t.getAttribute('x'), dy: i ? '1.05em' : '-0.52em' }, t); ts.textContent = w; });
+          shift = messen();
+          if (!shift) return;
+          t.textContent = teile.join(' ');
+        }
         t.setAttribute('x', lx + shift / k);
         t.setAttribute('y', (Math.sin(a) >= -0.2 ? 1 : -1) * 54);
       } catch (e) { /* Messung nicht möglich – Beschriftung bleibt, wo sie ist */ }
+    }
+    nachruecken(t) {
+      try {
+        const r = t.getBoundingClientRect(), vw = document.documentElement.clientWidth, pad = 8;
+        const d = r.right > vw - pad ? (vw - pad) - r.right : r.left < pad ? pad - r.left : 0;
+        const len = t.children.length ? Math.max(...[...t.children].map(c => c.getComputedTextLength())) : t.getComputedTextLength();
+        if (!d || !len || !r.width) return;
+        const x = parseFloat(t.getAttribute('x')) + d / (r.width / len);
+        [t, ...t.children].forEach(n => n.setAttribute('x', x));
+      } catch (e) { /* Messung nicht möglich */ }
     }
     text(parent, str, x, y, size, fill, cls) {
       const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': size, class: cls }, parent);
@@ -2218,7 +2258,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 
     fire(action) {
       const r = resolve(action, this.ctx, this);
-      const detail = { action, label: LABELS[action], url: r.url, context: this.ctx, stand: STAND[action] || null };
+      const detail = { action, label: LABELS[action], url: r.url, context: this.ctx, stand: STAND[action] || null, form: FORM[action] || null };
       this.closePop(0);
       if (r.handler && r.handler(detail) === false) return;
       const ok = this.dispatchEvent(new CustomEvent('relihub-action', { detail, bubbles: true, composed: true, cancelable: true }));
@@ -2232,11 +2272,12 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
   }
 
   const RelihubSteuerkonsole = {
-    version: '0.8.0',
+    version: '0.9.0',
     routes: ROUTES,
     contexts: CONTEXTS,
     functions: FUNCS.map(f => ({ id: f.id, label: f.label, color: f.color, subs: (f.subs || []).map(s => ({ ...s })) })),
     grau: GRAU,
+    formen: FORM_ORDER.map(id => ({ id, label: FORMEN[id].label })),
     registerContext(name, profile) {
       CONTEXTS[name] = profile || {};
       document.querySelectorAll('relihub-steuerkonsole').forEach(n => { if (n.getAttribute('context') === name) n.render(); });
@@ -2961,21 +3002,26 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     'ich.profil': { t:'Mein Profil', p:'Mit deinem Profil wird der reli_hub zu deinem persönlichen Ausgangspunkt: deine Communities, neue Materialien zu deinen Themen und passende Termine. Ein Schlüssel öffnet alle angeschlossenen Seiten.', go:['Mit Nostr-Schlüssel anmelden','#profil'] },
     'ich.interessen': { t:'Meine Themen', p:'Trag ein paar Schlagworte ein, zum Beispiel #Frieden oder #Konfi. Die Vorschau auf dieser Seite richtet sich danach. Die Themen bleiben in diesem Browser.', go:['Themen eintragen','#start?zu=themen'] },
     'ich.start': { t:'Überblick', p:'Alle vier auf einen Blick: Menschen, Communities, Materialien und Termine mit ihren Verbindungen.', go:['Zum Überblick','#oekosystem'] },
-    'menschen': { t:'Wer hier arbeitet', p:'Menschen, die Religion unterrichten, vermitteln und erforschen. Finde, wer zu deinen Themen arbeitet, und zeig dich selbst.', subs:['menschen.finden','menschen.zeigen'] },
+    'menschen': { t:'Wer hier arbeitet', p:'Menschen, die Religion unterrichten, vermitteln und erforschen. Finde, wer zu deinen Themen arbeitet, und zeig dich selbst.', subs:['menschen.finden','menschen.zeigen','menschen.pflegen','menschen.folgen'] },
     'menschen.finden': { t:'Menschen finden', p:'Entdecke, wer zu deinen Themen arbeitet. Folge Profilen und nimm Kontakt auf.', go:['Menschen entdecken','#kooperieren/personen'] },
     'menschen.zeigen': { t:'Mich zeigen', p:'Mit einem Profil wirst du für andere sichtbar: mit deinen Themen, deinen Materialien und deinen Communities.', lock:true, go:['Profil anlegen','#profil'] },
-    'communities': { t:'Gruppen von Menschen', p:'Communities sind Zusammenschlüsse von Menschen zu einem Thema oder für eine Zielgruppe. Finde eine, mach mit oder gründe eine eigene.', subs:['communities.finden','communities.mitmachen','communities.gruenden'], mehr:[['Ins relilab, das Labor','#relilab']] },
+    'menschen.pflegen': { t:'Profil pflegen', p:'Halte aktuell, was andere von dir sehen: Name, Bild, Themen und was du gerade anbietest.', lock:true, go:['Zum Profil','#profil'] },
+    'menschen.folgen': { t:'Menschen folgen', p:'Folge Menschen, deren Arbeit dich interessiert. Dann siehst du, was sie teilen. Folgen braucht ein Profil.', go:['Zu den Menschen','#kooperieren/personen'] },
+    'communities': { t:'Gruppen von Menschen', p:'Communities sind Zusammenschlüsse von Menschen zu einem Thema oder für eine Zielgruppe. Finde eine, mach mit oder gründe eine eigene.', subs:['communities.finden','communities.empfehlen','communities.gruenden','communities.mitmachen'], mehr:[['Ins relilab, das Labor','#relilab']] },
     'communities.finden': { t:'Communities finden', p:'Verschaffe dir einen Überblick über religionspädagogische Communities und suche Verbündete.', go:['Communities entdecken','#communities'] },
+    'communities.empfehlen': { t:'Community empfehlen', p:'Eine Community anderen zeigen und weiterempfehlen ist gewollt und im Hub noch nicht gebaut.', grau:'offen', go:['Communities ansehen','#communities'] },
     'communities.mitmachen': { t:'Mitmachen', p:'Was gerade besprochen und geteilt wird, steht im Raum Mitmachen. Beitreten, zusagen und kommentieren brauchen ein Profil.', go:['Raum Mitmachen','#mitmachen'] },
     'communities.gruenden': { t:'Community gründen', p:'Eine eigene Community zu gründen ist gewollt und im Hub noch nicht gebaut. Bis dahin geht es bei edufeed.', grau:'offen', go:['Bei edufeed ansehen','https://edufeed.org'] },
-    'material': { t:'Was geteilt wird', p:'Unterrichtsmaterial, Lernmodule und Beiträge. Für dich zählt, was du findest, nicht wo es liegt.', subs:['material.finden','material.beitraege','material.teilen','material.schreibtisch'] },
-    'material.finden': { t:'Material finden', p:'Finde aktuelles, redaktionell geprüftes Material zu deinen Themen und deiner Zielgruppe.', go:['Zum Materialpool','#materialpool'], p2:'Du kannst dir daraus auch eine Sammlung zusammenstellen und mitnehmen.', go2:['Sammlung zusammenstellen','#finden/sammlung'] },
-    'material.beitraege': { t:'Beiträge', p:'Artikel und Nachrichten aus deinen Communities und Instanzen. Sie gehören zu den Materialien wie Arbeitsblätter und Lernmodule.', go:['Zu den Beiträgen','#profil?zu=artikel'] },
+    'material': { t:'Was geteilt wird', p:'Unterrichtsmaterial, Lernmodule und Beiträge. Für dich zählt, was du findest, nicht wo es liegt.', subs:['material.finden','material.teilen','material.schreibtisch','material.kommentieren'] },
+    'material.finden': { t:'Material finden', p:'Finde aktuelles, redaktionell geprüftes Material zu deinen Themen und deiner Zielgruppe.', go:['Zum Materialpool','#materialpool'], p2:'Du kannst dir daraus auch eine Sammlung zusammenstellen und mitnehmen.', go2:['Sammlung zusammenstellen','#finden/sammlung'], mehr:[['Beiträge lesen','#profil?zu=artikel']] },
     'material.teilen': { t:'Material teilen', p:'Mach dein Material sichtbar: Beschreibe es mit Zielgruppe, Thema und Lizenz, und es wird im ganzen Netzwerk gefunden. Oder schreib einen Beitrag aus deiner Praxis.', lock:true, go:['Material eintragen','@lerninhalt'], mehr:[['Beitrag schreiben','@beitrag']] },
     'material.schreibtisch': { t:'Material bearbeiten', p:'Ein Material auf den eigenen Schreibtisch holen und weiterbearbeiten ist für später gedacht. Der relidesk zeigt, wohin es geht.', grau:'spaeter', go:['Zum relidesk','#relidesk?tab=schreibtisch'] },
-    'termine': { t:'Wann man sich trifft', p:'Fortbildungen, Werkstätten und Treffen, online oder vor Ort, in einem gemeinsamen Kalender.', subs:['termine.finden','termine.eintragen'] },
+    'material.kommentieren': { t:'Material kommentieren', p:'Sag, was dir an einem Material geholfen hat oder was fehlt. So wird es mit der Zeit besser. Was gerade besprochen wird, steht im Raum Mitmachen.', go:['Raum Mitmachen','#mitmachen'] },
+    'termine': { t:'Wann man sich trifft', p:'Fortbildungen, Werkstätten und Treffen, online oder vor Ort, in einem gemeinsamen Kalender.', subs:['termine.finden','termine.eintragen','termine.planen','termine.zusagen'] },
     'termine.finden': { t:'Termine finden', p:'Entdecke Fortbildungen religionspädagogischer Institute und Communities, deutschlandweit und meist online.', go:['Zum Kalender','#finden/fortbildungen'] },
-    'termine.eintragen': { t:'Termin eintragen', p:'Bewirb deine Fortbildung oder Veranstaltung: Einmal eingetragen, erscheint sie im gemeinsamen Kalender und auf allen angeschlossenen Seiten, zu denen sie passt.', lock:true, go:['Termin eintragen','@termin'] }
+    'termine.eintragen': { t:'Termin eintragen', p:'Bewirb deine Fortbildung oder Veranstaltung: Einmal eingetragen, erscheint sie im gemeinsamen Kalender und auf allen angeschlossenen Seiten, zu denen sie passt.', lock:true, go:['Termin eintragen','@termin'] },
+    'termine.planen': { t:'Termin planen', p:'Einen Termin gemeinsam vorbereiten, mit Abstimmung und Aufgaben, ist gewollt und im Hub noch nicht gebaut.', grau:'offen', go:['Zum Kalender','#finden/fortbildungen'] },
+    'termine.zusagen': { t:'Zusagen', p:'Sag zu oder vielleicht. Andere sehen, wer kommt, und der Termin steht in deinem Profil. Zusagen braucht ein Profil.', go:['Zum Kalender','#finden/fortbildungen'] }
   };
   const EX_NAME = {};   // Beschriftungen aus der Konsole: Element und Knospe
   RelihubSteuerkonsole.functions.forEach(f => { EX_NAME[f.id] = f.label; f.subs.forEach(u => { EX_NAME[u.id] = u.label; }); });
@@ -5367,7 +5413,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 
   // ---------- Kontexte der Steuerkonsole: dieselbe Steuerkonsole, je nach Seite andere Aktionen ----------
   let LOGGED = false;   // abgeleitet aus ICH.hex (ichSetzen im Block „Anmeldung“)
-  const VIEW_OF = { 'material.finden': 'materialpool', 'material.beitraege': 'profil?zu=artikel', 'ich.profil': 'profil', 'ich.start': 'start', 'material.schreibtisch': 'relidesk?tab=schreibtisch', 'termine.finden': 'finden/fortbildungen', 'menschen.finden': 'kooperieren/personen' };
+  const VIEW_OF = { 'material.finden': 'materialpool', 'material.kommentieren': 'mitmachen', 'termine.zusagen': 'finden/fortbildungen', 'menschen.folgen': 'kooperieren/personen', 'ich.profil': 'profil', 'ich.start': 'start', 'material.schreibtisch': 'relidesk?tab=schreibtisch', 'termine.finden': 'finden/fortbildungen', 'menschen.finden': 'kooperieren/personen' };
   function navTo(view, url) { const q = new URL(url).search; go(view + (q ? (view.includes('?') ? '&' + q.slice(1) : q) : '')); }
   function info(d) {
     if (!['menschen', 'communities', 'material', 'termine'].includes(d.action)) return false;
@@ -5384,9 +5430,10 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (d.action === 'material.teilen') { go('materialpool'); openChooser('materialpool'); return false; }
     if (d.action === 'ich') { go(LOGGED ? 'profil' : 'start'); return false; }
     if (d.action === 'ich.interessen') { go('start?zu=themen'); return false; }
-    if (d.action === 'menschen.zeigen') { if (LOGGED) go('profil'); else anmelden(); return false; }
+    if (d.action === 'menschen.zeigen' || d.action === 'menschen.pflegen') { if (LOGGED) go('profil'); else anmelden(); return false; }
     if (d.action === 'communities.mitmachen') { go('mitmachen'); return false; }
     if (d.action === 'communities.gruenden') { toast('<b>Community gründen</b> ' + GRAU_TEXT.offen + '. Bis dahin geht es bei edufeed: <code>https://edufeed.org</code>'); return false; }
+    if (d.stand === 'offen') { toast(`<b>${EX[d.action] ? EX[d.action].t : d.label}</b> ${GRAU_TEXT.offen}.`); return false; }
     if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); if (d.stand) toast(`<b>${d.label}</b> ${GRAU_TEXT[d.stand]}. Das hier ist ein Ausblick.`); return false; }
     if (info(d)) return false;
     later(d); return false;

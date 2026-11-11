@@ -66,10 +66,10 @@ Deno.test('Teilen in Communities im Beitrags- und Termin-Editor', () => {
   assert(/function isMember\(/.test(s), 'isMember fehlt');
 });
 
-Deno.test('Materialien haben die Knospe Beiträge und das Profil ein Artikel-Panel', () => {
+Deno.test('Beiträge hängen an Material finden und teilen, das Profil hat ein Artikel-Panel', () => {
   const c = consoleScript(), s = appScript();
-  assert(/material\.beitraege/.test(c) && /'\/material\/beitraege'/.test(c + s), 'Knospe oder Route fehlt');
-  assert(/id: 'material\.beitraege', label: 'Beiträge'/.test(c) && /'material\.beitraege': \{ t:'Beiträge'/.test(s), 'Beschriftung oder Karte fehlt');
+  assert(!/material\.beitraege/.test(c + s), 'Knospe Beiträge ist noch da (ADR-0011)');
+  assert(/'material\.finden': \{[^\n]*mehr:\[\['Beiträge lesen','#profil\?zu=artikel'\]\]/.test(s) && /'material\.teilen': \{[^\n]*\['Beitrag schreiben','@beitrag'\]/.test(s), 'Beiträge ohne Weg zum Lesen oder Schreiben');
   assert(html.includes('id="artikel"') && html.includes('Artikel aus deinen Communities'), 'Panel fehlt');
   assert(/function renderArtikel\(/.test(s) && s.includes('Folge Communities, um hier Artikel zu sehen.'), 'renderArtikel oder Leerzustand fehlt');
 });
