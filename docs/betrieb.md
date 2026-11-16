@@ -4,6 +4,25 @@ Stand 28.10.2026, ergänzt 04.11.2026. Diese Anleitung richtet sich an die techn
 
 **Stand 04.11.2026:** Der Prototyp wird unter `https://hub.rpi-virtuell.net` ausgeliefert (eigener Server, Caddy), nicht mehr über den GitHub-Spiegel und GitHub Pages. Die Schritte 1 bis 3 unten beschreiben den früheren Weg über GitHub und bleiben als Rückfall stehen; der Weg zum Server: `Dockerfile` (Caddy-Image, kopiert `index.html`) und `app.yaml` (`kind: static`, `subdomain: hub.rpi-virtuell.net`), eingerichtet am 03.11.2026 von der technischen Umsetzung (Commit df447bc).
 
+## Zwei Zweige, zwei Adressen (Entwurf, 16.11.2026)
+
+Entwicklung und Veröffentlichung laufen getrennt:
+
+| Zweig | Adresse | Zweck |
+|---|---|---|
+| `main` | `https://hub.rpi-virtuell.net` | tägliche Vorschau, jeder Merge erscheint dort |
+| `released` | `https://relihub.net` | öffentliche Seite, nur bewusst Freigegebenes |
+
+- **Auslieferung:** `.woodpecker.yml` hat je Zweig einen Schritt. Ein Push auf `main` nutzt die Secrets `deploy_host`, `deploy_user`, `deploy_key`, `deploy_script`. Ein Push auf `released` nutzt dieselben Namen mit der Endung `_released`. Die vier neuen Secrets legt die technische Umsetzung im Woodpecker an.
+- **Freigabe:** Eine Freigabe ist ein Merge von `main` nach `released`, ohne eigene Commits auf `released`:
+
+```bash
+cd ~/repositories/reli-hub && git fetch forgejo && git checkout released && git merge --ff-only main && git push forgejo released
+```
+
+- **Offen:** `app.yaml` nennt fest `hub.rpi-virtuell.net`. Damit `released` ohne eigene Commits auskommt, muss das Zielskript für `relihub.net` die Adresse selbst setzen. Sonst weichen die Zweige in dieser Datei dauerhaft voneinander ab.
+- **Später:** `hub.rpi-virtuell.net` bleibt Vorschau für die Entwicklung und kann nach dem Umzug auf `relihub.net` umleiten.
+
 ## Wie der Code fließt
 
 ```
