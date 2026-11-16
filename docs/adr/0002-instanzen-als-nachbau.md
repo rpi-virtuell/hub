@@ -5,7 +5,7 @@ angenommen · 28.10.2026 · Entscheidung der Maintainer · Bezug: Issue `74b30cd
 Punkt 1 (Inhalte als Schnappschuss mit Datenstand) ersetzt durch ADR-0006 am 03.11.2026; Punkte 2 bis 4 gelten weiter.
 
 ## Kontext
-Der reli_hub ist keine weitere Plattform, sondern verbindet bestehende Angebote. Der Prototyp zeigt das, indem er Instanzen (Materialpool, relilab, relidesk) in ihrem eigenen Design nachbaut und nur vier Dinge hinzufügt: den Vermerk „Teil des reli_hub“, den Profil-Link, die schwebende Steuerkonsole und das Vorauswahl-Banner. Das Issue fragt, wie die Webseite oer.community als Schaufenster des Projekts FOERBICO im Hub erscheinen kann.
+Der ReliHub ist keine weitere Plattform, sondern verbindet bestehende Angebote. Der Prototyp zeigt das, indem er Instanzen (Materialpool, relilab, relidesk) in ihrem eigenen Design nachbaut und nur vier Dinge hinzufügt: den Vermerk „Teil des ReliHub“, den Profil-Link, die schwebende Steuerkonsole und das Vorauswahl-Banner. Das Issue fragt, wie die Webseite oer.community als Schaufenster des Projekts FOERBICO im Hub erscheinen kann.
 
 ## Entscheidung
 1. Eine neue Instanz kommt als eigener View in den Prototyp, in ihrem eigenen Design (Schrift, Farben, Aufbau der Originalseite), mit Inhalten als Schnappschuss mit Datenstand. Der Hub fügt nur die vier genannten Dinge hinzu.

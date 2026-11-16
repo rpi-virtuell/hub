@@ -47,7 +47,7 @@ Deno.test('sammlungListe: d aus Filter, höchstens 100 Einträge, kein Hub-Name'
   const e = Array.from({ length: 120 }, (_, i) => ({ adr: `30142:${'ab'.repeat(32)}:m${i}`, kind: 30142 }));
   const ev = sl(f, e);
   assertEquals(ev.kind, 30004); assert(/^sammlung-[0-9a-f]{8}$/.test(ev.tags.find((t: string[]) => t[0] === 'd')[1]));
-  assertEquals(ev.tags.filter((t: string[]) => t[0] === 'a').length, 100); assert(!JSON.stringify(ev).includes('reli_hub'));
+  assertEquals(ev.tags.filter((t: string[]) => t[0] === 'a').length, 100); assert(!JSON.stringify(ev).includes('ReliHub'));
   assertEquals(sl(f, e).tags.find((t: string[]) => t[0] === 'd')[1], ev.tags.find((t: string[]) => t[0] === 'd')[1], 'deterministisch');
 });
 

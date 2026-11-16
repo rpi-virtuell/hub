@@ -1,6 +1,6 @@
 # Architekturentscheidungen (ADR)
 
-Hier liegen die Grundentscheidungen des reli_hub-Prototyps als kurze, nummerierte Dokumente. Sie sind Referenzpunkte: Wer eine Entscheidung ändern will, schreibt ein neues ADR, das das alte ersetzt, statt das alte umzuschreiben. So bleibt nachvollziehbar, was wann aus welchem Grund galt.
+Hier liegen die Grundentscheidungen des ReliHub-Prototyps als kurze, nummerierte Dokumente. Sie sind Referenzpunkte: Wer eine Entscheidung ändern will, schreibt ein neues ADR, das das alte ersetzt, statt das alte umzuschreiben. So bleibt nachvollziehbar, was wann aus welchem Grund galt.
 
 ## Vorlage
 
