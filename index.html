@@ -183,6 +183,8 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .pback p{margin:0;font-size:13.5px;line-height:1.38}
 .pback em{align-self:flex-end;font-style:normal;font-size:13px;font-weight:600;opacity:.9}
 .pcard .cc{flex:0 0 auto;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:18px}
+.pcard .cc-logo{position:relative;overflow:hidden}
+.pcard .cc-logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
 .pcard b{display:block;font-size:17px;line-height:1.2;hyphens:auto;overflow-wrap:anywhere}
 .pcard small{display:block;font-size:14px;color:var(--muted);margin-top:2px}
 .pcard .tag{display:inline-block;margin-top:6px;font-size:11.5px;font-weight:600;letter-spacing:.3px;border-radius:999px;padding:1px 8px;background:var(--t-erstellen);color:#7A4A00}
@@ -3298,6 +3300,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     ['reliGlobal', 'Globales Lernen im RU', 'kooperieren', 'rG', null, 'Gemeinsame Fachstelle der religionspädagogischen Institute für Globales Lernen: offene Materialien und Fortbildungen für den Religionsunterricht.'],
     ['Konfi-Arbeit bundesweit', 'konfi-arbeit.de', 'kooperieren', 'KA', null, 'Fortbildungen, Materialien und Praxisimpulse zur evangelischen Konfi-Arbeit für Haupt- und Ehrenamtliche in den Gemeinden.'],
     ['Friedensarbeit EKD', 'Evangelische Friedensarbeit', 'kooperieren', 'FA', null, 'Dachmarke der Friedensarbeit im Raum der EKD: Nachrichten, Termine, Projekte und Friedensbildung.'],
+    ['Kirche mit Kindern', 'Plan für den Kindergottesdienst', 'kooperieren', 'KK', 'https://kirchemitkindern.de/', 'Der Plan für Kirche mit Kindern: Einheiten für den Kindergottesdienst zum Merken, Bearbeiten und Teilen im Team, mit Suche und anpassbarer Ansicht. Getragen vom Gesamtverband für Kirche mit Kindern in der EKD.', 'verlinkt', 'https://kirchemitkindern-ekd.de/wp-content/uploads/2026/07/Logo-neu.jpg'],
     ['InkRV', 'Inklusive Religionspädagogik der Vielfalt', 'kooperieren', 'iV', null, 'Inklusive Religionspädagogik der Vielfalt. Die Plattform wird gerade überarbeitet und kommt bald wieder ins Ökosystem.', 'in Überarbeitung'],
     ['Comenius-Institut', 'Evangelische Bildungsforschung', 'hub', 'CI', null, 'Evangelische Arbeitsstätte für Erziehungswissenschaft in Münster – Forschung, Netzwerke und Projekte wie FOERBICO, aus dem der reli_hub entsteht.'],
     ['edufeed', 'offene Bildungsdaten im Nostr-Netz', 'hub', 'ef', null, 'Offene Infrastruktur für Bildungsdaten: Relays und Editoren, über die Materialien, Termine und Beiträge im ganzen Ökosystem geteilt werden.'],
@@ -3306,11 +3309,13 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   const TINT = { finden:cssVar('--t-finden'), erstellen:cssVar('--t-erstellen'), kooperieren:cssVar('--t-koop'), hub:cssVar('--t-hub') };
   const TINK = { finden:X.finden, erstellen:X.erstellen, kooperieren:X.kooperieren, hub:X.hub };
   const PARTNER_MIT_SCHLUESSEL = ['reliGlobal', 'Konfi-Arbeit bundesweit', 'Friedensarbeit EKD', 'edufeed'];   // Einträge von PARTNERS mit eigenem Schlüssel (Community-Konto, Schlüsselliste)
-  document.getElementById('pgrid').innerHTML = PARTNERS.map(([n, d, k, ab, href, back, tag]) => {
-    const partner = !href && !PARTNER_MIT_SCHLUESSEL.includes(n), marke = partner ? 'Partner' + (tag ? ' · ' + tag : '') : tag;   // Partner nur ohne eigenen Schlüssel; Einträge mit Schlüssel sind Communities. Ohne Seite im Hub führen beide zu den Communities
-    return `<a class="pcard${partner ? ' partner' : ''}" href="${href || '#communities'}" style="--bk:${TINT[k]};--bt:${TINK[k]}" aria-label="${n}: ${back}"><span class="pin">`
-    + `<span class="pface"><span class="cc" style="background:${C[k]};color:${T[k]}">${ab}</span><span><b>${n}</b><small>${d}</small>${marke ? `<span class="tag">${marke}</span>` : ''}</span></span>`
-    + `<span class="pface pback"><p>${back}</p><em>${href ? 'Ansehen ›' : 'Zu den Communities ›'}</em></span></span></a>`;
+  // Eintrag: [Name, Unterzeile, Farbe, Kürzel, Ziel, Rückseite, Marke, Logo]. Ziel: Ansicht im Hub (#…), fremde Seite (https://…, nur verlinkt) oder null (führt zu den Communities). Logos laufen über den Bildproxy von edufeed, damit die fremde Seite keine Besucher des Hubs sieht. Die Werte sind feste Einträge dieser Liste, deshalb ohne esc (das hier noch nicht bereitsteht); die Bildadresse trägt ihre &amp; selbst
+  const partnerLogo = url => `https://edufeed.org/api/image?url=${encodeURIComponent(url)}&amp;w=160&amp;h=160&amp;fit=contain&amp;fmt=webp`;
+  document.getElementById('pgrid').innerHTML = PARTNERS.map(([n, d, k, ab, href, back, tag, logo]) => {
+    const extern = /^https:\/\//.test(href || ''), partner = (!href || extern) && !PARTNER_MIT_SCHLUESSEL.includes(n), marke = partner ? 'Partner' + (tag ? ' · ' + tag : '') : tag;   // Partner nur ohne eigenen Schlüssel; Einträge mit Schlüssel sind Communities. Ohne Seite im Hub und ohne eigene Adresse führen beide zu den Communities
+    return `<a class="pcard${partner ? ' partner' : ''}" href="${href || '#communities'}"${extern ? ' target="_blank" rel="noopener"' : ''} style="--bk:${TINT[k]};--bt:${TINK[k]}" aria-label="${n}: ${back}"><span class="pin">`
+    + `<span class="pface"><span class="cc${logo ? ' cc-logo' : ''}" style="background:${C[k]};color:${T[k]}">${ab}${logo ? `<img src="${partnerLogo(logo)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span><span><b>${n}</b><small>${d}</small>${marke ? `<span class="tag">${marke}</span>` : ''}</span></span>`
+    + `<span class="pface pback"><p>${back}</p><em>${extern ? 'Zur Seite ›' : href ? 'Ansehen ›' : 'Zu den Communities ›'}</em></span></span></a>`;
   }).join('');
   // Auf Touch-Geräten: erstes Antippen dreht die Karte, zweites öffnet sie
   document.getElementById('pgrid').addEventListener('click', e => {
