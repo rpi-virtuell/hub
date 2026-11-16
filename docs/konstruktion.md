@@ -19,7 +19,7 @@ Der reli\_hub ist im Prototyp keine Website, auf der Inhalte liegen, sondern ein
 Drei Begriffe tragen das Konzept:
 
 - **Steuerkonsole**: das Projektlogo (fünf überlagerte Kreise, FOERBICO) wird zum interaktiven Element. Jeder Kreis ist eine Funktion, jede Funktion hat „Knospen“ (Unteraktionen). Dieselbe Konsole erscheint groß auf der Startseite (als Erklärobjekt) und klein schwebend unten rechts auf jeder angeschlossenen Seite (als Navigation).
-- **Ökosystem / Instanzen**: bestehende Angebote (Materialpool, relilab, relidesk, relimentar, narrt, reliGlobal, Konfi-Arbeit, Friedensarbeit EKD, InkRV, Comenius-Institut, edufeed) behalten Design und Funktion. Sie werden „Teil des reli\_hub“, indem sie die Konsole einbinden; sichtbar durch den Vermerk „Teil des reli\_hub“ im Fuß.
+- **Ökosystem / Instanzen**: bestehende Angebote (Materialpool, relilab, relidesk, relimentar, narrt, reliGlobal, Konfi-Arbeit, Friedensarbeit EKD, Kirche mit Kindern, InkRV, Comenius-Institut, edufeed) behalten Design und Funktion. Sie werden „Teil des reli\_hub“, indem sie die Konsole einbinden; sichtbar durch den Vermerk „Teil des reli\_hub“ im Fuß.
 - **Mitgenommenes Profil**: ein Schlüssel (Nostr) öffnet alle Seiten; Interessen (Schöpfung, Friedenspädagogik, KI im RU, Sek I) steuern Vorauswahlen, die über die Konsole als URL-Parameter an die Instanzen weitergereicht werden.
 
 Die Datenebene darunter ist Nostr/edufeed: Materialien, Termine und Beiträge sind signierte Ereignisse auf Relays, die jede Instanz anzeigen kann. Der Hub organisiert also drei Ebenen: Navigation (Konsole), Identität (Profil), Daten (Relays).
