@@ -1,6 +1,6 @@
 # Navigation: Startseite, Konsole, Leiste
 
-Drei Elemente führen durch den reli_hub und müssen dieselben Begriffe, Farben und Ziele verwenden. Die Tabelle unten ist die Referenz, an der sich jede neue Ansicht mit ihren Begriffen ausrichtet.
+Drei Elemente führen durch den ReliHub und müssen dieselben Begriffe, Farben und Ziele verwenden. Die Tabelle unten ist die Referenz, an der sich jede neue Ansicht mit ihren Begriffen ausrichtet.
 
 Die Startseite zeigt zu jedem Element gleich echte Einträge und erklärt mit Erklärkarte und Narrativ, was der Hub kann. Die Konsole (`<relihub-steuerkonsole>`) ordnet nach vier plus ich: Menschen, Communities, Materialien, Termine, dazu oben „ich“ ([ADR-0010](adr/0010-vier-plus-ich.md)). Die Leiste (`<relihub-leiste>`) zeigt Orte: siehe [leiste.md](leiste.md).
 

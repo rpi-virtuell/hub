@@ -1,4 +1,4 @@
-# reli\_hub-Prototyp – Konstruktionsbeschreibung (rekonstruiert)
+# ReliHub-Prototyp – Konstruktionsbeschreibung (rekonstruiert)
 
 Oct 26, 2026 · @Joerg
 
@@ -10,16 +10,16 @@ Drei Lesehilfen vorab:
 
 - Der Prototyp ist eine einzige HTML-Datei ohne Build, ohne Framework, ohne externe Abhängigkeiten außer Google Fonts. Alle „Seiten“ sind `div.view`-Blöcke, zwischen denen per Hash-Routing umgeschaltet wird.
 - Zwei Skripte: das erste ist die wiederverwendbare Web Component `relihub-steuerkonsole` (im Kopf als eigenständige Datei `relihub-steuerkonsole.js` gedacht), das zweite die Prototyp-Anwendung mit Beispieldaten, Routing und Kontextprofilen.
-- Die Datei trägt an vielen Stellen die Herkunft der Bausteine im Klartext: „Nachbau material.rpi-virtuell.net“, „Nachbau relilab.org“, „Nachbau des ReliDesk-Prototyps“, „Editoren im Stil von edufeed.org“, „Funktionen nach edufeed, Gestaltung in der Sprache des reli\_hub“. Diese Herkunftsangaben sind der Schlüssel zur Konstruktionsweise: Bestehendes wird nachgebaut und über die Konsole verbunden, nicht neu erfunden.
+- Die Datei trägt an vielen Stellen die Herkunft der Bausteine im Klartext: „Nachbau material.rpi-virtuell.net“, „Nachbau relilab.org“, „Nachbau des ReliDesk-Prototyps“, „Editoren im Stil von edufeed.org“, „Funktionen nach edufeed, Gestaltung in der Sprache des ReliHub“. Diese Herkunftsangaben sind der Schlüssel zur Konstruktionsweise: Bestehendes wird nachgebaut und über die Konsole verbunden, nicht neu erfunden.
 
 ## Leitidee: Steuerkonsole statt Plattform
 
-Der reli\_hub ist im Prototyp keine Website, auf der Inhalte liegen, sondern ein Steuerelement, das auf fremden Seiten eingebettet wird. Der Starttext sagt es wörtlich: „reli\_hub ist keine weitere Plattform. Er verbindet bestehende Angebote: Wer die reli\_hub-Steuerkonsole auf der eigenen Seite einbindet, wird Teil des Ökosystems.“ Daraus folgt die gesamte Bauweise.
+Der ReliHub ist im Prototyp keine Website, auf der Inhalte liegen, sondern ein Steuerelement, das auf fremden Seiten eingebettet wird. Der Starttext sagt es wörtlich: „ReliHub ist keine weitere Plattform. Er verbindet bestehende Angebote: Wer die ReliHub-Steuerkonsole auf der eigenen Seite einbindet, wird Teil des Ökosystems.“ Daraus folgt die gesamte Bauweise.
 
 Drei Begriffe tragen das Konzept:
 
 - **Steuerkonsole**: das Projektlogo (fünf überlagerte Kreise, FOERBICO) wird zum interaktiven Element. Jeder Kreis ist eine Funktion, jede Funktion hat „Knospen“ (Unteraktionen). Dieselbe Konsole erscheint groß auf der Startseite (als Erklärobjekt) und klein schwebend unten rechts auf jeder angeschlossenen Seite (als Navigation).
-- **Ökosystem / Instanzen**: bestehende Angebote (Materialpool, relilab, relidesk, relimentar, narrt, reliGlobal, Konfi-Arbeit, Friedensarbeit EKD, Kirche mit Kindern, InkRV, Comenius-Institut, edufeed) behalten Design und Funktion. Sie werden „Teil des reli\_hub“, indem sie die Konsole einbinden; sichtbar durch den Vermerk „Teil des reli\_hub“ im Fuß.
+- **Ökosystem / Instanzen**: bestehende Angebote (Materialpool, relilab, relidesk, relimentar, narrt, reliGlobal, Konfi-Arbeit, Friedensarbeit EKD, Kirche mit Kindern, InkRV, Comenius-Institut, edufeed) behalten Design und Funktion. Sie werden „Teil des ReliHub“, indem sie die Konsole einbinden; sichtbar durch den Vermerk „Teil des ReliHub“ im Fuß.
 - **Mitgenommenes Profil**: ein Schlüssel (Nostr) öffnet alle Seiten; Interessen (Schöpfung, Friedenspädagogik, KI im RU, Sek I) steuern Vorauswahlen, die über die Konsole als URL-Parameter an die Instanzen weitergereicht werden.
 
 Die Datenebene darunter ist Nostr/edufeed: Materialien, Termine und Beiträge sind signierte Ereignisse auf Relays, die jede Instanz anzeigen kann. Der Hub organisiert also drei Ebenen: Navigation (Konsole), Identität (Profil), Daten (Relays).
@@ -89,13 +89,13 @@ Das Logo wird außerdem als Mini-Symbol wiederverwendet: `svg.mark` zeichnet die
 
 ## Ansichten-Architektur: sieben Ansichten, zwei Sorten
 
-Der Prototyp hält sieben Ansichten in einer Datei und schaltet per Hash-Routing (`#start`, `#profil`, `#materialpool?thema=…`, `#relilab?tab=termine`, `#relidesk?tab=schreibtisch`, `#communities`, `#community?c=relilab`) zwischen ihnen um. Entscheidend ist die Zweiteilung: Hub-eigene Ansichten tragen das reli\_hub-Design (Barlow, Papierton, runde Panels), die Instanzen tragen ihr jeweils eigenes Design (Inter/Space Grotesk und Türkis für den Materialpool, Roboto/Oswald und Magenta-Pink für relilab, Outfit und Orange für relidesk). Nur die Konsole ist auf allen gleich.
+Der Prototyp hält sieben Ansichten in einer Datei und schaltet per Hash-Routing (`#start`, `#profil`, `#materialpool?thema=…`, `#relilab?tab=termine`, `#relidesk?tab=schreibtisch`, `#communities`, `#community?c=relilab`) zwischen ihnen um. Entscheidend ist die Zweiteilung: Hub-eigene Ansichten tragen das ReliHub-Design (Barlow, Papierton, runde Panels), die Instanzen tragen ihr jeweils eigenes Design (Inter/Space Grotesk und Türkis für den Materialpool, Roboto/Oswald und Magenta-Pink für relilab, Outfit und Orange für relidesk). Nur die Konsole ist auf allen gleich.
 
 &#91;embedded content: Architektur · 4 Hub-Ansichten, 4 Instanz-Nachbauten, 1 Konsole, Relays darunter\]
 
 Die Konsole ist in jeder Ansicht mit eigenem `context` eingebettet; die Routing-Pfeile stehen für Links, die Vorauswahlen als URL-Parameter mitnehmen (z. B. Profil → Materialpool mit `thema=Schöpfung&stufe=sek1`). Die Relays sind im Prototyp nur als Beschriftung präsent („Materialdaten aus dem Spiegel vom 22.10.2026, 296 Materialien“, „live vom AMB-Relay“), die Daten selbst sind eingebettete Schnappschüsse oder Beispieldaten.
 
-Die Nachbauten sind erkennbar Rekonstruktionen echter Seiten: der Materialpool mit rotierendem Untertitel („für die Schule / Kita / Gemeinde …“), Alters-Einstieg und „Neu im Pool“; relilab mit Hero-Blobs und Monatskalender, darüber als Labor die Trias Materialien, Menschen, Mitmachen (live aus den Community-Inhalten; Instagram-Kacheln und Attrappen-Suche sind entfallen) und dem Raum Mitmachen im Labor-Zuschnitt; relidesk mit Schule/Gemeinde-Umschalter, Planen/Schreibtisch-Tabs und Zwei-Spalten-Schreibtisch („Auf dem Schreibtisch“, „Das will ich verwenden“). Hinzugefügt wurde jeweils nur: der Vermerk „Teil des reli\_hub“, der Profil-Link zum Hub, die schwebende Konsole und ein Vorauswahl-Banner, wenn die Konsole Parameter übergibt.
+Die Nachbauten sind erkennbar Rekonstruktionen echter Seiten: der Materialpool mit rotierendem Untertitel („für die Schule / Kita / Gemeinde …“), Alters-Einstieg und „Neu im Pool“; relilab mit Hero-Blobs und Monatskalender, darüber als Labor die Trias Materialien, Menschen, Mitmachen (live aus den Community-Inhalten; Instagram-Kacheln und Attrappen-Suche sind entfallen) und dem Raum Mitmachen im Labor-Zuschnitt; relidesk mit Schule/Gemeinde-Umschalter, Planen/Schreibtisch-Tabs und Zwei-Spalten-Schreibtisch („Auf dem Schreibtisch“, „Das will ich verwenden“). Hinzugefügt wurde jeweils nur: der Vermerk „Teil des ReliHub“, der Profil-Link zum Hub, die schwebende Konsole und ein Vorauswahl-Banner, wenn die Konsole Parameter übergibt.
 
 ## Datenschicht: Nostr-Vokabular, Schnappschüsse, Editoren
 
@@ -111,7 +111,7 @@ Der Prototyp hat keine Netzverbindung, spricht aber durchgehend die Sprache des 
 | Communities | Beispieldaten, „Texte teils von edufeed.org übernommen“, verifiziert-Schild | 10 Communities, z. T. reale (reliGlobal, Konfiarbeit EKD, narrt, relimentar, CampusCom, KuRU & Schuldek.de, AG Didaktische Metadaten, KPH Wien/NÖ, RPI EKKW/EKHN) | Communities-Übersicht, Räume, Profil „Meine Communities“, relilab-Communities |
 | Identität | „Mit Nostr-Schlüssel anmelden“ | Persona Luca Beispiel, Interessen als Chips | Profil, Hub-Box im relidesk, Kontextprofil hub-profil |
 
-**Editoren** sind „Nachbau der edufeed-Editoren“ und öffnen als Overlay über jeder Ansicht. Sie tragen ein Kontext-Badge (reli\_hub, relilab, Materialpool, relidesk oder Community-Name) und belegen Felder kontextabhängig vor: im relilab-Kontext ist der Termin mit Tag „relilab“ und Organisation „relilab“ vorbelegt, sonst mit „Luca Beispiel, Organisator:in“.
+**Editoren** sind „Nachbau der edufeed-Editoren“ und öffnen als Overlay über jeder Ansicht. Sie tragen ein Kontext-Badge (ReliHub, relilab, Materialpool, relidesk oder Community-Name) und belegen Felder kontextabhängig vor: im relilab-Kontext ist der Termin mit Tag „relilab“ und Organisation „relilab“ vorbelegt, sonst mit „Luca Beispiel, Organisator:in“.
 
 - **Termin**: Typ (ganztägig/zeitgebunden), Titel (Pflicht), Beschreibung, Links, Tags, Personen mit Rolle.
 - **Lerninhalt**: zuerst Bereichswahl (Elementarpädagogik, Schule, Gottesdienstliche Angebote mit Kindern, Konfi-Arbeit, Jugendarbeit, Hochschule, Erwachsenenbildung, Familienbildung, Seniorenbildung; im Prototyp nur Schule und Konfi-Arbeit freigeschaltet), dann sieben Schritte: Bildungsbereich, Ressourcen-URL, Titel & Beschreibung, Einordnung, Lizenz, Schlagworte, Prüfen & veröffentlichen.
@@ -156,7 +156,7 @@ Der Prototyp zieht eine klare Linie, die er auf der Communities-Seite selbst erk
 
 **Communities-Übersicht**: Kacheln mit Avatar, Kurzbio, Mitgliederzahl, Verifiziert-Schild und Rückseite (Flip wie bei den Partnerkacheln), Filter nach Alle / Meine / Themen / Zielgruppen / Institute & Netzwerke, Suche, „+ Community gründen“. Beziehung zum Nutzer in drei Stufen: nichts, „folge ich“, „Mitglied“.
 
-**Community-Raum** („Funktionen nach edufeed.org, Gestaltung reli\_hub“): linke Navigation mit Übersicht, Inhalte (Artikel, Lernen, Kalender), Kanäle (#allgemein-Chat), Mitglieder, Einstellungen. Kalender und Einstellungen sind für Nichtmitglieder gesperrt (Schloss); Beitritt per Anfrage an die Moderation oder per Einladungscode. Jede Inhaltsart hat ihren Erstell-Knopf, der den passenden edufeed-Editor mit dem Community-Namen als Kontext öffnet.
+**Community-Raum** („Funktionen nach edufeed.org, Gestaltung ReliHub“): linke Navigation mit Übersicht, Inhalte (Artikel, Lernen, Kalender), Kanäle (#allgemein-Chat), Mitglieder, Einstellungen. Kalender und Einstellungen sind für Nichtmitglieder gesperrt (Schloss); Beitritt per Anfrage an die Moderation oder per Einladungscode. Jede Inhaltsart hat ihren Erstell-Knopf, der den passenden edufeed-Editor mit dem Community-Namen als Kontext öffnet.
 
 Zwei Konstruktionsdetails sind für die Weiterentwicklung wichtig:
 
@@ -170,7 +170,7 @@ Einige wiederkehrende Mechanismen machen aus den Nachbauten einen vorführbaren 
 | Konvention | Umsetzung | Wirkung |
 | --- | --- | --- |
 | Nicht Gebautes wird benannt, nicht versteckt | `data-todo="…"` an jedem Link ohne Ziel; Klick zeigt einen Toast „… ist im Prototyp noch nicht gebaut“ | kein toter Link, jede Lücke ist sichtbar |
-| Konsolen-Ziele ohne Ansicht zeigen die spätere URL | `later(d)`: Toast „führt später hierhin: https://relihub.example/…“ | die Zielarchitektur wird auch dort erklärt, wo nichts gebaut ist |
+| Konsolen-Ziele ohne Ansicht zeigen die spätere URL | `later(d)`: Toast „führt später hierhin: https://relihub.net/…“ | die Zielarchitektur wird auch dort erklärt, wo nichts gebaut ist |
 | Hinweis-Leiste für Vorführungen | fixe „Prototyp“-Leiste unten links mit Sprung zu Start, Profil, Materialpool, relilab, relidesk | Betrachter können jede Ansicht direkt anspringen |
 | Eine Persona | Luca Beispiel (LB), Interessen Schöpfung, Friedenspädagogik, KI im RU, Sek I, Mitglied in relilab und narrt | konsistente Vorauswahlen, Empfehlungen „warum“, Schreibtisch „Schöpfung erzählen, Kl. 6“ |
 | Anmeldung als Zustand, nicht als Funktion | `LOGGED` wird beim Betreten des Profils gesetzt, beim Abmelden gelöscht; ändert Beschriftungen (Anmelden/Mein Profil) und das Ziel von „hub“ | zeigt die Profil-Logik ohne echte Authentifizierung |
@@ -185,15 +185,15 @@ Die Datei heißt `_5`, also mindestens fünf Iterationen. Die Schichtung im Code
 
 **P0 · Briefing (vermutlich als Systemkontext oder erste Nachricht)**
 
-> Wir entwickeln im Projekt FOERBICO (Comenius-Institut) den „reli\_hub“, einen Startplatz in die digitale Welt der Religionspädagogik. Der Hub ist keine weitere Plattform, sondern verbindet bestehende Angebote: rpi-virtuell Materialpool, rpi-virtuell Fortbildungskalender, relilab, relidesk, relimentar, narrt, reliGlobal, Konfi-Arbeit, Friedensarbeit EKD, InkRV, Comenius-Institut, edufeed. Die Datenbasis ist der Nostr-Datenraum von edufeed (Materialien als AMB-Metadaten, Termine als NIP-52-Kalenderereignisse, Beiträge als NIP-23-Artikel, Communities nach edufeed-Logik). Nutzer:innen melden sich mit einem Nostr-Schlüssel an und nehmen ihr Profil auf alle angeschlossenen Seiten mit. Das Logo sind fünf überlagerte Kreise; sie stehen für fünf Funktionen: reli\_hub, finden, erstellen, kooperieren, veröffentlichen. Baue einen Klick-Prototyp als eine einzige HTML-Datei ohne Build und ohne Framework, der dieses Konzept vorführt. Deutsch, Du-Ansprache (relidesk siezt, das bleibt so). Was nicht gebaut ist, soll sichtbar als „noch nicht gebaut“ erscheinen, nie als toter Link.
+> Wir entwickeln im Projekt FOERBICO (Comenius-Institut) den „ReliHub“, einen Startplatz in die digitale Welt der Religionspädagogik. Der Hub ist keine weitere Plattform, sondern verbindet bestehende Angebote: rpi-virtuell Materialpool, rpi-virtuell Fortbildungskalender, relilab, relidesk, relimentar, narrt, reliGlobal, Konfi-Arbeit, Friedensarbeit EKD, InkRV, Comenius-Institut, edufeed. Die Datenbasis ist der Nostr-Datenraum von edufeed (Materialien als AMB-Metadaten, Termine als NIP-52-Kalenderereignisse, Beiträge als NIP-23-Artikel, Communities nach edufeed-Logik). Nutzer:innen melden sich mit einem Nostr-Schlüssel an und nehmen ihr Profil auf alle angeschlossenen Seiten mit. Das Logo sind fünf überlagerte Kreise; sie stehen für fünf Funktionen: ReliHub, finden, erstellen, kooperieren, veröffentlichen. Baue einen Klick-Prototyp als eine einzige HTML-Datei ohne Build und ohne Framework, der dieses Konzept vorführt. Deutsch, Du-Ansprache (relidesk siezt, das bleibt so). Was nicht gebaut ist, soll sichtbar als „noch nicht gebaut“ erscheinen, nie als toter Link.
 
 **P1 · Die Steuerkonsole als Komponente**
 
-> Mache aus dem Logo ein wiederverwendbares Steuerelement `<relihub-steuerkonsole>` als Web Component mit Shadow DOM, reinem SVG, ohne externe Dateien. Fünf Kreise mit Radius 100, Mittenabstand 98, Farben: reli\_hub #233E99, finden #008C86, erstellen #F39200, kooperieren #D6336C, veröffentlichen #7B4FB8. Beim Überfahren springt ein Kreis heraus; beim Klick wachsen Unteroptionen als „Knospen“ (alternativ Variante „scheibe“). Unteraktionen: ich.profil, ich.start; material.finden, termine.finden; material.schreibtisch, erstellen.labor; communities.finden, menschen.finden; material.teilen, termine.eintragen, veroeffentlichen.beitrag. Jeder Klick löst ein DOM-Ereignis `relihub-action` aus. Attribute: size, variant, context, base-url, target, config-src, demo, compact, floating, popover-size, popover-align. Kontextprofile über `registerContext(name, {target, params, actions, handler})`, damit dieselbe Konsole auf jeder Seite anderes auslösen kann. Tastatur- und Screenreader-tauglich, Gestaltung über CSS-Variablen. Schreibe die Einbindungs-Dokumentation als Kommentar in die Datei.
+> Mache aus dem Logo ein wiederverwendbares Steuerelement `<relihub-steuerkonsole>` als Web Component mit Shadow DOM, reinem SVG, ohne externe Dateien. Fünf Kreise mit Radius 100, Mittenabstand 98, Farben: ReliHub #233E99, finden #008C86, erstellen #F39200, kooperieren #D6336C, veröffentlichen #7B4FB8. Beim Überfahren springt ein Kreis heraus; beim Klick wachsen Unteroptionen als „Knospen“ (alternativ Variante „scheibe“). Unteraktionen: ich.profil, ich.start; material.finden, termine.finden; material.schreibtisch, erstellen.labor; communities.finden, menschen.finden; material.teilen, termine.eintragen, veroeffentlichen.beitrag. Jeder Klick löst ein DOM-Ereignis `relihub-action` aus. Attribute: size, variant, context, base-url, target, config-src, demo, compact, floating, popover-size, popover-align. Kontextprofile über `registerContext(name, {target, params, actions, handler})`, damit dieselbe Konsole auf jeder Seite anderes auslösen kann. Tastatur- und Screenreader-tauglich, Gestaltung über CSS-Variablen. Schreibe die Einbindungs-Dokumentation als Kommentar in die Datei.
 
 **P2 · Startseite mit Erklärkarte**
 
-> Baue die Startseite (nicht angemeldet): Kopfzeile mit Marke und „Anmelden“, Claim „Dein Startplatz in die digitale Welt der Religionspädagogik“, Eyebrow „offen · vernetzt · digital“, die Konsole groß in der Mitte, darunter eine Erklärkarte, die beim Klick auf Kreis oder Knospe den Bereich erklärt (Funktionspfad, Titel, ein Absatz, Weiter-Buttons; erstellen und veröffentlichen mit Badge „mit Profil“). Darunter „Das Ökosystem des reli\_hub“ mit Flip-Kacheln je Partner (Vorderseite: Kürzel, Name, Rolle; Rückseite: Beschreibung) in der Farbe der primären Funktion. Fußzeile „ein Vorhaben von FOERBICO · Prototyp“.
+> Baue die Startseite (nicht angemeldet): Kopfzeile mit Marke und „Anmelden“, Claim „Dein Startplatz in die digitale Welt der Religionspädagogik“, Eyebrow „offen · vernetzt · digital“, die Konsole groß in der Mitte, darunter eine Erklärkarte, die beim Klick auf Kreis oder Knospe den Bereich erklärt (Funktionspfad, Titel, ein Absatz, Weiter-Buttons; erstellen und veröffentlichen mit Badge „mit Profil“). Darunter „Das Ökosystem des ReliHub“ mit Flip-Kacheln je Partner (Vorderseite: Kürzel, Name, Rolle; Rückseite: Beschreibung) in der Farbe der primären Funktion. Fußzeile „ein Vorhaben von FOERBICO · Prototyp“.
 
 **P3 · Profilseite**
 
@@ -201,7 +201,7 @@ Die Datei heißt `_5`, also mindestens fünf Iterationen. Die Schichtung im Code
 
 **P4 · Nachbau Materialpool**
 
-> Baue material.rpi-virtuell.net als eigene Ansicht nach: eigene Schrift und Farbe (Inter/Space Grotesk, Türkis), Kopfzeile mit Stöbern/Gemerkt/Mein Profil, Hero mit rotierendem Untertitel, Suche, beliebte Themen, Nach Alter einsteigen, Aktuelle Empfehlung, Neu im Pool (echte Titel). Füge nur hinzu: Fußvermerk „Teil des reli\_hub“ und Datenstand der Relays, die schwebende Konsole mit Kontext rpi-materialpool, und ein Banner „Vorauswahl über die reli\_hub-Steuerkonsole“, wenn thema/stufe-Parameter ankommen.
+> Baue material.rpi-virtuell.net als eigene Ansicht nach: eigene Schrift und Farbe (Inter/Space Grotesk, Türkis), Kopfzeile mit Stöbern/Gemerkt/Mein Profil, Hero mit rotierendem Untertitel, Suche, beliebte Themen, Nach Alter einsteigen, Aktuelle Empfehlung, Neu im Pool (echte Titel). Füge nur hinzu: Fußvermerk „Teil des ReliHub“ und Datenstand der Relays, die schwebende Konsole mit Kontext rpi-materialpool, und ein Banner „Vorauswahl über die ReliHub-Steuerkonsole“, wenn thema/stufe-Parameter ankommen.
 
 **P5 · Nachbau relilab, dann relilab-Termine via Nostr**
 
@@ -209,15 +209,15 @@ Die Datei heißt `_5`, also mindestens fünf Iterationen. Die Schichtung im Code
 
 **P6 · Nachbau relidesk**
 
-> Baue den ReliDesk-Prototyp in der Farbe von „erstellen“ nach: Hinweisbalken „ist ein Prototyp“, Umschalter Schule/Gemeinde, Tabs Planen und Schreibtisch, Planen mit Eingabe „Weltreligionen, Klasse 7“, Aktuelles, Direkt einsteigen (Bildungsstufe, Kompetenz, Materialart); Schreibtisch mit zwei Spalten „Auf dem Schreibtisch“ und „Das will ich verwenden“ und Lucas Sammlung „Schöpfung erzählen, Kl. 6“. Hub-Box „Angemeldet über den reli\_hub als Luca Beispiel“. Stöbern führt in den Materialpool.
+> Baue den ReliDesk-Prototyp in der Farbe von „erstellen“ nach: Hinweisbalken „ist ein Prototyp“, Umschalter Schule/Gemeinde, Tabs Planen und Schreibtisch, Planen mit Eingabe „Weltreligionen, Klasse 7“, Aktuelles, Direkt einsteigen (Bildungsstufe, Kompetenz, Materialart); Schreibtisch mit zwei Spalten „Auf dem Schreibtisch“ und „Das will ich verwenden“ und Lucas Sammlung „Schöpfung erzählen, Kl. 6“. Hub-Box „Angemeldet über den ReliHub als Luca Beispiel“. Stöbern führt in den Materialpool.
 
 **P7 · Editoren nach edufeed**
 
-> Baue die edufeed-Editoren als Overlays nach, die aus jeder Ansicht über veröffentlichen.\* geöffnet werden: Termin (ganztägig/zeitgebunden, Titel, Beschreibung, Links, Tags, Personen mit Rolle), Lerninhalt (erst Bereichswahl, dann sieben Schritte: Bildungsbereich, Ressourcen-URL, Titel & Beschreibung, Einordnung, Lizenz, Schlagworte, Prüfen & veröffentlichen), Beitrag (Markdown mit Werkzeugleiste und Vorschau, Tags). Jeder Editor zeigt ein Kontext-Badge (reli\_hub, relilab, Materialpool, relidesk oder Community) und belegt Felder je nach Kontext vor. Beim Veröffentlichen nur ein Toast, der sagt, was passieren würde (kind 31923 bzw. 30023).
+> Baue die edufeed-Editoren als Overlays nach, die aus jeder Ansicht über veröffentlichen.\* geöffnet werden: Termin (ganztägig/zeitgebunden, Titel, Beschreibung, Links, Tags, Personen mit Rolle), Lerninhalt (erst Bereichswahl, dann sieben Schritte: Bildungsbereich, Ressourcen-URL, Titel & Beschreibung, Einordnung, Lizenz, Schlagworte, Prüfen & veröffentlichen), Beitrag (Markdown mit Werkzeugleiste und Vorschau, Tags). Jeder Editor zeigt ein Kontext-Badge (ReliHub, relilab, Materialpool, relidesk oder Community) und belegt Felder je nach Kontext vor. Beim Veröffentlichen nur ein Toast, der sagt, was passieren würde (kind 31923 bzw. 30023).
 
 **P8 · Communities und Community-Räume**
 
-> Baue eine Communities-Übersicht (Funktionen nach edufeed, Gestaltung reli\_hub): Kacheln mit Flip, Filter Alle/Meine/Themen/Zielgruppen/Institute & Netzwerke, Suche, „+ Community gründen“, Erklärbox „Instanzen und Communities“. Verwende diese Liste realer Communities mit Texten von edufeed.org: … Zeige den Bezug zur Instanz („↔ Instanz: relilab“). Baue dazu den Community-Raum: Seitennavigation Übersicht / Artikel / Lernen / Kalender / #allgemein / Mitglieder / Einstellungen; Kalender und Einstellungen nur für Mitglieder; Beitritt per Anfrage oder Einladungscode; Erstell-Knöpfe öffnen die Editoren mit Community-Kontext. Derselbe Raum soll auch eingebettet im relilab erscheinen (Tab Communities, nur Communities mit relilab-Bezug).
+> Baue eine Communities-Übersicht (Funktionen nach edufeed, Gestaltung ReliHub): Kacheln mit Flip, Filter Alle/Meine/Themen/Zielgruppen/Institute & Netzwerke, Suche, „+ Community gründen“, Erklärbox „Instanzen und Communities“. Verwende diese Liste realer Communities mit Texten von edufeed.org: … Zeige den Bezug zur Instanz („↔ Instanz: relilab“). Baue dazu den Community-Raum: Seitennavigation Übersicht / Artikel / Lernen / Kalender / #allgemein / Mitglieder / Einstellungen; Kalender und Einstellungen nur für Mitglieder; Beitritt per Anfrage oder Einladungscode; Erstell-Knöpfe öffnen die Editoren mit Community-Kontext. Derselbe Raum soll auch eingebettet im relilab erscheinen (Tab Communities, nur Communities mit relilab-Bezug).
 
 **P9 · Kontextprofile und Routing verdrahten**
 
@@ -231,12 +231,12 @@ Abstrahiert man die Sequenz, bleiben sechs Regeln, nach denen der Prototyp gebau
 
 1. **Ontologie zuerst.** Fünf Funktionen und ihre Unteraktionen werden einmal als IDs, Farben und Erklärtexte festgelegt. Alles Weitere referenziert diese IDs. Eine neue Funktion wäre ein Eingriff in die Ontologie; eine neue Instanz nicht.
 2. **Ein Element, viele Kontexte.** Die Konsole ist eine Komponente mit festem Verhalten; Unterschiede zwischen Seiten liegen ausschließlich im Kontextprofil (Parameter, Ziele, Handler). Nichts an der Konsole wird pro Seite geändert.
-3. **Nachbauen, nicht neu gestalten.** Eine bestehende Instanz wird in eigenem Design rekonstruiert. Der Hub fügt genau vier Dinge hinzu: den Vermerk „Teil des reli\_hub“, den Profil-Link, die schwebende Konsole, das Vorauswahl-Banner.
+3. **Nachbauen, nicht neu gestalten.** Eine bestehende Instanz wird in eigenem Design rekonstruiert. Der Hub fügt genau vier Dinge hinzu: den Vermerk „Teil des ReliHub“, den Profil-Link, die schwebende Konsole, das Vorauswahl-Banner.
 4. **Daten im Zielvokabular.** Oberfläche und Beschriftung sprechen Nostr/edufeed (kinds, NIPs, Relays, npubs), auch wenn die Daten Beispiele oder Schnappschüsse sind. So bleibt der Prototyp anschlussfähig an die spätere Implementierung.
 5. **Lücken sind sichtbar.** data-todo, Toast mit späterer URL, Hinweisbalken, Datenstand im Fuß. Der Prototyp behauptet nie mehr, als er kann.
 6. **Eine Persona trägt die Kohärenz.** Interessen, Mitgliedschaften und laufende Arbeit einer Person erscheinen konsistent auf allen Seiten und erklären, warum Vorauswahlen und Empfehlungen so sind, wie sie sind.
 
-**Template: Eine neue Instanz an den reli\_hub anbinden** (als Beschreibung, die du pro Partner ausfüllen und als Prompt verwenden kannst):
+**Template: Eine neue Instanz an den ReliHub anbinden** (als Beschreibung, die du pro Partner ausfüllen und als Prompt verwenden kannst):
 
 ```markdown
 ## Instanz: <Name>
@@ -244,7 +244,7 @@ Quelle: <URL der echten Seite>
 Primäre Funktion: finden | erstellen | kooperieren | veröffentlichen | hub
 Eigenes Design: Schrift <…>, Leitfarbe <…>, Kopfzeile <Elemente>, Fuß <Elemente>
 Nachzubauende Bereiche: <Hero, Listen, Formulare … mit echten Beispieltexten>
-Hub-Ergänzungen: Vermerk „Teil des reli_hub“, Profil-Link, schwebende Konsole (context="<name>"), Vorauswahl-Banner für Parameter <thema|stufe|…>
+Hub-Ergänzungen: Vermerk „Teil des ReliHub“, Profil-Link, schwebende Konsole (context="<name>"), Vorauswahl-Banner für Parameter <thema|stufe|…>
 
 ## Kontextprofil <name>
 params (global): <z. B. quelle=<name>>
@@ -264,7 +264,7 @@ Communities mit Bezug zu dieser Instanz: <Liste, Flag „aktiv in <name>“>
 <Liste der data-todo-Ziele mit späterer URL>
 ```
 
-Dasselbe Schema lässt sich für eine neue Hub-Ansicht (z. B. Ökosystem-Karte, Servicepoint) oder einen weiteren Editor verwenden; dort entfällt der Block „Eigenes Design“, weil Hub-Ansichten die reli\_hub-Gestaltung tragen.
+Dasselbe Schema lässt sich für eine neue Hub-Ansicht (z. B. Ökosystem-Karte, Servicepoint) oder einen weiteren Editor verwenden; dort entfällt der Block „Eigenes Design“, weil Hub-Ansichten die ReliHub-Gestaltung tragen.
 
 ## Offene Stellen und Ansatzpunkte
 

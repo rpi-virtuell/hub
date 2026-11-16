@@ -2,7 +2,7 @@
 
 ## Zweck
 
-Die Leiste ist die Klammer um die Instanzen und Communities des reli_hub. Du wechselst den Ort (Start, Materialpool, relilab, relidesk, FOERBICO oder eine deiner Communities) und bleibst doch im Ökosystem: Die Leiste steht auf jeder Seite an derselben Stelle.
+Die Leiste ist die Klammer um die Instanzen und Communities des ReliHub. Du wechselst den Ort (Start, Materialpool, relilab, relidesk, FOERBICO oder eine deiner Communities) und bleibst doch im Ökosystem: Die Leiste steht auf jeder Seite an derselben Stelle.
 
 Sie ist ein eigenständiges Custom Element mit Shadow DOM. Die Anwendung liefert nur die Daten und reagiert auf das Ereignis; Aussehen und Verhalten stecken im Element.
 
