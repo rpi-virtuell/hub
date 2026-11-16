@@ -109,9 +109,10 @@ Deno.test('Review-Fixes: Picker-Bindung, Escaping, Raum-Kontext, Mitgliedschaft,
   assert(!/#8A8378/i.test(html), 'Platzhalterfarbe #8A8378 unter 4,5:1');
 });
 
-Deno.test('Partnerseiten: verlinkte Seite ohne Nostr, Logo über den Bildproxy', () => {
+Deno.test('Partnerseiten: verlinkte Seite ohne Nostr, Logo nur mit Erlaubnis und über den Bildproxy', () => {
   const a = appScript();
-  assert(/\['Kirche mit Kindern', [^\]]*'https:\/\/kirchemitkindern\.de\/', [^\]]*'verlinkt', 'https:\/\/[^']+'\]/.test(a), 'Eintrag mit Adresse, Marke und Logo');
+  assert(/\['Kirche mit Kindern', [^\]]*'https:\/\/kirchemitkindern\.de\/', [^\]]*'verlinkt'\]/.test(a), 'Eintrag mit Adresse und Marke, ohne Logo bis zur Erlaubnis');
+  assert(!/kirchemitkindern-ekd\.de\/wp-content/.test(a), 'kein fremdes Logo ohne Erlaubnis');
   const r = a.slice(a.indexOf("document.getElementById('pgrid').innerHTML"), a.indexOf('// Auf Touch-Geräten'));
   assert(/target="_blank" rel="noopener"/.test(r) && /Zur Seite ›/.test(r) && !/\besc\(/.test(r) && /partnerLogo\(logo\)/.test(r) && /onerror="this\.remove\(\)"/.test(r), 'fremde Adresse öffnet neu, kein esc vor seiner Deklaration, Logo mit Rückfall auf das Kürzel');
   assert(/edufeed\.org\/api\/image\?url=\$\{encodeURIComponent\(url\)\}/.test(a), 'Logo läuft über den Bildproxy');
