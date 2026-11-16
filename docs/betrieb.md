@@ -13,14 +13,14 @@ Entwicklung und Veröffentlichung laufen getrennt:
 | `main` | `https://hub.rpi-virtuell.net` | tägliche Vorschau, jeder Merge erscheint dort |
 | `released` | `https://relihub.net` | öffentliche Seite, nur bewusst Freigegebenes |
 
-- **Auslieferung:** `.woodpecker.yml` hat je Zweig einen Schritt. Ein Push auf `main` nutzt die Secrets `deploy_host`, `deploy_user`, `deploy_key`, `deploy_script`. Ein Push auf `released` nutzt dieselben Namen mit der Endung `_released`. Die vier neuen Secrets legt die technische Umsetzung im Woodpecker an.
+- **Auslieferung:** Im Ordner `.woodpecker` liegt je Zweig eine Datei. `deploy_vorschau.yaml` läuft bei einem Push auf `main` und nutzt die bisherigen Secrets `deploy_host`, `deploy_user`, `deploy_key`, `deploy_script`. `deploy_released.yaml` läuft bei einem Push auf `released` und bekommt eigene Secrets. Die Datei ist ein Platzhalter: Namen und Schritt legt die technische Umsetzung fest.
 - **Freigabe:** Eine Freigabe ist ein Merge von `main` nach `released`, ohne eigene Commits auf `released`:
 
 ```bash
 cd ~/repositories/reli-hub && git fetch forgejo && git checkout released && git merge --ff-only main && git push forgejo released
 ```
 
-- **Offen:** `app.yaml` nennt fest `hub.rpi-virtuell.net`. Damit `released` ohne eigene Commits auskommt, muss das Zielskript für `relihub.net` die Adresse selbst setzen. Sonst weichen die Zweige in dieser Datei dauerhaft voneinander ab.
+- **Offen:** Ob die Auslieferung nach `relihub.net` die Datei `app.yaml` auswertet, wird noch untersucht. Die erste Einschätzung ist nein. Dann bleibt `app.yaml` auf beiden Zweigen gleich und gilt nur für die Vorschau.
 - **Später:** `hub.rpi-virtuell.net` bleibt Vorschau für die Entwicklung und kann nach dem Umzug auf `relihub.net` umleiten.
 
 ## Wie der Code fließt

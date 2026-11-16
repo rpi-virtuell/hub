@@ -1,0 +1,21 @@
+# Öffentliche Seite: ein Push auf released liefert nach relihub.net aus.
+# Platzhalter, bis die technische Umsetzung den Weg zum Zielserver festlegt:
+# Die Secret-Namen und der Schritt selbst können sich noch ändern. Ob dieser Weg
+# app.yaml auswertet, ist offen (erste Einschätzung: nein). Einzelheiten: docs/betrieb.md
+
+when:
+  - branch: released
+    event: push
+
+steps:
+  - name: deploy
+    image: appleboy/drone-ssh
+    settings:
+      host:
+        from_secret: deploy_host_released
+      username:
+        from_secret: deploy_user_released
+      key:
+        from_secret: deploy_key_released
+      script:
+        from_secret: deploy_script_released
