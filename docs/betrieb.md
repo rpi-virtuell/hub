@@ -13,14 +13,15 @@ Entwicklung und Veröffentlichung laufen getrennt:
 | `main` | `https://hub.rpi-virtuell.net` | tägliche Vorschau, jeder Merge erscheint dort |
 | `released` | `https://relihub.net` | öffentliche Seite, nur bewusst Freigegebenes |
 
-- **Auslieferung:** Im Ordner `.woodpecker` liegt je Zweig eine Datei. `deploy_vorschau.yaml` läuft bei einem Push auf `main` und nutzt die bisherigen Secrets `deploy_host`, `deploy_user`, `deploy_key`, `deploy_script`. `deploy_released.yaml` läuft bei einem Push auf `released` und bekommt eigene Secrets. Die Datei ist ein Platzhalter: Namen und Schritt legt die technische Umsetzung fest.
+- **Auslieferung:** Im Ordner `.woodpecker` liegt je Zweig eine Datei. `deploy_vorschau.yaml` läuft bei einem Push auf `main` und nutzt die bisherigen Secrets `deploy_host`, `deploy_user`, `deploy_key`, `deploy_script`. `deploy_released.yaml` läuft bei einem Push auf `released` und nutzt eigene Secrets: `deploy_host_released`, `deploy_port_released`, `deploy_user_released`, `deploy_key_released`, `deploy_script_released`. Die Datei stammt von der technischen Umsetzung (Fassung vom 17.11.2026).
 - **Freigabe:** Eine Freigabe ist ein Merge von `main` nach `released`, ohne eigene Commits auf `released`:
 
 ```bash
 cd ~/repositories/reli-hub && git fetch forgejo && git checkout released && git merge --ff-only main && git push forgejo released
 ```
 
-- **Offen:** Ob die Auslieferung nach `relihub.net` die Datei `app.yaml` auswertet, wird noch untersucht. Die erste Einschätzung ist nein. Dann bleibt `app.yaml` auf beiden Zweigen gleich und gilt nur für die Vorschau.
+- **Zielserver:** `relihub.net` hat einen eigenen Weg (Zertifikat, eigener SSH-Schlüssel, festes Kommando auf dem Server) und folgt nicht dem allgemeinen Verfahren für `*.rpi-virtuell.net`. `app.yaml` bleibt deshalb auf beiden Zweigen gleich und gilt nur für die Vorschau.
+- **Stand 18.11.2026:** `relihub.net` zeigt eine Platzhalterseite. Der Zweig `released` liegt schon auf Nostr und Forgejo, auf dem Stand vom 28.10.2026. Die Auslieferung über Woodpecker steht noch aus.
 - **Später:** `hub.rpi-virtuell.net` bleibt Vorschau für die Entwicklung und kann nach dem Umzug auf `relihub.net` umleiten.
 
 ## Wie der Code fließt

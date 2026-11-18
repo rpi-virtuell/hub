@@ -1,11 +1,9 @@
 # Öffentliche Seite: ein Push auf released liefert nach relihub.net aus.
-# Platzhalter, bis die technische Umsetzung den Weg zum Zielserver festlegt:
-# Die Secret-Namen und der Schritt selbst können sich noch ändern. Ob dieser Weg
-# app.yaml auswertet, ist offen (erste Einschätzung: nein). Einzelheiten: docs/betrieb.md
+# Fassung der technischen Umsetzung vom 17.11.2026. Einzelheiten: docs/betrieb.md
 
 when:
-  - branch: released
-    event: push
+  branch: released
+  event: push
 
 steps:
   - name: deploy
@@ -13,6 +11,8 @@ steps:
     settings:
       host:
         from_secret: deploy_host_released
+      port:
+        from_secret: deploy_port_released
       username:
         from_secret: deploy_user_released
       key:
