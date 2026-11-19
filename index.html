@@ -126,7 +126,7 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .narrativ .einladung{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .narrativ .einladung .btn{border-color:var(--c-hub);color:var(--x-hub)}
 .stage h1{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:clamp(32px,4.6vw,52px);line-height:1.05;margin:0 auto;max-width:20ch}
-.flower-wrap{display:flex;justify-content:center;padding:92px 0 70px}
+.flower-wrap{display:flex;justify-content:center;padding:124px 0 96px}
 .explain{max-width:620px;margin:0 auto;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px 24px 22px 24px;display:flex;gap:18px;align-items:flex-start;min-height:132px;transition:border-color .25s}
 .explain .ic{flex:0 0 auto;width:58px;height:58px}
 .explain .fn{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:15px;letter-spacing:1.5px;text-transform:uppercase;margin:0}
@@ -159,8 +159,9 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .st-person .st-bild{border-radius:50%}
 .st-community .st-bild{clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
 .st-event .st-bild,.st-material .st-bild{border-radius:6px}
-/* Graustufen: dunkel = später gedacht, hell = gewollt und noch nicht gebaut */
-.btn.st-grau{border-style:dashed}
+/* Graustufen: dunkel = später gedacht, hell = gewollt und noch nicht gebaut; das Wort am Knopf sagt es (bald, später) */
+.st-wort{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:#E4E7EC;color:#2B2F36;font-size:12px;font-weight:700;letter-spacing:.3px;vertical-align:1px}
+.st-spaeter .st-wort{background:#5F6672;color:#FFFFFF}
 .btn.st-spaeter{border-color:#5F6672;color:#454B55}
 .btn.st-offen{border-color:#8A919C;color:#454B55}
 .st-marke{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:999px;padding:3px 10px}
@@ -1197,7 +1198,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
 @media (max-width:640px){
   .hub-top nav a:not(.btn){display:none}
   .brand small{display:none}
-  .flower-wrap{padding:64px 0 60px}
+  .flower-wrap{padding:96px 0 74px}
   .mp-head{gap:4px}
   .sa-filter{grid-template-columns:1fr}
   .mp-brand{font-size:18px}
@@ -1911,6 +1912,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
   // sehen, zeigen, erarbeiten, in Kontakt treten. Das Zeichen in der Knospe zeigt die Form, das Wort bleibt konkret.
   // stand: 'spaeter' (dunkelgrau, später gedacht) oder 'offen' (hellgrau, gewollt und noch nicht gebaut).
   const GRAU = { spaeter: { fill: '#5F6672', text: '#FFFFFF' }, offen: { fill: '#C9CED6', text: '#2B2F36' } };
+  const GRAU_WORT = { spaeter: 'später', offen: 'bald' };   // sichtbar an Knospe und Knopf: die Graustufe allein erklärt sich nicht
   const FORMEN = {
     sehen: { label: 'sehen', blatt: 'sehen', color: '#3558A8', d: 'M-12 0 Q0 -11 12 0 Q0 11 -12 0 Z M-3 0 A3 3 0 1 0 3 0 A3 3 0 1 0 -3 0' },
     zeigen: { label: 'zeigen', blatt: 'zeigen', color: '#2F74B5', d: 'M0 7 V-10 M-7 -3 L0 -10 L7 -3 M-10 11 H10' },
@@ -2010,6 +2012,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 .lbl{pointer-events:none;font-weight:700}
 .out{pointer-events:auto;cursor:pointer;font-weight:600;
   stroke:var(--relihub-halo,#FFFFFF);stroke-width:7px;stroke-linejoin:round;paint-order:stroke}
+.out .bald{font-size:.72em;font-weight:700;fill:#454B55;letter-spacing:.4px}
 .bud{transition:transform .34s cubic-bezier(.3,1.45,.55,1) .06s,opacity .2s .06s}
 .bud circle:not(.hit){transition:fill .15s}
 .bud:not([data-stand]):hover circle:not(.hit),.bud:not([data-stand]).kbd circle:not(.hit){fill:var(--hl)}
@@ -2276,10 +2279,13 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
           const t = this.text(bud, eng && s.kurz ? (s.ding ? DING[s.ding].label : s.kurz) : s.label, lx, ly + (Math.abs(Math.cos(a)) <= 0.35 ? Math.sign(Math.sin(a)) * 10 : 0), 25, f.ink, 'out');
           t.setAttribute('text-anchor', anchor);
           const worte = t.textContent.split(' ');
-          if (worte.length === 2) {   // Verb plus Ding: zweizeilig, neben der Knospe mittig, darüber nach oben, darunter nach unten
-            const erste = anchor !== 'middle' ? '-0.52em' : Math.sin(a) < 0 ? '-1.05em' : '0';
+          const zeilen = worte.length === 2 ? worte : [t.textContent], wort = GRAU_WORT[s.stand];
+          if (zeilen.length + (wort ? 1 : 0) > 1) {   // Verb plus Ding, dazu „bald“ bei noch nicht Gebautem: mehrzeilig, neben der Knospe mittig, darüber nach oben, darunter nach unten
+            const mehr = zeilen.length + (wort ? 1 : 0) - 1;
+            const erste = anchor !== 'middle' ? (-0.52 * mehr) + 'em' : Math.sin(a) < 0 ? (-1.05 * mehr) + 'em' : '0';
             t.textContent = '';
-            worte.forEach((w, i) => { const ts = el('tspan', { x: lx, dy: i ? '1.05em' : erste }, t); ts.textContent = w; });
+            zeilen.forEach((w, i) => { const ts = el('tspan', { x: lx, dy: i ? '1.05em' : erste }, t); ts.textContent = w; });
+            if (wort) { const ts = el('tspan', { class: 'bald', x: lx, dy: '1.15em' }, t); ts.textContent = wort; }
           }
           this.fitLabel(t, f, bx + lx, a, anchor, lx);
           let gemessen = false;   // nach dem Aufspringen am echten Ort nachmessen: nichts ragt über den Bildschirmrand
@@ -2378,6 +2384,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     contexts: CONTEXTS,
     functions: FUNCS.map(f => ({ id: f.id, label: f.label, color: f.color, subs: (f.subs || []).map(s => ({ ...s })) })),
     grau: GRAU,
+    grauWort: GRAU_WORT,
     formen: FORM_ORDER.map(id => ({ id, label: FORMEN[id].label, blatt: FORMEN[id].blatt, color: FORMEN[id].color })),
     registerContext(name, profile) {
       CONTEXTS[name] = profile || {};
@@ -3179,9 +3186,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   }
   /** Knopf einer Karte: Ziel '#route', '@editor' (öffnet den Editor) oder 'https://…' (neues Fenster) */
   function exKnopf(text, ziel, stil, klasse, stand) {
-    if (stand) {   // Handlung, die noch nicht gebaut ist: gestrichelt, mit Ziel nur als Ausblick
-      const g = `class="btn btn-ghost st-grau st-${stand}" title="${GRAU_MARKE[stand]}"`;
-      return ziel ? `<a ${g} href="${ziel}">${text} ›</a>` : `<span ${g} aria-disabled="true">${text}</span>`;
+    if (stand) {   // Handlung, die noch nicht gebaut ist: grau mit dem Wort „bald“ oder „später“, mit Ziel nur als Ausblick
+      const g = `class="btn btn-ghost st-grau st-${stand}" title="${GRAU_MARKE[stand]}"`, wort = ` <span class="st-wort">${RelihubSteuerkonsole.grauWort[stand]}</span>`;
+      return ziel ? `<a ${g} href="${ziel}">${text} ›${wort}</a>` : `<span ${g} aria-disabled="true">${text}${wort}</span>`;
     }
     const k = `class="btn${klasse ? ' ' + klasse : ''}" style="${stil}"`;
     if (ziel[0] === '@') return `<button type="button" ${k} data-open="${ziel.slice(1)}">${text} ›</button>`;
@@ -3198,7 +3205,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       : !FORM_VON[action] ? EX_NAME[key] + ' › ' + EX_NAME[action]
       : SICHT === 'formen' ? 'Ich möchte ' + formName(FORM_VON[action]) + ' › ' + EX_NAME[key] : EX_NAME[key] + ' › ' + formName(FORM_VON[action]);
     const go = e.subs
-      ? `<span class="hint">Weiter zu:</span>` + e.subs.map(x => `<button type="button" class="btn btn-ghost${EX[x].grau ? ' st-grau st-' + EX[x].grau : ''}" data-ex="${x}"${EX[x].grau ? '' : ` style="${geist}"`}>${EX_NAME[x]} ›</button>`).join('')
+      ? `<span class="hint">Weiter zu:</span>` + e.subs.map(x => `<button type="button" class="btn btn-ghost${EX[x].grau ? ' st-grau st-' + EX[x].grau : ''}" data-ex="${x}"${EX[x].grau ? '' : ` style="${geist}"`}>${EX_NAME[x]} ›${EX[x].grau ? ` <span class="st-wort">${RelihubSteuerkonsole.grauWort[EX[x].grau]}</span>` : ''}</button>`).join('')
       : exKnopf(e.go[0], e.go[1], e.grau ? '' : btnStyle, e.grau ? 'btn-ghost' : '');
     const mehr = (e.mehr || []).map(m => exKnopf(m[0], m[1], geist, 'btn-ghost', m[2])).join('');
     const marke = e.grau ? `<span class="st-marke st-${e.grau}">● ${GRAU_MARKE[e.grau]}</span>` : e.lock ? '<span class="badge-lock">● mit Profil</span>' : '';
