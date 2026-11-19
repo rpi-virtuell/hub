@@ -14,7 +14,7 @@ Beide Ordnungen beschreiben dieselbe Matrix, nur mit vertauschten Achsen.
 1. **Drei Ebenen.** Die Aktionsform leitet: sehen, zeigen, erarbeiten, in Kontakt treten. Die Knospe benennt konkret mit Verb und Ding. Unter jeder Knospe liegen zwei bis vier Handlungen, von niedrigschwellig nach verbindlich geordnet.
 2. **Die Blätter sind die vier Dinge, die Knospen die vier Aktionsformen.** Jedes Blatt trägt vier Knospen in fester Reihenfolge. In der Mitte der Blume steht „Ich möchte“. Mit Blatt und Knospe ergibt sich ein Satz: Ich möchte Materialien suchen.
 3. **Ein Zeichen je Aktionsform, überall gleich.** Auge für sehen, Pfeil nach oben für zeigen, Stift für erarbeiten, Sprechblase für Kontakt. Farben bleiben den Blättern und den Graustufen vorbehalten.
-4. **Die Belegung.** Hellgrau heißt gewollt und noch nicht gebaut, dunkelgrau heißt später gedacht.
+4. **Die Belegung.** Hellgrau heißt gewollt und noch nicht gebaut, dunkelgrau heißt später gedacht. Weil sich die Graustufe allein nicht erklärt, steht an Knospe und Knopf das Wort dazu: „bald“ für hellgrau, „später“ für dunkelgrau (Nachtrag 19.11.2026, vorher gestrichelter Rand).
 
    | Ich möchte … | sehen | zeigen | erarbeiten | in Kontakt treten |
    |---|---|---|---|---|
