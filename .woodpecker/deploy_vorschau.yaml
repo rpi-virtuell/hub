@@ -11,6 +11,8 @@ steps:
     settings:
       host:
         from_secret: deploy_host
+      port:
+        from_secret: deploy_port
       username:
         from_secret: deploy_user
       key:
