@@ -117,3 +117,19 @@ Deno.test('Partnerseiten: verlinkte Seite ohne Nostr, Logo nur mit Erlaubnis und
   assert(/target="_blank" rel="noopener"/.test(r) && /Zur Seite ›/.test(r) && !/\besc\(/.test(r) && /partnerLogo\(logo\)/.test(r) && /onerror="this\.remove\(\)"/.test(r), 'fremde Adresse öffnet neu, kein esc vor seiner Deklaration, Logo mit Rückfall auf das Kürzel');
   assert(/edufeed\.org\/api\/image\?url=\$\{encodeURIComponent\(url\)\}/.test(a), 'Logo läuft über den Bildproxy');
 });
+
+Deno.test('Noch nicht Gebautes trägt das Wort „bald“ statt einer gestrichelten Linie', () => {
+  const k = consoleScript(), a = appScript();
+  assert(!/\.btn\.st-grau\{[^}]*dashed/.test(html), 'Knopf nicht mehr gestrichelt');
+  assert(/const GRAU_WORT = \{ spaeter: 'später', offen: 'bald' \}/.test(k) && /grauWort: GRAU_WORT,/.test(k), 'ein Wort je Graustufe, an der Konsole abrufbar');
+  assert(/class: 'bald'/.test(k) && /GRAU_WORT\[s\.stand\]/.test(k), 'Knospe trägt das Wort als eigene Zeile');
+  const kn = a.slice(a.indexOf('function exKnopf('), a.indexOf('function explain('));
+  assert(/st-wort/.test(kn) && /grauWort\[stand\]/.test(kn), 'Knopf einer Handlung nennt das Wort');
+  assert(/EX\[x\]\.grau \? ` <span class="st-wort">\$\{RelihubSteuerkonsole\.grauWort\[EX\[x\]\.grau\]\}<\/span>`/.test(a), 'Knopf „Weiter zu“ nennt das Wort');
+  assert(/\.st-wort\{[^}]*font-size:12px/.test(html), 'Wort als kleine Marke am Knopf');
+});
+
+Deno.test('Startseite: aufgeklappte Knospen haben Abstand zum Themenfeld und zum Umschalter', () => {
+  assert(/\.flower-wrap\{display:flex;justify-content:center;padding:124px 0 96px\}/.test(html), 'großer Schirm');
+  assert(/@media \(max-width:640px\)\{[^@]*\.flower-wrap\{padding:96px 0 74px\}/.test(html), 'kleiner Schirm');
+});

@@ -126,7 +126,7 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .narrativ .einladung{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .narrativ .einladung .btn{border-color:var(--c-hub);color:var(--x-hub)}
 .stage h1{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:clamp(32px,4.6vw,52px);line-height:1.05;margin:0 auto;max-width:20ch}
-.flower-wrap{display:flex;justify-content:center;padding:92px 0 70px}
+.flower-wrap{display:flex;justify-content:center;padding:124px 0 96px}
 .explain{max-width:620px;margin:0 auto;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px 24px 22px 24px;display:flex;gap:18px;align-items:flex-start;min-height:132px;transition:border-color .25s}
 .explain .ic{flex:0 0 auto;width:58px;height:58px}
 .explain .fn{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:15px;letter-spacing:1.5px;text-transform:uppercase;margin:0}
@@ -159,8 +159,9 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .st-person .st-bild{border-radius:50%}
 .st-community .st-bild{clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
 .st-event .st-bild,.st-material .st-bild{border-radius:6px}
-/* Graustufen: dunkel = später gedacht, hell = gewollt und noch nicht gebaut */
-.btn.st-grau{border-style:dashed}
+/* Graustufen: dunkel = später gedacht, hell = gewollt und noch nicht gebaut; das Wort am Knopf sagt es (bald, später) */
+.st-wort{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:#E4E7EC;color:#2B2F36;font-size:12px;font-weight:700;letter-spacing:.3px;vertical-align:1px}
+.st-spaeter .st-wort{background:#5F6672;color:#FFFFFF}
 .btn.st-spaeter{border-color:#5F6672;color:#454B55}
 .btn.st-offen{border-color:#8A919C;color:#454B55}
 .st-marke{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:999px;padding:3px 10px}
@@ -1115,6 +1116,12 @@ relihub-steuerkonsole[hidden]{display:none}
 .rl-krit{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;padding:0}
 .rl-krit li{background:#F4E6FA;color:#5B1C73;border-radius:999px;padding:4px 13px;font-size:14px;font-weight:600}
 .rl-satz{max-width:70ch;margin:0 0 22px;color:#3A3F47}
+.rl-hubband{display:flex;flex-direction:column;align-items:center;margin:0 0 28px;padding:22px 20px 96px;border:1px solid #E1D8FA;border-radius:14px;background:#FAF8FF}
+.rl-hubband>div{align-self:stretch;max-width:70ch;margin:0 0 100px}
+.rl-hubband h2{font-family:Oswald,"Roboto Condensed",sans-serif;font-weight:500;font-size:26px;color:#1F1F25;margin:2px 0 8px}
+.rl-hubband p{margin:0 0 8px;color:#3A3F47}
+.rl-hubband .rl-hubmarke{font-size:13px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#5A2FC0;margin:0}
+.rl-hubband .rl-hint{font-size:14px;color:#4B515A}
 .rl-trias{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:start}
 .rl-trias>section{border:1px solid #E6E6E6;border-radius:6px;padding:16px 16px 18px;min-width:0}
 .rl-trias h2{font-family:Oswald,"Roboto Condensed",sans-serif;font-weight:500;font-size:24px;color:#1F1F25;margin:0 0 4px}
@@ -1197,7 +1204,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
 @media (max-width:640px){
   .hub-top nav a:not(.btn){display:none}
   .brand small{display:none}
-  .flower-wrap{padding:64px 0 60px}
+  .flower-wrap{padding:96px 0 74px}
   .mp-head{gap:4px}
   .sa-filter{grid-template-columns:1fr}
   .mp-brand{font-size:18px}
@@ -1647,6 +1654,15 @@ a.kat-card:hover{border-color:var(--c-koop)}
     <h1>relilab · ein Labor</h1>
     <ul class="rl-krit" id="rlKrit" aria-label="Was das relilab auszeichnet"></ul>
     <p class="rl-satz">Was hier entsteht, ist unfertig und frei: Praxisentwürfe und Unterrichtsversuche stehen gleichrangig neben Produkten der Institute.</p>
+    <section class="rl-hubband" aria-labelledby="rlHubTitel">
+      <div>
+        <p class="rl-hubmarke">relilab im ReliHub · Entwurf</p>
+        <h2 id="rlHubTitel">In der Mitte steht relilab</h2>
+        <p>Ringsum stehen dieselben vier Dinge wie überall im ReliHub: Menschen, Communities, Materialien und Termine, hier die von relilab. Oben stehst du.</p>
+        <p class="rl-hint">Dasselbe Zeichen wandert unten rechts mit: die Blume des Hubs mit relilab in der Mitte.</p>
+      </div>
+      <relihub-steuerkonsole id="rlBlume" size="230" context="relilab" variant="knospen"></relihub-steuerkonsole>
+    </section>
     <div class="rl-trias" id="rlTrias"></div>
   </div>
   <div class="rl-wrap rl-eins">
@@ -1911,6 +1927,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
   // sehen, zeigen, erarbeiten, in Kontakt treten. Das Zeichen in der Knospe zeigt die Form, das Wort bleibt konkret.
   // stand: 'spaeter' (dunkelgrau, später gedacht) oder 'offen' (hellgrau, gewollt und noch nicht gebaut).
   const GRAU = { spaeter: { fill: '#5F6672', text: '#FFFFFF' }, offen: { fill: '#C9CED6', text: '#2B2F36' } };
+  const GRAU_WORT = { spaeter: 'später', offen: 'bald' };   // sichtbar an Knospe und Knopf: die Graustufe allein erklärt sich nicht
   const FORMEN = {
     sehen: { label: 'sehen', blatt: 'sehen', color: '#3558A8', d: 'M-12 0 Q0 -11 12 0 Q0 11 -12 0 Z M-3 0 A3 3 0 1 0 3 0 A3 3 0 1 0 -3 0' },
     zeigen: { label: 'zeigen', blatt: 'zeigen', color: '#2F74B5', d: 'M0 7 V-10 M-7 -3 L0 -10 L7 -3 M-10 11 H10' },
@@ -2010,6 +2027,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 .lbl{pointer-events:none;font-weight:700}
 .out{pointer-events:auto;cursor:pointer;font-weight:600;
   stroke:var(--relihub-halo,#FFFFFF);stroke-width:7px;stroke-linejoin:round;paint-order:stroke}
+.out .bald{font-size:.72em;font-weight:700;fill:#454B55;letter-spacing:.4px}
 .bud{transition:transform .34s cubic-bezier(.3,1.45,.55,1) .06s,opacity .2s .06s}
 .bud circle:not(.hit){transition:fill .15s}
 .bud:not([data-stand]):hover circle:not(.hit),.bud:not([data-stand]).kbd circle:not(.hit){fill:var(--hl)}
@@ -2021,6 +2039,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .mini{all:unset;box-sizing:border-box;display:block;width:100%;height:100%;cursor:pointer;border-radius:50%}
 .mini svg circle{opacity:.72}
+.mini svg circle.ort{opacity:1}
 .mini:focus-visible{outline:3px solid var(--relihub-focus,#111111);outline-offset:3px}
 .popover{position:absolute;top:calc(100% + 12px);z-index:10000;padding:52px 112px;border-radius:28px;
   background:var(--relihub-pop-bg,#FFFFFF);box-shadow:0 18px 50px rgba(15,23,42,.22),0 3px 10px rgba(15,23,42,.10);
@@ -2046,7 +2065,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 `;
 
   class RelihubSteuerkonsoleElement extends HTMLElement {
-    static get observedAttributes() { return ['size', 'variant', 'context', 'base-url', 'target', 'compact', 'floating', 'popover-size', 'popover-align', 'sicht']; }
+    static get observedAttributes() { return ['size', 'variant', 'context', 'base-url', 'target', 'compact', 'floating', 'popover-size', 'popover-align', 'sicht', 'mitte']; }
     constructor() {
       super();
       this.attachShadow({ mode: 'open' });
@@ -2121,14 +2140,24 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 
       let holder = root;
       this.miniBtn = null;
+      // Mitte plus vier (ADR-0013): In der Mitte steht der Ort, oben „ich“, ringsum die vier Dinge.
+      // Der Ort kommt aus dem Kontextprofil (mitte: { label, kurz, color }) oder aus dem Attribut mitte.
+      // In der Sicht von den Aktionsformen bleibt „Ich möchte“ stehen, dort trägt die Mitte den Satzanfang.
+      const profMitte = (CONTEXTS[this.ctx] || {}).mitte, attrMitte = this.getAttribute('mitte');
+      const ort = this.sicht === 'formen' ? null : attrMitte ? { label: attrMitte } : profMitte || null;
       if (this.compact) {
         const pz = parseInt(this.getAttribute('popover-size'), 10) || 200;
         this.style.setProperty('--rh-pop', pz + 'px');
         const btn = document.createElement('button');
         btn.className = 'mini'; btn.type = 'button';
-        btn.setAttribute('aria-label', 'ReliHub-Steuerkonsole öffnen'); btn.setAttribute('aria-expanded', 'false');
+        btn.setAttribute('aria-label', 'ReliHub-Steuerkonsole öffnen' + (ort ? ', Ort: ' + ort.label : '')); btn.setAttribute('aria-expanded', 'false');
         const mini = el('svg', { viewBox: `${-VB} ${-VB} ${2 * VB} ${2 * VB}`, 'aria-hidden': 'true' }, btn);
         this.funcs.forEach(f => el('circle', { cx: f.cx, cy: f.cy, r: R, fill: f.color }, mini));
+        // Mitwanderndes Zeichen: die Blume des Hubs mit dem Ort in der Mitte (Farbe und Kürzel der Instanz)
+        if (ort && ort.color) {
+          el('circle', { class: 'ort', r: 94, fill: ort.color, stroke: '#FFFFFF', 'stroke-width': 14 }, mini);
+          if (ort.kurz) this.text(mini, ort.kurz, 0, 6, ort.kurz.length > 2 ? 70 : 92, '#FFFFFF', 'lbl');
+        }
         btn.addEventListener('click', () => {
           // Ein Klick direkt nach dem Öffnen per Überfahren (oder Antippen) soll nicht gleich wieder schließen
           if (this.hasAttribute('open') && Date.now() - (this._openedAt || 0) > 600) this.closePop(0); else this.openPop();
@@ -2138,7 +2167,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         const popEl = document.createElement('div');
         popEl.className = 'popover';
         popEl.setAttribute('data-align', this.getAttribute('popover-align') === 'left' ? 'left' : 'right');
-        const cap = document.createElement('span'); cap.className = 'cap'; cap.textContent = this.sicht === 'formen' ? 'Ich möchte …' : 'Vier plus ich'; popEl.appendChild(cap);   // Konsole = vier Elemente plus ich, Leiste = Orte
+        const cap = document.createElement('span'); cap.className = 'cap'; cap.textContent = this.sicht === 'formen' ? 'Ich möchte …' : ort ? ort.label + ' · vier plus ich' : 'Vier plus ich'; popEl.appendChild(cap);   // Konsole = vier Elemente plus ich, Leiste = Orte
         const box = document.createElement('div'); box.className = 'fbox';
         popEl.appendChild(box); root.appendChild(popEl);
         holder = box;
@@ -2151,10 +2180,12 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       // Sicht von den Aktionsformen: das Zeichen der Form steht schon auf dem Blatt
       this.funcs.forEach(f => { if (f.form) el('path', { class: 'zeichen', d: FORMEN[f.form].d, transform: `translate(${(f.cx + 46 * f.ux).toFixed(1)} ${(f.cy + 46 * f.uy).toFixed(1)}) scale(2.3)`, fill: 'none', stroke: '#FFFFFF', 'stroke-width': 2.4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 0.92, 'pointer-events': 'none' }, base); });
       this.ov = el('g', { class: 'ov' }, svg);
-      // Mitte: „Ich möchte“ – mit Blatt und Knospe ergibt sich ein Satz (Ich möchte Materialien suchen)
+      // Mitte: der Ort (ADR-0013), sonst „Ich möchte“ – mit Blatt und Knospe ergibt sich ein Satz (Ich möchte Materialien suchen)
       const mitte = el('g', { class: 'mitte', 'pointer-events': 'none', 'aria-hidden': 'true' }, svg);
-      el('rect', { x: -66, y: -19, width: 132, height: 38, rx: 19, fill: '#FFFFFF', 'fill-opacity': 0.94 }, mitte);
-      this.text(mitte, 'Ich möchte', 0, 1, 23, '#1B2440', 'lbl');
+      const mText = ort ? ort.label : 'Ich möchte', mBreit = Math.max(96, Math.min(220, mText.length * 12.5 + 34));
+      if (ort) mitte.setAttribute('data-ort', ort.label);
+      el('rect', { x: -mBreit / 2, y: -19, width: mBreit, height: 38, rx: 19, fill: ort && ort.color ? ort.color : '#FFFFFF', 'fill-opacity': ort && ort.color ? 1 : 0.94 }, mitte);
+      this.text(mitte, mText, 0, 1, 23, ort && ort.color ? '#FFFFFF' : '#1B2440', 'lbl');
 
       // Zugängliche Links (für Tastatur und Screenreader) – steuern dieselbe Grafik
       const nav = document.createElement('nav');
@@ -2276,10 +2307,13 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
           const t = this.text(bud, eng && s.kurz ? (s.ding ? DING[s.ding].label : s.kurz) : s.label, lx, ly + (Math.abs(Math.cos(a)) <= 0.35 ? Math.sign(Math.sin(a)) * 10 : 0), 25, f.ink, 'out');
           t.setAttribute('text-anchor', anchor);
           const worte = t.textContent.split(' ');
-          if (worte.length === 2) {   // Verb plus Ding: zweizeilig, neben der Knospe mittig, darüber nach oben, darunter nach unten
-            const erste = anchor !== 'middle' ? '-0.52em' : Math.sin(a) < 0 ? '-1.05em' : '0';
+          const zeilen = worte.length === 2 ? worte : [t.textContent], wort = GRAU_WORT[s.stand];
+          if (zeilen.length + (wort ? 1 : 0) > 1) {   // Verb plus Ding, dazu „bald“ bei noch nicht Gebautem: mehrzeilig, neben der Knospe mittig, darüber nach oben, darunter nach unten
+            const mehr = zeilen.length + (wort ? 1 : 0) - 1;
+            const erste = anchor !== 'middle' ? (-0.52 * mehr) + 'em' : Math.sin(a) < 0 ? (-1.05 * mehr) + 'em' : '0';
             t.textContent = '';
-            worte.forEach((w, i) => { const ts = el('tspan', { x: lx, dy: i ? '1.05em' : erste }, t); ts.textContent = w; });
+            zeilen.forEach((w, i) => { const ts = el('tspan', { x: lx, dy: i ? '1.05em' : erste }, t); ts.textContent = w; });
+            if (wort) { const ts = el('tspan', { class: 'bald', x: lx, dy: '1.15em' }, t); ts.textContent = wort; }
           }
           this.fitLabel(t, f, bx + lx, a, anchor, lx);
           let gemessen = false;   // nach dem Aufspringen am echten Ort nachmessen: nichts ragt über den Bildschirmrand
@@ -2378,6 +2412,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     contexts: CONTEXTS,
     functions: FUNCS.map(f => ({ id: f.id, label: f.label, color: f.color, subs: (f.subs || []).map(s => ({ ...s })) })),
     grau: GRAU,
+    grauWort: GRAU_WORT,
     formen: FORM_ORDER.map(id => ({ id, label: FORMEN[id].label, blatt: FORMEN[id].blatt, color: FORMEN[id].color })),
     registerContext(name, profile) {
       CONTEXTS[name] = profile || {};
@@ -3179,9 +3214,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   }
   /** Knopf einer Karte: Ziel '#route', '@editor' (öffnet den Editor) oder 'https://…' (neues Fenster) */
   function exKnopf(text, ziel, stil, klasse, stand) {
-    if (stand) {   // Handlung, die noch nicht gebaut ist: gestrichelt, mit Ziel nur als Ausblick
-      const g = `class="btn btn-ghost st-grau st-${stand}" title="${GRAU_MARKE[stand]}"`;
-      return ziel ? `<a ${g} href="${ziel}">${text} ›</a>` : `<span ${g} aria-disabled="true">${text}</span>`;
+    if (stand) {   // Handlung, die noch nicht gebaut ist: grau mit dem Wort „bald“ oder „später“, mit Ziel nur als Ausblick
+      const g = `class="btn btn-ghost st-grau st-${stand}" title="${GRAU_MARKE[stand]}"`, wort = ` <span class="st-wort">${RelihubSteuerkonsole.grauWort[stand]}</span>`;
+      return ziel ? `<a ${g} href="${ziel}">${text} ›${wort}</a>` : `<span ${g} aria-disabled="true">${text}${wort}</span>`;
     }
     const k = `class="btn${klasse ? ' ' + klasse : ''}" style="${stil}"`;
     if (ziel[0] === '@') return `<button type="button" ${k} data-open="${ziel.slice(1)}">${text} ›</button>`;
@@ -3198,7 +3233,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       : !FORM_VON[action] ? EX_NAME[key] + ' › ' + EX_NAME[action]
       : SICHT === 'formen' ? 'Ich möchte ' + formName(FORM_VON[action]) + ' › ' + EX_NAME[key] : EX_NAME[key] + ' › ' + formName(FORM_VON[action]);
     const go = e.subs
-      ? `<span class="hint">Weiter zu:</span>` + e.subs.map(x => `<button type="button" class="btn btn-ghost${EX[x].grau ? ' st-grau st-' + EX[x].grau : ''}" data-ex="${x}"${EX[x].grau ? '' : ` style="${geist}"`}>${EX_NAME[x]} ›</button>`).join('')
+      ? `<span class="hint">Weiter zu:</span>` + e.subs.map(x => `<button type="button" class="btn btn-ghost${EX[x].grau ? ' st-grau st-' + EX[x].grau : ''}" data-ex="${x}"${EX[x].grau ? '' : ` style="${geist}"`}>${EX_NAME[x]} ›${EX[x].grau ? ` <span class="st-wort">${RelihubSteuerkonsole.grauWort[EX[x].grau]}</span>` : ''}</button>`).join('')
       : exKnopf(e.go[0], e.go[1], e.grau ? '' : btnStyle, e.grau ? 'btn-ghost' : '');
     const mehr = (e.mehr || []).map(m => exKnopf(m[0], m[1], geist, 'btn-ghost', m[2])).join('');
     const marke = e.grau ? `<span class="st-marke st-${e.grau}">● ${GRAU_MARKE[e.grau]}</span>` : e.lock ? '<span class="badge-lock">● mit Profil</span>' : '';
@@ -5697,6 +5732,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   // bis der Zeiger die große Konsole verlässt oder die Route wechselt. Tastatur wirkt immer.
   let exPinned = false;
   RelihubSteuerkonsole.registerContext('hub-start', {
+    mitte: { label: 'ReliHub' },
     onActivate: d => { if (exPinned && d.source === 'pointer') return; explain(d.action); },
     handler: d => {
       exPinned = true;
@@ -5707,6 +5743,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   });
   // Kleine Konsole der Startseite: erscheint, sobald die große aus dem Bild gescrollt ist
   RelihubSteuerkonsole.registerContext('hub-start-float', {
+    mitte: { label: 'ReliHub' },
     handler: d => {
       if (MODUS === 'direkt') return standardAktion(d, 'hub');
       explain(d.action);
@@ -5767,6 +5804,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     }
   });
   RelihubSteuerkonsole.registerContext('relilab', {
+    mitte: { label: 'relilab', kurz: 'rl', color: '#6D3BE0' },   // erstes Beispiel für „Mitte plus vier“ (ADR-0013)
     actions: { 'material.finden': { params: { thema: 'Digitalität' } } },
     handler: d => {
       if (d.action === 'communities.finden') { go('relilab?tab=communities'); return false; }
