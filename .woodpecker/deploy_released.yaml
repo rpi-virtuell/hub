@@ -1,0 +1,21 @@
+# Öffentliche Seite: ein Push auf released liefert nach relihub.net aus.
+# Fassung der technischen Umsetzung vom 17.11.2026. Einzelheiten: docs/betrieb.md
+
+when:
+  branch: released
+  event: push
+
+steps:
+  - name: deploy
+    image: appleboy/drone-ssh
+    settings:
+      host:
+        from_secret: deploy_host_released
+      port:
+        from_secret: deploy_port_released
+      username:
+        from_secret: deploy_user_released
+      key:
+        from_secret: deploy_key_released
+      script:
+        from_secret: deploy_script_released

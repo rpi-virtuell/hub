@@ -1,6 +1,9 @@
+# Tägliche Vorschau: jeder Push auf main erscheint unter hub.rpi-virtuell.net.
+# Unverändert gegenüber der früheren .woodpecker.yml. Einzelheiten: docs/betrieb.md
+
 when:
-  branch: main
-  event: push
+  - branch: main
+    event: push
 
 steps:
   - name: deploy
@@ -8,6 +11,8 @@ steps:
     settings:
       host:
         from_secret: deploy_host
+      port:
+        from_secret: deploy_port
       username:
         from_secret: deploy_user
       key:
