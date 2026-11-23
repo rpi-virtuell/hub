@@ -88,7 +88,7 @@ Deno.test('Startseite: Themenfeld, Vorschau mit Rückfall, maskiert, Laden nur e
 
 Deno.test('Sicht von den Aktionsformen: dieselbe Matrix, Blätter und Knospen getauscht', () => {
   assert(/const FUNCS_F = \[FUNCS\[0\]\]\.concat\(FORM_ORDER\.map\(/.test(c) && /f\.subs\.find\(u => u\.form === k\)/.test(c), 'Zweite Sicht wird nicht aus der Matrix abgeleitet');
-  assert(/'sicht'\]/.test(c) && /get funcs\(\) \{ return this\.sicht === 'formen' \? FUNCS_F : FUNCS; \}/.test(c), 'Attribut sicht fehlt');
+  assert(/'sicht', 'mitte'\]/.test(c) && /get funcs\(\) \{ return this\.sicht === 'formen' \? FUNCS_F : FUNCS; \}/.test(c), 'Attribut sicht fehlt');
   assert(!/\bFUNCS\.(forEach|filter)\(/.test((c.match(/class RelihubSteuerkonsoleElement[\s\S]*?\n  const RelihubSteuerkonsole = /) || [''])[0]), 'Klasse nutzt noch die feste Liste');
   assert(/const far = s\.ding \? DING\[s\.ding\] : f;/.test(c) && /sicht: this\.sicht/.test(c), 'Knospe ohne Farbe ihres Dings oder Ereignis ohne Sicht');
   assert(/<div class="st-sicht" id="stSicht" role="group"[^>]*>.*data-sicht="dinge" aria-pressed="true".*data-sicht="formen" aria-pressed="false"/.test(html), 'Umschalter fehlt');
@@ -98,7 +98,17 @@ Deno.test('Sicht von den Aktionsformen: dieselbe Matrix, Blätter und Knospen ge
   for (const k of ['sehen', 'zeigen', 'erarbeiten', 'kontakt']) assert(new RegExp(`'${k}': \\{ t:'Ich möchte [^']+', p:'[^']+', subs:\\[('[a-z]+\\.[a-z]+',?){4}\\] \\}`).test(s), `Karte ${k}`);
 });
 
-Deno.test('Mitte der Blume: Ich möchte', () => {
-  assert(/class: 'mitte', 'pointer-events': 'none'/.test(c) && /this\.text\(mitte, 'Ich möchte'/.test(c), 'Schrift in der Mitte fehlt oder fängt Klicks ab');
-  assert(contrast('#1B2440', '#FFFFFF') >= 4.5, 'Kontrast der Mitte');
+Deno.test('Mitte der Blume: der Ort, sonst „Ich möchte“ (ADR-0013)', () => {
+  assert(/class: 'mitte', 'pointer-events': 'none'/.test(c) && /const mText = ort \? ort\.label : 'Ich möchte'/.test(c) && /this\.text\(mitte, mText/.test(c), 'Schrift in der Mitte fehlt oder fängt Klicks ab');
+  assert(/const ort = this\.sicht === 'formen' \? null : attrMitte \? \{ label: attrMitte \} : profMitte \|\| null/.test(c), 'Ort aus Profil oder Attribut, nicht in der Sicht von den Aktionsformen');
+  assert(/'sicht', 'mitte'\]/.test(c), 'Attribut mitte wird beobachtet');
+  assert(contrast('#1B2440', '#FFFFFF') >= 4.5 && contrast('#FFFFFF', '#6D3BE0') >= 4.5, 'Kontrast der Mitte, weiß und in Instanzfarbe');
+});
+
+Deno.test('Mitte plus vier am Beispiel relilab: Zeichen, Kontext, Abschnitt', () => {
+  assert(/registerContext\('hub-start', \{\n    mitte: \{ label: 'ReliHub' \}/.test(s) && /registerContext\('hub-start-float', \{\n    mitte: \{ label: 'ReliHub' \}/.test(s), 'Startseite: ReliHub in der Mitte');
+  assert(/registerContext\('relilab', \{\n    mitte: \{ label: 'relilab', kurz: 'rl', color: '#6D3BE0' \}/.test(s), 'relilab: Name, Kürzel, Farbe');
+  assert(/class: 'ort', r: 94, fill: ort\.color/.test(c) && /\.mini svg circle\.ort\{opacity:1\}/.test(c) && /', Ort: ' \+ ort\.label/.test(c), 'Zeichen am schwebenden Knopf trägt den Ort, auch für Screenreader');
+  assert(/<section class="rl-hubband"[\s\S]{0,900}<relihub-steuerkonsole id="rlBlume" size="230" context="relilab" variant="knospen">/.test(html) && /In der Mitte steht relilab/.test(html), 'Abschnitt in der relilab-Ansicht');
+  assert(/<relihub-steuerkonsole id="rlFlower" floating[^>]*context="relilab"/.test(html), 'schwebende Konsole der relilab-Ansicht bleibt');
 });
