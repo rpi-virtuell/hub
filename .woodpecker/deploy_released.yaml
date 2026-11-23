@@ -2,8 +2,8 @@
 # Fassung der technischen Umsetzung vom 17.11.2026. Einzelheiten: docs/betrieb.md
 
 when:
-  branch: released
-  event: push
+  - branch: released
+    event: push
 
 steps:
   - name: deploy
