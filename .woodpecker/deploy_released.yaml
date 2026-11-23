@@ -6,7 +6,7 @@ when:
     event: push
 
 steps:
-  - name: deploy
+  - name: deploy_Release-Seite
     image: appleboy/drone-ssh
     settings:
       host:
