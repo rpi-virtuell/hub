@@ -14,8 +14,9 @@ Ein Prototyp aus dem Maintainer-Kreis zeigt eine andere Form: Unter der Blume w�
 3. **Der Stiel wandert mit.** In der schwebenden Form der Konsole ist er immer da. In der großen Form steht er nur mit dem Attribut `stiel`, auf der Startseite ist es gesetzt. `stiel="off"` blendet ihn aus.
 4. **Ein Ereignis für beide.** Ein Klick auf ein Blatt am Stiel löst `relihub-leiste-select` aus, wie ein Klick in der Leiste, mit `quelle: 'stiel'` im Detail. Die Anwendung entscheidet, wohin der Ort führt.
 5. **Schnittstelle.** `RelihubSteuerkonsole.setOrte(items)` setzt die Orte, `setOrt(id)` markiert den aktuellen. Die Leiste reicht ihre Einträge von selbst weiter. Der Zuschnitt ist kein Ort und bleibt in der Leiste.
-6. **Mehr Orte als Platz.** Sichtbar sind höchstens fünf Blätter. Zwei Knöpfe blättern weiter, der aktuelle Ort ist beim Öffnen im Blick.
-7. **Hinweiszeile zum Filter.** In der relilab-Ansicht steht über den Bereichen Communities, Termine und Menschen ein Satz: Der Bereich kommt aus dem gemeinsamen Datenraum und ist auf relilab gefiltert.
+6. **Erst die Orte der Leiste, dann das übrige Ökosystem.** Unter den Orten der Leiste hängen die weiteren Orte aus der Partnerliste, zum Beispiel reliGlobal oder die Konfi-Arbeit. Wer im Hub noch keine eigene Ansicht hat, ist heller gezeichnet und führt zu seiner Kachel auf der Startseite. Eine fremde Seite öffnet sich in einem neuen Fenster.
+7. **Mehr Orte als Platz.** An der großen Blume sind bis zu acht Blätter sichtbar, an der schwebenden bis zu sechs. Zwei Knöpfe blättern weiter, der aktuelle Ort ist beim Öffnen im Blick.
+8. **Hinweiszeile zum Filter.** In der relilab-Ansicht steht über den Bereichen Communities, Termine und Menschen ein Satz: Der Bereich kommt aus dem gemeinsamen Datenraum und ist auf relilab gefiltert.
 
 ## Folgen
 - Die Leiste bleibt vorerst stehen. Stiel und Leiste zeigen dasselbe, bis entschieden ist, ob die Leiste entfällt.
@@ -24,8 +25,6 @@ Ein Prototyp aus dem Maintainer-Kreis zeigt eine andere Form: Unter der Blume w�
 
 ## Offen
 1. **Entfällt die Leiste?** Der Stiel kann sie ersetzen. Das Anpassen der Orte je Person und je Community hängt heute an der Leiste.
-2. **Zwei Handlungen oder vier Aktionsformen.** Der Prototyp kennt je Blatt nur finden und veröffentlichen. Der Hub hat seit ADR-0011 sehen, zeigen, erarbeiten, in Kontakt treten. Nicht entschieden.
-3. **Welche Blätter.** Der Prototyp hat Material, Termine, News und Menschen, mit Personen und Communities als Knospen unter Menschen. Der Hub hat Menschen, Communities, Materialien, Termine und „ich“. Nicht entschieden.
-4. **Der Schreibtisch** ist ein Ort und keine Art von Inhalt. Er liegt im Hub noch unter „Material weiterentwickeln“.
-5. **Eigene Seiten je Art und Instanz.** Der Prototyp zeigt für relilab je eine gefilterte Seite für Termine, Material, News, Personen und Communities, mit einer Reihe zum Wechseln. Der Hub hat davon erst Teile.
-6. **Gestaltung des Stiels.** Form und Farbe sind aus dem Prototyp übernommen und dort als vorläufig bezeichnet.
+2. **Blätter und Knospen** regelt [ADR-0015](0015-belegung-der-blume.md).
+3. **Eigene Seiten je Art und Instanz.** Der Prototyp zeigt für relilab je eine gefilterte Seite für Termine, Material, News, Personen und Communities, mit einer Reihe zum Wechseln. Der Hub hat davon erst Teile.
+4. **Gestaltung des Stiels.** Form und Farbe sind aus dem Prototyp übernommen und dort als vorläufig bezeichnet.

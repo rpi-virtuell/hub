@@ -66,10 +66,10 @@ Deno.test('Teilen in Communities im Beitrags- und Termin-Editor', () => {
   assert(/function isMember\(/.test(s), 'isMember fehlt');
 });
 
-Deno.test('Beiträge hängen an Material finden und teilen, das Profil hat ein Artikel-Panel', () => {
+Deno.test('Beiträge sind ein eigenes Blatt (ADR-0015), das Profil hat ein Artikel-Panel', () => {
   const c = consoleScript(), s = appScript();
-  assert(!/material\.beitraege/.test(c + s), 'Knospe Beiträge ist noch da (ADR-0011)');
-  assert(/'material\.finden': \{[^\n]*mehr:\[\['Beiträge lesen','#profil\?zu=artikel'\]/.test(s) && /'material\.teilen': \{[^\n]*\['Beitrag schreiben','@beitrag'\]/.test(s), 'Beiträge ohne Weg zum Lesen oder Schreiben');
+  assert(!/material\.beitraege/.test(c + s), 'alte Knospe Beiträge unter Material ist noch da');
+  assert(/'news\.finden': \{[^\n]*go:\['Beiträge lesen','#mitmachen'\][^\n]*'#profil\?zu=artikel'/.test(s) && /'news\.veroeffentlichen': \{[^\n]*go:\['Beitrag schreiben','@beitrag'\]/.test(s), 'Beiträge ohne Weg zum Lesen oder Schreiben');
   assert(html.includes('id="artikel"') && html.includes('Artikel aus deinen Communities'), 'Panel fehlt');
   assert(/function renderArtikel\(/.test(s) && s.includes('Folge Communities, um hier Artikel zu sehen.'), 'renderArtikel oder Leerzustand fehlt');
 });
@@ -130,6 +130,6 @@ Deno.test('Noch nicht Gebautes trägt das Wort „bald“ statt einer gestrichel
 });
 
 Deno.test('Startseite: aufgeklappte Knospen haben Abstand zum Themenfeld und zum Umschalter', () => {
-  assert(/\.flower-wrap\{display:flex;justify-content:center;padding:124px 0 276px\}/.test(html), 'großer Schirm');
-  assert(/@media \(max-width:640px\)\{[^@]*\.flower-wrap\{padding:96px 0 268px\}/.test(html), 'kleiner Schirm');
+  assert(/\.flower-wrap\{display:flex;justify-content:center;padding:124px 0 366px\}/.test(html), 'großer Schirm');
+  assert(/@media \(max-width:640px\)\{[^@]*\.flower-wrap\{padding:96px 0 358px\}/.test(html), 'kleiner Schirm');
 });
