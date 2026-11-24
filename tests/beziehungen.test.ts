@@ -62,7 +62,7 @@ Deno.test('Ökosystem: Ansicht, Route, drei Zustände, Zeilen maskiert', () => {
   const k = fn('ozZeile') + fn('ozMarke') + fn('ozPille');
   assert(/esc\(e\.id\)/.test(k) && /sichereUrl\(/.test(k) && /kurzHash\(/.test(k) && /esc\(ozPille\(e\)\)/.test(k) && /Das bist du/.test(k), 'Zeile');
   assert(/function ozSichtbar\(ent\)/.test(s) && /HUB_C/.test(fn('ozSichtbar')), 'Sichtbarkeit kennt den Zuschnitt');
-  assert(/'ich\.start': \{[^}]*#oekosystem/.test(s), 'Konsole: Überblick führt ins Ökosystem');
+  assert(/'menschen\.personen': \{[^\n]*\['Im Überblick ansehen','#oekosystem'\]/.test(s), 'Konsole: ein Weg führt ins Ökosystem');
   assert(!/href="#partner">Ökosystem/.test(html) && (html.match(/href="#oekosystem">Ökosystem/g) || []).length >= 3, 'Menüpunkt Ökosystem führt in die Ansicht');
 });
 

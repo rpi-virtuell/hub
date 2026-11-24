@@ -26,9 +26,9 @@
   /* FOERBICO-Palette (Styleguide oer.community) für das Schaufenster */
   --fo-blau:#203A8F;--fo-orange:#FFA500;--fo-titel:#002366;--fo-text:#333333;--fo-hell:#F0F8FF;--fo-kopf:#E6F2FF;--fo-rahmen:#D3D3D3;
   /* Steuerkonsole liest diese Werte; ohne sie gelten ihre eingebauten Standardfarben */
-  --relihub-c-ich:var(--c-hub);--relihub-c-menschen:var(--c-koop);--relihub-c-communities:var(--c-ver);--relihub-c-material:var(--c-finden);--relihub-c-termine:var(--c-erstellen);
-  --relihub-x-ich:var(--x-hub);--relihub-x-menschen:var(--x-koop);--relihub-x-communities:var(--x-ver);--relihub-x-material:var(--x-finden);--relihub-x-termine:var(--x-erstellen);
-  --relihub-text-ich:#FFFFFF;--relihub-text-menschen:#FFFFFF;--relihub-text-communities:#FFFFFF;--relihub-text-material:#FFFFFF;--relihub-text-termine:#2B1A00;
+  --relihub-c-ich:var(--c-hub);--relihub-c-menschen:var(--c-koop);--relihub-c-material:var(--c-finden);--relihub-c-termine:var(--c-erstellen);--relihub-c-news:var(--c-ver);
+  --relihub-x-ich:var(--x-hub);--relihub-x-menschen:var(--x-koop);--relihub-x-material:var(--x-finden);--relihub-x-termine:var(--x-erstellen);--relihub-x-news:var(--x-ver);
+  --relihub-text-ich:#FFFFFF;--relihub-text-menschen:#FFFFFF;--relihub-text-communities:#FFFFFF;--relihub-text-material:#FFFFFF;--relihub-text-termine:#2B1A00;--relihub-text-news:#FFFFFF;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -126,7 +126,7 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .narrativ .einladung{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .narrativ .einladung .btn{border-color:var(--c-hub);color:var(--x-hub)}
 .stage h1{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:clamp(32px,4.6vw,52px);line-height:1.05;margin:0 auto;max-width:20ch}
-.flower-wrap{display:flex;justify-content:center;padding:124px 0 96px}
+.flower-wrap{display:flex;justify-content:center;padding:124px 0 366px}   /* unten Raum für den Stiel mit den Orten (ADR-0014) */
 .explain{max-width:620px;margin:0 auto;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px 24px 22px 24px;display:flex;gap:18px;align-items:flex-start;min-height:132px;transition:border-color .25s}
 .explain .ic{flex:0 0 auto;width:58px;height:58px}
 .explain .fn{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:15px;letter-spacing:1.5px;text-transform:uppercase;margin:0}
@@ -1116,6 +1116,8 @@ relihub-steuerkonsole[hidden]{display:none}
 .rl-krit{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;padding:0}
 .rl-krit li{background:#F4E6FA;color:#5B1C73;border-radius:999px;padding:4px 13px;font-size:14px;font-weight:600}
 .rl-satz{max-width:70ch;margin:0 0 22px;color:#3A3F47}
+.rl-filterhinweis{display:flex;gap:10px;align-items:flex-start;margin:10px 22px 0;padding:10px 14px;border-radius:10px;background:#EAF4F1;color:#1F4A45;font-size:14.5px;line-height:1.45}
+.rl-filterhinweis::before{content:'';flex:none;width:12px;height:12px;margin-top:4px;border-radius:50%;border:3px solid #1F6F68}
 .rl-hubband{display:flex;flex-direction:column;align-items:center;margin:0 0 28px;padding:22px 20px 96px;border:1px solid #E1D8FA;border-radius:14px;background:#FAF8FF}
 .rl-hubband>div{align-self:stretch;max-width:70ch;margin:0 0 100px}
 .rl-hubband h2{font-family:Oswald,"Roboto Condensed",sans-serif;font-weight:500;font-size:26px;color:#1F1F25;margin:2px 0 8px}
@@ -1204,7 +1206,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
 @media (max-width:640px){
   .hub-top nav a:not(.btn){display:none}
   .brand small{display:none}
-  .flower-wrap{padding:96px 0 74px}
+  .flower-wrap{padding:96px 0 358px}
   .mp-head{gap:4px}
   .sa-filter{grid-template-columns:1fr}
   .mp-brand{font-size:18px}
@@ -1250,7 +1252,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
       <span class="st-themen-zeile"><input id="stThemenFeld" type="text" autocomplete="off" maxlength="200" placeholder="#Frieden #Konfi #Schöpfung"><button type="submit" class="btn btn-ghost">Zeigen</button></span>
       <p class="st-chips" id="stThemenChips" aria-live="polite"></p>
     </form>
-    <div class="flower-wrap"><relihub-steuerkonsole id="startFlower" size="320" context="hub-start" variant="knospen"></relihub-steuerkonsole></div>
+    <div class="flower-wrap"><relihub-steuerkonsole id="startFlower" size="320" context="hub-start" variant="knospen" stiel></relihub-steuerkonsole></div>
     <div class="st-sicht" id="stSicht" role="group" aria-label="Ordnung der Konsole"><span>Ich denke von</span><button type="button" data-sicht="dinge" aria-pressed="true">den Dingen her</button><button type="button" data-sicht="formen" aria-pressed="false">dem Tun her</button></div>
     <div class="explain" id="explain" aria-live="polite"></div>
   </section>
@@ -1648,6 +1650,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
     <button class="rl-burger" aria-label="Menü" data-todo="Menü"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2F3640" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   </header>
   <p class="stand" aria-live="polite"></p>
+  <p class="rl-filterhinweis" id="rlFilterHinweis" hidden></p>
 
   <div data-rlsec="home" class="on">
   <div class="rl-lab">
@@ -1928,29 +1931,37 @@ a.kat-card:hover{border-color:var(--c-koop)}
   // stand: 'spaeter' (dunkelgrau, später gedacht) oder 'offen' (hellgrau, gewollt und noch nicht gebaut).
   const GRAU = { spaeter: { fill: '#5F6672', text: '#FFFFFF' }, offen: { fill: '#C9CED6', text: '#2B2F36' } };
   const GRAU_WORT = { spaeter: 'später', offen: 'bald' };   // sichtbar an Knospe und Knopf: die Graustufe allein erklärt sich nicht
+  // Die vier Wege (ADR-0015): finden, teilen, erstellen, bearbeiten. Kennungen weichen bei zweien vom Wort ab, weil „finden“ und „erstellen“ schon Farbnamen der Anwendung sind.
   const FORMEN = {
-    sehen: { label: 'sehen', blatt: 'sehen', color: '#3558A8', d: 'M-12 0 Q0 -11 12 0 Q0 11 -12 0 Z M-3 0 A3 3 0 1 0 3 0 A3 3 0 1 0 -3 0' },
-    zeigen: { label: 'zeigen', blatt: 'zeigen', color: '#2F74B5', d: 'M0 7 V-10 M-7 -3 L0 -10 L7 -3 M-10 11 H10' },
-    erarbeiten: { label: 'erarbeiten', blatt: 'erarbeiten', color: '#4B57A6', d: 'M-10 10 L-7 2 L4 -9 L9 -4 L-2 7 Z' },
-    kontakt: { label: 'in Kontakt treten', blatt: 'Kontakt', color: '#27628F', d: 'M-11 -9 H11 V5 H-1 L-7 11 V5 H-11 Z' }
+    suchen: { label: 'finden', blatt: 'finden', color: '#3558A8', d: 'M-12 0 Q0 -11 12 0 Q0 11 -12 0 Z M-3 0 A3 3 0 1 0 3 0 A3 3 0 1 0 -3 0' },
+    teilen: { label: 'teilen', blatt: 'teilen', color: '#2F74B5', d: 'M0 7 V-10 M-7 -3 L0 -10 L7 -3 M-10 11 H10' },
+    anlegen: { label: 'erstellen', blatt: 'erstellen', color: '#4B57A6', d: 'M0 -10 V10 M-10 0 H10' },
+    bearbeiten: { label: 'bearbeiten', blatt: 'bearbeiten', color: '#27628F', d: 'M-10 10 L-7 2 L4 -9 L9 -4 L-2 7 Z' }
   };
-  const FORM_ORDER = ['sehen', 'zeigen', 'erarbeiten', 'kontakt'];
-  // label: Verb plus Ding; kurz: nur das Verb, für enge Schirme
+  const FORM_ORDER = ['suchen', 'teilen', 'anlegen', 'bearbeiten'];
+  // Farbe einer Knospe, wenn sie zu einem anderen Ding gehört als ihr Blatt: „Materialien“ am Blatt „ich“ trägt die Farbe der Materialien
+  // Communities gehören zu den Menschen und tragen deren Farbe; Violett steht für Artikel. Blau heißt: Das mache ich mit meinen eigenen Dingen.
+  const FARBE = { ich: ['#203A8F', '#FFFFFF'], menschen: ['#D6336C', '#FFFFFF'], communities: ['#D6336C', '#FFFFFF'], material: ['#007A75', '#FFFFFF'], termine: ['#FFA500', '#2B1A00'], news: ['#7B4FB8', '#FFFFFF'] };
+  // Belegung nach ADR-0015: ich, Menschen, Materialien, Termine, Artikel. Die Knospen sind die Wege zu dem, was im Datenraum liegt:
+  // finden, teilen, erstellen, bearbeiten. label: Verb plus Ding; kurz: nur das Verb, für enge Schirme; ding: Name des Dings in der Sicht vom Tun her.
+  // Blatt „ich“: aufgeklappt steht „mein(e)“ auf dem Blatt, das Profil in der Mitte, daneben Materialien und Termine, außen Personen und Communities.
   const FUNCS = [
-    { id: 'ich', label: 'ich', color: '#203A8F', text: '#FFFFFF', self: true,
-      subs: [{ id: 'ich.profil', label: 'mein Profil' }, { id: 'ich.interessen', label: 'meine Themen' }, { id: 'ich.start', label: 'Überblick' }] },
+    { id: 'ich', label: 'ich', offen: 'mein(e)', color: '#203A8F', text: '#FFFFFF', self: true,
+      subs: [{ id: 'ich.menschen', label: 'Personen', kurz: 'Personen', farbe: 'menschen' }, { id: 'ich.materialien', label: 'Materialien', kurz: 'Materialien', farbe: 'material' }, { id: 'ich.profil', label: 'Profil', kurz: 'Profil' }, { id: 'ich.termine', label: 'Termine', kurz: 'Termine', farbe: 'termine' }, { id: 'ich.communities', label: 'Communities', kurz: 'Communities', farbe: 'communities' }] },
     { id: 'menschen', label: 'Menschen', color: '#D6336C', text: '#FFFFFF',
-      subs: [{ id: 'menschen.finden', label: 'Menschen entdecken', kurz: 'entdecken', form: 'sehen' }, { id: 'menschen.zeigen', label: 'mich vorstellen', kurz: 'vorstellen', form: 'zeigen' }, { id: 'menschen.zusammen', label: 'zusammenarbeiten', kurz: 'kooperieren', form: 'erarbeiten', stand: 'offen' }, { id: 'menschen.folgen', label: 'Menschen folgen', kurz: 'folgen', form: 'kontakt' }] },
-    { id: 'communities', label: 'Communities', color: '#7B4FB8', text: '#FFFFFF',
-      subs: [{ id: 'communities.finden', label: 'Communities entdecken', kurz: 'entdecken', form: 'sehen' }, { id: 'communities.vorstellen', label: 'Community vorstellen', kurz: 'vorstellen', form: 'zeigen', stand: 'offen' }, { id: 'communities.aufbauen', label: 'Community aufbauen', kurz: 'aufbauen', form: 'erarbeiten' }, { id: 'communities.mitmachen', label: 'mitmachen', kurz: 'mitmachen', form: 'kontakt' }] },
+      subs: [{ id: 'menschen.personen', label: 'Personen', kurz: 'Personen', form: 'suchen', name: 'Personen' }, { id: 'menschen.communities', label: 'Communities', kurz: 'Communities', form: 'suchen', name: 'Communities' }] },
     { id: 'material', label: 'Materialien', color: '#007A75', text: '#FFFFFF',
-      subs: [{ id: 'material.finden', label: 'Materialien suchen', kurz: 'suchen', form: 'sehen' }, { id: 'material.teilen', label: 'Material teilen', kurz: 'teilen', form: 'zeigen' }, { id: 'material.schreibtisch', label: 'Material weiterentwickeln', kurz: 'bearbeiten', form: 'erarbeiten' }, { id: 'material.rueckmeldung', label: 'Rückmeldung geben', kurz: 'reagieren', form: 'kontakt' }] },
+      subs: [{ id: 'material.finden', label: 'Materialien suchen', kurz: 'suchen', form: 'suchen' }, { id: 'material.teilen', label: 'Material teilen', kurz: 'teilen', form: 'teilen' }, { id: 'material.erstellen', label: 'Material erstellen', kurz: 'erstellen', form: 'anlegen' }, { id: 'material.bearbeiten', label: 'Material bearbeiten', kurz: 'bearbeiten', form: 'bearbeiten', farbe: 'ich' }] },
     { id: 'termine', label: 'Termine', color: '#FFA500', text: '#2B1A00',
-      subs: [{ id: 'termine.finden', label: 'Termine finden', kurz: 'finden', form: 'sehen' }, { id: 'termine.eintragen', label: 'Termin ankündigen', kurz: 'ankündigen', form: 'zeigen' }, { id: 'termine.vorbereiten', label: 'Termin vorbereiten', kurz: 'vorbereiten', form: 'erarbeiten', stand: 'offen' }, { id: 'termine.teilnehmen', label: 'teilnehmen', kurz: 'teilnehmen', form: 'kontakt' }] }
+      subs: [{ id: 'termine.finden', label: 'Termine finden', kurz: 'finden', form: 'suchen' }, { id: 'termine.teilen', label: 'Termin teilen', kurz: 'teilen', form: 'teilen' }, { id: 'termine.erstellen', label: 'Termin erstellen', kurz: 'erstellen', form: 'anlegen' }, { id: 'termine.bearbeiten', label: 'Termin bearbeiten', kurz: 'bearbeiten', form: 'bearbeiten', farbe: 'ich' }] },
+    { id: 'news', label: 'Artikel', color: '#7B4FB8', text: '#FFFFFF',
+      subs: [{ id: 'news.finden', label: 'Artikel finden', kurz: 'finden', form: 'suchen' }, { id: 'news.teilen', label: 'Artikel teilen', kurz: 'teilen', form: 'teilen' }, { id: 'news.veroeffentlichen', label: 'Artikel schreiben', kurz: 'schreiben', form: 'anlegen' }, { id: 'news.bearbeiten', label: 'Artikel bearbeiten', kurz: 'bearbeiten', form: 'bearbeiten', farbe: 'ich' }] }
   ];
-  // Zweite Sicht auf dieselbe Matrix (ADR-0011): Blätter sind die Aktionsformen, Knospen die vier Dinge. Kennungen und Ziele bleiben gleich.
+  // Zweite Sicht auf dieselbe Belegung: Blätter sind die vier Wege, Knospen die Dinge, die es dazu gibt. Kennungen und Ziele bleiben gleich.
+  // Unter „bearbeiten“ steht als letzte Knospe, zum Blatt „ich“ hin, das eigene Profil.
   const FUNCS_F = [FUNCS[0]].concat(FORM_ORDER.map(k => ({ id: k, label: FORMEN[k].blatt, color: FORMEN[k].color, text: '#FFFFFF', form: k,
-    subs: FUNCS.slice(1).map(f => Object.assign({ ding: f.id }, f.subs.find(u => u.form === k))) })));
+    subs: FUNCS.slice(1).flatMap(f => f.subs.filter(u => u.form === k).map(u => Object.assign({ ding: f.id }, u)))
+      .concat(k === 'bearbeiten' ? [Object.assign({ ding: 'ich', name: 'mein Profil' }, FUNCS[0].subs.find(u => u.id === 'ich.profil'))] : []) })));
   const DING = {}; FUNCS.forEach(f => { DING[f.id] = f; });
   [FUNCS, FUNCS_F].forEach(liste => liste.forEach((f, i) => {
     const a = (-90 + 72 * i) * Math.PI / 180;
@@ -1964,30 +1975,33 @@ a.kat-card:hover{border-color:var(--c-koop)}
   const ROUTES = {
     'ich': '/',
     'ich.profil': '/profil',
-    'ich.interessen': '/themen',
-    'ich.start': '/',
-    'menschen.finden': '/menschen',
-    'menschen.zeigen': '/profil',
-    'menschen.zusammen': '/menschen/zusammenarbeiten',
-    'menschen.folgen': '/menschen/folgen',
-    'communities.finden': '/communities',
-    'communities.vorstellen': '/communities/vorstellen',
-    'communities.aufbauen': '/communities/neu',
-    'communities.mitmachen': '/mitmachen',
+    'ich.communities': '/profil/communities',
+    'ich.menschen': '/profil/folge',
+    'ich.materialien': '/profil/materialien',
+    'ich.termine': '/profil/termine',
+    'menschen.personen': '/menschen',
+    'menschen.communities': '/communities',
     'material.finden': '/material',
-    'material.teilen': '/material/neu',
-    'material.schreibtisch': '/material/schreibtisch',
-    'material.rueckmeldung': '/material/rueckmeldung',
+    'material.teilen': '/material/teilen',
+    'material.erstellen': '/material/neu',
+    'material.bearbeiten': '/material/bearbeiten',
     'termine.finden': '/termine',
-    'termine.eintragen': '/termine/neu',
-    'termine.vorbereiten': '/termine/vorbereiten',
-    'termine.teilnehmen': '/termine/teilnehmen',
-    'sehen': '/sehen', 'zeigen': '/zeigen', 'erarbeiten': '/erarbeiten', 'kontakt': '/kontakt'
+    'termine.teilen': '/termine/teilen',
+    'termine.erstellen': '/termine/neu',
+    'termine.bearbeiten': '/termine/bearbeiten',
+    'news.finden': '/artikel',
+    'news.teilen': '/artikel/teilen',
+    'news.veroeffentlichen': '/artikel/neu',
+    'news.bearbeiten': '/artikel/bearbeiten',
+    'suchen': '/finden', 'teilen': '/teilen', 'anlegen': '/erstellen', 'bearbeiten': '/bearbeiten'
   };
+
   const LABELS = {}, STAND = {}, FORM = {};
   ALLE.forEach(f => { LABELS[f.id] = f.label; (f.subs || []).forEach(s => { LABELS[s.id] = s.label; if (s.stand) STAND[s.id] = s.stand; if (s.form) FORM[s.id] = s.form; }); });
   const DEFAULT_BASE = 'https://relihub.example';
   const CONTEXTS = { standard: {} };
+  let ORTE = [], WEITERE = [], ORT_AKTUELL = '';   // Orte am Stiel (ADR-0014): dieselben Einträge wie in der Leiste, gesetzt über setOrte und setOrt
+  const ST_ROW = 30;                 // Zeilenhöhe am Stiel in px, passend zu --row im CSS
 
   function mix(a, b, t) {
     const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
@@ -2048,8 +2062,47 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 .popover[data-align="right"]{right:-14px}
 .popover[data-align="left"]{left:-14px;transform-origin:top left}
 :host([open]) .popover{opacity:1;visibility:visible;transform:none;transition:opacity .18s,transform .22s cubic-bezier(.3,1.3,.5,1)}
-.fbox{position:relative;width:var(--rh-pop);height:var(--rh-pop)}
-.fbox svg{width:100%;height:100%}
+.fbox{position:relative;width:var(--rh-pop)}
+.fbox svg{display:block;width:100%;height:var(--rh-pop)}
+/* Stiel (ADR-0014): unter der Blume wächst ein Stiel, daran hängen die Orte als kleine Blätter. Der aktuelle Ort ist markiert. */
+.stiel{--lm:min(190px,calc(50vw - 22px));--row:30px;--gap:26px;position:relative;z-index:0;width:100%;pointer-events:none;
+  margin-top:calc(var(--u) * -46);
+  height:calc(var(--u) * 46 + var(--gap) + var(--n) * var(--row) + 8px + var(--pg,0px))}
+:host(:not([compact]):not([floating])) .stiel{--gap:78px;--lm:min(210px,calc(50vw - 22px))}
+.st-rail{position:absolute;left:50%;width:4px;margin-left:-2px;top:0;bottom:var(--pg,0px);border-radius:2px;
+  background:linear-gradient(to bottom,var(--relihub-stem,#5E8C61) 0,var(--relihub-stem,#5E8C61) 78%,transparent)}
+.st-scroll{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--u) * 46 + var(--gap));
+  height:calc(var(--n) * var(--row) + 8px);width:calc(var(--lm) * 2 + 28px);
+  overflow-y:auto;overflow-x:hidden;scrollbar-width:none;touch-action:pan-y;pointer-events:none;
+  --ft:0px;--fb:0px;--at:1;--ab:1;
+  -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,var(--at)) 0,#000 var(--ft),#000 calc(100% - var(--fb)),rgba(0,0,0,var(--ab)) 100%);
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,var(--at)) 0,#000 var(--ft),#000 calc(100% - var(--fb)),rgba(0,0,0,var(--ab)) 100%)}
+.st-scroll::-webkit-scrollbar{display:none}
+.st-scroll.cu{--ft:16px;--at:0}
+.st-scroll.cd{--fb:16px;--ab:0}
+.st-track{position:relative;padding:4px 0}
+.st-greif{position:absolute;left:50%;width:28px;margin-left:-14px;top:0;bottom:0;pointer-events:auto}
+.st-row{position:relative;height:var(--row);pointer-events:none}
+.st-row::before{content:'';position:absolute;top:14px;width:9px;height:2px;background:var(--relihub-stem,#5E8C61)}
+.st-row.r::before{left:50%}.st-row.l::before{right:50%}
+.st-blatt{position:absolute;top:2px;height:26px;box-sizing:border-box;max-width:calc(var(--lm) - 10px);padding:0 14px;
+  font:600 13px/23px var(--relihub-font,inherit);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;
+  color:var(--relihub-leaf-text,#1F3A22);background:var(--relihub-leaf,#E4F0E1);border:1.5px solid var(--relihub-leaf-line,#6E9A69);
+  pointer-events:auto;cursor:pointer;transition:background .15s}
+.st-row.r .st-blatt{left:calc(50% + 8px);border-radius:0 16px 0 16px;transform-origin:left center;transform:rotate(-4deg)}
+.st-row.l .st-blatt{right:calc(50% + 8px);border-radius:16px 0 16px 0;transform-origin:right center;transform:rotate(4deg)}
+.st-blatt:hover,.st-blatt:focus-visible{background:var(--relihub-leaf-hover,#C6E0C1)}
+.st-blatt:focus-visible{outline:2px solid var(--relihub-focus,#111111);outline-offset:1px}
+/* Orte ohne eigene Ansicht im Hub: heller, damit die begehbaren Orte hervortreten */
+.st-blatt.st-fern{background:#FFFFFF;color:#2F4A32}
+.st-blatt[aria-current]{background:var(--relihub-leaf-current,#2E7D4F);border-color:var(--relihub-leaf-current,#2E7D4F);color:#FFFFFF}
+.st-blatt[aria-current]::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#FFFFFF;margin-right:6px;vertical-align:1px}
+.st-pager{position:absolute;left:50%;bottom:0;transform:translateX(-50%);display:flex;gap:8px;pointer-events:auto}
+.st-pager button{all:unset;box-sizing:border-box;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  background:var(--relihub-leaf,#E4F0E1);border:1.5px solid var(--relihub-leaf-line,#6E9A69);color:#1F3A22;font-size:9px;line-height:1}
+.st-pager button:hover{background:var(--relihub-leaf-hover,#C6E0C1)}
+.st-pager button:focus-visible{outline:2px solid var(--relihub-focus,#111111);outline-offset:1px}
+.st-pager button[disabled]{opacity:.3;cursor:default}
 @media (max-width:560px){.popover{position:fixed;top:72px;left:50%;right:auto!important;padding:46px 76px;
   transform:translate(-50%,-8px) scale(.96);transform-origin:top center}
   :host([open]) .popover{transform:translate(-50%,0)}}
@@ -2060,12 +2113,12 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 :host([floating][open]) .popover{transform:none}
 @media (max-width:560px){:host([floating]) .popover{position:fixed;top:auto;bottom:96px;left:50%;right:auto!important;transform:translate(-50%,10px) scale(.96)}
   :host([floating][open]) .popover{transform:translate(-50%,0)}}
-@media (prefers-reduced-motion:reduce){.pop,.bud,.popover{transition:none}}
+@media (prefers-reduced-motion:reduce){.pop,.bud,.popover,.st-blatt{transition:none}}
 .cap{position:absolute;top:14px;left:0;right:0;text-align:center;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#5F5E5A}
 `;
 
   class RelihubSteuerkonsoleElement extends HTMLElement {
-    static get observedAttributes() { return ['size', 'variant', 'context', 'base-url', 'target', 'compact', 'floating', 'popover-size', 'popover-align', 'sicht', 'mitte']; }
+    static get observedAttributes() { return ['size', 'variant', 'context', 'base-url', 'target', 'compact', 'floating', 'popover-size', 'popover-align', 'sicht', 'mitte', 'stiel']; }
     constructor() {
       super();
       this.attachShadow({ mode: 'open' });
@@ -2202,6 +2255,8 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         });
       });
       root.appendChild(nav);
+      this.stielHalter = holder; this.stielEinheit = (this.compact ? (parseInt(this.getAttribute('popover-size'), 10) || 200) : size) / (2 * VB);
+      this.stielBauen();
 
       svg.addEventListener('pointermove', e => this.onMove(e));
       // Nur die Maus schließt beim Verlassen; ein Finger "verlässt" die Fläche nach jedem Antippen
@@ -2209,6 +2264,68 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       svg.addEventListener('pointerdown', e => this.onDown(e));
       svg.addEventListener('click', e => this.onClick(e));
       this.active = null;
+    }
+
+    // ---------- Stiel mit den Orten (ADR-0014) ----------
+    // An: in der Kompakt- und der schwebenden Form immer, in der großen Form nur mit dem Attribut stiel. stiel="off" blendet ihn aus.
+    stielAn() {
+      const at = this.getAttribute('stiel');
+      if (at === 'off') return false;
+      return this.compact || at !== null;
+    }
+    stielBauen() {
+      if (this.stielEl) { this.stielEl.remove(); this.stielEl = null; }
+      const parent = this.stielHalter;
+      // Erst die Orte der Leiste, dann weitere Orte des Ökosystems, die im Hub noch keine eigene Ansicht haben (kind 'ausblick')
+      const liste = ORTE.concat(WEITERE.filter(w => !ORTE.some(o => o.id === w.id)));
+      if (!parent || !this.stielAn() || !liste.length) return;
+      const N = Math.max(3, Math.min(this.compact ? 6 : 8, liste.length));
+      const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const mk = (tag, cls, p) => { const e = document.createElement(tag); if (cls) e.className = cls; if (p) p.appendChild(e); return e; };
+      const stiel = mk('div', 'stiel', parent);
+      stiel.style.setProperty('--u', this.stielEinheit + 'px');
+      stiel.style.setProperty('--n', N);
+      const mehr = liste.length > N;
+      if (mehr) stiel.style.setProperty('--pg', '30px');
+      mk('div', 'st-rail', stiel);
+      const sc = mk('nav', 'st-scroll', stiel);
+      sc.setAttribute('aria-label', 'Orte im ReliHub');
+      const track = mk('div', 'st-track', sc);
+      mk('div', 'st-greif', track).setAttribute('aria-hidden', 'true');
+      liste.forEach((o, i) => {
+        const row = mk('div', 'st-row ' + (i % 2 ? 'l' : 'r'), track);
+        const a = mk('a', 'st-blatt' + (o.kind === 'ausblick' ? ' st-fern' : ''), row);
+        a.textContent = o.label; a.title = o.kind === 'ausblick' ? o.label + ' (noch kein eigener Ort im Hub)' : o.label; a.href = o.href;
+        if (/^https:/.test(o.href)) { a.target = '_blank'; a.rel = 'noopener'; }
+        if (o.id === ORT_AKTUELL) a.setAttribute('aria-current', 'page');
+        a.addEventListener('click', e => {
+          if (e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;
+          // dasselbe Ereignis wie die Leiste: die Anwendung entscheidet, wohin der Ort führt
+          const ok = this.dispatchEvent(new CustomEvent('relihub-leiste-select', { detail: { id: o.id, href: o.href, kind: o.kind || 'instanz', quelle: 'stiel' }, bubbles: true, composed: true, cancelable: true }));
+          if (!ok) e.preventDefault();
+          this.closePop(0);
+        });
+        a.addEventListener('focus', () => { this.cancelClose(); this.openPop(); });
+        a.addEventListener('blur', () => this.closePop(300));
+      });
+      this.stielEl = stiel;
+      if (!mehr) return;
+      const pager = mk('div', 'st-pager', stiel);
+      const up = mk('button', '', pager), dn = mk('button', '', pager);
+      [[up, '▲', 'Orte weiter oben', -1], [dn, '▼', 'Weitere Orte', 1]].forEach(([b, ch, t, dir]) => {
+        b.type = 'button'; b.textContent = ch; b.title = t; b.setAttribute('aria-label', t);
+        b.addEventListener('click', () => sc.scrollBy({ top: dir * ST_ROW * 2, behavior: RM ? 'auto' : 'smooth' }));
+      });
+      const maxTop = () => sc.scrollHeight - sc.clientHeight;
+      const upd = () => {
+        const t = sc.scrollTop, m = maxTop();
+        sc.classList.toggle('cu', t > 2); sc.classList.toggle('cd', t < m - 2);
+        up.disabled = t <= 2; dn.disabled = t >= m - 2;
+      };
+      sc.addEventListener('scroll', upd, { passive: true });
+      // Der aktuelle Ort soll gleich sichtbar sein
+      const ci = liste.findIndex(o => o.id === ORT_AKTUELL);
+      requestAnimationFrame(() => { if (ci >= N) sc.scrollTop = Math.min(maxTop(), (ci - 1) * ST_ROW); upd(); });
     }
 
     pt(e) {
@@ -2276,7 +2393,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         this.text(pill, f.label, 0, 1, 21, f.ink, 'lbl');
       } else {
         el('circle', { class: 'act main', 'data-action': f.id, r: R, fill: f.color, 'fill-opacity': 0.96 }, pop);
-        this.text(pop, f.label, 0, 2, f.label.length > 12 ? 22 : f.label.length > 9 ? 26 : 30, f.text, 'lbl');
+        this.text(pop, f.offen || f.label, 0, 2, f.label.length > 12 ? 22 : f.label.length > 9 ? 26 : 30, f.text, 'lbl');   // „ich“ wird aufgeklappt zu „mein(e)“
       }
 
       requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -2289,7 +2406,8 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         f.subs.forEach((s, k) => {
           const a = ang + (n === 1 ? 0 : (k - (n - 1) / 2) * (2 * spread / (n - 1)));
           const dist = R + 26, bx = dist * Math.cos(a), by = dist * Math.sin(a);
-          const far = s.ding ? DING[s.ding] : f;   // Sicht von den Aktionsformen: die Knospe trägt die Farbe ihres Dings
+          // Die Knospe trägt die Farbe ihres Dings: in der Sicht von den Wegen immer, sonst wenn sie zu einem anderen Ding gehört als ihr Blatt (farbe)
+          const fb = s.farbe && FARBE[s.farbe], mk = c => ({ color: c[0], text: c[1], light: mix(c[0], '#FFFFFF', 0.22) }), far = s.ding ? (FARBE[s.ding] ? mk(FARBE[s.ding]) : DING[s.ding]) : fb ? mk(fb) : f;
           const eng = window.matchMedia && window.matchMedia('(max-width:640px)').matches;
           const bud = el('g', { class: 'bud act', 'data-action': s.id, style: `--hl:${far.light}` }, pop);
           bud.style.transform = 'translate(0px,0px) scale(.2)';
@@ -2304,7 +2422,8 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
           // Bei vier Knospen stehen zwei dicht nebeneinander: ihre Namen laufen voneinander weg statt mittig darunter
           const mittig = n > 3 ? 0.12 : 0.35;
           const anchor = Math.cos(a) > mittig ? 'start' : Math.cos(a) < -mittig ? 'end' : 'middle';
-          const t = this.text(bud, eng && s.kurz ? (s.ding ? DING[s.ding].label : s.kurz) : s.label, lx, ly + (Math.abs(Math.cos(a)) <= 0.35 ? Math.sign(Math.sin(a)) * 10 : 0), 25, f.ink, 'out');
+          const t = this.text(bud, s.ding ? (s.name || DING[s.ding].label) : eng && s.kurz ? s.kurz : s.label, lx,   // vom Tun her trägt die Knospe den Namen ihres Dings
+             ly + (Math.abs(Math.cos(a)) <= 0.35 ? Math.sign(Math.sin(a)) * 10 : 0), 25, f.ink, 'out');
           t.setAttribute('text-anchor', anchor);
           const worte = t.textContent.split(' ');
           const zeilen = worte.length === 2 ? worte : [t.textContent], wort = GRAU_WORT[s.stand];
@@ -2413,6 +2532,12 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     functions: FUNCS.map(f => ({ id: f.id, label: f.label, color: f.color, subs: (f.subs || []).map(s => ({ ...s })) })),
     grau: GRAU,
     grauWort: GRAU_WORT,
+    /** Orte am Stiel: items = [{ id, label, href, kind? }], dieselbe Form wie in der Leiste */
+    setOrte(items) { ORTE = (items || []).filter(o => o && o.id && o.href).map(o => ({ id: String(o.id), label: String(o.label || o.id), href: String(o.href), kind: o.kind })); document.querySelectorAll('relihub-steuerkonsole').forEach(n => n.stielBauen && n.stielBauen()); },
+    /** Weitere Orte des Ökosystems unterhalb der Orte der Leiste; kind 'ausblick' für Orte ohne eigene Ansicht */
+    setWeitereOrte(items) { WEITERE = (items || []).filter(o => o && o.id && o.href).map(o => ({ id: String(o.id), label: String(o.label || o.id), href: String(o.href), kind: o.kind })); document.querySelectorAll('relihub-steuerkonsole').forEach(n => n.stielBauen && n.stielBauen()); },
+    /** Markiert den Ort, an dem man gerade ist */
+    setOrt(id) { if (ORT_AKTUELL === (id || '')) return; ORT_AKTUELL = id || ''; document.querySelectorAll('relihub-steuerkonsole').forEach(n => n.stielBauen && n.stielBauen()); },
     formen: FORM_ORDER.map(id => ({ id, label: FORMEN[id].label, blatt: FORMEN[id].blatt, color: FORMEN[id].color })),
     registerContext(name, profile) {
       CONTEXTS[name] = profile || {};
@@ -2529,6 +2654,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 
   function setItems(items) {
     ITEMS = (items || []).slice();
+    // Der Stiel der Steuerkonsole zeigt dieselben Orte (ADR-0014); der Zuschnitt ist kein Ort, und „Start“ ist der Hub selbst: beide bleiben in der Leiste
+    if (window.RelihubSteuerkonsole && RelihubSteuerkonsole.setOrte) RelihubSteuerkonsole.setOrte(ITEMS.filter(o => o.kind !== 'zuschnitt' && o.id !== 'start'));
     document.querySelectorAll('relihub-leiste').forEach(n => { if (n.render) n.render(); });   // noch nicht aufgerüstete Elemente rendern beim Einhängen
   }
   window.RelihubLeiste = { version: '0.1.0', setItems };
@@ -2539,9 +2666,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 (() => {
   // Alle Bereichsfarben kommen aus :root (Issue fd31ec90): ein Theme-Wechsel ist ein Austausch der Variablen.
   const cssVar = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  const C = { ich:cssVar('--c-hub'), menschen:cssVar('--c-koop'), communities:cssVar('--c-ver'), material:cssVar('--c-finden'), termine:cssVar('--c-erstellen'), hub:cssVar('--c-hub'), finden:cssVar('--c-finden'), erstellen:cssVar('--c-erstellen'), kooperieren:cssVar('--c-koop'), koop:cssVar('--c-koop'), veroeffentlichen:cssVar('--c-ver') };
-  const T = { ich:cssVar('--relihub-text-ich'), menschen:cssVar('--relihub-text-menschen'), communities:cssVar('--relihub-text-communities'), material:cssVar('--relihub-text-material'), termine:cssVar('--relihub-text-termine') };
-  const X = { ich:cssVar('--x-hub'), menschen:cssVar('--x-koop'), communities:cssVar('--x-ver'), material:cssVar('--x-finden'), termine:cssVar('--x-erstellen'), hub:cssVar('--x-hub'), finden:cssVar('--x-finden'), erstellen:cssVar('--x-erstellen'), kooperieren:cssVar('--x-koop'), koop:cssVar('--x-koop'), veroeffentlichen:cssVar('--x-ver') };
+  const C = { ich:cssVar('--c-hub'), menschen:cssVar('--c-koop'), communities:cssVar('--c-ver'), material:cssVar('--c-finden'), termine:cssVar('--c-erstellen'), news:cssVar('--c-ver'), hub:cssVar('--c-hub'), finden:cssVar('--c-finden'), erstellen:cssVar('--c-erstellen'), kooperieren:cssVar('--c-koop'), koop:cssVar('--c-koop'), veroeffentlichen:cssVar('--c-ver') };
+  const T = { ich:cssVar('--relihub-text-ich'), menschen:cssVar('--relihub-text-menschen'), communities:cssVar('--relihub-text-communities'), material:cssVar('--relihub-text-material'), termine:cssVar('--relihub-text-termine'), news:cssVar('--relihub-text-news') };
+  const X = { ich:cssVar('--x-hub'), menschen:cssVar('--x-koop'), communities:cssVar('--x-ver'), material:cssVar('--x-finden'), termine:cssVar('--x-erstellen'), news:cssVar('--x-ver'), hub:cssVar('--x-hub'), finden:cssVar('--x-finden'), erstellen:cssVar('--x-erstellen'), kooperieren:cssVar('--x-koop'), koop:cssVar('--x-koop'), veroeffentlichen:cssVar('--x-ver') };
 
   // ---------- Datenschicht (ADR-0006): Live von den Relays, eingebetteter Schnappschuss als Startzustand und Rückfall ----------
   // Nur diese Relays, nie das Gruppen-Relay. Gebündelt: ein REQ je Relay und Ansicht, höchstens MAX_CONN Sockets zugleich.
@@ -3134,34 +3261,34 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   // ---------- Erläuterungen auf der Startseite ----------
   // Vier plus ich (ADR-0010). go: [Text, Ziel] mit Ziel '#route', '@editor' oder 'https://…'; mehr: weitere Knöpfe; grau: 'spaeter' | 'offen'
   const EX = {
-    'ich': { t:'Dein Ausgangspunkt', p:'Sag, was dich interessiert, und der Hub zeigt dir Menschen, Communities, Materialien und Termine dazu. Das geht ohne Anmeldung. Mit einem Profil nimmst du deine Themen überallhin mit.', subs:['ich.interessen','ich.profil','ich.start'] },
-    'ich.profil': { t:'Mein Profil', p:'Mit deinem Profil wird der ReliHub zu deinem persönlichen Ausgangspunkt: deine Communities, neue Materialien zu deinen Themen und passende Termine. Ein Schlüssel öffnet alle angeschlossenen Seiten.', go:['Mit Nostr-Schlüssel anmelden','#profil'] },
-    'ich.interessen': { t:'Meine Themen', p:'Trag ein paar Schlagworte ein, zum Beispiel #Frieden oder #Konfi. Die Vorschau auf dieser Seite richtet sich danach. Die Themen bleiben in diesem Browser.', go:['Themen eintragen','#start?zu=themen'] },
-    'ich.start': { t:'Überblick', p:'Alle vier auf einen Blick: Menschen, Communities, Materialien und Termine mit ihren Verbindungen.', go:['Zum Überblick','#oekosystem'] },
-    'menschen': { t:'Wer hier arbeitet', p:'Menschen, die Religion unterrichten, vermitteln und erforschen. Entdecke, wer zu deinen Themen arbeitet, und stell dich selbst vor.', subs:['menschen.finden','menschen.zeigen','menschen.zusammen','menschen.folgen'] },
-    'menschen.finden': { t:'Menschen entdecken', p:'Schau, wer zu deinen Themen arbeitet, was diese Menschen teilen und in welchen Communities sie sind. Das geht ohne Anmeldung.', go:['Nach Thema suchen','#kooperieren/personen'], mehr:[['Im Überblick ansehen','#oekosystem']] },
-    'menschen.zeigen': { t:'Mich vorstellen', p:'Mit einem Profil wirst du für andere sichtbar: mit deinen Themen, deinen Materialien und deinen Communities.', lock:true, go:['Profil anlegen','#profil'], mehr:[['Themen angeben','#start?zu=themen']] },
-    'menschen.zusammen': { t:'Zusammenarbeiten', p:'Mitstreitende für ein Vorhaben suchen und gemeinsam an etwas arbeiten ist gewollt und im Hub noch nicht gebaut.', grau:'offen', go:['Menschen ansehen','#kooperieren/personen'], mehr:[['Mitstreitende suchen','','offen'],['Gemeinsam arbeiten','','offen']] },
-    'menschen.folgen': { t:'Menschen folgen', p:'Folge Menschen, deren Arbeit dich interessiert. Dann siehst du, was sie teilen.', lock:true, go:['Folgen','#kooperieren/personen'], mehr:[['Anschreiben','','offen']] },
-    'communities': { t:'Gruppen von Menschen', p:'Communities sind Zusammenschlüsse von Menschen zu einem Thema oder für eine Zielgruppe. Entdecke eine, mach mit oder bau eine eigene auf.', subs:['communities.finden','communities.vorstellen','communities.aufbauen','communities.mitmachen'], mehr:[['Ins relilab, das Labor','#relilab']] },
-    'communities.finden': { t:'Communities entdecken', p:'Verschaffe dir einen Überblick über religionspädagogische Communities und lies, was dort gerade läuft. Das geht ohne Anmeldung.', go:['Zur Übersicht','#communities'], mehr:[['Was gerade läuft','#mitmachen']] },
-    'communities.vorstellen': { t:'Community vorstellen', p:'Eine Community anderen zeigen und weiterempfehlen ist gewollt und im Hub noch nicht gebaut.', grau:'offen', go:['Communities ansehen','#communities'], mehr:[['Weiterempfehlen','','offen']] },
-    'communities.aufbauen': { t:'Community aufbauen', p:'Richte für deine Community einen eigenen Zuschnitt des Hubs ein. Eine neue Community gründest du bis auf Weiteres bei edufeed.', lock:true, go:['Zuschnitt einrichten','#eigene-instanz'], mehr:[['Bei edufeed gründen','https://edufeed.org'],['Inhalte auswählen','','offen']] },
-    'communities.mitmachen': { t:'Mitmachen', p:'Tritt einer Community bei und rede mit. Was gerade besprochen und geteilt wird, steht im Raum Mitmachen.', lock:true, go:['Raum Mitmachen','#mitmachen'], mehr:[['Beitreten','#communities']] },
-    'material': { t:'Was geteilt wird', p:'Unterrichtsmaterial, Lernmodule und Beiträge. Für dich zählt, was du findest, nicht wo es liegt.', subs:['material.finden','material.teilen','material.schreibtisch','material.rueckmeldung'] },
-    'material.finden': { t:'Materialien suchen', p:'Suche und filtere aktuelles, redaktionell geprüftes Material zu deinen Themen und deiner Zielgruppe. Das geht ohne Anmeldung.', go:['Suchen und filtern','#materialpool'], mehr:[['Beiträge lesen','#profil?zu=artikel'],['Im Überblick ansehen','#oekosystem']] },
-    'material.teilen': { t:'Material teilen', p:'Mach dein Material sichtbar: Beschreibe es mit Zielgruppe, Thema und Lizenz, und es wird im ganzen Netzwerk gefunden. Beim Eintragen wählst du, in welche Communities du es teilst.', lock:true, go:['Material eintragen','@lerninhalt'], mehr:[['Beitrag schreiben','@beitrag']] },
-    'material.schreibtisch': { t:'Material weiterentwickeln', p:'Stell dir aus Materialien eine Sammlung zusammen und nimm sie mit. Ein Material auf den eigenen Schreibtisch holen und remixen ist für später gedacht.', go:['Sammlung zusammenstellen','#finden/sammlung'], mehr:[['Bearbeiten und remixen','#relidesk?tab=schreibtisch','spaeter']] },
-    'material.rueckmeldung': { t:'Rückmeldung geben', p:'Sag mit einem Klick, dass dir ein Material gefällt, oder schreib, was dir geholfen hat und was fehlt. So wird Material mit der Zeit besser.', lock:true, go:['Gefällt mir sagen','#oekosystem'], mehr:[['Kommentieren','#mitmachen'],['Autor:in folgen','#kooperieren/personen']] },
-    'termine': { t:'Wann man sich trifft', p:'Fortbildungen, Werkstätten und Treffen, online oder vor Ort, in einem gemeinsamen Kalender.', subs:['termine.finden','termine.eintragen','termine.vorbereiten','termine.teilnehmen'] },
-    'termine.finden': { t:'Termine finden', p:'Entdecke Fortbildungen religionspädagogischer Institute und Communities, deutschlandweit und meist online. Das geht ohne Anmeldung.', go:['Zum Kalender','#finden/fortbildungen'], mehr:[['Im Überblick ansehen','#oekosystem']] },
-    'termine.eintragen': { t:'Termin ankündigen', p:'Bewirb deine Fortbildung oder Veranstaltung: Einmal eingetragen, erscheint sie im gemeinsamen Kalender und auf allen angeschlossenen Seiten, zu denen sie passt.', lock:true, go:['Termin eintragen','@termin'] },
-    'termine.vorbereiten': { t:'Termin vorbereiten', p:'Einen Termin gemeinsam planen und Material anhängen ist gewollt und im Hub noch nicht gebaut.', grau:'offen', go:['Zum Kalender','#finden/fortbildungen'], mehr:[['Gemeinsam planen','','offen'],['Material anhängen','','offen']] },
-    'termine.teilnehmen': { t:'Teilnehmen', p:'Sag zu oder vielleicht. Andere sehen, wer kommt, und der Termin steht in deinem Profil.', lock:true, go:['Zusagen im Kalender','#finden/fortbildungen'], mehr:[['Nachfragen','#mitmachen']] },
-    'sehen': { t:'Ich möchte sehen', p:'Schauen, was es gibt, ohne etwas zu müssen. Hinter jedem Material und jedem Termin stehen Menschen und Communities. Alles hier geht ohne Anmeldung.', subs:['menschen.finden','communities.finden','material.finden','termine.finden'] },
-    'zeigen': { t:'Ich möchte zeigen', p:'Sichtbar machen, was du hast und wer du bist: dich selbst, dein Material, deinen Termin.', subs:['menschen.zeigen','communities.vorstellen','material.teilen','termine.eintragen'] },
-    'erarbeiten': { t:'Ich möchte erarbeiten', p:'Aus Vorhandenem etwas Neues machen, allein oder mit anderen. Hier wird Material besser.', subs:['menschen.zusammen','communities.aufbauen','material.schreibtisch','termine.vorbereiten'] },
-    'kontakt': { t:'Ich möchte in Kontakt treten', p:'Reagieren, mitreden, sich verbinden: vom schnellen „Gefällt mir“ bis zur Mitgliedschaft.', subs:['menschen.folgen','communities.mitmachen','material.rueckmeldung','termine.teilnehmen'] }
+    'ich': { t:'Was zu mir gehört', p:'Dein Profil, deine Materialien und Termine, die Personen, denen du folgst, und deine Communities. Mit einem Profil nimmst du das überallhin mit.', subs:['ich.profil','ich.materialien','ich.termine','ich.menschen','ich.communities'], mehr:[['Themen eintragen','#start?zu=themen']] },
+    'ich.profil': { t:'Mein Profil', p:'Mit deinem Profil wird der ReliHub zu deinem persönlichen Ausgangspunkt. Ein Schlüssel öffnet alle angeschlossenen Seiten. Hier stellst du dich vor und änderst deine Angaben.', go:['Mit Nostr-Schlüssel anmelden','#profil'] },
+    'ich.communities': { t:'Meine Communities', p:'Die Communities, in denen du Mitglied bist oder denen du folgst, mit dem, was dort gerade läuft.', lock:true, go:['Meine Communities','#profil?zu=comm'], mehr:[['Alle Communities','#communities']] },
+    'ich.menschen': { t:'Meine Personen', p:'Die Menschen, denen du folgst. Du siehst, was sie teilen und wo sie mitarbeiten.', lock:true, go:['Personen ansehen','#kooperieren/personen'], mehr:[['Liste im Profil','','offen']] },
+    'ich.materialien': { t:'Meine Materialien', p:'Was du gemerkt, gesammelt oder selbst geteilt hast.', lock:true, go:['Zum Profil','#profil'], mehr:[['Meine Sammlung','#finden/sammlung']] },
+    'ich.termine': { t:'Meine Termine', p:'Termine, zu denen du zugesagt hast, und Veranstaltungen, die zu deinen Themen passen.', lock:true, go:['Meine Termine','#profil?zu=events'] },
+    'menschen': { t:'Wer hier arbeitet', p:'Einzelne Menschen und ihre Zusammenschlüsse: Personen, die Religion unterrichten, vermitteln und erforschen, und Communities zu einem Thema oder für eine Zielgruppe.', subs:['menschen.personen','menschen.communities'] },
+    'menschen.personen': { t:'Personen', p:'Schau, wer zu deinen Themen arbeitet, was diese Menschen teilen und in welchen Communities sie sind. Das geht ohne Anmeldung. Folgen kannst du mit einem Profil direkt an der Person.', go:['Personen ansehen','#kooperieren/personen'], mehr:[['Im Überblick ansehen','#oekosystem']] },
+    'menschen.communities': { t:'Communities', p:'Verschaffe dir einen Überblick über religionspädagogische Communities und lies, was dort gerade läuft. Das geht ohne Anmeldung. Beitreten kannst du mit einem Profil direkt an der Community.', go:['Zur Übersicht','#communities'], mehr:[['Was gerade läuft','#mitmachen'],['Eigenen Zuschnitt einrichten','#eigene-instanz']] },
+    'material': { t:'Was geteilt wird', p:'Unterrichtsmaterial und Lernmodule. Für dich zählt, was du findest, nicht wo es liegt.', subs:['material.finden','material.teilen','material.erstellen','material.bearbeiten'] },
+    'material.finden': { t:'Materialien suchen', p:'Suche und filtere aktuelles, redaktionell geprüftes Material zu deinen Themen und deiner Zielgruppe. Das geht ohne Anmeldung.', go:['Suchen und filtern','#materialpool'], mehr:[['Im Überblick ansehen','#oekosystem']] },
+    'material.teilen': { t:'Material teilen', p:'Mach vorhandenes Material sichtbar: Beschreibe es mit Zielgruppe, Thema und Lizenz, und es wird im ganzen Netzwerk gefunden. Beim Eintragen wählst du, in welche Communities du es teilst.', lock:true, go:['Material eintragen','@lerninhalt'] },
+    'material.erstellen': { t:'Material erstellen', p:'Bau aus Bausteinen etwas Neues, zum Beispiel eine Unterrichtsplanung. Dafür gibt es den Schreibtisch im relidesk.', go:['Zum Schreibtisch','#relidesk?tab=schreibtisch'] },
+    'material.bearbeiten': { t:'Material bearbeiten', p:'Stell dir aus Materialien eine Sammlung zusammen und nimm sie mit. Ein fremdes Material übernehmen und verändern ist für später gedacht.', go:['Sammlung zusammenstellen','#finden/sammlung'], mehr:[['Übernehmen und verändern','#relidesk?tab=schreibtisch','spaeter']] },
+    'termine': { t:'Wann man sich trifft', p:'Fortbildungen, Werkstätten und Treffen, online oder vor Ort, in einem gemeinsamen Kalender.', subs:['termine.finden','termine.teilen','termine.erstellen','termine.bearbeiten'] },
+    'termine.finden': { t:'Termine finden', p:'Entdecke Fortbildungen religionspädagogischer Institute und Communities, deutschlandweit und meist online. Das geht ohne Anmeldung. Zusagen kannst du mit einem Profil direkt am Termin.', go:['Zum Kalender','#finden/fortbildungen'], mehr:[['Im Überblick ansehen','#oekosystem']] },
+    'termine.teilen': { t:'Termin teilen', p:'Gib einen Termin weiter: als Link, als Kalenderdatei oder in eine deiner Communities. Die Knöpfe dafür stehen an jedem Termin im Kalender.', go:['Zum Kalender','#finden/fortbildungen'], mehr:[['In eine Community teilen','','offen']] },
+    'termine.erstellen': { t:'Termin erstellen', p:'Trag deine Fortbildung oder Veranstaltung ein. Einmal eingetragen, erscheint sie im gemeinsamen Kalender und auf allen angeschlossenen Seiten, zu denen sie passt.', lock:true, go:['Termin eintragen','@termin'] },
+    'termine.bearbeiten': { t:'Termin bearbeiten', p:'Deine eigenen Termine änderst du selbst: Zeit, Ort, Beschreibung. Der Hub führt dich zu deinen Terminen. Das Ändern selbst geschieht bis auf Weiteres bei edufeed.', lock:true, go:['Meine Termine','#profil?zu=events'], mehr:[['Bei edufeed ändern','https://edufeed.org'],['Im Hub ändern','','offen']] },
+    'news': { t:'Was geschrieben wird', p:'Artikel und Neuigkeiten aus den Communities und Instituten.', subs:['news.finden','news.teilen','news.veroeffentlichen','news.bearbeiten'] },
+    'news.finden': { t:'Artikel finden', p:'Lies, was in den Communities gerade geschrieben und besprochen wird. Das geht ohne Anmeldung.', go:['Artikel lesen','#mitmachen'], mehr:[['Aus meinen Communities','#profil?zu=artikel']] },
+    'news.teilen': { t:'Artikel teilen', p:'Gib einen Artikel in eine deiner Communities weiter. Das geht im Raum der Community.', lock:true, go:['Zu den Communities','#communities'], mehr:[['Direkt am Artikel teilen','','offen']] },
+    'news.veroeffentlichen': { t:'Artikel schreiben', p:'Schreib einen Artikel. Beim Veröffentlichen wählst du, in welchen Communities er erscheint.', lock:true, go:['Artikel schreiben','@beitrag'] },
+    'news.bearbeiten': { t:'Artikel bearbeiten', p:'Deine eigenen Artikel änderst du selbst. Der Hub führt dich zu den Artikeln aus deinen Communities. Das Ändern selbst geschieht bis auf Weiteres bei edufeed.', lock:true, go:['Meine Artikel','#profil?zu=artikel'], mehr:[['Bei edufeed ändern','https://edufeed.org'],['Im Hub ändern','','offen']] },
+    'suchen': { t:'Ich möchte finden', p:'Schauen, was es gibt: Personen, Communities, Materialien, Termine und Artikel. Alles hier geht ohne Anmeldung.', subs:['menschen.personen','menschen.communities','material.finden','termine.finden','news.finden'] },
+    'teilen': { t:'Ich möchte teilen', p:'Vorhandenes sichtbar machen oder weitergeben: ein Material, einen Termin, einen Artikel.', subs:['material.teilen','termine.teilen','news.teilen'] },
+    'anlegen': { t:'Ich möchte erstellen', p:'Etwas Neues in die Welt bringen: ein Material, einen Termin, einen Artikel.', subs:['material.erstellen','termine.erstellen','news.veroeffentlichen'] },
+    'bearbeiten': { t:'Ich möchte bearbeiten', p:'An Eigenem und Vorhandenem weiterarbeiten: Materialien sammeln und anpassen, eigene Termine und Artikel ändern, das eigene Profil pflegen.', subs:['material.bearbeiten','termine.bearbeiten','news.bearbeiten','ich.profil'] }
   };
   const EX_NAME = {}, FORM_VON = {};   // Beschriftungen aus der Konsole: Element und Knospe; Aktionsform je Knospe
   RelihubSteuerkonsole.functions.forEach(f => { EX_NAME[f.id] = f.label; f.subs.forEach(u => { EX_NAME[u.id] = u.label; if (u.form) FORM_VON[u.id] = u.form; }); });
@@ -3207,8 +3334,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     exEl.style.borderColor = '';
     const direkt = MODUS === 'direkt';
     const kopf = direkt ? `<h2>Die Konsole führt dich direkt zur Aktion</h2><p>Ein Klick auf eine Knospe öffnet sofort, was dahintersteht. Unter „Hilfe“ zeigt dir die Konsole die Erklärungen wieder. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`
-      : SICHT === 'formen' ? `<h2>Ich möchte …</h2><p>Sehen, zeigen, erarbeiten, in Kontakt treten: Fahre über einen Kreis, und du siehst, womit das geht. Oben stehst du. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`
-      : `<h2>Vier Dinge und du</h2><p>Menschen, Communities, Materialien und Termine: Fahre über einen Kreis, und du siehst gleich, was es dazu gibt. Oben stehst du. Sag dort, was dich interessiert. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`;
+      : SICHT === 'formen' ? `<h2>Ich möchte …</h2><p>Finden, teilen, erstellen, bearbeiten: Fahre über einen Kreis, und du siehst, womit das geht. Oben stehst du. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`
+      : `<h2>Vier Dinge und du</h2><p>Menschen, Materialien, Termine und Artikel: Fahre über einen Kreis, und du siehst gleich, was es dazu gibt. Oben stehst du. Sag dort, was dich interessiert. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`;
     const umschalter = direkt ? `<button type="button" class="btn btn-ghost modus" data-modus="tutorial">Konsole wieder erklären lassen</button>` : `<button type="button" class="btn btn-ghost modus" data-modus="direkt">Verstanden, direkt loslegen</button>`;
     exEl.innerHTML = `${icon('none')}<div><p class="fn" style="color:var(--muted)">So funktioniert's</p>${kopf}<div class="acts"><span class="hint">Schon dabei?</span><a class="btn btn-ghost" href="#profil" data-anmelden>Anmelden</a>${umschalter}</div></div>`;
   }
@@ -5228,6 +5355,10 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   function rlShow(qs) {
     const p = new URLSearchParams(qs || ''), room = p.get('room'), sec = room ? 'room' : ['communities', 'termine', 'mitmachen'].includes(p.get('tab')) ? p.get('tab') : 'home';
     document.querySelectorAll('#v-relilab [data-rlsec]').forEach(n => n.classList.toggle('on', n.dataset.rlsec === sec));
+    // Hinweiszeile (ADR-0014): sagt in einem Satz, dass dieser Bereich aus dem gemeinsamen Datenraum kommt und auf relilab gefiltert ist
+    const fh = document.getElementById('rlFilterHinweis'), was = sec === 'communities' ? 'Communities' : sec === 'termine' ? 'Termine' : sec === 'home' && p.get('zu') === 'menschen' ? 'Menschen' : '';
+    fh.hidden = !was;
+    if (was) fh.innerHTML = `<span>Über die <b>Steuerkonsole des ReliHub</b> (${was}): Hier im relilab siehst du nur die ${was}, die zu relilab gehören. Sie kommen aus demselben Datenraum wie im ReliHub, gefiltert auf <b>relilab</b>.</span>`;
     if (sec === 'room') crOpen(room, p.get('rtab'), 'rlCrRoot'); else if (sec === 'communities') rlCommRender();
     else if (sec === 'termine') rtOpen(p);
     else if (sec === 'mitmachen') { pkRender(document.getElementById('rlPkRoot'), 'relilab'); pkAnstossen(); }
@@ -5703,7 +5834,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 
   // ---------- Kontexte der Steuerkonsole: dieselbe Steuerkonsole, je nach Seite andere Aktionen ----------
   let LOGGED = false;   // abgeleitet aus ICH.hex (ichSetzen im Block „Anmeldung“)
-  const VIEW_OF = { 'material.finden': 'materialpool', 'material.rueckmeldung': 'oekosystem', 'termine.teilnehmen': 'finden/fortbildungen', 'menschen.folgen': 'kooperieren/personen', 'communities.aufbauen': 'eigene-instanz', 'ich.profil': 'profil', 'ich.start': 'start', 'material.schreibtisch': 'finden/sammlung', 'termine.finden': 'finden/fortbildungen', 'menschen.finden': 'kooperieren/personen' };
+  const VIEW_OF = { 'material.finden': 'materialpool', 'ich.profil': 'profil', 'ich.communities': 'profil?zu=comm', 'ich.termine': 'profil?zu=events', 'ich.materialien': 'profil', 'ich.menschen': 'kooperieren/personen', 'material.bearbeiten': 'finden/sammlung', 'material.erstellen': 'relidesk?tab=schreibtisch', 'termine.finden': 'finden/fortbildungen', 'termine.teilen': 'finden/fortbildungen', 'menschen.personen': 'kooperieren/personen', 'news.finden': 'mitmachen', 'news.teilen': 'communities', 'termine.bearbeiten': 'profil?zu=events', 'news.bearbeiten': 'profil?zu=artikel' };
   function navTo(view, url) { const q = new URL(url).search; go(view + (q ? (view.includes('?') ? '&' + q.slice(1) : q) : '')); }
   function info(d) {
     if (!['menschen', 'communities', 'material', 'termine', 'sehen', 'zeigen', 'erarbeiten', 'kontakt'].includes(d.action)) return false;
@@ -5715,13 +5846,12 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 
   // Gemeinsame Kette aller Kontexte: Knospe → Aktion (Editor, Ansicht), sonst Hinweis oder „führt später hierhin“
   function standardAktion(d, ctx) {
-    if (d.action === 'communities.finden') { go(HUB_C ? 'community' : 'communities'); return false; }   // mit Zuschnitt in den Raum der Community (ohne c gilt HUB_C)
-    if (d.action === 'termine.eintragen') { openEvent(ctx); return false; }
+    if (d.action === 'menschen.communities') { go(HUB_C ? 'community' : 'communities'); return false; }   // mit Zuschnitt in den Raum der Community (ohne c gilt HUB_C)
+    if (d.action === 'termine.erstellen') { openEvent(ctx); return false; }
+    if (d.action === 'news.veroeffentlichen') { openBlog(ctx); return false; }
     if (d.action === 'material.teilen') { go('materialpool'); openChooser('materialpool'); return false; }
     if (d.action === 'ich') { go(LOGGED ? 'profil' : 'start'); return false; }
-    if (d.action === 'ich.interessen') { go('start?zu=themen'); return false; }
-    if (d.action === 'menschen.zeigen') { if (LOGGED) go('profil'); else anmelden(); return false; }
-    if (d.action === 'communities.mitmachen') { go('mitmachen'); return false; }
+    if (d.action.startsWith('ich.') && d.action !== 'ich.profil' && !LOGGED) { anmelden(); return false; }
     if (d.stand === 'offen') { toast(`<b>${EX[d.action] ? EX[d.action].t : d.label}</b> ${GRAU_TEXT.offen}.`); return false; }
     if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); if (d.stand) toast(`<b>${d.label}</b> ${GRAU_TEXT[d.stand]}. Das hier ist ein Ausblick.`); return false; }
     if (info(d)) return false;
@@ -5780,7 +5910,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   });
   RelihubSteuerkonsole.registerContext('personen', {
     handler: d => {
-      if (d.action === 'menschen.finden') { window.scrollTo({ top: 0, behavior: 'smooth' }); toast('Du bist bereits bei den Personen.'); return false; }
+      if (d.action === 'menschen.personen') { window.scrollTo({ top: 0, behavior: 'smooth' }); toast('Du bist bereits bei den Personen.'); return false; }
       return standardAktion(d, 'Personen');
     }
   });
@@ -5797,9 +5927,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   });
   RelihubSteuerkonsole.registerContext('oer-community', {
     handler: d => {
-      if (d.action === 'ich.start') { go('start'); return false; }
       if (d.action === 'material.finden') { go('materialpool?thema=OER'); return false; }
-      if (d.action === 'communities.finden') { go('community?c=oercommunity'); return false; }
+      if (d.action === 'menschen.communities') { go('community?c=oercommunity'); return false; }
       return standardAktion(d, 'OER-Community');
     }
   });
@@ -5807,8 +5936,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     mitte: { label: 'relilab', kurz: 'rl', color: '#6D3BE0' },   // erstes Beispiel für „Mitte plus vier“ (ADR-0013)
     actions: { 'material.finden': { params: { thema: 'Digitalität' } } },
     handler: d => {
-      if (d.action === 'communities.finden') { go('relilab?tab=communities'); return false; }
-      if (d.action === 'menschen.finden') { go('relilab?zu=menschen'); return false; }
+      if (d.action === 'menschen.communities') { go('relilab?tab=communities'); return false; }
+      if (d.action === 'menschen.personen') { go('relilab?zu=menschen'); return false; }
       if (d.action === 'termine.finden') { go('relilab?tab=termine&von=konsole'); return false; }
       return standardAktion(d, 'relilab');
     }
@@ -5817,14 +5946,14 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   RelihubSteuerkonsole.registerContext('relidesk', {
     actions: { 'material.finden': { params: { thema: 'Schöpfung', stufe: 'sek1' } } },
     handler: d => {
-      if (d.action === 'material.schreibtisch') { go('relidesk?tab=schreibtisch'); toast('Du bist auf deinem Schreibtisch im relidesk.'); return false; }
+      if (d.action === 'material.bearbeiten') { go('relidesk?tab=schreibtisch'); toast('Du bist auf deinem Schreibtisch im relidesk.'); return false; }
       return standardAktion(d, 'relidesk');
     }
   });
 
   RelihubSteuerkonsole.registerContext('hub-communities', {
     handler: d => {
-      if (d.action === 'communities.finden') { window.scrollTo({ top: 0, behavior: 'smooth' }); toast('Du bist bereits bei den Communities.'); return false; }
+      if (d.action === 'menschen.communities') { window.scrollTo({ top: 0, behavior: 'smooth' }); toast('Du bist bereits bei den Communities.'); return false; }
       return standardAktion(d, 'hub');
     }
   });
@@ -5862,7 +5991,18 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   }
   const leisteEl = document.getElementById('leiste');
   let leisteKey = null;   // Ansicht + Anmeldung: ändert sich eins davon, setzt route() die Einträge neu
-  document.addEventListener('relihub-leiste-select', e => { e.preventDefault(); go(e.detail.href.slice(1)); });
+  document.addEventListener('relihub-leiste-select', e => {
+    const d = e.detail;
+    if (/^https:/.test(d.href)) return;   // fremde Seite: der Link öffnet sich selbst in einem neuen Fenster
+    e.preventDefault();
+    if (d.kind === 'ausblick') {   // Ort des Ökosystems ohne eigene Ansicht: zur Kachel auf der Startseite
+      go('start'); setTimeout(() => { const g = document.getElementById('pgrid'); if (g) g.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 80);
+      toast('Dieser Ort hat im ReliHub noch keine eigene Ansicht. Hier steht, was er ist.'); return;
+    }
+    go(d.href.slice(1));
+  });
+  // Stiel (ADR-0014): unter den Orten der Leiste hängen die übrigen Orte des Ökosystems aus der Partnerliste
+  RelihubSteuerkonsole.setWeitereOrte(PARTNERS.filter(p => !p[4] || /^https:/.test(p[4])).map(p => ({ id: 'p-' + p[3].toLowerCase(), label: p[0], href: p[4] || '#start', kind: p[4] ? 'instanz' : 'ausblick' })));
   // Panel „Leiste anpassen“: ein Kästchen je Instanz; Änderungen gelten sofort und bleiben im Speicher
   const leisteCfg = document.getElementById('leisteCfg');
   function leisteCfgRender() {
@@ -5921,7 +6061,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const p = bzProfil(HUB_C), k = CO_SCHLUESSEL.find(x => x.hex === HUB_C), c = CY.find(x => x.id === CY_HEX.get(HUB_C)) || (cyDaten && cyDaten.liste.find(x => x.hex === HUB_C));
     return p ? p.name : k ? esc(k.n) : c ? esc(c.n) : zuschnittNpub(HUB_C).slice(0, 12) + '…';
   }
-  const ZUSCHNITT_AKTIONEN = ['material.finden', 'termine.finden', 'communities.finden'];
+  const ZUSCHNITT_AKTIONEN = ['material.finden', 'termine.finden', 'menschen.communities'];
   /** Jeder Kontext der Steuerkonsole trägt den Zuschnitt als Parameter c an die Ziele dieser drei Aktionen (ohne Zuschnitt entfällt er) */
   function zuschnittKonsolen() {
     Object.keys(RelihubSteuerkonsole.contexts).forEach(name => {
@@ -6374,6 +6514,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     document.title = { start: 'ReliHub', profil: 'ReliHub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'Fortbildungen', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'ReliHub · Communities', oekosystem: 'ReliHub · Ökosystem', mitmachen: 'ReliHub · Mitmachen', 'eigene-instanz': 'ReliHub · Eigene Instanz', community: 'ReliHub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des ReliHub' }[v];
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || '', pp.get('zu') === 'katalog' ? 'katalog' : pp.get('tab')); }
     leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v === 'fortbildungen' ? 'rpi-virtuell' : v === 'eigene-instanz' ? 'zuschnitt' : v);
+    RelihubSteuerkonsole.setOrt(leisteEl.getAttribute('current'));   // der Stiel markiert denselben Ort wie die Leiste
     if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); cyOpen(); }
     if (v === 'oekosystem') ozOpen(qs);
     if (v === 'mitmachen') pkOpen(qs);
