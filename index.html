@@ -1253,6 +1253,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
       <p class="st-chips" id="stThemenChips" aria-live="polite"></p>
     </form>
     <div class="flower-wrap"><relihub-steuerkonsole id="startFlower" size="320" context="hub-start" variant="knospen" stiel></relihub-steuerkonsole></div>
+    <div class="st-sicht" id="stSicht" role="group" aria-label="Ordnung der Konsole"><span>Ich denke von</span><button type="button" data-sicht="dinge" aria-pressed="true">den Dingen her</button><button type="button" data-sicht="formen" aria-pressed="false">dem Tun her</button></div>
     <div class="explain" id="explain" aria-live="polite"></div>
   </section>
 
@@ -1930,38 +1931,42 @@ a.kat-card:hover{border-color:var(--c-koop)}
   // stand: 'spaeter' (dunkelgrau, später gedacht) oder 'offen' (hellgrau, gewollt und noch nicht gebaut).
   const GRAU = { spaeter: { fill: '#5F6672', text: '#FFFFFF' }, offen: { fill: '#C9CED6', text: '#2B2F36' } };
   const GRAU_WORT = { spaeter: 'später', offen: 'bald' };   // sichtbar an Knospe und Knopf: die Graustufe allein erklärt sich nicht
+  // Die vier Wege (ADR-0015): finden, teilen, erstellen, bearbeiten. Kennungen weichen bei zweien vom Wort ab, weil „finden“ und „erstellen“ schon Farbnamen der Anwendung sind.
   const FORMEN = {
-    sehen: { label: 'sehen', blatt: 'sehen', color: '#3558A8', d: 'M-12 0 Q0 -11 12 0 Q0 11 -12 0 Z M-3 0 A3 3 0 1 0 3 0 A3 3 0 1 0 -3 0' },
-    zeigen: { label: 'zeigen', blatt: 'zeigen', color: '#2F74B5', d: 'M0 7 V-10 M-7 -3 L0 -10 L7 -3 M-10 11 H10' },
-    erarbeiten: { label: 'erarbeiten', blatt: 'erarbeiten', color: '#4B57A6', d: 'M-10 10 L-7 2 L4 -9 L9 -4 L-2 7 Z' },
-    kontakt: { label: 'in Kontakt treten', blatt: 'Kontakt', color: '#27628F', d: 'M-11 -9 H11 V5 H-1 L-7 11 V5 H-11 Z' }
+    suchen: { label: 'finden', blatt: 'finden', color: '#3558A8', d: 'M-12 0 Q0 -11 12 0 Q0 11 -12 0 Z M-3 0 A3 3 0 1 0 3 0 A3 3 0 1 0 -3 0' },
+    teilen: { label: 'teilen', blatt: 'teilen', color: '#2F74B5', d: 'M0 7 V-10 M-7 -3 L0 -10 L7 -3 M-10 11 H10' },
+    anlegen: { label: 'erstellen', blatt: 'erstellen', color: '#4B57A6', d: 'M0 -10 V10 M-10 0 H10' },
+    bearbeiten: { label: 'bearbeiten', blatt: 'bearbeiten', color: '#27628F', d: 'M-10 10 L-7 2 L4 -9 L9 -4 L-2 7 Z' }
   };
-  const FORM_ORDER = ['sehen', 'zeigen', 'erarbeiten', 'kontakt'];
+  const FORM_ORDER = ['suchen', 'teilen', 'anlegen', 'bearbeiten'];
+  // Farbe einer Knospe, wenn sie zu einem anderen Ding gehört als ihr Blatt: „meine Materialien“ am Blatt „ich“ trägt die Farbe der Materialien
+  const FARBE = { ich: ['#203A8F', '#FFFFFF'], menschen: ['#D6336C', '#FFFFFF'], communities: ['#7B4FB8', '#FFFFFF'], material: ['#007A75', '#FFFFFF'], termine: ['#FFA500', '#2B1A00'], news: ['#7B4FB8', '#FFFFFF'] };
   // Belegung nach ADR-0015: ich, Menschen, Materialien, Termine, Beiträge. Die Knospen sind die Wege zu dem, was im Datenraum liegt:
   // finden, teilen, erstellen, bearbeiten. label: Verb plus Ding; kurz: nur das Verb, für enge Schirme.
   const FUNCS = [
     { id: 'ich', label: 'ich', color: '#203A8F', text: '#FFFFFF', self: true,
-      subs: [{ id: 'ich.profil', label: 'mein Profil', kurz: 'Profil' }, { id: 'ich.communities', label: 'meine Communities', kurz: 'Communities' }, { id: 'ich.menschen', label: 'wem ich folge', kurz: 'ich folge' }, { id: 'ich.materialien', label: 'meine Materialien', kurz: 'Materialien' }, { id: 'ich.termine', label: 'meine Termine', kurz: 'Termine' }] },
+      subs: [{ id: 'ich.profil', label: 'mein Profil', kurz: 'Profil' }, { id: 'ich.communities', label: 'meine Communities', kurz: 'Communities', farbe: 'communities' }, { id: 'ich.menschen', label: 'wem ich folge', kurz: 'ich folge', farbe: 'menschen' }, { id: 'ich.materialien', label: 'meine Materialien', kurz: 'Materialien', farbe: 'material' }, { id: 'ich.termine', label: 'meine Termine', kurz: 'Termine', farbe: 'termine' }] },
     { id: 'menschen', label: 'Menschen', color: '#D6336C', text: '#FFFFFF',
-      subs: [{ id: 'menschen.personen', label: 'Personen', kurz: 'Personen' }, { id: 'menschen.communities', label: 'Communities', kurz: 'Communities' }] },
+      subs: [{ id: 'menschen.personen', label: 'Personen', kurz: 'Personen', form: 'suchen' }, { id: 'menschen.communities', label: 'Communities', kurz: 'Communities', form: 'suchen', farbe: 'communities' }] },
     { id: 'material', label: 'Materialien', color: '#007A75', text: '#FFFFFF',
-      subs: [{ id: 'material.finden', label: 'Materialien suchen', kurz: 'suchen' }, { id: 'material.teilen', label: 'Material teilen', kurz: 'teilen' }, { id: 'material.erstellen', label: 'Material erstellen', kurz: 'erstellen' }, { id: 'material.bearbeiten', label: 'Material bearbeiten', kurz: 'bearbeiten' }] },
+      subs: [{ id: 'material.finden', label: 'Materialien suchen', kurz: 'suchen', form: 'suchen' }, { id: 'material.teilen', label: 'Material teilen', kurz: 'teilen', form: 'teilen' }, { id: 'material.erstellen', label: 'Material erstellen', kurz: 'erstellen', form: 'anlegen' }, { id: 'material.bearbeiten', label: 'Material bearbeiten', kurz: 'bearbeiten', form: 'bearbeiten' }] },
     { id: 'termine', label: 'Termine', color: '#FFA500', text: '#2B1A00',
-      subs: [{ id: 'termine.finden', label: 'Termine finden', kurz: 'finden' }, { id: 'termine.teilen', label: 'Termin teilen', kurz: 'teilen' }, { id: 'termine.erstellen', label: 'Termin erstellen', kurz: 'erstellen' }, { id: 'termine.bearbeiten', label: 'Termin bearbeiten', kurz: 'bearbeiten', stand: 'offen' }] },
+      subs: [{ id: 'termine.finden', label: 'Termine finden', kurz: 'finden', form: 'suchen' }, { id: 'termine.teilen', label: 'Termin teilen', kurz: 'teilen', form: 'teilen' }, { id: 'termine.erstellen', label: 'Termin erstellen', kurz: 'erstellen', form: 'anlegen' }, { id: 'termine.bearbeiten', label: 'Termin bearbeiten', kurz: 'bearbeiten', form: 'bearbeiten', stand: 'offen' }] },
     { id: 'news', label: 'Beiträge', color: '#7B4FB8', text: '#FFFFFF',
-      subs: [{ id: 'news.finden', label: 'Beiträge finden', kurz: 'finden' }, { id: 'news.teilen', label: 'Beitrag teilen', kurz: 'teilen' }, { id: 'news.veroeffentlichen', label: 'Beitrag veröffentlichen', kurz: 'schreiben' }] }
+      subs: [{ id: 'news.finden', label: 'Beiträge finden', kurz: 'finden', form: 'suchen' }, { id: 'news.teilen', label: 'Beitrag teilen', kurz: 'teilen', form: 'teilen' }, { id: 'news.veroeffentlichen', label: 'Beitrag veröffentlichen', kurz: 'schreiben', form: 'anlegen' }] }
   ];
-  // Die zweite Sicht von den Aktionsformen her (ADR-0011) ruht seit ADR-0015: Die Knospen tragen keine Aktionsform mehr.
-  const FUNCS_F = FUNCS;
+  // Zweite Sicht auf dieselbe Belegung: Blätter sind die vier Wege, Knospen die Dinge, die es dazu gibt. Kennungen und Ziele bleiben gleich.
+  const FUNCS_F = [FUNCS[0]].concat(FORM_ORDER.map(k => ({ id: k, label: FORMEN[k].blatt, color: FORMEN[k].color, text: '#FFFFFF', form: k,
+    subs: FUNCS.slice(1).flatMap(f => f.subs.filter(u => u.form === k).map(u => Object.assign({ ding: f.id }, u))) })));
   const DING = {}; FUNCS.forEach(f => { DING[f.id] = f; });
-  [FUNCS].forEach(liste => liste.forEach((f, i) => {
+  [FUNCS, FUNCS_F].forEach(liste => liste.forEach((f, i) => {
     const a = (-90 + 72 * i) * Math.PI / 180;
     f.ux = Math.cos(a); f.uy = Math.sin(a);
     f.cx = D * f.ux; f.cy = D * f.uy;
     f.light = mix(f.color, '#FFFFFF', 0.22);
     f.ink = mix(f.color, '#000000', 0.4);
   }));
-  const ALLE = FUNCS;
+  const ALLE = FUNCS.concat(FUNCS_F.slice(1));
 
   const ROUTES = {
     'ich': '/',
@@ -1982,7 +1987,8 @@ a.kat-card:hover{border-color:var(--c-koop)}
     'termine.bearbeiten': '/termine/bearbeiten',
     'news.finden': '/beitraege',
     'news.teilen': '/beitraege/teilen',
-    'news.veroeffentlichen': '/beitraege/neu'
+    'news.veroeffentlichen': '/beitraege/neu',
+    'suchen': '/finden', 'teilen': '/teilen', 'anlegen': '/erstellen', 'bearbeiten': '/bearbeiten'
   };
 
   const LABELS = {}, STAND = {}, FORM = {};
@@ -2395,7 +2401,8 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         f.subs.forEach((s, k) => {
           const a = ang + (n === 1 ? 0 : (k - (n - 1) / 2) * (2 * spread / (n - 1)));
           const dist = R + 26, bx = dist * Math.cos(a), by = dist * Math.sin(a);
-          const far = s.ding ? DING[s.ding] : f;   // Sicht von den Aktionsformen: die Knospe trägt die Farbe ihres Dings
+          // Die Knospe trägt die Farbe ihres Dings: in der Sicht von den Wegen immer, sonst wenn sie zu einem anderen Ding gehört als ihr Blatt (farbe)
+          const fb = s.farbe && FARBE[s.farbe], far = fb ? { color: fb[0], text: fb[1], light: mix(fb[0], '#FFFFFF', 0.22) } : s.ding ? DING[s.ding] : f;
           const eng = window.matchMedia && window.matchMedia('(max-width:640px)').matches;
           const bud = el('g', { class: 'bud act', 'data-action': s.id, style: `--hl:${far.light}` }, pop);
           bud.style.transform = 'translate(0px,0px) scale(.2)';
@@ -2525,7 +2532,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
     setWeitereOrte(items) { WEITERE = (items || []).filter(o => o && o.id && o.href).map(o => ({ id: String(o.id), label: String(o.label || o.id), href: String(o.href), kind: o.kind })); document.querySelectorAll('relihub-steuerkonsole').forEach(n => n.stielBauen && n.stielBauen()); },
     /** Markiert den Ort, an dem man gerade ist */
     setOrt(id) { if (ORT_AKTUELL === (id || '')) return; ORT_AKTUELL = id || ''; document.querySelectorAll('relihub-steuerkonsole').forEach(n => n.stielBauen && n.stielBauen()); },
-    formen: [],   // ruht seit ADR-0015
+    formen: FORM_ORDER.map(id => ({ id, label: FORMEN[id].label, blatt: FORMEN[id].blatt, color: FORMEN[id].color })),
     registerContext(name, profile) {
       CONTEXTS[name] = profile || {};
       document.querySelectorAll('relihub-steuerkonsole').forEach(n => { if (n.getAttribute('context') === name) n.render(); });
@@ -2641,8 +2648,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 
   function setItems(items) {
     ITEMS = (items || []).slice();
-    // Der Stiel der Steuerkonsole zeigt dieselben Orte (ADR-0014); der Zuschnitt ist kein Ort und bleibt in der Leiste
-    if (window.RelihubSteuerkonsole && RelihubSteuerkonsole.setOrte) RelihubSteuerkonsole.setOrte(ITEMS.filter(o => o.kind !== 'zuschnitt'));
+    // Der Stiel der Steuerkonsole zeigt dieselben Orte (ADR-0014); der Zuschnitt ist kein Ort, und „Start“ ist der Hub selbst: beide bleiben in der Leiste
+    if (window.RelihubSteuerkonsole && RelihubSteuerkonsole.setOrte) RelihubSteuerkonsole.setOrte(ITEMS.filter(o => o.kind !== 'zuschnitt' && o.id !== 'start'));
     document.querySelectorAll('relihub-leiste').forEach(n => { if (n.render) n.render(); });   // noch nicht aufgerüstete Elemente rendern beim Einhängen
   }
   window.RelihubLeiste = { version: '0.1.0', setItems };
@@ -3270,7 +3277,11 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     'news': { t:'Was es Neues gibt', p:'Beiträge, Artikel und Neuigkeiten aus den Communities und Instituten.', subs:['news.finden','news.teilen','news.veroeffentlichen'] },
     'news.finden': { t:'Beiträge finden', p:'Lies, was in den Communities gerade geschrieben und besprochen wird. Das geht ohne Anmeldung.', go:['Beiträge lesen','#mitmachen'], mehr:[['Aus meinen Communities','#profil?zu=artikel']] },
     'news.teilen': { t:'Beitrag teilen', p:'Gib einen Beitrag in eine deiner Communities weiter. Das geht im Raum der Community.', lock:true, go:['Zu den Communities','#communities'], mehr:[['Direkt am Beitrag teilen','','offen']] },
-    'news.veroeffentlichen': { t:'Beitrag veröffentlichen', p:'Schreib einen Beitrag. Beim Veröffentlichen wählst du, in welchen Communities er erscheint.', lock:true, go:['Beitrag schreiben','@beitrag'] }
+    'news.veroeffentlichen': { t:'Beitrag veröffentlichen', p:'Schreib einen Beitrag. Beim Veröffentlichen wählst du, in welchen Communities er erscheint.', lock:true, go:['Beitrag schreiben','@beitrag'] },
+    'suchen': { t:'Ich möchte finden', p:'Schauen, was es gibt: Personen, Communities, Materialien, Termine und Beiträge. Alles hier geht ohne Anmeldung.', subs:['menschen.personen','menschen.communities','material.finden','termine.finden','news.finden'] },
+    'teilen': { t:'Ich möchte teilen', p:'Vorhandenes sichtbar machen oder weitergeben: ein Material, einen Termin, einen Beitrag.', subs:['material.teilen','termine.teilen','news.teilen'] },
+    'anlegen': { t:'Ich möchte erstellen', p:'Etwas Neues in die Welt bringen: ein Material, einen Termin, einen Beitrag.', subs:['material.erstellen','termine.erstellen','news.veroeffentlichen'] },
+    'bearbeiten': { t:'Ich möchte bearbeiten', p:'An Vorhandenem weiterarbeiten: Materialien sammeln und anpassen, einen eigenen Termin ändern.', subs:['material.bearbeiten','termine.bearbeiten'] }
   };
   const EX_NAME = {}, FORM_VON = {};   // Beschriftungen aus der Konsole: Element und Knospe; Aktionsform je Knospe
   RelihubSteuerkonsole.functions.forEach(f => { EX_NAME[f.id] = f.label; f.subs.forEach(u => { EX_NAME[u.id] = u.label; if (u.form) FORM_VON[u.id] = u.form; }); });
@@ -3295,6 +3306,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     document.querySelectorAll('#stSicht button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sicht === SICHT)));
     if (document.getElementById('v-start').classList.contains('on')) explainDefault();
   }
+  document.getElementById('stSicht').addEventListener('click', e => { const b = e.target.closest('button[data-sicht]'); if (b) sichtSetzen(b.dataset.sicht, true); });
   function setModus(m) {
     MODUS = m; speicher('relihub-modus', m);
     if (document.getElementById('v-start').classList.contains('on')) explainDefault();
@@ -3315,7 +3327,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     exEl.style.borderColor = '';
     const direkt = MODUS === 'direkt';
     const kopf = direkt ? `<h2>Die Konsole führt dich direkt zur Aktion</h2><p>Ein Klick auf eine Knospe öffnet sofort, was dahintersteht. Unter „Hilfe“ zeigt dir die Konsole die Erklärungen wieder. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`
-      : SICHT === 'formen' ? `<h2>Ich möchte …</h2><p>Sehen, zeigen, erarbeiten, in Kontakt treten: Fahre über einen Kreis, und du siehst, womit das geht. Oben stehst du. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`
+      : SICHT === 'formen' ? `<h2>Ich möchte …</h2><p>Finden, teilen, erstellen, bearbeiten: Fahre über einen Kreis, und du siehst, womit das geht. Oben stehst du. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`
       : `<h2>Vier Dinge und du</h2><p>Menschen, Communities, Materialien und Termine: Fahre über einen Kreis, und du siehst gleich, was es dazu gibt. Oben stehst du. Sag dort, was dich interessiert. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`;
     const umschalter = direkt ? `<button type="button" class="btn btn-ghost modus" data-modus="tutorial">Konsole wieder erklären lassen</button>` : `<button type="button" class="btn btn-ghost modus" data-modus="direkt">Verstanden, direkt loslegen</button>`;
     exEl.innerHTML = `${icon('none')}<div><p class="fn" style="color:var(--muted)">So funktioniert's</p>${kopf}<div class="acts"><span class="hint">Schon dabei?</span><a class="btn btn-ghost" href="#profil" data-anmelden>Anmelden</a>${umschalter}</div></div>`;
@@ -6518,7 +6530,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   }
   window.addEventListener('hashchange', () => { CUR = leseHash(); route(); });
   window.addEventListener('popstate', () => { CUR = leseHash(); route(); });
-  sichtSetzen('dinge');   // die Sicht von den Aktionsformen ruht seit ADR-0015, eine gemerkte Wahl wird nicht mehr angewandt
+  sichtSetzen(speicher('relihub-sicht'));
   themenRender();   // gespeicherte Themen der Startseite
   route();
 })();

@@ -4,7 +4,7 @@ import { appScript, consoleScript, contrast, html } from './helfer.ts';
 const c = consoleScript(), s = appScript();
 const block = (re: RegExp) => (s.match(re) || [''])[0];
 const fn = (name: string) => block(new RegExp(`  function ${name}\\([^)]*\\) \\{[\\s\\S]*?\\n  \\}`));
-const FUNCS = new Function((c.match(/const FUNCS = \[[\s\S]*?\n  \];/) || [''])[0] + '; return FUNCS;')() as { id: string; label: string; self?: boolean; subs: { id: string; label: string; kurz?: string; stand?: string; form?: string }[] }[];
+const FUNCS = new Function((c.match(/const FUNCS = \[[\s\S]*?\n  \];/) || [''])[0] + '; return FUNCS;')() as { id: string; label: string; self?: boolean; subs: { id: string; label: string; kurz?: string; stand?: string; form?: string; farbe?: string }[] }[];
 
 Deno.test('Konsole: ich oben, dann Menschen, Materialien, Termine, Beiträge (ADR-0015)', () => {
   assertEquals(FUNCS.map((f) => f.id), ['ich', 'menschen', 'material', 'termine', 'news']);
@@ -13,18 +13,27 @@ Deno.test('Konsole: ich oben, dann Menschen, Materialien, Termine, Beiträge (AD
   assert(!/'(communities\.(finden|vorstellen|aufbauen|mitmachen)|menschen\.(finden|zeigen|zusammen|folgen)|material\.(schreibtisch|rueckmeldung)|termine\.(eintragen|vorbereiten|teilnehmen)|ich\.(interessen|start))'/.test(c + s), 'Kennungen der früheren Belegung im Code');
 });
 
-Deno.test('Belegung: Knospen je Blatt, keine Aktionsform, Reagieren ist kein Menüpunkt', () => {
+Deno.test('Belegung: Knospen je Blatt, vier Wege, Reagieren ist kein Menüpunkt', () => {
   const k = (id: string) => FUNCS.find((f) => f.id === id)!.subs.map((u) => u.id.split('.')[1]);
   assertEquals(k('ich'), ['profil', 'communities', 'menschen', 'materialien', 'termine']);
   assertEquals(k('menschen'), ['personen', 'communities']);
   assertEquals(k('material'), ['finden', 'teilen', 'erstellen', 'bearbeiten']);
   assertEquals(k('termine'), ['finden', 'teilen', 'erstellen', 'bearbeiten']);
   assertEquals(k('news'), ['finden', 'teilen', 'veroeffentlichen']);
-  assert(FUNCS.flatMap((f) => f.subs).every((u) => !u.form), 'Knospe trägt noch eine Aktionsform');
+  const weg = (id: string) => FUNCS.find((f) => f.id === id)!.subs.map((u) => u.form);
+  assertEquals(weg('ich'), [undefined, undefined, undefined, undefined, undefined], '„ich“ steht außerhalb der Wege');
+  assertEquals(weg('menschen'), ['suchen', 'suchen']);
+  assertEquals(weg('material'), ['suchen', 'teilen', 'anlegen', 'bearbeiten']);
+  assertEquals(weg('termine'), ['suchen', 'teilen', 'anlegen', 'bearbeiten']);
+  assertEquals(weg('news'), ['suchen', 'teilen', 'anlegen']);
+  for (const [k, wort] of [['suchen', 'finden'], ['teilen', 'teilen'], ['anlegen', 'erstellen'], ['bearbeiten', 'bearbeiten']]) assert(new RegExp(`\\n    ${k}: \\{ label: '${wort}', blatt: '${wort}', color: '#[0-9A-F]{6}', d: '[^']+' \\}`).test(c), `Zeichen für ${wort} fehlt`);
+  // Farbpunkte: eine Knospe, die zu einem anderen Ding gehört als ihr Blatt, trägt dessen Farbe
+  const farbe = Object.fromEntries(FUNCS.flatMap((f) => f.subs).filter((u) => u.farbe).map((u) => [u.id, u.farbe]));
+  assertEquals(farbe, { 'ich.communities': 'communities', 'ich.menschen': 'menschen', 'ich.materialien': 'material', 'ich.termine': 'termine', 'menschen.communities': 'communities' });
+  assert(/const fb = s\.farbe && FARBE\[s\.farbe\]/.test(c) && /communities: \['#7B4FB8', '#FFFFFF'\]/.test(c) && /material: \['#007A75', '#FFFFFF'\]/.test(c), 'Knospe ohne Farbe ihres Dings');
   assert(!/reagieren|Rückmeldung geben|teilnehmen|folgen'/.test(JSON.stringify(FUNCS)), 'Reagieren, Teilnehmen oder Folgen als Menüpunkt');
   for (const f of FUNCS) for (const u of f.subs) assert(u.label.split(' ').length <= 3 && (u.kurz || '').length > 0 && (u.kurz || '').length <= 11, `${u.id}: Name oder Kurzname passt nicht`);
   assert(/d\.stand === 'offen'\) \{ toast\(/.test(fn('standardAktion')), 'Hellgraue Knospe ohne Hinweis');
-  assert(/const FUNCS_F = FUNCS;/.test(c) && /formen: \[\],/.test(c) && !/id="stSicht"/.test(html) && /\n  sichtSetzen\('dinge'\);/.test(s), 'Die Sicht von den Aktionsformen ruht nicht');
 });
 
 Deno.test('Konsole: jede Aktion hat Route, Erklärung und Farben', () => {
@@ -37,7 +46,9 @@ Deno.test('Konsole: jede Aktion hat Route, Erklärung und Farben', () => {
       assert(ex.includes(`'${u.id}': {`), `Erklärung ${u.id} fehlt`);
     }
   }
-  const ids = FUNCS.flatMap((f) => [f.id, ...f.subs.map((u) => u.id)]);
+  const formen = ['suchen', 'teilen', 'anlegen', 'bearbeiten'];
+  for (const k of formen) assert(routen.includes(`'${k}':`) && ex.includes(`'${k}': {`), `Blatt ${k} ohne Route oder Erklärung`);
+  const ids = FUNCS.flatMap((f) => [f.id, ...f.subs.map((u) => u.id)]).concat(formen);
   for (const m of ex.matchAll(/\n    '([a-z.]+)': \{/g)) assert(ids.includes(m[1]), `Erklärung ohne Aktion: ${m[1]}`);
   for (const m of ex.matchAll(/subs:\[([^\]]*)\]/g)) for (const x of m[1].split(',')) assert(ids.includes(x.replace(/'/g, '').trim()), `Unbekannte Knospe in subs: ${x}`);
 });
@@ -85,6 +96,21 @@ Deno.test('Startseite: Themenfeld, Vorschau mit Rückfall, maskiert, Laden nur e
   assert(/'ich': \{[^\n]*\['Themen eintragen','#start\?zu=themen'\]/.test(s) && /get\('zu'\) === 'themen'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'Weg zu den Themen fehlt');
 });
 
+Deno.test('Sicht vom Tun her: dieselbe Belegung, Blätter sind die vier Wege, Knospen die Dinge', () => {
+  assert(/const FUNCS_F = \[FUNCS\[0\]\]\.concat\(FORM_ORDER\.map\(/.test(c) && /f\.subs\.filter\(u => u\.form === k\)/.test(c), 'Zweite Sicht wird nicht aus der Belegung abgeleitet');
+  assert(/'sicht', 'mitte', 'stiel'\]/.test(c) && /get funcs\(\) \{ return this\.sicht === 'formen' \? FUNCS_F : FUNCS; \}/.test(c), 'Attribut sicht fehlt');
+  assert(/sicht: this\.sicht/.test(c) && /'data-form', s\.form/.test(c) && /s\.form \? FORMEN\[s\.form\]\.d/.test(c), 'Ereignis ohne Sicht oder Knospe ohne Zeichen ihres Wegs');
+  assert(/<div class="st-sicht" id="stSicht" role="group"[^>]*>.*data-sicht="dinge" aria-pressed="true".*data-sicht="formen" aria-pressed="false"/.test(html), 'Umschalter fehlt');
+  const z = fn('sichtSetzen');
+  assert(/speicher\('relihub-sicht', SICHT\)/.test(z) && /setAttribute\('sicht', 'formen'\)/.test(z) && /removeAttribute\('sicht'\)/.test(z) && /aria-pressed/.test(z), 'Umschalter merkt oder setzt die Sicht nicht');
+  assert(/\n  sichtSetzen\(speicher\('relihub-sicht'\)\);\n  themenRender\(\);/.test(s), 'Gemerkte Sicht wird beim Start nicht gesetzt');
+  const zahl: Record<string, number> = { suchen: 5, teilen: 3, anlegen: 3, bearbeiten: 2 };
+  for (const k of Object.keys(zahl)) {
+    assert(new RegExp(`'${k}': \\{ t:'Ich möchte [^']+', p:'[^']+', subs:\\[('[a-z]+\\.[a-z]+',?){${zahl[k]}}\\] \\}`).test(s), `Karte ${k}`);
+    assertEquals(FUNCS.slice(1).flatMap((f) => f.subs).filter((u) => u.form === k).length, zahl[k], `Knospen am Weg ${k}`);
+  }
+});
+
 Deno.test('Mitte der Blume: der Ort, sonst „Ich möchte“ (ADR-0013)', () => {
   assert(/class: 'mitte', 'pointer-events': 'none'/.test(c) && /const mText = ort \? ort\.label : 'Ich möchte'/.test(c) && /this\.text\(mitte, mText/.test(c), 'Schrift in der Mitte fehlt oder fängt Klicks ab');
   assert(/const ort = this\.sicht === 'formen' \? null : attrMitte \? \{ label: attrMitte \} : profMitte \|\| null/.test(c), 'Ort aus Profil oder Attribut, nicht in der Sicht von den Aktionsformen');
@@ -106,7 +132,7 @@ Deno.test('Stiel mit den Orten (ADR-0014): Aufbau, Schnittstelle, Weitergabe aus
   assert(/new CustomEvent\('relihub-leiste-select', \{ detail: \{ id: o\.id, href: o\.href, kind: o\.kind \|\| 'instanz', quelle: 'stiel' \}/.test(c), 'Klick löst dasselbe Ereignis aus wie die Leiste');
   assert(/setOrte\(items\) \{/.test(c) && /setOrt\(id\) \{/.test(c) && /a\.textContent = o\.label/.test(c), 'Schnittstelle; Namen als Text, nicht als HTML');
   const l = (html.match(/function setItems\(items\) \{[\s\S]*?\n  \}/) || [''])[0];
-  assert(/RelihubSteuerkonsole\.setOrte\(ITEMS\.filter\(o => o\.kind !== 'zuschnitt'\)\)/.test(l), 'Leiste reicht ihre Orte weiter, ohne den Zuschnitt');
+  assert(/RelihubSteuerkonsole\.setOrte\(ITEMS\.filter\(o => o\.kind !== 'zuschnitt' && o\.id !== 'start'\)\)/.test(l), 'Leiste reicht ihre Orte weiter, ohne Zuschnitt und ohne Start');
   assert(/RelihubSteuerkonsole\.setOrt\(leisteEl\.getAttribute\('current'\)\)/.test(s), 'aktueller Ort folgt der Leiste');
   assert(/setWeitereOrte\(items\) \{/.test(c) && /RelihubSteuerkonsole\.setWeitereOrte\(PARTNERS\.filter\(/.test(s) && /kind: p\[4\] \? 'instanz' : 'ausblick'/.test(s), 'weitere Orte des Ökosystems aus der Partnerliste');
   assert(/if \(d\.kind === 'ausblick'\) \{/.test(s) && /a\.rel = 'noopener'/.test(c), 'Ort ohne Ansicht führt zur Kachel, fremde Seite öffnet neu');
