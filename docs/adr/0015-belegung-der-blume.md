@@ -22,7 +22,7 @@ Aus dem Maintainer-Kreis kam der Gedanke, die Blume an dem auszurichten, was im 
    | Termine | finden, teilen, erstellen, bearbeiten |
    | Artikel | finden, teilen, schreiben, bearbeiten |
 
-   Das Blatt „ich“ trägt aufgeklappt das Wort „mein“. Das Profil steht in der Mitte, daneben Materialien und Termine, außen Personen und Communities.
+   Das Blatt „ich“ trägt aufgeklappt das Wort „mein(e)“. Das Profil steht in der Mitte, daneben Materialien und Termine, außen Personen und Communities.
 
 3. **Reagieren ist kein Menüpunkt.** Folgen, Beitreten, Zusagen, Gefällt mir und Kommentieren stehen am Eintrag selbst: an der Person, an der Community, am Termin, am Material. Die Erklärkarten sagen das.
 4. **Teilen und Erstellen sind zweierlei.** Teilen macht Vorhandenes sichtbar oder gibt es weiter. Erstellen bringt Neues hervor. Bei Terminen heißt es „erstellen“ statt „ankündigen“.
@@ -40,7 +40,7 @@ Aus dem Maintainer-Kreis kam der Gedanke, die Blume an dem auszurichten, was im 
 
    In dieser Sicht steht „Ich möchte“ in der Mitte. Das Blatt „ich“ steht in beiden Sichten oben.
 7. **Farbpunkte.** Eine Knospe, die zu einem anderen Ding gehört als ihr Blatt, trägt dessen Farbe. Am Blatt „ich“ sind Materialien türkis, Termine orange, Personen und Communities pink. Communities gehören zu den Menschen und tragen deren Farbe, denn Violett steht für Artikel.
-8. **Blau heißt: meins.** Von den Dingen her sind „Termin bearbeiten“ und „Artikel bearbeiten“ blau, weil ich das mit meinen eigenen Einträgen tue. Beide sind keine Vorschau mehr: Der Hub führt zu den eigenen Einträgen, das Ändern selbst geschieht bis auf Weiteres bei edufeed.
+8. **Blau heißt: meins.** Von den Dingen her ist „bearbeiten“ an Materialien, Terminen und Artikeln blau, weil ich das mit meinen eigenen Einträgen tue. Termine und Artikel sind keine Vorschau mehr: Der Hub führt zu den eigenen Einträgen, das Ändern selbst geschieht bis auf Weiteres bei edufeed.
 9. **Kennungen.** Neu ist auch `news.bearbeiten`. Die Wege heißen im Code `suchen`, `teilen`, `anlegen`, `bearbeiten`, weil „finden“ und „erstellen“ dort schon Farbnamen sind. Neu: `ich.communities`, `ich.menschen`, `ich.materialien`, `ich.termine`, `menschen.personen`, `menschen.communities`, `material.erstellen`, `material.bearbeiten`, `termine.teilen`, `termine.erstellen`, `termine.bearbeiten`, `news.finden`, `news.teilen`, `news.veroeffentlichen`. Entfallen ohne Alias: alle Kennungen unter `communities.`, dazu `menschen.finden`, `menschen.zeigen`, `menschen.zusammen`, `menschen.folgen`, `material.schreibtisch`, `material.rueckmeldung`, `termine.eintragen`, `termine.vorbereiten`, `termine.teilnehmen`, `ich.interessen`, `ich.start`.
 
 ## Folgen
@@ -52,9 +52,7 @@ Aus dem Maintainer-Kreis kam der Gedanke, die Blume an dem auszurichten, was im 
 
 ## Offen
 1. **Violett in den Ansichten.** In der Blume steht Violett jetzt für Artikel. In den übrigen Ansichten des Hubs tragen Communities noch Violett.
-2. **„Material bearbeiten“** ist türkis geblieben, weil es auch um fremdes Material geht. Ob es wie die beiden anderen blau werden soll, ist nicht entschieden.
-3. **Eigene Seite für Artikel**, über alle Communities und ohne Anmeldung.
-4. **Meine Personen** haben im Profil noch keine eigene Liste.
-5. **Das Wort Beitrag** steht außerhalb der Blume noch an vielen Stellen, zum Beispiel im Editor.
-6. **Die Zeichen am Eintrag.** Wenn Reagieren am Eintrag steht, braucht es dort eine einheitliche Form. ADR-0011 hatte dafür vier Zeichen vorgeschlagen.
-7. **„mein“ auf dem Blatt.** Zu Materialien, Terminen, Personen und Communities müsste es „meine“ heißen.
+2. **Eigene Seite für Artikel**, über alle Communities und ohne Anmeldung.
+3. **Meine Personen** haben im Profil noch keine eigene Liste.
+4. **Das Wort Beitrag** steht außerhalb der Blume noch an vielen Stellen, zum Beispiel im Editor.
+5. **Die Zeichen am Eintrag.** Wenn Reagieren am Eintrag steht, braucht es dort eine einheitliche Form. ADR-0011 hatte dafür vier Zeichen vorgeschlagen.

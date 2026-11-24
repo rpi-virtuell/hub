@@ -1944,14 +1944,14 @@ a.kat-card:hover{border-color:var(--c-koop)}
   const FARBE = { ich: ['#203A8F', '#FFFFFF'], menschen: ['#D6336C', '#FFFFFF'], communities: ['#D6336C', '#FFFFFF'], material: ['#007A75', '#FFFFFF'], termine: ['#FFA500', '#2B1A00'], news: ['#7B4FB8', '#FFFFFF'] };
   // Belegung nach ADR-0015: ich, Menschen, Materialien, Termine, Artikel. Die Knospen sind die Wege zu dem, was im Datenraum liegt:
   // finden, teilen, erstellen, bearbeiten. label: Verb plus Ding; kurz: nur das Verb, für enge Schirme; ding: Name des Dings in der Sicht vom Tun her.
-  // Blatt „ich“: aufgeklappt steht „mein“ auf dem Blatt, das Profil in der Mitte, daneben Materialien und Termine, außen Personen und Communities.
+  // Blatt „ich“: aufgeklappt steht „mein(e)“ auf dem Blatt, das Profil in der Mitte, daneben Materialien und Termine, außen Personen und Communities.
   const FUNCS = [
-    { id: 'ich', label: 'ich', offen: 'mein', color: '#203A8F', text: '#FFFFFF', self: true,
+    { id: 'ich', label: 'ich', offen: 'mein(e)', color: '#203A8F', text: '#FFFFFF', self: true,
       subs: [{ id: 'ich.menschen', label: 'Personen', kurz: 'Personen', farbe: 'menschen' }, { id: 'ich.materialien', label: 'Materialien', kurz: 'Materialien', farbe: 'material' }, { id: 'ich.profil', label: 'Profil', kurz: 'Profil' }, { id: 'ich.termine', label: 'Termine', kurz: 'Termine', farbe: 'termine' }, { id: 'ich.communities', label: 'Communities', kurz: 'Communities', farbe: 'communities' }] },
     { id: 'menschen', label: 'Menschen', color: '#D6336C', text: '#FFFFFF',
       subs: [{ id: 'menschen.personen', label: 'Personen', kurz: 'Personen', form: 'suchen', name: 'Personen' }, { id: 'menschen.communities', label: 'Communities', kurz: 'Communities', form: 'suchen', name: 'Communities' }] },
     { id: 'material', label: 'Materialien', color: '#007A75', text: '#FFFFFF',
-      subs: [{ id: 'material.finden', label: 'Materialien suchen', kurz: 'suchen', form: 'suchen' }, { id: 'material.teilen', label: 'Material teilen', kurz: 'teilen', form: 'teilen' }, { id: 'material.erstellen', label: 'Material erstellen', kurz: 'erstellen', form: 'anlegen' }, { id: 'material.bearbeiten', label: 'Material bearbeiten', kurz: 'bearbeiten', form: 'bearbeiten' }] },
+      subs: [{ id: 'material.finden', label: 'Materialien suchen', kurz: 'suchen', form: 'suchen' }, { id: 'material.teilen', label: 'Material teilen', kurz: 'teilen', form: 'teilen' }, { id: 'material.erstellen', label: 'Material erstellen', kurz: 'erstellen', form: 'anlegen' }, { id: 'material.bearbeiten', label: 'Material bearbeiten', kurz: 'bearbeiten', form: 'bearbeiten', farbe: 'ich' }] },
     { id: 'termine', label: 'Termine', color: '#FFA500', text: '#2B1A00',
       subs: [{ id: 'termine.finden', label: 'Termine finden', kurz: 'finden', form: 'suchen' }, { id: 'termine.teilen', label: 'Termin teilen', kurz: 'teilen', form: 'teilen' }, { id: 'termine.erstellen', label: 'Termin erstellen', kurz: 'erstellen', form: 'anlegen' }, { id: 'termine.bearbeiten', label: 'Termin bearbeiten', kurz: 'bearbeiten', form: 'bearbeiten', farbe: 'ich' }] },
     { id: 'news', label: 'Artikel', color: '#7B4FB8', text: '#FFFFFF',
@@ -2393,7 +2393,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         this.text(pill, f.label, 0, 1, 21, f.ink, 'lbl');
       } else {
         el('circle', { class: 'act main', 'data-action': f.id, r: R, fill: f.color, 'fill-opacity': 0.96 }, pop);
-        this.text(pop, f.offen || f.label, 0, 2, f.label.length > 12 ? 22 : f.label.length > 9 ? 26 : 30, f.text, 'lbl');   // „ich“ wird aufgeklappt zu „mein“
+        this.text(pop, f.offen || f.label, 0, 2, f.label.length > 12 ? 22 : f.label.length > 9 ? 26 : 30, f.text, 'lbl');   // „ich“ wird aufgeklappt zu „mein(e)“
       }
 
       requestAnimationFrame(() => requestAnimationFrame(() => {

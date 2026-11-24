@@ -16,7 +16,7 @@ Deno.test('Konsole: ich oben, dann Menschen, Materialien, Termine, Artikel (ADR-
 Deno.test('Belegung: Knospen je Blatt, vier Wege, Reagieren ist kein Menüpunkt', () => {
   const k = (id: string) => FUNCS.find((f) => f.id === id)!.subs.map((u) => u.id.split('.')[1]);
   assertEquals(k('ich'), ['menschen', 'materialien', 'profil', 'termine', 'communities'], 'Profil in der Mitte, daneben Materialien und Termine, außen Personen und Communities');
-  assert(/\{ id: 'ich', label: 'ich', offen: 'mein',/.test(c) && /this\.text\(pop, f\.offen \|\| f\.label,/.test(c), 'aufgeklappt steht „mein“ auf dem Blatt');
+  assert(/\{ id: 'ich', label: 'ich', offen: 'mein\(e\)',/.test(c) && /this\.text\(pop, f\.offen \|\| f\.label,/.test(c), 'aufgeklappt steht „mein(e)“ auf dem Blatt');
   assertEquals(k('menschen'), ['personen', 'communities']);
   assertEquals(k('material'), ['finden', 'teilen', 'erstellen', 'bearbeiten']);
   assertEquals(k('termine'), ['finden', 'teilen', 'erstellen', 'bearbeiten']);
@@ -32,7 +32,7 @@ Deno.test('Belegung: Knospen je Blatt, vier Wege, Reagieren ist kein Menüpunkt'
   for (const [k, wort] of [['suchen', 'finden'], ['teilen', 'teilen'], ['anlegen', 'erstellen'], ['bearbeiten', 'bearbeiten']]) assert(new RegExp(`\\n    ${k}: \\{ label: '${wort}', blatt: '${wort}', color: '#[0-9A-F]{6}', d: '[^']+' \\}`).test(c), `Zeichen für ${wort} fehlt`);
   // Farbpunkte: eine Knospe, die zu einem anderen Ding gehört als ihr Blatt, trägt dessen Farbe
   const farbe = Object.fromEntries(FUNCS.flatMap((f) => f.subs).filter((u) => u.farbe).map((u) => [u.id, u.farbe]));
-  assertEquals(farbe, { 'ich.communities': 'communities', 'ich.menschen': 'menschen', 'ich.materialien': 'material', 'ich.termine': 'termine', 'termine.bearbeiten': 'ich', 'news.bearbeiten': 'ich' });
+  assertEquals(farbe, { 'ich.communities': 'communities', 'ich.menschen': 'menschen', 'ich.materialien': 'material', 'ich.termine': 'termine', 'material.bearbeiten': 'ich', 'termine.bearbeiten': 'ich', 'news.bearbeiten': 'ich' });
   assert(/const fb = s\.farbe && FARBE\[s\.farbe\]/.test(c) && /communities: \['#D6336C', '#FFFFFF'\]/.test(c) && /material: \['#007A75', '#FFFFFF'\]/.test(c) && /ich: \['#203A8F', '#FFFFFF'\]/.test(c), 'Communities tragen die Farbe der Menschen, Eigenes ist blau');
   assert(!/reagieren|Rückmeldung geben|teilnehmen|folgen'/.test(JSON.stringify(FUNCS)), 'Reagieren, Teilnehmen oder Folgen als Menüpunkt');
   for (const f of FUNCS) for (const u of f.subs) assert(u.label.split(' ').length <= 3 && (u.kurz || '').length > 0 && (u.kurz || '').length <= 11, `${u.id}: Name oder Kurzname passt nicht`);
