@@ -130,6 +130,6 @@ Deno.test('Noch nicht Gebautes trägt das Wort „bald“ statt einer gestrichel
 });
 
 Deno.test('Startseite: aufgeklappte Knospen haben Abstand zum Themenfeld und zum Umschalter', () => {
-  assert(/\.flower-wrap\{display:flex;justify-content:center;padding:124px 0 96px\}/.test(html), 'großer Schirm');
-  assert(/@media \(max-width:640px\)\{[^@]*\.flower-wrap\{padding:96px 0 74px\}/.test(html), 'kleiner Schirm');
+  assert(/\.flower-wrap\{display:flex;justify-content:center;padding:124px 0 276px\}/.test(html), 'großer Schirm');
+  assert(/@media \(max-width:640px\)\{[^@]*\.flower-wrap\{padding:96px 0 268px\}/.test(html), 'kleiner Schirm');
 });

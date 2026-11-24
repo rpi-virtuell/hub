@@ -88,7 +88,7 @@ Deno.test('Startseite: Themenfeld, Vorschau mit Rückfall, maskiert, Laden nur e
 
 Deno.test('Sicht von den Aktionsformen: dieselbe Matrix, Blätter und Knospen getauscht', () => {
   assert(/const FUNCS_F = \[FUNCS\[0\]\]\.concat\(FORM_ORDER\.map\(/.test(c) && /f\.subs\.find\(u => u\.form === k\)/.test(c), 'Zweite Sicht wird nicht aus der Matrix abgeleitet');
-  assert(/'sicht', 'mitte'\]/.test(c) && /get funcs\(\) \{ return this\.sicht === 'formen' \? FUNCS_F : FUNCS; \}/.test(c), 'Attribut sicht fehlt');
+  assert(/'sicht', 'mitte', 'stiel'\]/.test(c) && /get funcs\(\) \{ return this\.sicht === 'formen' \? FUNCS_F : FUNCS; \}/.test(c), 'Attribut sicht fehlt');
   assert(!/\bFUNCS\.(forEach|filter)\(/.test((c.match(/class RelihubSteuerkonsoleElement[\s\S]*?\n  const RelihubSteuerkonsole = /) || [''])[0]), 'Klasse nutzt noch die feste Liste');
   assert(/const far = s\.ding \? DING\[s\.ding\] : f;/.test(c) && /sicht: this\.sicht/.test(c), 'Knospe ohne Farbe ihres Dings oder Ereignis ohne Sicht');
   assert(/<div class="st-sicht" id="stSicht" role="group"[^>]*>.*data-sicht="dinge" aria-pressed="true".*data-sicht="formen" aria-pressed="false"/.test(html), 'Umschalter fehlt');
@@ -101,7 +101,7 @@ Deno.test('Sicht von den Aktionsformen: dieselbe Matrix, Blätter und Knospen ge
 Deno.test('Mitte der Blume: der Ort, sonst „Ich möchte“ (ADR-0013)', () => {
   assert(/class: 'mitte', 'pointer-events': 'none'/.test(c) && /const mText = ort \? ort\.label : 'Ich möchte'/.test(c) && /this\.text\(mitte, mText/.test(c), 'Schrift in der Mitte fehlt oder fängt Klicks ab');
   assert(/const ort = this\.sicht === 'formen' \? null : attrMitte \? \{ label: attrMitte \} : profMitte \|\| null/.test(c), 'Ort aus Profil oder Attribut, nicht in der Sicht von den Aktionsformen');
-  assert(/'sicht', 'mitte'\]/.test(c), 'Attribut mitte wird beobachtet');
+  assert(/'sicht', 'mitte', 'stiel'\]/.test(c), 'Attribut mitte wird beobachtet');
   assert(contrast('#1B2440', '#FFFFFF') >= 4.5 && contrast('#FFFFFF', '#6D3BE0') >= 4.5, 'Kontrast der Mitte, weiß und in Instanzfarbe');
 });
 
@@ -111,4 +111,19 @@ Deno.test('Mitte plus vier am Beispiel relilab: Zeichen, Kontext, Abschnitt', ()
   assert(/class: 'ort', r: 94, fill: ort\.color/.test(c) && /\.mini svg circle\.ort\{opacity:1\}/.test(c) && /', Ort: ' \+ ort\.label/.test(c), 'Zeichen am schwebenden Knopf trägt den Ort, auch für Screenreader');
   assert(/<section class="rl-hubband"[\s\S]{0,900}<relihub-steuerkonsole id="rlBlume" size="230" context="relilab" variant="knospen">/.test(html) && /In der Mitte steht relilab/.test(html), 'Abschnitt in der relilab-Ansicht');
   assert(/<relihub-steuerkonsole id="rlFlower" floating[^>]*context="relilab"/.test(html), 'schwebende Konsole der relilab-Ansicht bleibt');
+});
+
+Deno.test('Stiel mit den Orten (ADR-0014): Aufbau, Schnittstelle, Weitergabe aus der Leiste', async () => {
+  assert(/stielAn\(\) \{[\s\S]{0,200}if \(at === 'off'\) return false;\s*return this\.compact \|\| at !== null;/.test(c), 'an in der Kompaktform, groß nur mit Attribut, off blendet aus');
+  assert(/sc\.setAttribute\('aria-label', 'Orte im ReliHub'\)/.test(c) && /a\.setAttribute\('aria-current', 'page'\)/.test(c), 'Navigation benannt, aktueller Ort markiert');
+  assert(/new CustomEvent\('relihub-leiste-select', \{ detail: \{ id: o\.id, href: o\.href, kind: o\.kind \|\| 'instanz', quelle: 'stiel' \}/.test(c), 'Klick löst dasselbe Ereignis aus wie die Leiste');
+  assert(/setOrte\(items\) \{/.test(c) && /setOrt\(id\) \{/.test(c) && /a\.textContent = o\.label/.test(c), 'Schnittstelle; Namen als Text, nicht als HTML');
+  const l = (html.match(/function setItems\(items\) \{[\s\S]*?\n  \}/) || [''])[0];
+  assert(/RelihubSteuerkonsole\.setOrte\(ITEMS\.filter\(o => o\.kind !== 'zuschnitt'\)\)/.test(l), 'Leiste reicht ihre Orte weiter, ohne den Zuschnitt');
+  assert(/RelihubSteuerkonsole\.setOrt\(leisteEl\.getAttribute\('current'\)\)/.test(s), 'aktueller Ort folgt der Leiste');
+  assert(/id="startFlower"[^>]* stiel>/.test(html) && !/id="rlBlume"[^>]* stiel/.test(html), 'Startseite mit Stiel, Abschnitt bei relilab ohne');
+  assert(contrast('#1F3A22', '#E4F0E1') >= 4.5 && contrast('#FFFFFF', '#2E7D4F') >= 4.5, 'Kontrast der Blätter am Stiel');
+  assert(/id="rlFilterHinweis" hidden/.test(html) && /gefiltert auf <b>relilab<\/b>/.test(s), 'Hinweiszeile zum Filter in der relilab-Ansicht');
+  const adr = await Deno.readTextFile(new URL('../docs/adr/0014-stiel-mit-orten.md', import.meta.url));
+  assert(/Entwurf/.test(adr) && /Stiel/.test(adr), 'ADR-0014 fehlt');
 });
