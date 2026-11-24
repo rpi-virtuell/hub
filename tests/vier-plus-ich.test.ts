@@ -101,7 +101,7 @@ Deno.test('Startseite: Themenfeld, Vorschau mit Rückfall, maskiert, Laden nur e
 
 Deno.test('Sicht vom Tun her: dieselbe Belegung, Blätter sind die vier Wege, Knospen die Dinge', () => {
   assert(/const FUNCS_F = \[FUNCS\[0\]\]\.concat\(FORM_ORDER\.map\(/.test(c) && /f\.subs\.filter\(u => u\.form === k\)/.test(c), 'Zweite Sicht wird nicht aus der Belegung abgeleitet');
-  assert(/'sicht', 'mitte', 'stiel'\]/.test(c) && /get funcs\(\) \{ return this\.sicht === 'formen' \? FUNCS_F : FUNCS; \}/.test(c), 'Attribut sicht fehlt');
+  assert(/'sicht', 'mitte', 'stiel'\]/.test(c) && /get funcs\(\) \{ return this\.belegung \|\| \(this\.sicht === 'formen' \? FUNCS_F : FUNCS\); \}/.test(c), 'Attribut sicht fehlt');
   assert(/sicht: this\.sicht/.test(c) && /'data-form', s\.form/.test(c) && /s\.form \? FORMEN\[s\.form\]\.d/.test(c), 'Ereignis ohne Sicht oder Knospe ohne Zeichen ihres Wegs');
   assert(/<div class="st-sicht" id="stSicht" role="group"[^>]*>.*data-sicht="dinge" aria-pressed="true".*data-sicht="formen" aria-pressed="false"/.test(html), 'Umschalter fehlt');
   const z = fn('sichtSetzen');
