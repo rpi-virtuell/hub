@@ -1,0 +1,21 @@
+# Tägliche Vorschau: jeder Push auf main erscheint unter hub.rpi-virtuell.net.
+# Unverändert gegenüber der früheren .woodpecker.yml. Einzelheiten: docs/betrieb.md
+
+when:
+  - branch: main
+    event: push
+
+steps:
+  - name: deploy_Vorschau-Seite
+    image: appleboy/drone-ssh
+    settings:
+      host:
+        from_secret: deploy_host
+      port:
+        from_secret: deploy_port
+      username:
+        from_secret: deploy_user
+      key:
+        from_secret: deploy_key
+      script:
+        from_secret: deploy_script

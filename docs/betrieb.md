@@ -1,6 +1,6 @@
 # Betrieb: Forgejo, GitHub-Spiegel, GitHub Pages, Domain
 
-Stand 28.10.2026, ergänzt 04.11.2026. Diese Anleitung richtet sich an die technische Umsetzung.
+Stand 28.10.2026, ergänzt 04.11.2026 und 23.11.2026. Diese Anleitung richtet sich an die technische Umsetzung.
 
 **Stand 04.11.2026:** Der Prototyp wird unter `https://hub.rpi-virtuell.net` ausgeliefert (eigener Server, Caddy), nicht mehr über den GitHub-Spiegel und GitHub Pages. Die Schritte 1 bis 3 unten beschreiben den früheren Weg über GitHub und bleiben als Rückfall stehen; der Weg zum Server: `Dockerfile` (Caddy-Image, kopiert `index.html`) und `app.yaml` (`kind: static`, `subdomain: hub.rpi-virtuell.net`), eingerichtet am 03.11.2026 von der technischen Umsetzung (Commit df447bc).
 
@@ -9,10 +9,12 @@ Stand 28.10.2026, ergänzt 04.11.2026. Diese Anleitung richtet sich an die techn
 ```
 gitworkshop.dev (Nostr, reli-hub)  ──pusht main──▶  Forgejo Comenius-Institut/hub  ──Push-Spiegel──▶  GitHub rpi-virtuell/hub  ──Pages──▶  rpi-virtuell.github.io/hub  ──Domain──▶  hub.rpi-virtuell.net
       Quelle, PRs, Issues                           Arbeitskopie, Issues im Projekt           nur Spiegel, nichts direkt ändern          Auslieferung
+
+Forgejo Comenius-Institut/hub  ──Push auf released──▶  Woodpecker (deploy_released.yaml)  ──▶  relihub.net
 ```
 
 - **Quelle** ist das Nostr-Repo `reli-hub` (nostr://laoc.xyz/reli-hub, Web: gitworkshop.dev). Änderungen kommen dort als Pull Request an und werden nach `main` gemergt.
-- **Forgejo** `Comenius-Institut/hub` bekommt `main` nach jedem Merge gepusht (siehe „Laufender Betrieb“). Es ist die Arbeitskopie im Projekt und die Quelle für den Spiegel.
+- **Forgejo** `Comenius-Institut/hub` bekommt `main` nach jedem Merge gepusht (siehe „Laufender Betrieb“). Es ist die Arbeitskopie im Projekt und die Quelle für den Spiegel. Hier liegt auch der Zweig `released` (siehe „Auslieferung nach relihub.net“).
 - **GitHub** `rpi-virtuell/hub` ist ein reiner Push-Spiegel von Forgejo. Dort wird nichts direkt bearbeitet; jeder Commit dort würde beim nächsten Spiegeln überschrieben.
 - **GitHub Pages** liefert den Inhalt von `main` (Wurzelverzeichnis) aus. Es gibt keinen Build: `index.html` liegt fertig im Repo, die Datei `.nojekyll` verhindert, dass Pages Jekyll darüberlaufen lässt.
 
@@ -71,6 +73,39 @@ cd ~/repositories/reli-hub && deno task schnappschuss && deno task test
 Das Skript meldet `<n> Termine, Stand <Datum>`; das Ergebnis kommt wie jede Änderung als Pull Request. Nicht mehrmals kurz hintereinander laufen lassen, die Relays sperren sonst die Adresse. Einzelheiten: [daten.md](daten.md).
 
 Nie direkt auf GitHub committen. Issues zum Prototyp werden auf gitworkshop geführt; Forgejo-Issues gehören zur Projektarbeit.
+
+## Auslieferung nach relihub.net (Zweig `released`)
+
+`main` bleibt die tägliche Vorschau unter `https://hub.rpi-virtuell.net`. Was auf `released` liegt, wird unter `https://relihub.net` ausgeliefert.
+
+Für jeden Zweig gibt es eine eigene Woodpecker-Datei im Ordner `.woodpecker/`: `deploy_vorschau.yaml` für `main`, `deploy_released.yaml` für `released`. Beide Läufe starten beim Push des jeweiligen Zweigs nach Forgejo und liefern auf getrennte Server aus. Zugangsdaten stehen nur in den Woodpecker-Secrets des Repos (für `released` mit der Endung `_released`), nie im Repo.
+
+**`app.yaml` gilt nur für `main`.** Die Auslieferung nach relihub.net liest diese Datei nicht. Sie ist deshalb auf beiden Zweigen gleich (`subdomain: hub.rpi-virtuell.net`) und verursacht bei der Freigabe keinen Konflikt. Auf dem Zweig `released` daher nicht ändern! Die Datei `deploy_released.yaml` liegt im Repo. Der Woodpecker-Lauf für relihub.net wird demnächst eingerichtet.
+
+### Freigabe
+
+Eine Freigabe nach relihub.net erfolgt immer aus dem Zweig `released`. Dieser Zweig wird nur aus `main` aktualisiert:
+
+- Auf `released` wird **nicht direkt** committet und nicht direkt gepusht.
+- Alle Commits auf `released` müssen Commits aus `main` sein. Deshalb wird nur mit `--ff-only` gemergt; sonst drohen (Merge-)Konflikte.
+
+```bash
+cd ~/repositories/reli-hub && git fetch forgejo && git checkout released && git merge --ff-only forgejo/main && git push forgejo released
+```
+
+Der Push auf Forgejo startet den Woodpecker-Lauf; kurz danach ist der Stand unter `https://relihub.net` sichtbar. Schlägt `--ff-only` fehl, hat `released` einen eigenen Commit bekommen: nicht mergen, sondern klären, woher er stammt.
+
+### Was ausgeliefert wird
+
+Es gibt keinen Build. Ausgeliefert werden nur Web-Dateien (`*.html`, `*.js`, `*.css`, Bilder, Schriften …). Versteckte Dateien, `docs/`, `tests/`, `tools/`, `deno.json` und `app.yaml` gehören nicht zur Seite. Kommt später ein Build-Schritt dazu (Svelte), wird stattdessen das Build-Ergebnis ausgeliefert; dafür muss die Auslieferung angepasst werden.
+
+Das Zertifikat kommt von Let's Encrypt und wird automatisch erneuert. `www.relihub.net` und `http://` leiten auf `https://relihub.net` um.
+
+### Wenn relihub.net nicht wie erwartet aussieht
+
+- **Alter Stand sichtbar**: Woodpecker-Lauf für `released` prüfen (grün? welcher Commit?) und mit `git log -1 forgejo/released` vergleichen. Sonst liegt es vermutlich an einem alten Stand im Browser-Cache (Strg + F5).
+- **Zertifikatsfehler oder fremde Seite**: Alle Nameserver von `relihub.net` müssen auf den Zielserver zeigen (`dig +short relihub.net @<nameserver>`).
+- **Woodpecker-Lauf rot**: Details zur Fehlersuche stehen in der internen Betriebsdoku (nicht im Repo).
 
 ## Wenn etwas nicht geht
 
