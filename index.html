@@ -1939,25 +1939,29 @@ a.kat-card:hover{border-color:var(--c-koop)}
     bearbeiten: { label: 'bearbeiten', blatt: 'bearbeiten', color: '#27628F', d: 'M-10 10 L-7 2 L4 -9 L9 -4 L-2 7 Z' }
   };
   const FORM_ORDER = ['suchen', 'teilen', 'anlegen', 'bearbeiten'];
-  // Farbe einer Knospe, wenn sie zu einem anderen Ding gehört als ihr Blatt: „meine Materialien“ am Blatt „ich“ trägt die Farbe der Materialien
-  const FARBE = { ich: ['#203A8F', '#FFFFFF'], menschen: ['#D6336C', '#FFFFFF'], communities: ['#7B4FB8', '#FFFFFF'], material: ['#007A75', '#FFFFFF'], termine: ['#FFA500', '#2B1A00'], news: ['#7B4FB8', '#FFFFFF'] };
-  // Belegung nach ADR-0015: ich, Menschen, Materialien, Termine, Beiträge. Die Knospen sind die Wege zu dem, was im Datenraum liegt:
-  // finden, teilen, erstellen, bearbeiten. label: Verb plus Ding; kurz: nur das Verb, für enge Schirme.
+  // Farbe einer Knospe, wenn sie zu einem anderen Ding gehört als ihr Blatt: „Materialien“ am Blatt „ich“ trägt die Farbe der Materialien
+  // Communities gehören zu den Menschen und tragen deren Farbe; Violett steht für Artikel. Blau heißt: Das mache ich mit meinen eigenen Dingen.
+  const FARBE = { ich: ['#203A8F', '#FFFFFF'], menschen: ['#D6336C', '#FFFFFF'], communities: ['#D6336C', '#FFFFFF'], material: ['#007A75', '#FFFFFF'], termine: ['#FFA500', '#2B1A00'], news: ['#7B4FB8', '#FFFFFF'] };
+  // Belegung nach ADR-0015: ich, Menschen, Materialien, Termine, Artikel. Die Knospen sind die Wege zu dem, was im Datenraum liegt:
+  // finden, teilen, erstellen, bearbeiten. label: Verb plus Ding; kurz: nur das Verb, für enge Schirme; ding: Name des Dings in der Sicht vom Tun her.
+  // Blatt „ich“: aufgeklappt steht „mein“ auf dem Blatt, das Profil in der Mitte, daneben Materialien und Termine, außen Personen und Communities.
   const FUNCS = [
-    { id: 'ich', label: 'ich', color: '#203A8F', text: '#FFFFFF', self: true,
-      subs: [{ id: 'ich.profil', label: 'mein Profil', kurz: 'Profil' }, { id: 'ich.communities', label: 'meine Communities', kurz: 'Communities', farbe: 'communities' }, { id: 'ich.menschen', label: 'wem ich folge', kurz: 'ich folge', farbe: 'menschen' }, { id: 'ich.materialien', label: 'meine Materialien', kurz: 'Materialien', farbe: 'material' }, { id: 'ich.termine', label: 'meine Termine', kurz: 'Termine', farbe: 'termine' }] },
+    { id: 'ich', label: 'ich', offen: 'mein', color: '#203A8F', text: '#FFFFFF', self: true,
+      subs: [{ id: 'ich.menschen', label: 'Personen', kurz: 'Personen', farbe: 'menschen' }, { id: 'ich.materialien', label: 'Materialien', kurz: 'Materialien', farbe: 'material' }, { id: 'ich.profil', label: 'Profil', kurz: 'Profil' }, { id: 'ich.termine', label: 'Termine', kurz: 'Termine', farbe: 'termine' }, { id: 'ich.communities', label: 'Communities', kurz: 'Communities', farbe: 'communities' }] },
     { id: 'menschen', label: 'Menschen', color: '#D6336C', text: '#FFFFFF',
-      subs: [{ id: 'menschen.personen', label: 'Personen', kurz: 'Personen', form: 'suchen' }, { id: 'menschen.communities', label: 'Communities', kurz: 'Communities', form: 'suchen', farbe: 'communities' }] },
+      subs: [{ id: 'menschen.personen', label: 'Personen', kurz: 'Personen', form: 'suchen', name: 'Personen' }, { id: 'menschen.communities', label: 'Communities', kurz: 'Communities', form: 'suchen', name: 'Communities' }] },
     { id: 'material', label: 'Materialien', color: '#007A75', text: '#FFFFFF',
       subs: [{ id: 'material.finden', label: 'Materialien suchen', kurz: 'suchen', form: 'suchen' }, { id: 'material.teilen', label: 'Material teilen', kurz: 'teilen', form: 'teilen' }, { id: 'material.erstellen', label: 'Material erstellen', kurz: 'erstellen', form: 'anlegen' }, { id: 'material.bearbeiten', label: 'Material bearbeiten', kurz: 'bearbeiten', form: 'bearbeiten' }] },
     { id: 'termine', label: 'Termine', color: '#FFA500', text: '#2B1A00',
-      subs: [{ id: 'termine.finden', label: 'Termine finden', kurz: 'finden', form: 'suchen' }, { id: 'termine.teilen', label: 'Termin teilen', kurz: 'teilen', form: 'teilen' }, { id: 'termine.erstellen', label: 'Termin erstellen', kurz: 'erstellen', form: 'anlegen' }, { id: 'termine.bearbeiten', label: 'Termin bearbeiten', kurz: 'bearbeiten', form: 'bearbeiten', stand: 'offen' }] },
-    { id: 'news', label: 'Beiträge', color: '#7B4FB8', text: '#FFFFFF',
-      subs: [{ id: 'news.finden', label: 'Beiträge finden', kurz: 'finden', form: 'suchen' }, { id: 'news.teilen', label: 'Beitrag teilen', kurz: 'teilen', form: 'teilen' }, { id: 'news.veroeffentlichen', label: 'Beitrag veröffentlichen', kurz: 'schreiben', form: 'anlegen' }] }
+      subs: [{ id: 'termine.finden', label: 'Termine finden', kurz: 'finden', form: 'suchen' }, { id: 'termine.teilen', label: 'Termin teilen', kurz: 'teilen', form: 'teilen' }, { id: 'termine.erstellen', label: 'Termin erstellen', kurz: 'erstellen', form: 'anlegen' }, { id: 'termine.bearbeiten', label: 'Termin bearbeiten', kurz: 'bearbeiten', form: 'bearbeiten', farbe: 'ich' }] },
+    { id: 'news', label: 'Artikel', color: '#7B4FB8', text: '#FFFFFF',
+      subs: [{ id: 'news.finden', label: 'Artikel finden', kurz: 'finden', form: 'suchen' }, { id: 'news.teilen', label: 'Artikel teilen', kurz: 'teilen', form: 'teilen' }, { id: 'news.veroeffentlichen', label: 'Artikel schreiben', kurz: 'schreiben', form: 'anlegen' }, { id: 'news.bearbeiten', label: 'Artikel bearbeiten', kurz: 'bearbeiten', form: 'bearbeiten', farbe: 'ich' }] }
   ];
   // Zweite Sicht auf dieselbe Belegung: Blätter sind die vier Wege, Knospen die Dinge, die es dazu gibt. Kennungen und Ziele bleiben gleich.
+  // Unter „bearbeiten“ steht als letzte Knospe, zum Blatt „ich“ hin, das eigene Profil.
   const FUNCS_F = [FUNCS[0]].concat(FORM_ORDER.map(k => ({ id: k, label: FORMEN[k].blatt, color: FORMEN[k].color, text: '#FFFFFF', form: k,
-    subs: FUNCS.slice(1).flatMap(f => f.subs.filter(u => u.form === k).map(u => Object.assign({ ding: f.id }, u))) })));
+    subs: FUNCS.slice(1).flatMap(f => f.subs.filter(u => u.form === k).map(u => Object.assign({ ding: f.id }, u)))
+      .concat(k === 'bearbeiten' ? [Object.assign({ ding: 'ich', name: 'mein Profil' }, FUNCS[0].subs.find(u => u.id === 'ich.profil'))] : []) })));
   const DING = {}; FUNCS.forEach(f => { DING[f.id] = f; });
   [FUNCS, FUNCS_F].forEach(liste => liste.forEach((f, i) => {
     const a = (-90 + 72 * i) * Math.PI / 180;
@@ -1985,9 +1989,10 @@ a.kat-card:hover{border-color:var(--c-koop)}
     'termine.teilen': '/termine/teilen',
     'termine.erstellen': '/termine/neu',
     'termine.bearbeiten': '/termine/bearbeiten',
-    'news.finden': '/beitraege',
-    'news.teilen': '/beitraege/teilen',
-    'news.veroeffentlichen': '/beitraege/neu',
+    'news.finden': '/artikel',
+    'news.teilen': '/artikel/teilen',
+    'news.veroeffentlichen': '/artikel/neu',
+    'news.bearbeiten': '/artikel/bearbeiten',
     'suchen': '/finden', 'teilen': '/teilen', 'anlegen': '/erstellen', 'bearbeiten': '/bearbeiten'
   };
 
@@ -2388,7 +2393,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
         this.text(pill, f.label, 0, 1, 21, f.ink, 'lbl');
       } else {
         el('circle', { class: 'act main', 'data-action': f.id, r: R, fill: f.color, 'fill-opacity': 0.96 }, pop);
-        this.text(pop, f.label, 0, 2, f.label.length > 12 ? 22 : f.label.length > 9 ? 26 : 30, f.text, 'lbl');
+        this.text(pop, f.offen || f.label, 0, 2, f.label.length > 12 ? 22 : f.label.length > 9 ? 26 : 30, f.text, 'lbl');   // „ich“ wird aufgeklappt zu „mein“
       }
 
       requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -2402,7 +2407,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
           const a = ang + (n === 1 ? 0 : (k - (n - 1) / 2) * (2 * spread / (n - 1)));
           const dist = R + 26, bx = dist * Math.cos(a), by = dist * Math.sin(a);
           // Die Knospe trägt die Farbe ihres Dings: in der Sicht von den Wegen immer, sonst wenn sie zu einem anderen Ding gehört als ihr Blatt (farbe)
-          const fb = s.farbe && FARBE[s.farbe], far = fb ? { color: fb[0], text: fb[1], light: mix(fb[0], '#FFFFFF', 0.22) } : s.ding ? DING[s.ding] : f;
+          const fb = s.farbe && FARBE[s.farbe], mk = c => ({ color: c[0], text: c[1], light: mix(c[0], '#FFFFFF', 0.22) }), far = s.ding ? (FARBE[s.ding] ? mk(FARBE[s.ding]) : DING[s.ding]) : fb ? mk(fb) : f;
           const eng = window.matchMedia && window.matchMedia('(max-width:640px)').matches;
           const bud = el('g', { class: 'bud act', 'data-action': s.id, style: `--hl:${far.light}` }, pop);
           bud.style.transform = 'translate(0px,0px) scale(.2)';
@@ -2417,7 +2422,8 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
           // Bei vier Knospen stehen zwei dicht nebeneinander: ihre Namen laufen voneinander weg statt mittig darunter
           const mittig = n > 3 ? 0.12 : 0.35;
           const anchor = Math.cos(a) > mittig ? 'start' : Math.cos(a) < -mittig ? 'end' : 'middle';
-          const t = this.text(bud, eng && s.kurz ? (s.ding ? DING[s.ding].label : s.kurz) : s.label, lx, ly + (Math.abs(Math.cos(a)) <= 0.35 ? Math.sign(Math.sin(a)) * 10 : 0), 25, f.ink, 'out');
+          const t = this.text(bud, s.ding ? (s.name || DING[s.ding].label) : eng && s.kurz ? s.kurz : s.label, lx,   // vom Tun her trägt die Knospe den Namen ihres Dings
+             ly + (Math.abs(Math.cos(a)) <= 0.35 ? Math.sign(Math.sin(a)) * 10 : 0), 25, f.ink, 'out');
           t.setAttribute('text-anchor', anchor);
           const worte = t.textContent.split(' ');
           const zeilen = worte.length === 2 ? worte : [t.textContent], wort = GRAU_WORT[s.stand];
@@ -3255,10 +3261,10 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   // ---------- Erläuterungen auf der Startseite ----------
   // Vier plus ich (ADR-0010). go: [Text, Ziel] mit Ziel '#route', '@editor' oder 'https://…'; mehr: weitere Knöpfe; grau: 'spaeter' | 'offen'
   const EX = {
-    'ich': { t:'Dein Ausgangspunkt', p:'Hier steht, was zu dir gehört: dein Profil, deine Communities, die Menschen, denen du folgst, deine Materialien und deine Termine. Mit einem Profil nimmst du das überallhin mit.', subs:['ich.profil','ich.communities','ich.menschen','ich.materialien','ich.termine'], mehr:[['Themen eintragen','#start?zu=themen']] },
-    'ich.profil': { t:'Mein Profil', p:'Mit deinem Profil wird der ReliHub zu deinem persönlichen Ausgangspunkt. Ein Schlüssel öffnet alle angeschlossenen Seiten.', go:['Mit Nostr-Schlüssel anmelden','#profil'] },
+    'ich': { t:'Was zu mir gehört', p:'Dein Profil, deine Materialien und Termine, die Personen, denen du folgst, und deine Communities. Mit einem Profil nimmst du das überallhin mit.', subs:['ich.profil','ich.materialien','ich.termine','ich.menschen','ich.communities'], mehr:[['Themen eintragen','#start?zu=themen']] },
+    'ich.profil': { t:'Mein Profil', p:'Mit deinem Profil wird der ReliHub zu deinem persönlichen Ausgangspunkt. Ein Schlüssel öffnet alle angeschlossenen Seiten. Hier stellst du dich vor und änderst deine Angaben.', go:['Mit Nostr-Schlüssel anmelden','#profil'] },
     'ich.communities': { t:'Meine Communities', p:'Die Communities, in denen du Mitglied bist oder denen du folgst, mit dem, was dort gerade läuft.', lock:true, go:['Meine Communities','#profil?zu=comm'], mehr:[['Alle Communities','#communities']] },
-    'ich.menschen': { t:'Wem ich folge', p:'Die Menschen, denen du folgst. Du siehst, was sie teilen und wo sie mitarbeiten.', lock:true, go:['Personen ansehen','#kooperieren/personen'], mehr:[['Liste im Profil','','offen']] },
+    'ich.menschen': { t:'Meine Personen', p:'Die Menschen, denen du folgst. Du siehst, was sie teilen und wo sie mitarbeiten.', lock:true, go:['Personen ansehen','#kooperieren/personen'], mehr:[['Liste im Profil','','offen']] },
     'ich.materialien': { t:'Meine Materialien', p:'Was du gemerkt, gesammelt oder selbst geteilt hast.', lock:true, go:['Zum Profil','#profil'], mehr:[['Meine Sammlung','#finden/sammlung']] },
     'ich.termine': { t:'Meine Termine', p:'Termine, zu denen du zugesagt hast, und Veranstaltungen, die zu deinen Themen passen.', lock:true, go:['Meine Termine','#profil?zu=events'] },
     'menschen': { t:'Wer hier arbeitet', p:'Einzelne Menschen und ihre Zusammenschlüsse: Personen, die Religion unterrichten, vermitteln und erforschen, und Communities zu einem Thema oder für eine Zielgruppe.', subs:['menschen.personen','menschen.communities'] },
@@ -3273,15 +3279,16 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     'termine.finden': { t:'Termine finden', p:'Entdecke Fortbildungen religionspädagogischer Institute und Communities, deutschlandweit und meist online. Das geht ohne Anmeldung. Zusagen kannst du mit einem Profil direkt am Termin.', go:['Zum Kalender','#finden/fortbildungen'], mehr:[['Im Überblick ansehen','#oekosystem']] },
     'termine.teilen': { t:'Termin teilen', p:'Gib einen Termin weiter: als Link, als Kalenderdatei oder in eine deiner Communities. Die Knöpfe dafür stehen an jedem Termin im Kalender.', go:['Zum Kalender','#finden/fortbildungen'], mehr:[['In eine Community teilen','','offen']] },
     'termine.erstellen': { t:'Termin erstellen', p:'Trag deine Fortbildung oder Veranstaltung ein. Einmal eingetragen, erscheint sie im gemeinsamen Kalender und auf allen angeschlossenen Seiten, zu denen sie passt.', lock:true, go:['Termin eintragen','@termin'] },
-    'termine.bearbeiten': { t:'Termin bearbeiten', p:'Einen eigenen Termin ändern oder absagen ist gewollt und im Hub noch nicht gebaut.', grau:'offen', go:['Zum Kalender','#finden/fortbildungen'], mehr:[['Ändern','','offen'],['Absagen','','offen']] },
-    'news': { t:'Was es Neues gibt', p:'Beiträge, Artikel und Neuigkeiten aus den Communities und Instituten.', subs:['news.finden','news.teilen','news.veroeffentlichen'] },
-    'news.finden': { t:'Beiträge finden', p:'Lies, was in den Communities gerade geschrieben und besprochen wird. Das geht ohne Anmeldung.', go:['Beiträge lesen','#mitmachen'], mehr:[['Aus meinen Communities','#profil?zu=artikel']] },
-    'news.teilen': { t:'Beitrag teilen', p:'Gib einen Beitrag in eine deiner Communities weiter. Das geht im Raum der Community.', lock:true, go:['Zu den Communities','#communities'], mehr:[['Direkt am Beitrag teilen','','offen']] },
-    'news.veroeffentlichen': { t:'Beitrag veröffentlichen', p:'Schreib einen Beitrag. Beim Veröffentlichen wählst du, in welchen Communities er erscheint.', lock:true, go:['Beitrag schreiben','@beitrag'] },
-    'suchen': { t:'Ich möchte finden', p:'Schauen, was es gibt: Personen, Communities, Materialien, Termine und Beiträge. Alles hier geht ohne Anmeldung.', subs:['menschen.personen','menschen.communities','material.finden','termine.finden','news.finden'] },
-    'teilen': { t:'Ich möchte teilen', p:'Vorhandenes sichtbar machen oder weitergeben: ein Material, einen Termin, einen Beitrag.', subs:['material.teilen','termine.teilen','news.teilen'] },
-    'anlegen': { t:'Ich möchte erstellen', p:'Etwas Neues in die Welt bringen: ein Material, einen Termin, einen Beitrag.', subs:['material.erstellen','termine.erstellen','news.veroeffentlichen'] },
-    'bearbeiten': { t:'Ich möchte bearbeiten', p:'An Vorhandenem weiterarbeiten: Materialien sammeln und anpassen, einen eigenen Termin ändern.', subs:['material.bearbeiten','termine.bearbeiten'] }
+    'termine.bearbeiten': { t:'Termin bearbeiten', p:'Deine eigenen Termine änderst du selbst: Zeit, Ort, Beschreibung. Der Hub führt dich zu deinen Terminen. Das Ändern selbst geschieht bis auf Weiteres bei edufeed.', lock:true, go:['Meine Termine','#profil?zu=events'], mehr:[['Bei edufeed ändern','https://edufeed.org'],['Im Hub ändern','','offen']] },
+    'news': { t:'Was geschrieben wird', p:'Artikel und Neuigkeiten aus den Communities und Instituten.', subs:['news.finden','news.teilen','news.veroeffentlichen','news.bearbeiten'] },
+    'news.finden': { t:'Artikel finden', p:'Lies, was in den Communities gerade geschrieben und besprochen wird. Das geht ohne Anmeldung.', go:['Artikel lesen','#mitmachen'], mehr:[['Aus meinen Communities','#profil?zu=artikel']] },
+    'news.teilen': { t:'Artikel teilen', p:'Gib einen Artikel in eine deiner Communities weiter. Das geht im Raum der Community.', lock:true, go:['Zu den Communities','#communities'], mehr:[['Direkt am Artikel teilen','','offen']] },
+    'news.veroeffentlichen': { t:'Artikel schreiben', p:'Schreib einen Artikel. Beim Veröffentlichen wählst du, in welchen Communities er erscheint.', lock:true, go:['Artikel schreiben','@beitrag'] },
+    'news.bearbeiten': { t:'Artikel bearbeiten', p:'Deine eigenen Artikel änderst du selbst. Der Hub führt dich zu den Artikeln aus deinen Communities. Das Ändern selbst geschieht bis auf Weiteres bei edufeed.', lock:true, go:['Meine Artikel','#profil?zu=artikel'], mehr:[['Bei edufeed ändern','https://edufeed.org'],['Im Hub ändern','','offen']] },
+    'suchen': { t:'Ich möchte finden', p:'Schauen, was es gibt: Personen, Communities, Materialien, Termine und Artikel. Alles hier geht ohne Anmeldung.', subs:['menschen.personen','menschen.communities','material.finden','termine.finden','news.finden'] },
+    'teilen': { t:'Ich möchte teilen', p:'Vorhandenes sichtbar machen oder weitergeben: ein Material, einen Termin, einen Artikel.', subs:['material.teilen','termine.teilen','news.teilen'] },
+    'anlegen': { t:'Ich möchte erstellen', p:'Etwas Neues in die Welt bringen: ein Material, einen Termin, einen Artikel.', subs:['material.erstellen','termine.erstellen','news.veroeffentlichen'] },
+    'bearbeiten': { t:'Ich möchte bearbeiten', p:'An Eigenem und Vorhandenem weiterarbeiten: Materialien sammeln und anpassen, eigene Termine und Artikel ändern, das eigene Profil pflegen.', subs:['material.bearbeiten','termine.bearbeiten','news.bearbeiten','ich.profil'] }
   };
   const EX_NAME = {}, FORM_VON = {};   // Beschriftungen aus der Konsole: Element und Knospe; Aktionsform je Knospe
   RelihubSteuerkonsole.functions.forEach(f => { EX_NAME[f.id] = f.label; f.subs.forEach(u => { EX_NAME[u.id] = u.label; if (u.form) FORM_VON[u.id] = u.form; }); });
@@ -3328,7 +3335,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const direkt = MODUS === 'direkt';
     const kopf = direkt ? `<h2>Die Konsole führt dich direkt zur Aktion</h2><p>Ein Klick auf eine Knospe öffnet sofort, was dahintersteht. Unter „Hilfe“ zeigt dir die Konsole die Erklärungen wieder. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`
       : SICHT === 'formen' ? `<h2>Ich möchte …</h2><p>Finden, teilen, erstellen, bearbeiten: Fahre über einen Kreis, und du siehst, womit das geht. Oben stehst du. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`
-      : `<h2>Vier Dinge und du</h2><p>Menschen, Communities, Materialien und Termine: Fahre über einen Kreis, und du siehst gleich, was es dazu gibt. Oben stehst du. Sag dort, was dich interessiert. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`;
+      : `<h2>Vier Dinge und du</h2><p>Menschen, Materialien, Termine und Artikel: Fahre über einen Kreis, und du siehst gleich, was es dazu gibt. Oben stehst du. Sag dort, was dich interessiert. Diesen Knopf findest du auf jeder Seite unten rechts.</p>`;
     const umschalter = direkt ? `<button type="button" class="btn btn-ghost modus" data-modus="tutorial">Konsole wieder erklären lassen</button>` : `<button type="button" class="btn btn-ghost modus" data-modus="direkt">Verstanden, direkt loslegen</button>`;
     exEl.innerHTML = `${icon('none')}<div><p class="fn" style="color:var(--muted)">So funktioniert's</p>${kopf}<div class="acts"><span class="hint">Schon dabei?</span><a class="btn btn-ghost" href="#profil" data-anmelden>Anmelden</a>${umschalter}</div></div>`;
   }
@@ -5827,7 +5834,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 
   // ---------- Kontexte der Steuerkonsole: dieselbe Steuerkonsole, je nach Seite andere Aktionen ----------
   let LOGGED = false;   // abgeleitet aus ICH.hex (ichSetzen im Block „Anmeldung“)
-  const VIEW_OF = { 'material.finden': 'materialpool', 'ich.profil': 'profil', 'ich.communities': 'profil?zu=comm', 'ich.termine': 'profil?zu=events', 'ich.materialien': 'profil', 'ich.menschen': 'kooperieren/personen', 'material.bearbeiten': 'finden/sammlung', 'material.erstellen': 'relidesk?tab=schreibtisch', 'termine.finden': 'finden/fortbildungen', 'termine.teilen': 'finden/fortbildungen', 'menschen.personen': 'kooperieren/personen', 'news.finden': 'mitmachen', 'news.teilen': 'communities' };
+  const VIEW_OF = { 'material.finden': 'materialpool', 'ich.profil': 'profil', 'ich.communities': 'profil?zu=comm', 'ich.termine': 'profil?zu=events', 'ich.materialien': 'profil', 'ich.menschen': 'kooperieren/personen', 'material.bearbeiten': 'finden/sammlung', 'material.erstellen': 'relidesk?tab=schreibtisch', 'termine.finden': 'finden/fortbildungen', 'termine.teilen': 'finden/fortbildungen', 'menschen.personen': 'kooperieren/personen', 'news.finden': 'mitmachen', 'news.teilen': 'communities', 'termine.bearbeiten': 'profil?zu=events', 'news.bearbeiten': 'profil?zu=artikel' };
   function navTo(view, url) { const q = new URL(url).search; go(view + (q ? (view.includes('?') ? '&' + q.slice(1) : q) : '')); }
   function info(d) {
     if (!['menschen', 'communities', 'material', 'termine', 'sehen', 'zeigen', 'erarbeiten', 'kontakt'].includes(d.action)) return false;

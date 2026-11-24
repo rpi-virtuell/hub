@@ -66,10 +66,10 @@ Deno.test('Teilen in Communities im Beitrags- und Termin-Editor', () => {
   assert(/function isMember\(/.test(s), 'isMember fehlt');
 });
 
-Deno.test('Beiträge sind ein eigenes Blatt (ADR-0015), das Profil hat ein Artikel-Panel', () => {
+Deno.test('Artikel sind ein eigenes Blatt (ADR-0015), das Profil hat ein Artikel-Panel', () => {
   const c = consoleScript(), s = appScript();
   assert(!/material\.beitraege/.test(c + s), 'alte Knospe Beiträge unter Material ist noch da');
-  assert(/'news\.finden': \{[^\n]*go:\['Beiträge lesen','#mitmachen'\][^\n]*'#profil\?zu=artikel'/.test(s) && /'news\.veroeffentlichen': \{[^\n]*go:\['Beitrag schreiben','@beitrag'\]/.test(s), 'Beiträge ohne Weg zum Lesen oder Schreiben');
+  assert(/'news\.finden': \{[^\n]*go:\['Artikel lesen','#mitmachen'\][^\n]*'#profil\?zu=artikel'/.test(s) && /'news\.veroeffentlichen': \{[^\n]*go:\['Artikel schreiben','@beitrag'\]/.test(s) && /'news\.bearbeiten': \{[^\n]*go:\['Meine Artikel','#profil\?zu=artikel'\]/.test(s), 'Artikel ohne Weg zum Lesen, Schreiben oder Bearbeiten');
   assert(html.includes('id="artikel"') && html.includes('Artikel aus deinen Communities'), 'Panel fehlt');
   assert(/function renderArtikel\(/.test(s) && s.includes('Folge Communities, um hier Artikel zu sehen.'), 'renderArtikel oder Leerzustand fehlt');
 });

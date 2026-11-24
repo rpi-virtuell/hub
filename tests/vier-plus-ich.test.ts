@@ -6,7 +6,7 @@ const block = (re: RegExp) => (s.match(re) || [''])[0];
 const fn = (name: string) => block(new RegExp(`  function ${name}\\([^)]*\\) \\{[\\s\\S]*?\\n  \\}`));
 const FUNCS = new Function((c.match(/const FUNCS = \[[\s\S]*?\n  \];/) || [''])[0] + '; return FUNCS;')() as { id: string; label: string; self?: boolean; subs: { id: string; label: string; kurz?: string; stand?: string; form?: string; farbe?: string }[] }[];
 
-Deno.test('Konsole: ich oben, dann Menschen, Materialien, Termine, Beiträge (ADR-0015)', () => {
+Deno.test('Konsole: ich oben, dann Menschen, Materialien, Termine, Artikel (ADR-0015)', () => {
   assertEquals(FUNCS.map((f) => f.id), ['ich', 'menschen', 'material', 'termine', 'news']);
   assert(FUNCS[0].self === true && /const a = \(-90 \+ 72 \* i\)/.test(c), '„ich“ steht nicht oben oder navigiert nicht selbst');
   assert(!/'(hub|finden|erstellen|kooperieren|veroeffentlichen)\.[a-z]+'/.test(c + s), 'frühere Kennungen im Code');
@@ -15,22 +15,25 @@ Deno.test('Konsole: ich oben, dann Menschen, Materialien, Termine, Beiträge (AD
 
 Deno.test('Belegung: Knospen je Blatt, vier Wege, Reagieren ist kein Menüpunkt', () => {
   const k = (id: string) => FUNCS.find((f) => f.id === id)!.subs.map((u) => u.id.split('.')[1]);
-  assertEquals(k('ich'), ['profil', 'communities', 'menschen', 'materialien', 'termine']);
+  assertEquals(k('ich'), ['menschen', 'materialien', 'profil', 'termine', 'communities'], 'Profil in der Mitte, daneben Materialien und Termine, außen Personen und Communities');
+  assert(/\{ id: 'ich', label: 'ich', offen: 'mein',/.test(c) && /this\.text\(pop, f\.offen \|\| f\.label,/.test(c), 'aufgeklappt steht „mein“ auf dem Blatt');
   assertEquals(k('menschen'), ['personen', 'communities']);
   assertEquals(k('material'), ['finden', 'teilen', 'erstellen', 'bearbeiten']);
   assertEquals(k('termine'), ['finden', 'teilen', 'erstellen', 'bearbeiten']);
-  assertEquals(k('news'), ['finden', 'teilen', 'veroeffentlichen']);
+  assertEquals(k('news'), ['finden', 'teilen', 'veroeffentlichen', 'bearbeiten']);
+  assertEquals(FUNCS.find((f) => f.id === 'news')!.label, 'Artikel');
+  assert(!/Beitr[aä]g/.test(JSON.stringify(FUNCS)), 'Wort Beitrag in der Blume');
   const weg = (id: string) => FUNCS.find((f) => f.id === id)!.subs.map((u) => u.form);
   assertEquals(weg('ich'), [undefined, undefined, undefined, undefined, undefined], '„ich“ steht außerhalb der Wege');
   assertEquals(weg('menschen'), ['suchen', 'suchen']);
   assertEquals(weg('material'), ['suchen', 'teilen', 'anlegen', 'bearbeiten']);
   assertEquals(weg('termine'), ['suchen', 'teilen', 'anlegen', 'bearbeiten']);
-  assertEquals(weg('news'), ['suchen', 'teilen', 'anlegen']);
+  assertEquals(weg('news'), ['suchen', 'teilen', 'anlegen', 'bearbeiten']);
   for (const [k, wort] of [['suchen', 'finden'], ['teilen', 'teilen'], ['anlegen', 'erstellen'], ['bearbeiten', 'bearbeiten']]) assert(new RegExp(`\\n    ${k}: \\{ label: '${wort}', blatt: '${wort}', color: '#[0-9A-F]{6}', d: '[^']+' \\}`).test(c), `Zeichen für ${wort} fehlt`);
   // Farbpunkte: eine Knospe, die zu einem anderen Ding gehört als ihr Blatt, trägt dessen Farbe
   const farbe = Object.fromEntries(FUNCS.flatMap((f) => f.subs).filter((u) => u.farbe).map((u) => [u.id, u.farbe]));
-  assertEquals(farbe, { 'ich.communities': 'communities', 'ich.menschen': 'menschen', 'ich.materialien': 'material', 'ich.termine': 'termine', 'menschen.communities': 'communities' });
-  assert(/const fb = s\.farbe && FARBE\[s\.farbe\]/.test(c) && /communities: \['#7B4FB8', '#FFFFFF'\]/.test(c) && /material: \['#007A75', '#FFFFFF'\]/.test(c), 'Knospe ohne Farbe ihres Dings');
+  assertEquals(farbe, { 'ich.communities': 'communities', 'ich.menschen': 'menschen', 'ich.materialien': 'material', 'ich.termine': 'termine', 'termine.bearbeiten': 'ich', 'news.bearbeiten': 'ich' });
+  assert(/const fb = s\.farbe && FARBE\[s\.farbe\]/.test(c) && /communities: \['#D6336C', '#FFFFFF'\]/.test(c) && /material: \['#007A75', '#FFFFFF'\]/.test(c) && /ich: \['#203A8F', '#FFFFFF'\]/.test(c), 'Communities tragen die Farbe der Menschen, Eigenes ist blau');
   assert(!/reagieren|Rückmeldung geben|teilnehmen|folgen'/.test(JSON.stringify(FUNCS)), 'Reagieren, Teilnehmen oder Folgen als Menüpunkt');
   for (const f of FUNCS) for (const u of f.subs) assert(u.label.split(' ').length <= 3 && (u.kurz || '').length > 0 && (u.kurz || '').length <= 11, `${u.id}: Name oder Kurzname passt nicht`);
   assert(/d\.stand === 'offen'\) \{ toast\(/.test(fn('standardAktion')), 'Hellgraue Knospe ohne Hinweis');
@@ -55,11 +58,11 @@ Deno.test('Konsole: jede Aktion hat Route, Erklärung und Farben', () => {
 
 Deno.test('Graustufen: Stand an der Knospe, im Ereignis, in der Karte; lesbar', () => {
   const grau = FUNCS.flatMap((f) => f.subs).filter((u) => u.stand);
-  assertEquals(grau.map((u) => `${u.id}:${u.stand}`).sort(), ['termine.bearbeiten:offen']);
+  assertEquals(grau.map((u) => `${u.id}:${u.stand}`).sort(), [], 'keine Knospe ist mehr grau');
   assert(/const GRAU = \{ spaeter: \{ fill: '#5F6672', text: '#FFFFFF' \}, offen: \{ fill: '#C9CED6', text: '#2B2F36' \} \}/.test(c), 'GRAU');
   assert(contrast('#FFFFFF', '#5F6672') >= 4.5 && contrast('#2B2F36', '#C9CED6') >= 4.5, 'Kontrast der Graustufen');
   assert(/stand: STAND\[action\] \|\| null/.test(c) && /\(später\)/.test(c) && /\(noch nicht gebaut\)/.test(c), 'Stand fehlt im Ereignis oder im Linktext');
-  assert(/'termine\.bearbeiten': \{[^}]*grau:'offen'/.test(s) && /'material\.bearbeiten': \{[^\n]*\['Übernehmen und verändern','#relidesk\?tab=schreibtisch','spaeter'\]/.test(s), 'Karte oder Handlung ohne Graustufe');
+  assert(/'termine\.bearbeiten': \{[^\n]*\['Im Hub ändern','','offen'\]/.test(s) && /'material\.bearbeiten': \{[^\n]*\['Übernehmen und verändern','#relidesk\?tab=schreibtisch','spaeter'\]/.test(s), 'Karte oder Handlung ohne Graustufe');
   assert(/if \(d\.stand\) toast\(/.test(fn('standardAktion')) && /d\.stand === 'offen'\) \{ toast\(/.test(fn('standardAktion')), 'Kein Hinweis beim Klick auf eine graue Knospe');
   assert(/if \(stand\) \{/.test(fn('exKnopf')) && /aria-disabled="true"/.test(fn('exKnopf')), 'Graue Handlung in der Karte fehlt');
 });
@@ -104,9 +107,11 @@ Deno.test('Sicht vom Tun her: dieselbe Belegung, Blätter sind die vier Wege, Kn
   const z = fn('sichtSetzen');
   assert(/speicher\('relihub-sicht', SICHT\)/.test(z) && /setAttribute\('sicht', 'formen'\)/.test(z) && /removeAttribute\('sicht'\)/.test(z) && /aria-pressed/.test(z), 'Umschalter merkt oder setzt die Sicht nicht');
   assert(/\n  sichtSetzen\(speicher\('relihub-sicht'\)\);\n  themenRender\(\);/.test(s), 'Gemerkte Sicht wird beim Start nicht gesetzt');
-  const zahl: Record<string, number> = { suchen: 5, teilen: 3, anlegen: 3, bearbeiten: 2 };
+  const zahl: Record<string, number> = { suchen: 5, teilen: 3, anlegen: 3, bearbeiten: 3 };
+  assert(/k === 'bearbeiten' \? \[Object\.assign\(\{ ding: 'ich', name: 'mein Profil' \}/.test(c) && /subs:\['material\.bearbeiten','termine\.bearbeiten','news\.bearbeiten','ich\.profil'\]/.test(s), 'unter bearbeiten steht zuletzt das eigene Profil');
+  assert(/s\.ding \? \(s\.name \|\| DING\[s\.ding\]\.label\)/.test(c) && /name: 'Personen'/.test(c) && /name: 'Communities'/.test(c), 'vom Tun her trägt die Knospe den Namen ihres Dings, bei Menschen Personen und Communities');
   for (const k of Object.keys(zahl)) {
-    assert(new RegExp(`'${k}': \\{ t:'Ich möchte [^']+', p:'[^']+', subs:\\[('[a-z]+\\.[a-z]+',?){${zahl[k]}}\\] \\}`).test(s), `Karte ${k}`);
+    assert(new RegExp(`'${k}': \\{ t:'Ich möchte [^']+', p:'[^']+', subs:\\[('[a-z]+\\.[a-z]+',?){${zahl[k] + (k === 'bearbeiten' ? 1 : 0)}}\\] \\}`).test(s), `Karte ${k}`);
     assertEquals(FUNCS.slice(1).flatMap((f) => f.subs).filter((u) => u.form === k).length, zahl[k], `Knospen am Weg ${k}`);
   }
 });

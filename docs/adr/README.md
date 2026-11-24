@@ -41,4 +41,4 @@ Regeln: Deutsch; Produktsicht (keine Projektverwaltung, keine Berichtsbezüge); 
 | [0012](0012-oekosystem-als-blume.md) | Ökosystem als Blume mit Kelch: gewählter Eintrag in der Mitte, Verbundenes in den Blättern, Handlungen im Kelch | Entwurf |
 | [0013](0013-mitte-plus-vier.md) | Mitte plus vier: der Ort in der Mitte, oben ich, ringsum die vier Dinge; Blume mit Instanz in der Mitte als mitwanderndes Zeichen; erstes Beispiel relilab | Entwurf |
 | [0014](0014-stiel-mit-orten.md) | Stiel mit den Orten: die Orte der Leiste als Blätter am Stiel der Blume, aktueller Ort markiert; Hinweiszeile zum Filter bei relilab | Entwurf |
-| [0015](0015-belegung-der-blume.md) | Belegung der Blume: ich, Menschen, Materialien, Termine, Beiträge; Knospen als Wege (finden, teilen, erstellen, bearbeiten); Reagieren am Eintrag; umkehrbar vom Tun her mit denselben vier Wegen | Entwurf |
+| [0015](0015-belegung-der-blume.md) | Belegung der Blume: ich, Menschen, Materialien, Termine, Artikel; Knospen als Wege (finden, teilen, erstellen, bearbeiten); Reagieren am Eintrag; umkehrbar vom Tun her mit denselben vier Wegen | Entwurf |
