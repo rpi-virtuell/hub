@@ -12,9 +12,9 @@
   /* Textfarben je Bereich: mindestens 4,5:1 auf paper, card und eigenem Tint */
   --x-hub:#203A8F;--x-finden:#00605C;--x-erstellen:#8A4C00;--x-koop:#7A1A3E;--x-ver:#5A3590;
   /* Farbnavigation (ADR-0017): eine Farbe je Inhaltsart, Werte aus dem Erscheinungsbild des Instituts; x = Text auf hellem Grund, t = Tint */
-  --n-ich:#2A3B8E;--n-material:#85992C;--n-termine:#DAB000;--n-menschen:#AF4112;--n-gespraeche:#DA8D00;--n-news:#7F89BB;
-  --nx-material:#4E5B13;--nx-termine:#6B5600;--nx-menschen:#8F330B;--nx-gespraeche:#7A4E00;--nx-news:#353F78;
-  --nt-material:#EEF1DD;--nt-termine:#FAF1CC;--nt-menschen:#F7E3DA;--nt-gespraeche:#FBEBCF;--nt-news:#E6E8F3;
+  --n-ich:#2A3B8E;--n-material:#85992C;--n-termine:#DAB000;--n-menschen:#AF4112;--n-gespraeche:#B549F0;--n-news:#0072AA;
+  --nx-material:#4E5B13;--nx-termine:#6B5600;--nx-menschen:#8F330B;--nx-gespraeche:#7A1FB5;--nx-news:#005A87;
+  --nt-material:#EEF1DD;--nt-termine:#FAF1CC;--nt-menschen:#F7E3DA;--nt-gespraeche:#F1E0FC;--nt-news:#DCEEF7;
   --t-hub:#E6EAF5;--t-finden:#DDF1F0;--t-erstellen:#FEEFD9;--t-koop:#FAE1EA;--t-ver:#EEE7F7;--t-profil:#E6EAF5;
   --ink:#1D1D1B;--muted:#5F5E5A;--line:#E7E4DC;--paper:#FBFAF7;--card:#FFFFFF;
   /* Lizenzpillen (Fläche plus Textfarbe, 4,5:1 auf Fläche, paper und card) */
@@ -1236,8 +1236,20 @@ a.kat-card:hover{border-color:var(--c-koop)}
 .stage h1{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .flower-wrap{position:relative;flex-direction:column;align-items:center;padding:84px 0 30px}
 /* Erläuterung zum Blatt: steht neben der Blume in der Farbe des Blatts, auf schmalen Schirmen darunter */
-.v-hinweis{position:relative;z-index:1;max-width:560px;min-height:3.2em;margin:84px auto 0;padding:10px 16px;font-size:17px;color:var(--ink);border-left:6px solid var(--hc,var(--n-ich));border-radius:4px 14px 14px 4px;background:var(--card);text-align:left}
-@media (min-width:1100px){.v-hinweis{position:absolute;left:calc(50% + 268px);top:50%;transform:translateY(-50%);width:250px;margin:0;min-height:0}.flower-wrap{padding-bottom:104px}}
+.v-info{position:relative;z-index:1;max-width:560px;margin:84px auto 0;text-align:left}
+.v-hinweis{min-height:3.2em;margin:0;padding:10px 16px;font-size:17px;color:var(--ink);border-left:6px solid var(--hc,var(--n-ich));border-radius:4px 14px 14px 4px;background:var(--card)}
+@media (min-width:1100px){.v-info{position:absolute;left:calc(50% + 268px);top:50%;transform:translateY(-50%);width:270px;margin:0}.v-hinweis{min-height:0}.flower-wrap{padding-bottom:104px}}
+/* Vorschau um die Erläuterung: echte, aktuelle Einträge als Kreise mit Ring in der Farbe des Dings */
+.vk-reihe{display:flex;justify-content:flex-start;gap:10px;margin:12px 0 0;min-height:0}
+.vk{display:flex;flex-direction:column;align-items:center;gap:5px;width:82px;text-decoration:none;color:var(--ink);font-size:12px;line-height:1.2;text-align:center}
+.vk:nth-child(2){margin-top:14px}
+.vk-ring{position:relative;display:grid;place-items:center;width:74px;height:74px;border-radius:50%;padding:5px;box-sizing:border-box;background:linear-gradient(120deg,color-mix(in srgb,var(--hc) 45%,#fff),var(--hc) 60%,color-mix(in srgb,var(--hc) 70%,#1B2440))}
+.vk-bild{position:relative;display:grid;place-items:center;width:100%;height:100%;border-radius:50%;overflow:hidden;border:2px solid #fff;box-sizing:border-box;background:color-mix(in srgb,var(--hc) 22%,#fff);color:#1B2440;font:600 20px/1 "Barlow Condensed",sans-serif}
+.vk-bild img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vk b{font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.vk:focus-visible{outline:3px solid var(--n-ich);outline-offset:2px;border-radius:10px}
+.vk-kopf{margin:10px 0 0;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+body.oz-pop .bl-pw[data-typ="suche"]{order:9}
 .v-hinweis a{font-weight:600;color:var(--x-hub)}
 .v-drei{position:relative;z-index:1;display:grid;list-style:none;padding:0;margin:26px auto 0;max-width:880px;grid-template-columns:repeat(2,1fr);gap:12px;text-align:left}
 .v-drei li{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-size:15px}
@@ -1359,7 +1371,7 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
       <p class="st-chips" id="stThemenChips" aria-live="polite"></p>
     </form>
     <div class="st-sicht" id="stSicht" role="group" aria-label="Ordnung der Blume"><span>Ich denke</span><span class="st-seite an" data-sicht="dinge">von den Dingen her</span><button type="button" class="st-schalter" id="stSchalter" role="switch" aria-checked="false" aria-label="Vom Tun her denken statt von den Dingen her"></button><span class="st-seite" data-sicht="formen">vom Tun her</span></div>
-    <div class="flower-wrap"><relihub-steuerkonsole id="startFlower" size="320" context="hub-start" variant="knospen"></relihub-steuerkonsole><p class="v-hinweis" id="vHinweis" aria-live="polite"></p></div>
+    <div class="flower-wrap"><relihub-steuerkonsole id="startFlower" size="320" context="hub-start" variant="knospen"></relihub-steuerkonsole><div class="v-info" id="vInfo"><p class="v-hinweis" id="vHinweis" aria-live="polite"></p><p class="vk-kopf" id="vVorKopf" hidden></p><div class="vk-reihe" id="vVor"></div></div></div>
     <ul class="v-drei" id="vDrei">
       <li><b>Was du hier findest</b>Material, Termine und Artikel aus den religionspädagogischen Instituten und Communities, an einem Ort.</li>
       <li><b>Was du hier tun kannst</b>Suchen, Eigenes teilen, Termine eintragen und Menschen finden, die an deinen Themen arbeiten.</li>
@@ -1951,7 +1963,7 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
     <form class="fl-form" id="flForm"><input id="flEin" type="text" autocomplete="off" maxlength="200" placeholder="Frag Flowi …" aria-label="Frage an Flowi"><button type="submit">Senden</button></form>
   </div>
   <button type="button" class="fl-knopf" id="flKnopf" aria-expanded="false" aria-controls="flFeld" aria-label="Flowi fragen">
-    <svg viewBox="-50 -50 100 100" aria-hidden="true"><circle cx="0" cy="-24" r="20" fill="#85992C"/><circle cx="23" cy="-7" r="20" fill="#DAB000"/><circle cx="14" cy="19" r="20" fill="#7F89BB"/><circle cx="-14" cy="19" r="20" fill="#DA8D00"/><circle cx="-23" cy="-7" r="20" fill="#AF4112"/><circle r="19" fill="#fff"/><circle cx="-6" cy="-3" r="2.6" fill="#1B2440"/><circle cx="6" cy="-3" r="2.6" fill="#1B2440"/><path d="M-7 5 Q0 12 7 5" fill="none" stroke="#1B2440" stroke-width="2.4" stroke-linecap="round"/></svg>
+    <svg viewBox="-50 -50 100 100" aria-hidden="true"><circle cx="0" cy="-24" r="20" fill="#85992C"/><circle cx="23" cy="-7" r="20" fill="#DAB000"/><circle cx="14" cy="19" r="20" fill="#0072AA"/><circle cx="-14" cy="19" r="20" fill="#B549F0"/><circle cx="-23" cy="-7" r="20" fill="#AF4112"/><circle r="19" fill="#fff"/><circle cx="-6" cy="-3" r="2.6" fill="#1B2440"/><circle cx="6" cy="-3" r="2.6" fill="#1B2440"/><path d="M-7 5 Q0 12 7 5" fill="none" stroke="#1B2440" stroke-width="2.4" stroke-linecap="round"/></svg>
   </button>
 </div>
 <div class="ef-overlay" id="efOverlay" hidden></div>
@@ -2075,7 +2087,7 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
   const FORM_ORDER = ['suchen', 'teilen', 'anlegen', 'bearbeiten'];
   // Farbe einer Knospe, wenn sie zu einem anderen Ding gehört als ihr Blatt: „Materialien“ am Blatt „ich“ trägt die Farbe der Materialien
   // Communities gehören zu den Menschen und tragen deren Farbe; Violett steht für Artikel. Blau heißt: Das mache ich mit meinen eigenen Dingen.
-  const FARBE = { ich: ['#2A3B8E', '#FFFFFF'], menschen: ['#AF4112', '#FFFFFF'], communities: ['#AF4112', '#FFFFFF'], material: ['#85992C', '#1B2400'], termine: ['#DAB000', '#2B1A00'], news: ['#7F89BB', '#141A33'], gespraeche: ['#DA8D00', '#2B1A00'] };   // Werte aus dem Erscheinungsbild des Instituts (ADR-0017)
+  const FARBE = { ich: ['#2A3B8E', '#FFFFFF'], menschen: ['#AF4112', '#FFFFFF'], communities: ['#AF4112', '#FFFFFF'], material: ['#85992C', '#1B2400'], termine: ['#DAB000', '#2B1A00'], news: ['#0072AA', '#FFFFFF'], gespraeche: ['#B549F0', '#1B0A2A'] };   // Werte aus dem Erscheinungsbild des Instituts (ADR-0017)
   // Belegung nach ADR-0015: ich, Menschen, Materialien, Termine, Artikel. Die Knospen sind die Wege zu dem, was im Datenraum liegt:
   // finden, teilen, erstellen, bearbeiten. label: Verb plus Ding; kurz: nur das Verb, für enge Schirme; ding: Name des Dings in der Sicht vom Tun her.
   // Blatt „ich“: aufgeklappt steht „mein(e)“ auf dem Blatt, das Profil in der Mitte, daneben Materialien und Termine, außen Personen und Communities.
@@ -4638,11 +4650,11 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   // ---------- Ökosystem: Blume mit Kelch (ADR-0009, ADR-0012) ----------
   // Im Kelch liegt der gewählte Eintrag, die vier Blätter (Menschen, Communities, Materialien, Termine) zeigen, womit er verbunden ist; das obere Blatt sucht.
   // Ohne Antwort des Relays zeigt die Ansicht die Schnappschuss-Einträge ohne Kanten und sagt es; Kanten gelten wie geteilt, ohne Rollenprüfung.
-  const OZ_TYPEN = ['person', 'community', 'material', 'event'];
+  const OZ_TYPEN = ['material', 'event', 'community', 'person'];   // Material zuerst, wie in der Blume der Startseite
   const OZ_TITEL = { person: 'Menschen', event: 'Termine', community: 'Communities', material: 'Materialien' };
   const OZ_ART = { person: 'Mensch', event: 'Termin', community: 'Community', material: 'Material' };
   const OZ_EINZAHL = { person: 'Person', event: 'Termin', community: 'Community', material: 'Material' };
-  const OZ_WINKEL = { suche: 0, person: 72, community: 144, material: 216, event: 288 };   // Lage wie im Logo
+  const OZ_WINKEL = { material: 0, event: 72, suche: 144, community: 216, person: 288 };   // Lage wie in der Blume der Startseite: Material oben, rechts Termine, links Menschen (ADR-0017)
   const OZ_G = { cx: 550, cy: 548, r0: 64, lang: 470, breit: 370, kelch: 130, w: 240, h: 276 };   // Bühnenmaße: Mitte, Blattbeginn, Länge, Breite, Kelchradius, nutzbarer Bereich im Blatt
   const OZ_MAX = 60, OZ_MONATE = ['JAN', 'FEB', 'MÄR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DEZ'];
   const ozSchmal = () => matchMedia('(max-width:760px)').matches;
@@ -6908,8 +6920,29 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   });
   const vHinweis = document.getElementById('vHinweis'), startBlume = document.getElementById('startFlower');
   const blattFarbe = a => { const k = String(a).replace(/^e-/, '').split('.')[0]; return (D_FARBE[k] || [/^t-/.test(a) ? FORM_C[{ 't-finden': 'suchen', 't-teilen': 'teilen', 't-erstellen': 'anlegen', 't-bearbeiten': 'bearbeiten' }[a]] || D_FARBE.gespraeche[0] : D_FARBE.ich[0]])[0]; };
-  startBlume.addEventListener('relihub-activate', e => { if (V_SATZ[e.detail.action]) { vHinweis.textContent = V_SATZ[e.detail.action]; vHinweis.style.setProperty('--hc', blattFarbe(e.detail.action)); } });
-  startBlume.addEventListener('pointerleave', () => { vHinweis.textContent = startSatz(); vHinweis.style.removeProperty('--hc'); });
+  const vInfo = document.getElementById('vInfo'), vVor = document.getElementById('vVor'), vVorKopf = document.getElementById('vVorKopf');
+  // Vorschau zur Erläuterung: drei echte, aktuelle Einträge des Dings als Kreise mit Ring in seiner Farbe. Quelle ist das Gefüge des Ökosystems, für News die Artikel der OER-Community.
+  const VOR_TYP = { material: 'material', termine: 'event', menschen: 'person', communities: 'community' };
+  let vorDing = '';
+  function vorZeigen(aktion) {
+    const a = String(aktion).replace(/^e-/, ''), k = a === 'menschen.communities' ? 'communities' : a.split('.')[0];
+    vorDing = k;
+    const kreis = (href, name, bild, text) => `<a class="vk" href="${href}"><span class="vk-ring"><span class="vk-bild">${esc(text)}${bild ? `<img src="${esc(bild)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span></span><b>${name}</b></a>`;
+    let html = '', kopf = '';
+    if (VOR_TYP[k]) {
+      stLaden();
+      const gesehen = new Set();   // Reihen tragen denselben Titel mehrfach: je Titel nur ein Kreis
+      html = stVorschau(VOR_TYP[k], 24).liste.filter(e => { const n = ozName(e); if (gesehen.has(n)) return false; gesehen.add(n); return true; }).slice(0, 3).map(e => { const nm = ozName(e), dat = k === 'termine' ? (String(ozPille(e)).match(/\d{1,2}\.\d{1,2}\./) || [''])[0] : ''; return kreis('#oekosystem?wahl=' + encodeURIComponent(e.id), nm, dat ? '' : sichereUrl(ozBild(e)), dat || ozIni(nm)); }).join('');
+      kopf = k === 'termine' ? 'Die nächsten Termine' : k === 'material' ? 'Neu im Material' : k === 'communities' ? 'Communities' : 'Menschen im Netz';
+    } else if (k === 'news') {
+      html = OC_RAW.filter(e => e.kind === 30023 && tagWert(e, 'title') && !tagWerte(e, 'l').includes('seite')).sort((x, y) => y.created_at - x.created_at).slice(0, 3)
+        .map(e => kreis('#oercommunity/' + encodeURIComponent(tagWert(e, 'd')), esc(tagWert(e, 'title')), sichereUrl(tagWert(e, 'image')), 'N')).join('');
+      kopf = 'Neueste Artikel';
+    }
+    vVor.innerHTML = html; vVorKopf.textContent = kopf; vVorKopf.hidden = !html;
+  }
+  startBlume.addEventListener('relihub-activate', e => { if (V_SATZ[e.detail.action]) { vHinweis.textContent = V_SATZ[e.detail.action]; vInfo.style.setProperty('--hc', blattFarbe(e.detail.action)); vorZeigen(e.detail.action); } });
+  // Die Vorschau bleibt stehen, wenn der Zeiger die Blume verlässt: Man soll die Kreise erreichen und anklicken können
 
   // ---------- Tun auf der Seite des Dings ----------
   const TUN = {

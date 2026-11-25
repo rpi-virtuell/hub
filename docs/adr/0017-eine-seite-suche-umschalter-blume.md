@@ -35,10 +35,13 @@ Die Punkte 5, 8 und 10 sind damit geändert, Punkt 13 ergänzt.
 - **Von den Dingen her reduziert.** Ein Klick auf Material, Termine, News oder Gespräche führt direkt zur Seite. Was man dort tun kann, steht auf der Seite als Knopfzeile in der Farbe des Dings: veröffentlichen, erstellen, sammeln. Nur Menschen trägt zwei Knospen, Personen und Communities. Vom Tun her bleibt ausdifferenziert, dort sind die Knospen ohne Anmeldung grau.
 - **Erläuterung am Blatt.** Der Satz zum Blatt steht auf breiten Schirmen rechts neben der Blume, mit einem Rand in der Farbe des Blatts. Auf schmalen Schirmen steht er darunter.
 - **Blüten am linken Rand.** Am linken Rand ragen sechs Blütenblätter ein Stück herein. Beim Überfahren, Antippen oder mit der Tastatur blättern sie auf: oben der Weg zum Start, dann die Dinge, die Anmeldung und die Orte. Sie ersetzen die schwarze Leiste und die kleine Blume unten rechts. Bei jedem Ort steht, was er ist: Ort, Community, Werkzeug oder Projekt. In einer Community zeigen die Blüten deren eigene Wörter.
-- **Farben aus dem Erscheinungsbild des Instituts.** Material grün `#85992C`, Termine gelb `#DAB000`, Menschen und Communities rot `#AF4112`, Gespräche orange `#DA8D00`, die Mitte blau `#2A3B8E`. News tragen ein aufgehelltes Blau `#7F89BB`, weil die Palette keinen sechsten Ton hat. Die Farben gelten für Blume, Blüten am Rand und Ökosystem. Die Nachbau-Ansichten behalten vorerst ihre Farben.
+- **Farben aus dem Erscheinungsbild des Instituts.** Material grün `#85992C`, Termine gelb `#DAB000`, Menschen und Communities rot `#AF4112`, die Mitte blau `#2A3B8E`. Gespräche und News tragen zwei Töne aus der Palette von rpi-virtuell: Gespräche violett `#B549F0`, News blau `#0072AA`. Das Orange der ersten Fassung lag zu nah am Gelb der Termine. Die Farben gelten für Blume, Blüten am Rand und Ökosystem. Die Nachbau-Ansichten behalten vorerst ihre Farben.
 - **Flowi.** Unten rechts sitzt eine Chat-Blume als Hilfe. Im Entwurf antwortet sie nach Stichwort mit festen Sätzen und Links, ohne Sprachmodell, und sendet nichts. Sie sagt das selbst.
 - **reliGLOBAL als zweites Beispiel.** Neben relilab steht reliGLOBAL: eine Community mit einem Schaufenster. Die Blüten heißen dort „Material zum Globalen Lernen finden“ und „Werkstätten finden“ und führen in den Raum der Community.
 - **In Entwicklung.** Über Ansichten, hinter denen noch keine eigene Entwicklung steht, liegt quer der Schriftzug „In Entwicklung“ und oben ein Band: Materialpool, Sammlung, relidesk, rpi-virtuell, Eigene Instanz, die Räume der übrigen Communities und das Beispielprofil ohne Anmeldung.
+
+- **Große Blume wie die kleine.** Das Ökosystem ordnet seine Blätter wie die Blume der Startseite: Material oben, rechts Termine, links Menschen, darunter Communities. Die Suche liegt unten rechts. Auf schmalen Schirmen kommt Material zuerst.
+- **Vorschau um die Erläuterung.** Unter dem Satz zum Blatt stehen drei echte, aktuelle Einträge als Kreise mit einem Ring in der Farbe des Dings: die nächsten Termine mit Datum, neues Material, Menschen, Communities und die neuesten Artikel. Ein Klick führt zum Eintrag. Für Gespräche gibt es noch keine Vorschau.
 
 ## Technik
 - Vier Belegungen der Steuerkonsole: `eins-dinge-gast`, `eins-dinge-ich`, `eins-tun-gast`, `eins-tun-ich`. Welche gilt, folgt aus Sicht und Anmeldung.
@@ -52,7 +55,7 @@ Die Punkte 5, 8 und 10 sind damit geändert, Punkt 13 ergänzt.
 
 ## Offen
 - Die Suche findet nur über Namen und Titel, nicht über Schlagworte oder Beschreibungen.
-- Gelb und Orange liegen nah beieinander. Ob Termine und Gespräche so unterscheidbar genug sind, zeigt der Test. Grün und Gelb tragen dunkle Schrift, damit der Kontrast reicht.
+- Das Blau der News und das Blau der Mitte sind verwandt. Ob das trägt, zeigt der Test. Grün, Gelb und Violett tragen dunkle Schrift, damit der Kontrast reicht.
 - Flowi braucht eine Entscheidung, woher die Antworten später kommen.
 - Im relilab tragen je zwei Blätter dieselbe Farbe, weil zwei Blätter zum selben Ding gehören.
 - „News“ in der Blume und „Artikel“ in den Ansichten meinen dasselbe. Ein Wort für beides steht aus.

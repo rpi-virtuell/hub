@@ -94,7 +94,7 @@ Deno.test('Communities live: echter Knopf „Beitreten“ statt Beispiel-Folgen,
 
 Deno.test('Ökosystem als Blume: Kelch, fünf Blätter, ähnlich Verbundene, Aktionen im Kelch', () => {
   assert(/id="ozBuehne"/.test(html) && /id="ozWeg"/.test(html) && /<dialog id="ozAlle"/.test(html) && !/id="ozReihen"/.test(html) && !/oz-karte/.test(html), 'Bühne, Weg und Dialog statt Reihen');
-  assert(/\['suche', \.\.\.OZ_TYPEN\]/.test(fn('ozBuehne')) && /const OZ_TYPEN = \['person', 'community', 'material', 'event'\]/.test(s) && /bl-calyx/.test(fn('ozBuehne')), 'fünf Blätter und Kelch');
+  assert(/\['suche', \.\.\.OZ_TYPEN\]/.test(fn('ozBuehne')) && /const OZ_TYPEN = \['material', 'event', 'community', 'person'\]/.test(s) && /const OZ_WINKEL = \{ material: 0, event: 72, suche: 144, community: 216, person: 288 \}/.test(s) && /bl-calyx/.test(fn('ozBuehne')), 'fünf Blätter und Kelch');
   const ae = bau('ozAehnlich');
   const ents = new Map(['p:a', 'p:b', 'p:c', 'c:x', 'c:y', 'm:1'].map((id) => [id, { id, typ: id[0] === 'p' ? 'person' : id[0] === 'c' ? 'community' : 'material' }]));
   const kanten = new Map<string, Set<string>>();
