@@ -6770,7 +6770,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       { ding: 'termine', wort: 'Freizeit eintragen', kurz: 'eintragen', aktion: 'termine.erstellen' },
       { ding: 'termine', wort: 'Termine finden', kurz: 'finden', aktion: 'termine.finden' }] }
   };
-  const ZIEL_TEXT = { 'menschen.personen': 'Ansprechpersonen der Community', 'material.finden': 'Liste, zuerst nur die eigene Community', 'material.teilen': 'Formular nach Anmeldung, die Community ist vorbelegt', 'termine.erstellen': 'Formular nach Anmeldung, die Community ist vorbelegt', 'termine.finden': 'Liste, zuerst nur die eigene Community' };
+  const ZIEL_TEXT = { 'menschen.personen': 'Ansprechpersonen der Community', 'material.finden': 'Liste, zuerst nur die eigene Community', 'material.teilen': 'Formular nach Anmeldung. Ob es im Pool der Community erscheint, entscheidet ihre Redaktion.', 'termine.erstellen': 'Formular nach Anmeldung. Ob er im Kalender der Community erscheint, entscheidet ihre Redaktion.', 'termine.finden': 'Liste, zuerst nur die eigene Community' };
   const V_SATZ = {
     'menschen.personen': 'Sieh, wer hier mitarbeitet, und nimm Kontakt auf.', 'menschen.communities': 'Finde Communities, die an deinen Themen arbeiten.',
     'material.finden': 'Suche Material aus allen Instituten und Communities.', 'material.teilen': 'Gib eigenes Material weiter. Es erscheint überall, wo es gebraucht wird.',
@@ -6823,6 +6823,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       + `<div class="rk-wahl"><span>Beispiel</span>${wahl('data-rk-bsp', 'relilab', rkBsp, 'relilab')}${wahl('data-rk-bsp', 'wissenschaft', rkBsp, 'Wissenschaft')}${wahl('data-rk-bsp', 'konfi', rkBsp, 'Konfi-Arbeit')}</div>`
       + `<div class="rk-wahl"><span>Spielart</span>${wahl('data-rk-art', 'fuenf', rkArt, 'Fünf Verben')}${wahl('data-rk-art', 'geteilt', rkArt, 'Geteilte Blätter')}</div>`
       + `<table><thead><tr><th>Ding</th><th>Wortlaut</th><th>Ziel</th></tr></thead><tbody>${b.blaetter.map(x => `<tr><td><span class="pk" style="--c:${D_FARBE[x.ding][0]}"></span>${D_NAME[x.ding]}</td><td>${esc(x.wort)}</td><td>${ZIEL_TEXT[x.aktion]}</td></tr>`).join('')}</tbody></table>`
+      + `<p class="rl-hint">Anmelden allein genügt nicht: Die Community nimmt auf, wer bei ihr veröffentlicht. Wer nicht dazugehört, teilt in den Materialpool von rpi-virtuell. Das Material ist dann im gemeinsamen Datenraum zu finden, aber nicht im Pool von ${esc(b.name)}.</p>`
       + (rkBsp === 'relilab' ? '' : '<p class="rl-hint">Dieses Beispiel zeigt nur den Wortlaut. Die Klicks führen hier weiter ins relilab.</p>');
   }
   document.getElementById('rlKonfig').addEventListener('click', e => {
