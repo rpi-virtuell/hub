@@ -58,7 +58,7 @@ Deno.test('Aktionen: nur mit Signer, frisch holen, Relays zählen, kein nsec', (
   const su = fn('signierenUndSenden');
   assert(/ICH\.kann/.test(su) && /Signieren abgebrochen/.test(su) && /Kein Relay hat/.test(su) && /angenommen von/.test(su), 'Zustände');
   assert(/function hubSenden\(ev\)/.test(s) && /'OK'/.test(fn('hubSenden')) && /RELAYS/.test(fn('hubSenden')), 'Senden an die drei Relays mit OK');
-  assert(/braucht Anmeldung mit Schlüssel/.test(s) && /id="anmelden"/.test(html), 'Hinweis und Dialog');
+  assert(/geht nach der Anmeldung/.test(s) && /id="anmelden"/.test(html), 'Hinweis und Dialog');
   assert(/Das bist du/.test(block(/if \(v === 'profil'\)[\s\S]*?\n    \}/) + s), 'eigenes Profil');
 });
 

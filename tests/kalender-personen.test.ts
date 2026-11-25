@@ -57,11 +57,11 @@ Deno.test('peLaden: zwei Abfragen, feste Autoren; Personen und Person: Rückfall
   assert(/hubFetch\('personen:profile'/.test(l) && /kinds: \[0\]/.test(l) && /'#d': \['communities'\]/.test(l) && (l.match(/hubFetch\(/g) || []).length === 2, 'zweite Abfrage abhängig, keine dritte');
   assert(/istHex64\(/.test(l) && /150/.test(l), 'Schlüssel geprüft, gedeckelt');
   const r = block(/function peRender\(daten\)[\s\S]*?\n  \}/);
-  assert(/OC_TEAM/.test(r) && /noch nicht angelegt/.test(r) && /antworten gerade nicht/.test(r) && /disabled aria-disabled="true"/.test(r) && /\.bot/.test(r), 'Zustände, Teamseite, Folgen, Bots');
+  assert(!/OC_TEAM/.test(r) && /e\.typ === 'person' && ozSichtbar\(e\) && !PERSONEN_AUS\.includes\(e\.pk\)/.test(r) && /antworten gerade nicht/.test(r) && /disabled aria-disabled="true"/.test(r) && /\.bot/.test(r), 'Alle Personen des Ökosystems, Ausschlussliste, Zustände, Folgen, Bots');
   const o = block(/function prOpen\(qs\)[\s\S]*?\n  \}/);
   assert(/npubToHex\(/.test(o) && /kinds: \[30142, 30023, 31923\]/.test(o) && /Kein gültiges Profil/.test(o), 'Profilseite');
   assert(/kinds: \[0\], authors: \[FO_HEX\], limit: 1/.test(o) && /antworten gerade nicht/.test(o) && /!evs\.length/.test(o), 'Profilseite im Funkloch: Gesundheitsfilter, ehrliche Meldung');
-  assert(/id="v-personen" data-stand="stand:04\.11\.2026/.test(html) && /id="v-person" data-stand="nachbau:/.test(html), 'Ansichten mit Stand');
+  assert(/id="v-personen" data-stand="nachbau:Personen laden/.test(html) && /const PERSONEN_AUS = \[\];/.test(s) && /ozQuellenLaden\(\)\.then\(r => \{\n      if \(lauf !== peStart\) return;/.test(s) && /id="v-person" data-stand="nachbau:/.test(html), 'Ansichten mit Stand');
   assert(/'menschen\.personen': 'kooperieren\/personen'/.test(s) && /'person'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'Konsole und Route');
 });
 
