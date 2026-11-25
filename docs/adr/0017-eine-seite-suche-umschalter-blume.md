@@ -63,6 +63,12 @@ Die Punkte 5, 8 und 10 sind damit geändert, Punkt 13 ergänzt.
 
 - **OER-Ampel.** Alle Lizenzpillen folgen der Ampel: grün für CC0, CC BY und CC BY-SA, orange für alle anderen CC-Lizenzen, rot für urheberrechtlich geschützt. Unbekannte Lizenzen bleiben neutral. Die Terminliste zeigt den Knopf „nostr:“ nicht mehr.
 
+- **Communities: eine Leiste, ihre Wörter.** Im Raum einer Community entfällt die eigene linke Leiste. Die Blüten am Rand tragen die Wege des Raums, in den Worten der Community, wo sie welche eingestellt hat, sonst in allgemeinen: Übersicht, Kontakt aufnehmen, Material finden und teilen, Termin eintragen und finden, News lesen, Mitreden. Im relilab steht keine Blume mehr in der Mitte der Seite. Was die Community braucht, steht in den Blüten am Rand. Der Kasten auf der Seite zeigt die Einstellung als Tabelle; wer dort ein anderes Beispiel wählt, sieht dessen Wörter auch in den Blüten.
+
+- **Blaupause für Community-Räume.** reliGLOBAL, Konfi-Arbeit und Friedensarbeit folgen demselben Muster: eigene Wörter in den Blüten am Rand, keine zweite Leiste, auf der Übersicht echte Materialien der Community als Karten wie im Materialfeed, kein Hinweis „In Entwicklung“. Gezeigt wird, was das Konto der Community veröffentlicht hat oder was mit ihr geteilt ist. Im relilab ist der Kasten mit den einstellbaren Blüten von der Seite genommen, die Blüten am Rand zeigen die Wörter selbst.
+
+- **Reihenfolge im relilab.** Die Seite zeigt ihre Abschnitte untereinander: Termine, Communities, Personen, Material, News. Vorher standen Material, Menschen und Termine als drei Spalten nebeneinander.
+
 ## Technik
 - Vier Belegungen der Steuerkonsole: `eins-dinge-gast`, `eins-dinge-ich`, `eins-tun-gast`, `eins-tun-ich`. Welche gilt, folgt aus Sicht und Anmeldung.
 - Neues Attribut `mitte-knopf`: Die Mitte ist klickbar, auch ohne Unterzeile.
