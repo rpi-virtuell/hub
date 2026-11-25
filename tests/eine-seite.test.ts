@@ -41,7 +41,7 @@ Deno.test('Von den Dingen her direkt zum Ding, vom Tun her ausdifferenziert; gra
 
 Deno.test('Tun auf der Seite des Dings: Knöpfe im Materialpool, im Kalender und bei den Gesprächen', () => {
   const tun = (s.match(/const TUN = \{[\s\S]*?\n  \};/) || [''])[0];
-  assert(/materialpool: \['material'/.test(tun) && /fortbildungen: \['termine'/.test(tun) && /mitmachen: \['news'/.test(tun), 'Seite ohne Tun');
+  assert(/materialpool: \['material'/.test(tun) && /fortbildungen: \['termine'/.test(tun) && /mitmachen: \['gespraeche'/.test(tun), 'Seite ohne Tun');
   assert(/'material\.teilen', 'veröffentlichen'/.test(tun) && /'material\.erstellen', 'erstellen'/.test(tun) && /'termine\.erstellen', 'veröffentlichen'/.test(tun), 'Tun fehlt');
   assert(/view\.prepend\(z\)/.test(s) && /const b = e\.target\.closest\('\[data-tun\]'\); if \(b\) standardAktion\(/.test(s), 'Knopf führt nicht in die Standardkette');
 });
@@ -82,6 +82,14 @@ Deno.test('Anmelden ohne Fachwörter; Wege vom Tun her als Blau-Treppe; Randblü
   assert(/<summary>Wie funktioniert das genau\?<\/summary>/.test(d) && /id="anNpub"/.test(d.split('<details')[1] || ''), 'Einzelheiten und Nur-Ansehen sind nicht mehr erreichbar');
   assert(/color: '#1F2F7A'/.test(c) && /color: '#2F74C0'/.test(c) && /color: '#63AEDD'/.test(c) && /color: '#B5D3EE'/.test(c) && /const FORM_T = \{ anlegen: '#10233A', bearbeiten: '#10233A' \}/.test(s), 'Wege sind nicht gestaffelt');
   assert(/function aktionVon\(action, label\) \{ let url = 'https:\/\/relihub\.example\/'; try \{ url = RelihubSteuerkonsole\.resolve\(action, 'hub-start'\)/.test(s) && !/url: '#' \}/.test(s), 'Randblüte ohne gültige Adresse');
+});
+
+Deno.test('Gespräche sind ein Feed: Beiträge zuerst, Zusagen nur auf Wunsch, eigener Feed nach Anmeldung', () => {
+  assert(/<h1>Gespräche<\/h1>/.test(s) && /<section aria-label="Feed"><h2>Feed<\/h2>\$\{gespr\}<\/section>/.test(s) && !/<h2>Protokoll<\/h2>/.test(s) && !/<h1>Mitmachen<\/h1>/.test(s), 'Ansicht heißt noch Mitmachen oder Protokoll');
+  assert(/pkMitLeisem \? alle : alle\.filter\(e => e\.ev\.kind !== 31925 && e\.ev\.kind !== 7\)/.test(s), 'Zusagen und Reaktionen stehen ungefragt im Feed');
+  assert(/new Set\(tagWerte\(ichDaten\.kontakte, 'p'\)\)/.test(s) && /!pkNurFolge \|\| folge\.has\(e\.ev\.pubkey\)/.test(s), 'Feed lässt sich nicht auf Gefolgte eingrenzen');
+  assert(/w\.dataset\.pkwer === 'folge' && !LOGGED\) \{ anDialogAuf\(\);/.test(s), 'eigener Feed ohne Anmeldung');
+  assert(!/Schreiben mit Schlüssel in der edufeed-App/.test(s) && /const kopf = view\.querySelector\(':scope > header'\); if \(kopf\) kopf\.after\(z\)/.test(s), 'Fachwort im Vorspann oder Knopfzeile über dem Kopf');
 });
 
 Deno.test('reliGLOBAL als zweites Beispiel neben relilab', () => {

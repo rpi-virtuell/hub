@@ -821,7 +821,12 @@ relihub-steuerkonsole[hidden]{display:none}
 .ei-kacheln{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
 .ei-vorb{display:inline-block;margin-left:6px;padding:2px 10px;border-radius:999px;background:var(--oz-hell);color:var(--oz-text);font-size:13px;font-weight:600}
 @media (max-width:640px){.ei-vorschau{flex-direction:column;align-items:stretch}.ei-start{flex-direction:column;align-items:flex-start}}
-.pk-spalten{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:26px;align-items:start}
+.pk-spalten{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:26px;align-items:start}
+.pk-filter{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+.pk-filter button{font:inherit;font-size:14.5px;font-weight:600;min-height:38px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--n-gespraeche);background:#fff;color:var(--nx-gespraeche);cursor:pointer}
+.pk-filter button[aria-pressed="true"]{background:var(--n-gespraeche);color:#1B0A2A}
+.pk-filter button.grau{border-color:#C9CED6;background:#C9CED6;color:#2B2F36}
+.pk-filter button:focus-visible{outline:3px solid #1B2440;outline-offset:2px}
 .pk-liste{list-style:none;margin:0;padding:0}
 .pk-zeile{display:flex;gap:12px;align-items:baseline;padding:8px 10px;border-bottom:1px solid var(--line);font-size:15px;line-height:1.4;overflow-wrap:anywhere}
 .pk-zeile.neu{background:var(--oz-hell);color:var(--oz-text);border-radius:10px}
@@ -1353,6 +1358,8 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
 @media (max-width:820px){
   .v-drei{grid-template-columns:1fr}
   .st-sicht{font-size:14px;gap:6px;flex-wrap:nowrap;white-space:nowrap}
+  .sb-griff i{width:11px;height:30px;margin:-4px 0}
+  .tun-zeile{padding:6px 16px;font-size:14px}.tun-zeile button{min-height:34px;padding:4px 12px}
   .st-sicht>span:first-child{display:none}
 }
 </style>
@@ -1534,7 +1541,7 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
 </div>
 
 <!-- ===================== Ansicht: Mitmachen (Aktivitätsprotokoll, ADR-0009) ===================== -->
-<div class="view" id="v-mitmachen" data-stand="nachbau:Protokoll verbinden">
+<div class="view" id="v-mitmachen" data-stand="nachbau:Feed verbinden">
   <header class="hub-top">
     <a class="brand" href="#start"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg>ReliHub</a>
     <span class="sp"></span>
@@ -5235,32 +5242,48 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     return `<a class="pk-wer" href="${esc('#person?p=' + voll)}">${p ? p.name : esc(voll.slice(0, 12) + '…')}</a>`;
   }
   /** Ansicht Mitmachen in `root` (Standard: der Raum #mitmachen); `c` = Community (Kennung oder Hex, 'alle' oder leer = alle), ohne Angabe bleibt die Auswahl */
+  let pkNurFolge = false, pkMitLeisem = false;   // Feed: nur Menschen, denen ich folge; Zusagen und Reaktionen mitzeigen
   function pkRender(root, c) {
     root = root || document.getElementById('pkRoot'); pkWurzel = root;
     const fest = root.dataset.pkfest;   // fester Zuschnitt (relilab-Raum): Auswahl nicht änderbar
     if (fest) pkC = pkHex(fest); else if (c !== undefined) pkC = pkHex(c);
-    const liste = pkListe.filter(e => pkPasst(e, pkC)), kom = liste.filter(e => e.ev.kind === 1111), beitr = liste.filter(e => e.ev.kind === 1);
+    // Gespräche als Feed (ADR-0017): Beiträge und Kommentare zuerst. Zusagen und Reaktionen zeigt der Feed erst auf Wunsch; angemeldet lässt er sich auf die Menschen eingrenzen, denen man folgt.
+    const folge = LOGGED && ichDaten && ichDaten.kontakte ? new Set(tagWerte(ichDaten.kontakte, 'p')) : null;
+    if (!folge) pkNurFolge = false;
+    const alle = pkListe.filter(e => pkPasst(e, pkC) && (!pkNurFolge || folge.has(e.ev.pubkey)));
+    const leise = alle.filter(e => e.ev.kind === 31925 || e.ev.kind === 7).length;
+    const liste = pkMitLeisem ? alle : alle.filter(e => e.ev.kind !== 31925 && e.ev.kind !== 7), kom = liste.filter(e => e.ev.kind === 1111), beitr = liste.filter(e => e.ev.kind === 1);
     const antwort = !!((bzDaten && bzDaten.antwort) || (pkDaten && pkDaten.antwort)), r = pkVerbunden, g = pkG;
     const opts = CO_SCHLUESSEL.map(k => [k.hex, esc(k.n)]).concat(g ? [...g.ents.values()].filter(e => e.typ === 'community' && !CO_SCHLUESSEL.some(k => k.hex === e.pk)).map(e => [e.pk, bzName(e)]) : []);
     const wahl = fest ? `<p class="pk-wahl">Zuschnitt: ${esc((CO_SCHLUESSEL.find(k => k.hex === pkC) || { n: fest }).n)}</p>` : `<label class="pk-wahl">Community <select data-pkc><option value="">Alle</option>${opts.map(([h, n]) => `<option value="${esc(h)}"${h === pkC ? ' selected' : ''}>${n}</option>`).join('')}</select></label>`;
     let prot, gespr;
-    if (!pkGeladen) { prot = '<p class="pk-leer">Das Protokoll wird geladen …</p>'; gespr = ''; }
+    if (!pkGeladen) { prot = ''; gespr = '<p class="pk-leer">Der Feed wird geladen …</p>'; }
     else {
       prot = liste.length ? `<ul class="pk-liste">${liste.slice(0, 80).map(e => `<li class="pk-zeile${pkMarke.has(e.id) && Date.now() - pkMarke.get(e.id) < 180000 ? ' neu' : ''}"><span class="pk-zeit">${esc(pkZeit(e.zeit))}</span><span class="pk-satz">${e.html}</span></li>`).join('')}</ul>`
-        : `<p class="pk-leer">${antwort ? 'Noch keine Aktivitäten zu dieser Auswahl.' : 'Die Relays antworten gerade nicht.'}</p>`;
+        : `<p class="pk-leer">${antwort ? 'Noch nichts zu dieser Auswahl.' : 'Die Verbindung antwortet gerade nicht (Relays antworten gerade nicht).'}</p>`;
       const gruppen = new Map();
       kom.forEach(e => { if (!gruppen.has(e.bezug[0])) gruppen.set(e.bezug[0], []); gruppen.get(e.bezug[0]).push(e); });
       const gk = [...gruppen].filter(([id]) => g && g.ents.get(id) && g.ents.get(id).ev).map(([id, es]) => `<div class="pk-gruppe">${eintragKarte({ ev: g.ents.get(id).ev, adr: id })}<ul>${es.map(e => `<li class="pk-kommentar"><b>${pkAutor(e.ev.pubkey)}</b> <span class="pk-zeit">${esc(pkZeit(e.zeit))}</span><p>${esc(String(e.ev.content || '').trim().slice(0, 1000))}</p></li>`).join('')}</ul></div>`).join('');
       const bk = beitr.map(e => `<li class="pk-kommentar">${e.bezug[0] && g && g.ents.get(e.bezug[0]) ? `<span class="pk-in">${bzName(g.ents.get(e.bezug[0]))}</span> ` : ''}<b>${pkAutor(e.ev.pubkey)}</b> <span class="pk-zeit">${esc(pkZeit(e.zeit))}</span><p>${esc(String(e.ev.content || '').trim().slice(0, 600))}</p></li>`).join('');
       gespr = (gk || bk) ? gk + (bk ? `<div class="pk-gruppe"><h3>Kurze Beiträge in Communities</h3><ul>${bk}</ul></div>` : '')
-        : '<p class="pk-leer">Noch kein Gespräch zu Materialien, Terminen oder Beiträgen des Ökosystems. Der erste Kommentar entsteht in der <a href="https://edufeed.org" target="_blank" rel="noopener">edufeed-App</a>.</p>';
+        : `<p class="pk-leer">${pkNurFolge ? 'Noch kein Gespräch von Menschen, denen du folgst.' : 'Noch kein Gespräch zu Materialien, Terminen oder Beiträgen.'} Kommentieren kannst du zurzeit in der <a href="https://edufeed.org" target="_blank" rel="noopener">edufeed-App</a>.</p>`;
     }
-    root.innerHTML = `<h1>Mitmachen</h1><p class="pk-sub">Was im Ökosystem gerade passiert: Kommentare, Zusagen, Reaktionen, Geteiltes. Lesen geht ohne Anmeldung, Schreiben mit Schlüssel in der edufeed-App.</p>${wahl}`
-      + `<div class="pk-spalten"><section aria-label="Protokoll"><h2>Protokoll</h2>${prot}</section><section aria-label="Gespräche"><h2>Gespräche</h2>${gespr}</section></div>`;
+    const chip = (attr, an, text, grau) => `<button type="button" ${attr} aria-pressed="${an}"${grau ? ' class="grau"' : ''}>${text}</button>`;
+    const filter = `<div class="pk-filter" role="group" aria-label="Feed eingrenzen">${chip('data-pkwer="alle"', !pkNurFolge, 'Alle')}${chip('data-pkwer="folge"', pkNurFolge, folge ? 'Von Menschen, denen ich folge' : 'Von Menschen, denen ich folge · anmelden', !folge)}`
+      + `${chip('data-pkleise', pkMitLeisem, pkMitLeisem ? 'Zusagen und Reaktionen ausblenden' : `Auch Zusagen und Reaktionen zeigen${leise ? ' (' + leise + ')' : ''}`)}</div>`;
+    root.innerHTML = `<h1>Gespräche</h1><p class="pk-sub">Was gerade besprochen und geteilt wird: Beiträge, Kommentare und Materialtipps aus den Communities. Lesen geht ohne Anmeldung.</p>${wahl}${filter}`
+      + `<div class="pk-spalten"><section aria-label="Feed"><h2>Feed</h2>${gespr}</section><section aria-label="Was sonst passiert"><h2>Was sonst passiert</h2>${prot}</section></div>`;
     const v = root.closest('.view');
-    if (v && pkGeladen) datenstand(v.id, antwort ? 'live' : 'nachbau', antwort ? `${liste.length} Aktivitäten · ${kom.length} Kommentare · Protokoll verbunden mit ${r} von 2 Relays${r ? '' : ' · keine Live-Verbindung'}` : 'Relays nicht erreichbar');
+    if (v && pkGeladen) datenstand(v.id, antwort ? 'live' : 'nachbau', antwort ? `${liste.length} Einträge · ${kom.length} Kommentare · Protokoll verbunden mit ${r} von 2 Relays${r ? '' : ' · keine Live-Verbindung'}` : 'Relays nicht erreichbar');
     if (!pkHoerer.has(root)) {
       pkHoerer.add(root);
+      root.addEventListener('click', e => {
+        const w = e.target.closest('[data-pkwer]'), l = e.target.closest('[data-pkleise]'); if (!w && !l) return;
+        if (w && w.dataset.pkwer === 'folge' && !LOGGED) { anDialogAuf(); anMeldung('Für deinen eigenen Feed melde dich bitte an.'); return; }
+        if (w) pkNurFolge = w.dataset.pkwer === 'folge'; else pkMitLeisem = !pkMitLeisem;
+        pkRender(root);
+        const n = root.querySelector(w ? '[data-pkwer][aria-pressed="true"]' : '[data-pkleise]'); if (n) n.focus();
+      });
       root.addEventListener('change', e => {
         const s = e.target.closest('[data-pkc]'); if (!s) return;
         pkRender(root, s.value);
@@ -6836,7 +6859,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell', 'person', 'oekosystem', 'mitmachen', 'eigene-instanz'].includes(view) ? view : 'start');
     if (finden === null) toast('Diese Seite gibt es nicht.');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
-    document.title = { start: 'ReliHub', profil: 'ReliHub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'Fortbildungen', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'ReliHub · Communities', oekosystem: 'ReliHub · Ökosystem', mitmachen: 'ReliHub · Mitmachen', 'eigene-instanz': 'ReliHub · Eigene Instanz', community: 'ReliHub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des ReliHub' }[v];
+    document.title = { start: 'ReliHub', profil: 'ReliHub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'Fortbildungen', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'ReliHub · Communities', oekosystem: 'ReliHub · Ökosystem', mitmachen: 'ReliHub · Gespräche', 'eigene-instanz': 'ReliHub · Eigene Instanz', community: 'ReliHub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des ReliHub' }[v];
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || '', pp.get('zu') === 'katalog' ? 'katalog' : pp.get('tab')); }
     leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v === 'fortbildungen' ? 'rpi-virtuell' : v === 'eigene-instanz' ? 'zuschnitt' : v);
     RelihubSteuerkonsole.setOrt(leisteEl.getAttribute('current'));   // der Stiel markiert denselben Ort wie die Leiste
@@ -6933,7 +6956,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     'e-news': 'News: Artikel und Neuigkeiten aus dem Ökosystem.', 'e-menschen': 'Menschen: Personen und Communities.',
     't-finden': 'Finden: Material, Termine, News, Personen und Communities.',
     'e-gespraeche': 'Gespräche: Kommentare, Reaktionen, Antworten und Zusagen, öffentlich oder aus deinen Communities.', 't-mitreden': 'Mitreden: Kommentare, Reaktionen, Antworten und Zusagen, öffentlich oder aus deinen Communities.',
-    'gespraeche.oeffentlich': 'Lies, was öffentlich gerade besprochen wird.', 'gespraeche.communities': 'Gespräche aus deinen Communities.', 'gespraeche.eigenes': 'Kommentare, Reaktionen, Antworten, Erwähnungen und Zusagen zu deinen Dingen.', 'gespraeche.chat': 'Chat aus den edufeed-Räumen: gewollt und noch nicht gebaut.',
+    'gespraeche.oeffentlich': 'Der Feed: Beiträge, Kommentare und Materialtipps aus den Communities.', 'gespraeche.communities': 'Gespräche aus deinen Communities.', 'gespraeche.eigenes': 'Kommentare, Reaktionen, Antworten, Erwähnungen und Zusagen zu deinen Dingen.', 'gespraeche.chat': 'Chat aus den edufeed-Räumen: gewollt und noch nicht gebaut.',
     't-teilen': 'Teilen: Gib weiter, was du hast.', 't-erstellen': 'Erstellen: Material, Termin oder Beitrag neu anlegen.', 't-bearbeiten': 'Bearbeiten: deine eigenen Dinge und dein Profil.',
     'material.erstellen': 'Erstelle Material auf deinem Schreibtisch.', 'material.bearbeiten': 'Sammle Material in deinen Listen.', 'news.finden': 'Lies, was im Ökosystem gerade passiert.', 'news.veroeffentlichen': 'Schreib einen Beitrag.', 'ich': 'Die Mitte führt zur Anmeldung oder zu deinem ReliHub.'
   };
@@ -6979,7 +7002,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   const TUN = {
     materialpool: ['material', 'Material', [['material.teilen', 'veröffentlichen'], ['material.erstellen', 'erstellen'], ['material.bearbeiten', 'sammeln']]],
     fortbildungen: ['termine', 'Termine', [['termine.erstellen', 'veröffentlichen']]],
-    mitmachen: ['news', 'News und Gespräche', [['news.veroeffentlichen', 'Beitrag schreiben']]]
+    mitmachen: ['gespraeche', 'Gespräche', [['news.veroeffentlichen', 'Beitrag schreiben']]]
   };
   function tunZeile(v) {
     document.querySelectorAll('.tun-zeile').forEach(n => n.remove());
@@ -6987,7 +7010,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const z = document.createElement('div'); z.className = 'tun-zeile'; z.setAttribute('role', 'group'); z.setAttribute('aria-label', 'Was du hier tun kannst');
     z.style.cssText = `--tc:${D_FARBE[t[0]][0]};--tf:${D_FARBE[t[0]][1]};--tb:color-mix(in srgb,${D_FARBE[t[0]][0]} 14%,#fff)`;
     z.innerHTML = `<b>${t[1]}:</b>` + t[2].map(x => `<button type="button" data-tun="${x[0]}"${LOGGED ? '' : ' class="grau"'}>${x[1]}${LOGGED ? '' : ' <small>· anmelden</small>'}</button>`).join('');
-    view.prepend(z);
+    const kopf = view.querySelector(':scope > header'); if (kopf) kopf.after(z); else view.prepend(z);   // unter dem Kopf der Seite, nicht darüber
   }
   document.addEventListener('click', e => { const b = e.target.closest('[data-tun]'); if (b) standardAktion(aktionVon(b.dataset.tun, b.textContent), 'hub'); });
 
