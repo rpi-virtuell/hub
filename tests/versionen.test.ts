@@ -66,11 +66,12 @@ Deno.test('Version 4, Suche zuerst: Suchfeld führt ins Ökosystem, Orte als Bl�
   assertEquals((s.match(/kind: 'instanz', color: /g) || []).length, 6, 'nicht jeder Ort der Leiste hat eine Farbe');
 });
 
-Deno.test('Version 5, Leiste links, und die drei Sätze der Startseite', () => {
+Deno.test('Version 5, Leiste links, und die vier Antworten der Startseite', () => {
   assert(/<nav class="vl" id="vLinks" aria-label="ReliHub">/.test(html) && /body\[data-v="links"\] \.vl\{display:flex\}/.test(html), 'Navigation links fehlt');
   assert(/body\[data-v="links"\] relihub-steuerkonsole\[floating\],body\[data-v="links"\] \.flower-wrap\{display:none\}/.test(html), 'Blume bleibt in Version 5 Steuerung');
   const drei = (html.match(/<ul class="v-drei" id="vDrei">[\s\S]*?<\/ul>/) || [''])[0];
-  assertEquals([...drei.matchAll(/<li><b>([^<]+)<\/b>/g)].map((m) => m[1]), ['Was du hier findest', 'Was du hier tun kannst', 'Warum']);
+  assert(/an deine Lerngruppe anpassen/.test(drei) && !/mehrfach/.test(drei), 'Warum spricht nur Einstellende an, nicht Lehrkräfte');
+  assertEquals([...drei.matchAll(/<li><b>([^<]+)<\/b>/g)].map((m) => m[1]), ['Was du hier findest', 'Was du hier tun kannst', 'Warum offen', 'Was wir dir bieten']);
 });
 
 Deno.test('ADR-0016 und README nennen den Entwurfsvergleich', async () => {
