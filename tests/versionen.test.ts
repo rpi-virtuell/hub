@@ -11,7 +11,7 @@ Deno.test('Reiterzeile: fünf Versionen mit eigener Adresse', () => {
   assert(/new URLSearchParams\(location\.search\)\.get\('v'\) \|\| speicher\('relihub-version'\)/.test(s), 'Version kommt nicht aus der Adresse oder dem Speicher');
   assert(/VERSION = VERSIONEN\[v\] \? v : 'heute'/.test(s), 'unbekannte Version fällt nicht auf den Stand heute zurück');
   assert(/versionSetzen\(b\.dataset\.v, true\); if \(CUR\.split\('\?'\)\[0\] !== 'start'\) go\('start'\);/.test(s), 'Reiter führt nicht auf die Startseite');
-  assert(/const b = imLab \? \(VERSION === 'light' \? 'ort-relilab-fuenf' : null\) : beleg;/.test(s), 'relilab ändert sich auch außerhalb der Version Light');
+  assert(/const b = imLab \? \(VERSION === 'light' \? 'ort-relilab-fuenf' : VERSION === 'reinraus' \? 'reinraus' : null\) : beleg;/.test(s), 'relilab trägt nicht nur in Version 2 und 3 eine eigene Blume');
 });
 
 Deno.test('Steuerkonsole: weitere Belegungen, direkte Blätter, dauerhafte Beschriftung', () => {
@@ -19,18 +19,28 @@ Deno.test('Steuerkonsole: weitere Belegungen, direkte Blätter, dauerhafte Besch
   assert(/const a = \(-90 \+ 360 \/ n \* i\) \* Math\.PI \/ 180/.test(c), 'Blätter verteilen sich nicht gleichmäßig');
   assert(/'data-action': f\.aktion \|\| f\.id/.test(c), 'Blatt ohne Knospen führt nicht direkt zur Aktion');
   assert(/if \(this\.hasAttribute\('beschriftet'\)\) this\.funcs\.forEach\(f => this\.wort\(base, f\.label/.test(c), 'Wort steht nicht dauerhaft auf dem Blatt');
-  assert(/'belegung', 'beschriftet', 'mitte-unter', 'sicht', 'mitte', 'stiel'\]/.test(c), 'neue Attribute werden nicht beobachtet');
+  assert(/'belegung', 'beschriftet', 'ohne-mitte', 'mitte-unter', 'sicht', 'mitte', 'stiel'\]/.test(c), 'neue Attribute werden nicht beobachtet');
   assert(/const unter = this\.getAttribute\('mitte-unter'\)/.test(c) && /mitte\.addEventListener\('click', e => \{ e\.stopPropagation\(\); this\.fire\('ich'\); \}\)/.test(c), 'Mitte wird nicht zum Knopf für ich');
 });
 
-Deno.test('Version 2, rein und raus: vier Dinge, je zwei Wege', () => {
+Deno.test('Version 2, rein und raus: streng nach dem Entwurf aus dem Maintainer-Kreis', () => {
   const b = (s.match(/registerBelegung\('reinraus', \[[\s\S]*?\n  \]\);/) || [''])[0];
-  assertEquals([...b.matchAll(/blatt\('rr-([a-z]+)'/g)].map((m) => m[1]), ['menschen', 'material', 'termine', 'news']);
-  assertEquals((b.match(/label: 'finden', form: 'suchen'/g) || []).length, 3);
-  assertEquals((b.match(/label: 'veröffentlichen', form: 'teilen'/g) || []).length, 3);
+  assertEquals([...b.matchAll(/blatt\('rr-[a-z]+', '([^']+)', '([a-z]+)'/g)].map((m) => [m[1], m[2]]), [['ReliHub', 'ich'], ['Material', 'material'], ['Termine', 'termine'], ['News', 'menschen'], ['Menschen', 'news']], 'Blätter, Reihenfolge oder Farben weichen vom Entwurf ab');
+  assert(/id: 'ich\.profil', label: 'mein Profil' \}, \{ id: 'ich\.suche', label: 'vernetzte Suche'/.test(b), 'oben: mein Profil und vernetzte Suche');
+  assertEquals((b.match(/\{ id: '[a-z]+\.[a-z]+', label: 'finden' \}, \{ id: '[a-z]+\.[a-z]+', label: 'veröffentlichen' \}/g) || []).length, 3);
   assert(/id: 'menschen\.personen', label: 'Personen'/.test(b) && /id: 'menschen\.communities', label: 'Communities'/.test(b), 'Menschen: Personen und Communities');
-  assert(!/farbe: 'ich'/.test(b), 'Sonderfarbe für Eigenes in der Version rein und raus');
+  assert(!/farbe: 'ich'/.test(b) && !/form:/.test(b), 'Sonderfarbe oder Wegzeichen in der Version rein und raus');
+  assert(/setze\(k, 'ohne-mitte', b === 'reinraus' \? '' : null\)/.test(s) && /setze\(k, 'beschriftet', b && !schwebt && VERSION !== 'reinraus' \? '' : null\)/.test(s), 'Mitte oder dauerhafte Beschriftung, die der Entwurf nicht hat');
+  assert(/if \(d\.action === 'ich\.suche'\) \{ go\('oekosystem'\); return false; \}/.test(s), 'vernetzte Suche führt nicht ins Ökosystem');
   assert(/body\[data-v="reinraus"\] #leiste,body\[data-v="links"\] #leiste\{display:none\}/.test(html), 'Leiste bleibt in Version 2 stehen');
+});
+
+Deno.test('Version 2 im relilab: jede Knospe „finden“ führt auf eine gefilterte Ansicht mit Hinweis und Unternavigation', () => {
+  const rx = (s.match(/const RX_SUB = \[.*?\];\n/) || [''])[0];
+  assertEquals([...rx.matchAll(/\['([a-z]+)', '([A-Za-z]+)', '#relilab\?[^']*von=konsole'\]/g)].map((m) => m[2]), ['Termine', 'Material', 'News', 'Personen', 'Communities']);
+  for (const ziel of ["go('relilab?zu=materialien&von=konsole')", "go('relilab?room=relilab&rtab=art&von=konsole')", "go('relilab?tab=communities&von=konsole')", "go('relilab?zu=menschen&von=konsole')", "go('relilab?tab=termine&von=konsole')"]) assert(s.includes(ziel), 'Ziel fehlt: ' + ziel);
+  assert(/rx\.hidden = !\(VERSION === 'reinraus' && wk\)/.test(s) && /<nav class="rx-sub" id="rxSub" aria-label="relilab-Unterseiten" hidden><\/nav>/.test(html), 'Unternavigation fehlt');
+  assert(/gefiltert auf <b>relilab<\/b>/.test(s), 'Hinweis auf den Filter fehlt');
 });
 
 Deno.test('Version 3, Light: fünf Blätter mit Verb, direkt, Mitte zur Anmeldung, Blume unten rechts', () => {
