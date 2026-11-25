@@ -28,16 +28,51 @@ Deno.test('Umschalter über der Blume: ein Schalter, keine zwei Knöpfe', () => 
   assert(/const beleg = 'eins-' \+ \(SICHT === 'formen' \? 'tun' : 'dinge'\) \+ '-' \+ \(LOGGED \? 'ich' : 'gast'\);/.test(s), 'Belegung folgt nicht Sicht und Anmeldung');
 });
 
-Deno.test('Blume ohne Anmeldung: dieselben Knospen, grau mit „anmelden“; fünftes Blatt Gespräche', () => {
+Deno.test('Von den Dingen her direkt zum Ding, vom Tun her ausdifferenziert; grau ohne Anmeldung; fünftes Blatt Gespräche', () => {
   const d = (s.match(/registerBelegung\('eins-dinge-' \+ wer, \[[\s\S]*?\n    \]\);/) || [''])[0], t = (s.match(/registerBelegung\('eins-tun-' \+ wer, \[[\s\S]*?\n    \]\);/) || [''])[0];
-  assertEquals([...d.matchAll(/blatt\('e-[a-z]+', '([^']+)', '([a-z]+)'/g)].map((m) => [m[1], m[2]]), [['Material', 'material'], ['Termine', 'termine'], ['News', 'news'], ['Gespräche', 'gespraeche'], ['Menschen', 'menschen']], 'jede Inhaltsart behält ihre Farbe');
+  assertEquals([...d.matchAll(/blatt\('e-[a-z]+', '([^']+)', '([a-z]+)', \{ (aktion|subs)/g)].map((m) => [m[1], m[2], m[3]]), [['Material', 'material', 'aktion'], ['Termine', 'termine', 'aktion'], ['News', 'news', 'aktion'], ['Gespräche', 'gespraeche', 'aktion'], ['Menschen', 'menschen', 'subs']], 'von den Dingen her führt ein Blatt nicht direkt zum Ding');
   assertEquals([...t.matchAll(/(?:tun|blatt)\('t-[a-z]+', '([a-z]+)'/g)].map((m) => m[1]), ['finden', 'teilen', 'erstellen', 'mitreden', 'bearbeiten']);
   assert(/\[false, true\]\.forEach\(an => \{/.test(s) && /!an && NUR_ANGEMELDET\.includes\(id\) \? \{ stand: 'anmelden' \} : null/.test(s), 'ohne Anmeldung sind die Erweiterungen nicht ausgegraut');
   assert(/anmelden: \{ fill: '#C9CED6', text: '#2B2F36' \}/.test(c) && /anmelden: 'anmelden' \}/.test(c), 'graue Knospe sagt nicht, dass die Anmeldung fehlt');
   assert(/function standardAktion\(d, ctx\) \{\n    if \(brauchtAnmeldung\(d\)\) return false;/.test(s), 'graue Knospe führt nicht zuerst zur Anmeldung');
   for (const k of ['gespraeche.oeffentlich', 'gespraeche.communities', 'gespraeche.eigenes']) assert(s.includes(`if (d.action === '${k}')`), 'Ziel fehlt: ' + k);
   assert(/'gespraeche\.chat', 'Chat', \{ stand: 'offen' \}/.test(s) && !/groups\.edufeed\.org/.test(s), 'Chat ist nicht als „bald“ gezeichnet oder liest die Räume');
-  assert(/gespraeche: \['#AF4112', '#FFFFFF'\]/.test(c), 'Gespräche ohne eigene Farbe');
+});
+
+Deno.test('Tun auf der Seite des Dings: Knöpfe im Materialpool, im Kalender und bei den Gesprächen', () => {
+  const tun = (s.match(/const TUN = \{[\s\S]*?\n  \};/) || [''])[0];
+  assert(/materialpool: \['material'/.test(tun) && /fortbildungen: \['termine'/.test(tun) && /mitmachen: \['news'/.test(tun), 'Seite ohne Tun');
+  assert(/'material\.teilen', 'veröffentlichen'/.test(tun) && /'material\.erstellen', 'erstellen'/.test(tun) && /'termine\.erstellen', 'veröffentlichen'/.test(tun), 'Tun fehlt');
+  assert(/view\.prepend\(z\)/.test(s) && /const b = e\.target\.closest\('\[data-tun\]'\); if \(b\) standardAktion\(/.test(s), 'Knopf führt nicht in die Standardkette');
+});
+
+Deno.test('Farbnavigation: eine Farbe je Inhaltsart aus dem Erscheinungsbild des Instituts', () => {
+  assert(/--n-ich:#2A3B8E;--n-material:#85992C;--n-termine:#DAB000;--n-menschen:#AF4112;--n-gespraeche:#DA8D00;--n-news:#7F89BB;/.test(html), 'Farbwerte fehlen');
+  assert(/material: \['#85992C', '#1B2400'\], termine: \['#DAB000', '#2B1A00'\], news: \['#7F89BB', '#141A33'\], gespraeche: \['#DA8D00', '#2B1A00'\]/.test(c), 'Blume trägt die Farben nicht');
+  assert(/\[data-typ="material"\]\{--tc:var\(--n-material\)/.test(html) && /\[data-typ="event"\]\{--tc:var\(--n-termine\)/.test(html) && /\[data-typ="person"\]\{--tc:var\(--n-menschen\)/.test(html), 'Ökosystem trägt andere Farben als die Blume');
+  assert(/vHinweis\.style\.setProperty\('--hc', blattFarbe\(e\.detail\.action\)\)/.test(s) && /@media \(min-width:1100px\)\{\.v-hinweis\{position:absolute;left:calc\(50% \+ 268px\)/.test(html), 'Erläuterung steht nicht neben dem Blatt in dessen Farbe');
+});
+
+Deno.test('Blüten am linken Rand ersetzen Leiste und kleine Blume', () => {
+  assert(/<nav class="sb" id="sb" aria-label="ReliHub-Navigation">/.test(html) && /#leiste,relihub-steuerkonsole\[floating\]\{display:none!important\}/.test(html), 'Blüten fehlen oder Leiste und kleine Blume stehen noch');
+  assertEquals((html.match(/<button type="button" class="sb-griff"[\s\S]*?<\/button>/) || [''])[0].match(/<i /g)!.length, 6);
+  assert(/const ORT_ART = \{ materialpool: 'Ort', 'rpi-virtuell': 'Ort', relilab: 'Community', relidesk: 'Werkzeug', oercommunity: 'Projekt' \};/.test(s), 'Ort, Community, Werkzeug und Projekt sind nicht unterschieden');
+  assert(/if \(ort === 'relilab'\) rlAktion\(d\); else if \(ort === 'religlobal'\) rgAktion\(d\); else standardAktion\(d, 'hub'\);/.test(s), 'in einer Community führen die Blüten nicht an ihren Ort');
+  assert(/ReliHub · Start<\/a>/.test(s) && /e\.key === 'Escape' && sbEl\.classList\.contains\('auf'\)/.test(s), 'Weg zum Start oder Schließen fehlt');
+});
+
+Deno.test('reliGLOBAL als zweites Beispiel neben relilab', () => {
+  const b = (s.match(/religlobal: \{ name: 'reliGLOBAL', blaetter: \[[\s\S]*?\] \}/) || [''])[0];
+  assertEquals([...b.matchAll(/ding: '([a-z]+)'/g)].map((m) => m[1]), ['menschen', 'material', 'material', 'termine', 'termine']);
+  assert(/Werkstätten finden/.test(b) && /wahl\('data-rk-bsp', 'religlobal', rkBsp, 'reliGLOBAL'\)/.test(s), 'Beispiel fehlt in der Auswahl');
+  for (const z of ["go('community?c=religlobal&zu=katalog')", "go('community?c=religlobal&tab=kal')", "go('community?c=religlobal&tab=mem')"]) assert(s.includes(z), 'Ziel fehlt: ' + z);
+});
+
+Deno.test('In Entwicklung liegt über Ansichten ohne eigene Entwicklung; Flowi sitzt unten rechts', () => {
+  assert(/const IN_ENTW = \['materialpool', 'sammlung', 'relidesk', 'rpi-virtuell', 'eigene-instanz'\];/.test(s) && /<div class="entw-wort" aria-hidden="true">IN ENTWICKLUNG<\/div>/.test(html) && /class="entw-band" role="status"/.test(html), 'Hinweis fehlt');
+  assert(/\.entw-wort\{[^}]*pointer-events:none/.test(html), 'Schriftzug fängt Klicks ab');
+  assert(/<div class="fl" id="flowi">/.test(html) && /\.fl\{position:fixed;right:16px;bottom:16px/.test(html) && /Entwurf · feste Antworten/.test(html), 'Flowi fehlt oder sagt nicht, dass er ein Entwurf ist');
+  assert(/const FLOWI = \[/.test(s) && !/fetch\([^)]*flowi/i.test(s), 'Flowi sendet etwas');
 });
 
 Deno.test('Mitte: ReliHub mit „anmelden“, angemeldet „Mein ReliHub“', () => {

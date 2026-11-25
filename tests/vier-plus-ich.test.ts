@@ -33,7 +33,7 @@ Deno.test('Belegung: Knospen je Blatt, vier Wege, Reagieren ist kein Menüpunkt'
   // Farbpunkte: eine Knospe, die zu einem anderen Ding gehört als ihr Blatt, trägt dessen Farbe
   const farbe = Object.fromEntries(FUNCS.flatMap((f) => f.subs).filter((u) => u.farbe).map((u) => [u.id, u.farbe]));
   assertEquals(farbe, { 'ich.communities': 'communities', 'ich.menschen': 'menschen', 'ich.materialien': 'material', 'ich.termine': 'termine', 'material.bearbeiten': 'ich', 'termine.bearbeiten': 'ich', 'news.bearbeiten': 'ich' });
-  assert(/const fb = s\.farbe && FARBE\[s\.farbe\]/.test(c) && /communities: \['#D6336C', '#FFFFFF'\]/.test(c) && /material: \['#007A75', '#FFFFFF'\]/.test(c) && /ich: \['#203A8F', '#FFFFFF'\]/.test(c), 'Communities tragen die Farbe der Menschen, Eigenes ist blau');
+  assert(/const fb = s\.farbe && FARBE\[s\.farbe\]/.test(c) && /menschen: \['#AF4112', '#FFFFFF'\], communities: \['#AF4112', '#FFFFFF'\]/.test(c) && /material: \['#85992C', '#1B2400'\]/.test(c) && /ich: \['#2A3B8E', '#FFFFFF'\]/.test(c), 'Communities tragen die Farbe der Menschen, Eigenes ist blau');
   assert(!/reagieren|Rückmeldung geben|teilnehmen|folgen'/.test(JSON.stringify(FUNCS)), 'Reagieren, Teilnehmen oder Folgen als Menüpunkt');
   for (const f of FUNCS) for (const u of f.subs) assert(u.label.split(' ').length <= 3 && (u.kurz || '').length > 0 && (u.kurz || '').length <= 11, `${u.id}: Name oder Kurzname passt nicht`);
   assert(/d\.stand === 'offen'\) \{ toast\(/.test(fn('standardAktion')), 'Hellgraue Knospe ohne Hinweis');

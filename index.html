@@ -11,6 +11,10 @@
   --c-hub:#203A8F;--c-finden:#007A75;--c-erstellen:#FFA500;--c-koop:#D6336C;--c-ver:#7B4FB8;--c-profil:#203A8F;
   /* Textfarben je Bereich: mindestens 4,5:1 auf paper, card und eigenem Tint */
   --x-hub:#203A8F;--x-finden:#00605C;--x-erstellen:#8A4C00;--x-koop:#7A1A3E;--x-ver:#5A3590;
+  /* Farbnavigation (ADR-0017): eine Farbe je Inhaltsart, Werte aus dem Erscheinungsbild des Instituts; x = Text auf hellem Grund, t = Tint */
+  --n-ich:#2A3B8E;--n-material:#85992C;--n-termine:#DAB000;--n-menschen:#AF4112;--n-gespraeche:#DA8D00;--n-news:#7F89BB;
+  --nx-material:#4E5B13;--nx-termine:#6B5600;--nx-menschen:#8F330B;--nx-gespraeche:#7A4E00;--nx-news:#353F78;
+  --nt-material:#EEF1DD;--nt-termine:#FAF1CC;--nt-menschen:#F7E3DA;--nt-gespraeche:#FBEBCF;--nt-news:#E6E8F3;
   --t-hub:#E6EAF5;--t-finden:#DDF1F0;--t-erstellen:#FEEFD9;--t-koop:#FAE1EA;--t-ver:#EEE7F7;--t-profil:#E6EAF5;
   --ink:#1D1D1B;--muted:#5F5E5A;--line:#E7E4DC;--paper:#FBFAF7;--card:#FFFFFF;
   /* Lizenzpillen (Fläche plus Textfarbe, 4,5:1 auf Fläche, paper und card) */
@@ -836,10 +840,10 @@ relihub-steuerkonsole[hidden]{display:none}
 .oz-meldung:empty{display:none}
 .oz-meldung{min-height:21px}
 /* Ökosystem als Blume (ADR-0012): Typfarben wie im Logo, Suche blau */
-#v-oekosystem [data-typ="person"]{--tc:var(--c-koop);--tx:var(--x-koop);--tt:var(--t-koop)}
-#v-oekosystem [data-typ="community"]{--tc:var(--c-ver);--tx:var(--x-ver);--tt:var(--t-ver)}
-#v-oekosystem [data-typ="material"]{--tc:var(--c-finden);--tx:var(--x-finden);--tt:var(--t-finden)}
-#v-oekosystem [data-typ="event"]{--tc:var(--c-erstellen);--tx:var(--x-erstellen);--tt:var(--t-erstellen)}
+#v-oekosystem [data-typ="person"]{--tc:var(--n-menschen);--tx:var(--nx-menschen);--tt:var(--nt-menschen)}
+#v-oekosystem [data-typ="community"]{--tc:var(--n-menschen);--tx:var(--nx-menschen);--tt:var(--nt-menschen)}
+#v-oekosystem [data-typ="material"]{--tc:var(--n-material);--tx:var(--nx-material);--tt:var(--nt-material)}
+#v-oekosystem [data-typ="event"]{--tc:var(--n-termine);--tx:var(--nx-termine);--tt:var(--nt-termine)}
 #v-oekosystem [data-typ="suche"]{--tc:var(--c-hub);--tx:var(--x-hub);--tt:var(--t-hub)}
 .bl-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .bl-trail{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:34px;margin:0 0 4px}
@@ -1230,8 +1234,10 @@ a.kat-card:hover{border-color:var(--c-koop)}
 /* ---------- Eine Seite (ADR-0017): Suche oben, Umschalter, Blume ---------- */
 #explain{display:none}
 .stage h1{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.flower-wrap{padding:84px 0 104px}
-.v-hinweis{position:relative;z-index:1;max-width:560px;min-height:3.2em;margin:0 auto;font-size:17px;color:var(--ink)}
+.flower-wrap{position:relative;flex-direction:column;align-items:center;padding:84px 0 30px}
+/* Erläuterung zum Blatt: steht neben der Blume in der Farbe des Blatts, auf schmalen Schirmen darunter */
+.v-hinweis{position:relative;z-index:1;max-width:560px;min-height:3.2em;margin:84px auto 0;padding:10px 16px;font-size:17px;color:var(--ink);border-left:6px solid var(--hc,var(--n-ich));border-radius:4px 14px 14px 4px;background:var(--card);text-align:left}
+@media (min-width:1100px){.v-hinweis{position:absolute;left:calc(50% + 268px);top:50%;transform:translateY(-50%);width:250px;margin:0;min-height:0}.flower-wrap{padding-bottom:104px}}
 .v-hinweis a{font-weight:600;color:var(--x-hub)}
 .v-drei{position:relative;z-index:1;display:grid;list-style:none;padding:0;margin:26px auto 0;max-width:880px;grid-template-columns:repeat(2,1fr);gap:12px;text-align:left}
 .v-drei li{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-size:15px}
@@ -1251,6 +1257,57 @@ a.kat-card:hover{border-color:var(--c-koop)}
 .st-schalter:focus-visible{outline:3px solid var(--c-erstellen);outline-offset:3px}
 @media (prefers-reduced-motion:reduce){.st-schalter::after{transition:none}}
 /* Ökosystem geht unter dem Suchschlitz auf, sobald getippt wird */
+/* Blüten am linken Rand: ragen ein Stück herein und blättern beim Überfahren auf; ersetzen Leiste und kleine Blume */
+#leiste,relihub-steuerkonsole[floating]{display:none!important}
+.sb{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:7200;font-size:15px}
+.sb-griff{display:flex;flex-direction:column;padding:0;border:0;background:none;cursor:pointer}
+.sb-griff i{display:block;width:20px;height:40px;margin:-5px 0;border-radius:0 40px 40px 0;background:var(--c);box-shadow:1px 0 3px rgba(0,0,0,.18)}
+.sb-griff:focus-visible{outline:3px solid var(--n-gespraeche);outline-offset:2px}
+.sb-feld{position:absolute;left:0;top:50%;width:268px;max-height:88vh;box-sizing:border-box;overflow-y:auto;padding:14px 14px 14px 0;background:var(--card);border:1px solid var(--line);border-left:0;border-radius:0 24px 24px 0;box-shadow:6px 8px 30px rgba(20,24,40,.22);transform:translate(-105%,-50%);visibility:hidden;transition:transform .2s,visibility .2s}
+.sb:hover .sb-feld,.sb:focus-within .sb-feld,.sb.auf .sb-feld{transform:translate(0,-50%);visibility:visible}
+@media (prefers-reduced-motion:reduce){.sb-feld{transition:none}}
+.sb-feld h2{font:700 11px/1.2 Barlow,sans-serif;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:14px 14px 4px}
+.sb-blatt{display:flex;align-items:center;gap:8px;width:fit-content;max-width:100%;box-sizing:border-box;min-height:40px;margin:4px 0;padding:7px 18px 7px 14px;border:0;border-radius:0 999px 999px 0;background:var(--c);color:var(--t,#fff);font:inherit;font-weight:600;text-decoration:none;text-align:left;cursor:pointer}
+.sb-blatt.sub{min-height:34px;margin-left:0;padding-left:26px;font-size:14px;background:color-mix(in srgb,var(--c) 24%,#fff);color:#1B2440}
+.sb-blatt.ort{background:#F1F3F7;color:#1B2440;font-weight:500}
+.sb-blatt.ort::before{content:"";flex:none;width:11px;height:11px;border-radius:50%;background:var(--c)}
+.sb-blatt.ort small{font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.sb-blatt[aria-current]{box-shadow:inset 0 0 0 3px #1B2440}
+.sb-blatt:focus-visible{outline:3px solid #1B2440;outline-offset:2px}
+.sb-blatt.grau{background:#C9CED6;color:#2B2F36}
+/* Tun auf der Seite des Dings: Wer von den Dingen her kommt, findet hier, was er damit tun kann */
+.tun-zeile{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px clamp(34px,4vw,40px);background:var(--tb);border-bottom:3px solid var(--tc);font-size:15px}
+.tun-zeile b{margin-right:4px}
+.tun-zeile button{font:inherit;font-weight:600;min-height:38px;padding:6px 16px;border:0;border-radius:999px;background:var(--tc);color:var(--tf);cursor:pointer}
+.tun-zeile button.grau{background:#C9CED6;color:#2B2F36}
+.tun-zeile button small{font-weight:500}
+.tun-zeile button:focus-visible{outline:3px solid #1B2440;outline-offset:2px}
+/* In Entwicklung: liegt über Ansichten, hinter denen noch keine eigene Entwicklung steht */
+.entw{display:none}
+body.in-entw .entw{display:block}
+body.in-entw .view.on{padding-top:28px}
+.entw-band{position:fixed;left:0;right:0;top:0;z-index:7100;padding:5px 12px;background:#1D1D1B;color:#fff;font-size:13px;font-weight:600;letter-spacing:.6px;text-align:center}
+.entw-wort{position:fixed;left:50%;top:50%;z-index:6900;transform:translate(-50%,-50%) rotate(-16deg);font:800 clamp(44px,11vw,170px)/1 "Barlow Condensed",Barlow,sans-serif;letter-spacing:.04em;white-space:nowrap;color:rgba(175,65,18,.2);-webkit-text-stroke:2px rgba(175,65,18,.38);pointer-events:none;user-select:none}
+/* Flowi: Chat-Blume unten rechts (Entwurf, antwortet nach festen Regeln) */
+.fl{position:fixed;right:16px;bottom:16px;z-index:7300;font-size:15px}
+.fl-knopf{display:block;width:64px;height:64px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;filter:drop-shadow(0 4px 10px rgba(20,24,40,.3))}
+.fl-knopf svg{display:block;width:100%;height:100%}
+.fl-knopf:focus-visible{outline:3px solid var(--n-ich);outline-offset:3px}
+.fl-feld{position:absolute;right:0;bottom:76px;display:flex;flex-direction:column;width:min(340px,calc(100vw - 32px));max-height:min(520px,calc(100vh - 120px));background:var(--card);border:1px solid var(--line);border-radius:20px 20px 6px 20px;box-shadow:0 14px 44px rgba(20,24,40,.3);overflow:hidden}
+.fl-feld[hidden]{display:none}
+.fl-kopf{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--n-ich);color:#fff;font-weight:700}
+.fl-kopf small{font-weight:500;opacity:.85}
+.fl-kopf button{margin-left:auto;font:inherit;border:0;background:none;color:#fff;cursor:pointer;min-width:36px;min-height:36px}
+.fl-log{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.fl-log p{margin:0;padding:8px 12px;border-radius:14px;max-width:88%;line-height:1.35}
+.fl-log .f{align-self:flex-start;background:var(--nt-news)}
+.fl-log .i{align-self:flex-end;background:var(--n-ich);color:#fff}
+.fl-log a{font-weight:600;color:var(--n-ich)}
+.fl-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 8px}
+.fl-chips button{font:inherit;font-size:13.5px;font-weight:600;padding:5px 11px;border-radius:999px;border:1.5px solid var(--n-ich);background:#fff;color:var(--n-ich);cursor:pointer}
+.fl-form{display:flex;gap:6px;padding:10px;border-top:1px solid var(--line)}
+.fl-form input{flex:1;min-width:0;font:inherit;padding:9px 12px;border:1.5px solid var(--line);border-radius:999px}
+.fl-form button{font:inherit;font-weight:600;padding:8px 14px;border:0;border-radius:999px;background:var(--n-ich);color:#fff;cursor:pointer}
 .oz-zu{display:none}
 body.oz-pop{overflow:hidden}
 body.oz-pop #v-start{display:block}
@@ -1271,7 +1328,8 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
 #rlHubText{display:none}
 @media (max-width:820px){
   .v-drei{grid-template-columns:1fr}
-  .st-sicht{font-size:15px}
+  .st-sicht{font-size:14px;gap:6px;flex-wrap:nowrap;white-space:nowrap}
+  .st-sicht>span:first-child{display:none}
 }
 </style>
 </head>
@@ -1301,8 +1359,7 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
       <p class="st-chips" id="stThemenChips" aria-live="polite"></p>
     </form>
     <div class="st-sicht" id="stSicht" role="group" aria-label="Ordnung der Blume"><span>Ich denke</span><span class="st-seite an" data-sicht="dinge">von den Dingen her</span><button type="button" class="st-schalter" id="stSchalter" role="switch" aria-checked="false" aria-label="Vom Tun her denken statt von den Dingen her"></button><span class="st-seite" data-sicht="formen">vom Tun her</span></div>
-    <div class="flower-wrap"><relihub-steuerkonsole id="startFlower" size="320" context="hub-start" variant="knospen"></relihub-steuerkonsole></div>
-    <p class="v-hinweis" id="vHinweis" aria-live="polite"></p>
+    <div class="flower-wrap"><relihub-steuerkonsole id="startFlower" size="320" context="hub-start" variant="knospen"></relihub-steuerkonsole><p class="v-hinweis" id="vHinweis" aria-live="polite"></p></div>
     <ul class="v-drei" id="vDrei">
       <li><b>Was du hier findest</b>Material, Termine und Artikel aus den religionspädagogischen Instituten und Communities, an einem Ort.</li>
       <li><b>Was du hier tun kannst</b>Suchen, Eigenes teilen, Termine eintragen und Menschen finden, die an deinen Themen arbeiten.</li>
@@ -1878,6 +1935,25 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
 </div>
 
 <relihub-leiste id="leiste" label="Orte"></relihub-leiste>
+<!-- Blüten am linken Rand (ADR-0017): Start, die Dinge und die Orte, auf jeder Seite -->
+<nav class="sb" id="sb" aria-label="ReliHub-Navigation">
+  <button type="button" class="sb-griff" id="sbGriff" aria-expanded="false" aria-controls="sbFeld" aria-label="Navigation aufblättern"><i style="--c:var(--n-ich)"></i><i style="--c:var(--n-material)"></i><i style="--c:var(--n-termine)"></i><i style="--c:var(--n-news)"></i><i style="--c:var(--n-gespraeche)"></i><i style="--c:var(--n-menschen)"></i></button>
+  <div class="sb-feld" id="sbFeld"></div>
+</nav>
+<!-- In Entwicklung: über Ansichten ohne eigene Entwicklung -->
+<div class="entw" id="entw"><p class="entw-band" role="status">In Entwicklung · Diese Ansicht ist ein Nachbau mit Beispieldaten</p><div class="entw-wort" aria-hidden="true">IN ENTWICKLUNG</div></div>
+<!-- Flowi: Chat-Blume unten rechts (Entwurf) -->
+<div class="fl" id="flowi">
+  <div class="fl-feld" id="flFeld" role="dialog" aria-label="Flowi, Hilfe im ReliHub" hidden>
+    <div class="fl-kopf">Flowi <small>Entwurf · feste Antworten</small><button type="button" id="flZu" aria-label="Flowi schließen">✕</button></div>
+    <div class="fl-log" id="flLog" aria-live="polite"></div>
+    <div class="fl-chips" id="flChips"></div>
+    <form class="fl-form" id="flForm"><input id="flEin" type="text" autocomplete="off" maxlength="200" placeholder="Frag Flowi …" aria-label="Frage an Flowi"><button type="submit">Senden</button></form>
+  </div>
+  <button type="button" class="fl-knopf" id="flKnopf" aria-expanded="false" aria-controls="flFeld" aria-label="Flowi fragen">
+    <svg viewBox="-50 -50 100 100" aria-hidden="true"><circle cx="0" cy="-24" r="20" fill="#85992C"/><circle cx="23" cy="-7" r="20" fill="#DAB000"/><circle cx="14" cy="19" r="20" fill="#7F89BB"/><circle cx="-14" cy="19" r="20" fill="#DA8D00"/><circle cx="-23" cy="-7" r="20" fill="#AF4112"/><circle r="19" fill="#fff"/><circle cx="-6" cy="-3" r="2.6" fill="#1B2440"/><circle cx="6" cy="-3" r="2.6" fill="#1B2440"/><path d="M-7 5 Q0 12 7 5" fill="none" stroke="#1B2440" stroke-width="2.4" stroke-linecap="round"/></svg>
+  </button>
+</div>
 <div class="ef-overlay" id="efOverlay" hidden></div>
 <div class="leiste-cfg" id="leisteCfg" hidden role="dialog" aria-label="Leiste anpassen">
   <h2>Leiste anpassen</h2>
@@ -1999,7 +2075,7 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
   const FORM_ORDER = ['suchen', 'teilen', 'anlegen', 'bearbeiten'];
   // Farbe einer Knospe, wenn sie zu einem anderen Ding gehört als ihr Blatt: „Materialien“ am Blatt „ich“ trägt die Farbe der Materialien
   // Communities gehören zu den Menschen und tragen deren Farbe; Violett steht für Artikel. Blau heißt: Das mache ich mit meinen eigenen Dingen.
-  const FARBE = { ich: ['#203A8F', '#FFFFFF'], menschen: ['#D6336C', '#FFFFFF'], communities: ['#D6336C', '#FFFFFF'], material: ['#007A75', '#FFFFFF'], termine: ['#FFA500', '#2B1A00'], news: ['#7B4FB8', '#FFFFFF'], gespraeche: ['#AF4112', '#FFFFFF'] };
+  const FARBE = { ich: ['#2A3B8E', '#FFFFFF'], menschen: ['#AF4112', '#FFFFFF'], communities: ['#AF4112', '#FFFFFF'], material: ['#85992C', '#1B2400'], termine: ['#DAB000', '#2B1A00'], news: ['#7F89BB', '#141A33'], gespraeche: ['#DA8D00', '#2B1A00'] };   // Werte aus dem Erscheinungsbild des Instituts (ADR-0017)
   // Belegung nach ADR-0015: ich, Menschen, Materialien, Termine, Artikel. Die Knospen sind die Wege zu dem, was im Datenraum liegt:
   // finden, teilen, erstellen, bearbeiten. label: Verb plus Ding; kurz: nur das Verb, für enge Schirme; ding: Name des Dings in der Sicht vom Tun her.
   // Blatt „ich“: aufgeklappt steht „mein(e)“ auf dem Blatt, das Profil in der Mitte, daneben Materialien und Termine, außen Personen und Communities.
@@ -6031,10 +6107,11 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       setze(k, 'mitte-unter', LOGGED ? (start ? null : 'mein Profil') : 'anmelden');
     });
     const h = document.getElementById('vHinweis'); if (h) h.textContent = startSatz();
+    try { const v = CUR.split('?')[0].split('/').pop(); tunZeile(v); sbRender(); entwStand(v); } catch (e) {}   // Anmeldung ändert graue Knöpfe und Demo-Profil; beim ersten Aufruf stehen die Blüten am Rand noch nicht
   }
   function startSatz() {
     return LOGGED ? 'Du kannst jetzt auch veröffentlichen, erstellen, sammeln und mitreden. Die Mitte führt zu deinem ReliHub.'
-      : 'Ohne Anmeldung kannst du alles finden und lesen. Was grau ist, geht nach der Anmeldung. Die Mitte führt dorthin.';
+      : 'Ohne Anmeldung kannst du alles finden und lesen. Zum Veröffentlichen, Sammeln und Mitreden führt die Mitte zur Anmeldung.';
   }
   function standardAktion(d, ctx) {
     if (brauchtAnmeldung(d)) return false;   // ausgegraute Knospen: erst anmelden
@@ -6125,7 +6202,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   RelihubSteuerkonsole.registerContext('relilab', {
     mitte: { label: 'relilab', kurz: 'rl', color: '#6D3BE0' },   // erstes Beispiel für „Mitte plus vier“ (ADR-0013)
     actions: { 'material.finden': { params: { thema: 'Digitalität' } } },
-    handler: d => {
+    handler: d => rlAktion(d)
+  });
+  function rlAktion(d) {
       if (!d.action.includes('.') && d.action !== 'ich') return false;
       if (brauchtAnmeldung(d)) return false;
       {   // der Ort bleibt stehen: Das Formular legt sich über relilab, jede Knospe „finden“ zeigt nur, was zu relilab gehört
@@ -6137,8 +6216,17 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       if (d.action === 'menschen.personen') { go('relilab?zu=menschen&von=konsole'); return false; }
       if (d.action === 'termine.finden') { go('relilab?tab=termine&von=konsole'); return false; }
       return standardAktion(d, 'relilab');
-    }
-  });
+  }
+  // Zweites Beispiel: reliGLOBAL. Der Ort bleibt stehen, jede Knospe zeigt nur, was zu reliGLOBAL gehört
+  function rgAktion(d) {
+    if (brauchtAnmeldung(d)) return false;
+    if (d.action === 'material.finden') { go('community?c=religlobal&zu=katalog'); return false; }
+    if (d.action === 'termine.finden') { go('community?c=religlobal&tab=kal'); return false; }
+    if (d.action === 'menschen.personen') { go('community?c=religlobal&tab=mem'); return false; }
+    if (d.action === 'material.teilen') { openChooser('reliGlobal'); return false; }
+    if (d.action === 'termine.erstellen') { openEvent('reliGlobal'); return false; }
+    return standardAktion(d, 'reliGlobal');
+  }
 
   RelihubSteuerkonsole.registerContext('relidesk', {
     actions: { 'material.finden': { params: { thema: 'Schöpfung', stufe: 'sek1' } } },
@@ -6712,6 +6800,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || '', pp.get('zu') === 'katalog' ? 'katalog' : pp.get('tab')); }
     leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v === 'fortbildungen' ? 'rpi-virtuell' : v === 'eigene-instanz' ? 'zuschnitt' : v);
     RelihubSteuerkonsole.setOrt(leisteEl.getAttribute('current'));   // der Stiel markiert denselben Ort wie die Leiste
+    tunZeile(v); sbRender(); entwStand(v);
     if (v !== 'oekosystem' && document.body.classList.contains('oz-pop')) { document.body.classList.remove('oz-pop'); ozQ = ''; }
     if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); cyOpen(); }
     if (v === 'oekosystem') ozOpen(qs);
@@ -6749,13 +6838,13 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   const kn = (an, id, ding, name) => sub(an, id, name, { ding, name });
   [false, true].forEach(an => {
     const wer = an ? 'ich' : 'gast';
-    // Von den Dingen her: Inhalte des Entwurfs „rein und raus“, erweitert um Erstellen, Sammeln und Gespräche
+    // Von den Dingen her: reduziert. Ein Klick führt direkt zum Ding; was man damit tun kann, steht dort als Knopf (TUN).
     RelihubSteuerkonsole.registerBelegung('eins-dinge-' + wer, [
-      blatt('e-material', 'Material', 'material', { subs: [sub(an, 'material.finden', 'finden'), sub(an, 'material.teilen', 'veröffentlichen'), sub(an, 'material.erstellen', 'erstellen'), sub(an, 'material.bearbeiten', 'sammeln')] }),
-      blatt('e-termine', 'Termine', 'termine', { subs: [sub(an, 'termine.finden', 'finden'), sub(an, 'termine.erstellen', 'veröffentlichen')] }),
-      blatt('e-news', 'News', 'news', { subs: [sub(an, 'news.finden', 'finden'), sub(an, 'news.veroeffentlichen', 'veröffentlichen')] }),
-      blatt('e-gespraeche', 'Gespräche', 'gespraeche', { subs: gespraeche(an) }),
-      blatt('e-menschen', 'Menschen', 'menschen', { subs: [sub(an, 'menschen.personen', an ? 'Personen folgen' : 'Personen'), sub(an, 'menschen.communities', an ? 'Community beitreten' : 'Communities')] })
+      blatt('e-material', 'Material', 'material', { aktion: 'material.finden' }),
+      blatt('e-termine', 'Termine', 'termine', { aktion: 'termine.finden' }),
+      blatt('e-news', 'News', 'news', { aktion: 'news.finden' }),
+      blatt('e-gespraeche', 'Gespräche', 'gespraeche', { aktion: 'gespraeche.oeffentlich' }),
+      blatt('e-menschen', 'Menschen', 'menschen', { subs: [sub(an, 'menschen.personen', 'Personen'), sub(an, 'menschen.communities', 'Communities')] })
     ]);
     // Vom Tun her: die vier Wege des bisherigen Stands, dazu mitreden
     RelihubSteuerkonsole.registerBelegung('eins-tun-' + wer, [
@@ -6769,6 +6858,12 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   // Einstellbare Blume einer Community (ADR-0016): eine Stufe, fünf Blätter mit Verb.
   // Fest sind Farbe und Platz je Ding; die Community wählt Blätter, Wortlaut und Ziel.
   const BLUMEN = {
+    religlobal: { name: 'reliGLOBAL', blaetter: [
+      { ding: 'menschen', wort: 'Kontakt aufnehmen', aktion: 'menschen.personen' },
+      { ding: 'material', wort: 'Material zum Globalen Lernen finden', kurz: 'finden', aktion: 'material.finden' },
+      { ding: 'material', wort: 'Material teilen', kurz: 'teilen', aktion: 'material.teilen' },
+      { ding: 'termine', wort: 'Werkstatt eintragen', kurz: 'eintragen', aktion: 'termine.erstellen' },
+      { ding: 'termine', wort: 'Werkstätten finden', kurz: 'finden', aktion: 'termine.finden' }] },
     relilab: { name: 'relilab', blaetter: [
       { ding: 'menschen', wort: 'Kontakt aufnehmen', aktion: 'menschen.personen' },
       { ding: 'material', wort: 'Material finden', kurz: 'finden', aktion: 'material.finden' },
@@ -6812,8 +6907,87 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     }));
   });
   const vHinweis = document.getElementById('vHinweis'), startBlume = document.getElementById('startFlower');
-  startBlume.addEventListener('relihub-activate', e => { if (V_SATZ[e.detail.action]) vHinweis.textContent = V_SATZ[e.detail.action]; });
-  startBlume.addEventListener('pointerleave', () => { vHinweis.textContent = startSatz(); });
+  const blattFarbe = a => { const k = String(a).replace(/^e-/, '').split('.')[0]; return (D_FARBE[k] || [/^t-/.test(a) ? FORM_C[{ 't-finden': 'suchen', 't-teilen': 'teilen', 't-erstellen': 'anlegen', 't-bearbeiten': 'bearbeiten' }[a]] || D_FARBE.gespraeche[0] : D_FARBE.ich[0]])[0]; };
+  startBlume.addEventListener('relihub-activate', e => { if (V_SATZ[e.detail.action]) { vHinweis.textContent = V_SATZ[e.detail.action]; vHinweis.style.setProperty('--hc', blattFarbe(e.detail.action)); } });
+  startBlume.addEventListener('pointerleave', () => { vHinweis.textContent = startSatz(); vHinweis.style.removeProperty('--hc'); });
+
+  // ---------- Tun auf der Seite des Dings ----------
+  const TUN = {
+    materialpool: ['material', 'Material', [['material.teilen', 'veröffentlichen'], ['material.erstellen', 'erstellen'], ['material.bearbeiten', 'sammeln']]],
+    fortbildungen: ['termine', 'Termine', [['termine.erstellen', 'veröffentlichen']]],
+    mitmachen: ['news', 'News und Gespräche', [['news.veroeffentlichen', 'Beitrag schreiben']]]
+  };
+  function tunZeile(v) {
+    document.querySelectorAll('.tun-zeile').forEach(n => n.remove());
+    const t = TUN[v], view = document.getElementById('v-' + v); if (!t || !view) return;
+    const z = document.createElement('div'); z.className = 'tun-zeile'; z.setAttribute('role', 'group'); z.setAttribute('aria-label', 'Was du hier tun kannst');
+    z.style.cssText = `--tc:${D_FARBE[t[0]][0]};--tf:${D_FARBE[t[0]][1]};--tb:color-mix(in srgb,${D_FARBE[t[0]][0]} 14%,#fff)`;
+    z.innerHTML = `<b>${t[1]}:</b>` + t[2].map(x => `<button type="button" data-tun="${x[0]}"${LOGGED ? '' : ' class="grau"'}>${x[1]}${LOGGED ? '' : ' <small>· anmelden</small>'}</button>`).join('');
+    view.prepend(z);
+  }
+  document.addEventListener('click', e => { const b = e.target.closest('[data-tun]'); if (b) standardAktion({ action: b.dataset.tun, label: b.textContent, url: '#' }, 'hub'); });
+
+  // ---------- Blüten am linken Rand ----------
+  const ORT_ART = { materialpool: 'Ort', 'rpi-virtuell': 'Ort', relilab: 'Community', relidesk: 'Werkzeug', oercommunity: 'Projekt' };
+  const sbEl = document.getElementById('sb'), sbFeld = document.getElementById('sbFeld'), sbGriff = document.getElementById('sbGriff');
+  function sbOrt() { const v = CUR.split('?')[0]; return v === 'relilab' ? 'relilab' : v === 'community' && crId === 'religlobal' ? 'religlobal' : ''; }
+  function sbRender() {
+    const v = CUR.split('?')[0].split('/').pop(), ort = sbOrt();
+    const b = (akt, wort, ding, kl) => `<button type="button" class="sb-blatt${kl ? ' ' + kl : ''}${!LOGGED && NUR_ANGEMELDET.includes(akt) ? ' grau' : ''}" data-sb="${akt}" style="--c:${D_FARBE[ding][0]};--t:${D_FARBE[ding][1]}">${esc(wort)}${!LOGGED && NUR_ANGEMELDET.includes(akt) ? ' · anmelden' : ''}</button>`;
+    const dinge = ort ? BLUMEN[ort].blaetter.map(x => b(x.aktion, x.wort, x.ding)).join('')
+      : b('material.finden', 'Material', 'material') + b('termine.finden', 'Termine', 'termine') + b('news.finden', 'News', 'news') + b('gespraeche.oeffentlich', 'Gespräche', 'gespraeche')
+        + b('menschen.personen', 'Menschen', 'menschen') + b('menschen.personen', 'Personen', 'menschen', 'sub') + b('menschen.communities', 'Communities', 'menschen', 'sub');
+    const orte = LEISTE.filter(x => x.id !== 'start').map(x => `<a class="sb-blatt ort" href="${x.href}" style="--c:${x.color}"${x.id === v ? ' aria-current="page"' : ''}>${esc(x.label)} <small>${ORT_ART[x.id] || 'Ort'}</small></a>`).join('')
+      + `<a class="sb-blatt ort" href="#community?c=religlobal" style="--c:${D_FARBE.menschen[0]}"${ort === 'religlobal' ? ' aria-current="page"' : ''}>reliGLOBAL <small>Community</small></a><a class="sb-blatt ort" href="#partner" style="--c:#8A909C">Alle Orte</a>`;
+    sbFeld.innerHTML = `<a class="sb-blatt" href="#start" style="--c:${D_FARBE.ich[0]}"${v === 'start' ? ' aria-current="page"' : ''}>ReliHub · Start</a>`
+      + `<h2>${ort ? 'Hier bei ' + esc(BLUMEN[ort].name) : 'Im ReliHub'}</h2>${dinge}`
+      + `<button type="button" class="sb-blatt" data-sb="ich" style="--c:${D_FARBE.ich[0]}">${LOGGED ? 'Mein ReliHub' : 'Anmelden'}</button>`
+      + `<h2>Orte im Ökosystem</h2>${orte}`;
+  }
+  const sbZu = () => { sbEl.classList.remove('auf'); sbGriff.setAttribute('aria-expanded', 'false'); if (document.activeElement && sbEl.contains(document.activeElement)) document.activeElement.blur(); };
+  sbGriff.addEventListener('click', () => { const auf = !sbEl.classList.contains('auf'); sbEl.classList.toggle('auf', auf); sbGriff.setAttribute('aria-expanded', String(auf)); });
+  sbFeld.addEventListener('click', e => {
+    const k = e.target.closest('[data-sb]');
+    if (k) { const d = { action: k.dataset.sb, label: k.textContent, url: '#' }, ort = sbOrt(); if (ort === 'relilab') rlAktion(d); else if (ort === 'religlobal') rgAktion(d); else standardAktion(d, 'hub'); }
+    if (k || e.target.closest('a')) sbZu();
+  });
+  document.addEventListener('click', e => { if (sbEl.classList.contains('auf') && !sbEl.contains(e.target)) sbZu(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && sbEl.classList.contains('auf')) { sbZu(); sbGriff.focus(); } });
+
+  // ---------- In Entwicklung: Ansichten ohne eigene Entwicklung ----------
+  const IN_ENTW = ['materialpool', 'sammlung', 'relidesk', 'rpi-virtuell', 'eigene-instanz'];
+  function entwStand(v) { document.body.classList.toggle('in-entw', IN_ENTW.includes(v) || (v === 'community' && crId !== 'religlobal') || (v === 'profil' && !LOGGED)); }
+
+  // ---------- Flowi: Chat-Blume unten rechts. Entwurf: feste Antworten nach Stichwort, noch kein Sprachmodell, nichts wird gesendet ----------
+  const FLOWI = [
+    [/material|unterricht|arbeitsblatt|entwurf/i, 'Material findest du im Materialpool. Tipp ein Thema oben in den Suchschlitz, dann zeigt dir die große Blume, was dazu passt. <a href="#materialpool">Zum Material ›</a>'],
+    [/termin|fortbildung|veranstalt|kalender/i, 'Fortbildungen und Treffen stehen im Kalender, meist online. <a href="#finden/fortbildungen">Zu den Terminen ›</a>'],
+    [/anmeld|konto|profil|registr|login/i, 'Finden und Lesen geht ohne Anmeldung. Zum Veröffentlichen, Erstellen, Sammeln und Mitreden brauchst du ein Profil. Die Mitte der Blume führt zur Anmeldung.'],
+    [/veröffentlich|teilen|hochladen|eintragen/i, 'Eigenes teilst du nach der Anmeldung. Ob es im Pool einer Community erscheint, entscheidet ihre Redaktion.'],
+    [/communit|gruppe|relilab|religlobal|mitmachen/i, 'Communities arbeiten an gemeinsamen Themen. <a href="#communities">Alle Communities ›</a> · <a href="#relilab">relilab ›</a> · <a href="#community?c=religlobal">reliGLOBAL ›</a>'],
+    [/gespräch|chat|kommentar|nachricht/i, 'Öffentliche Gespräche findest du unter Gespräche. Der Chat aus den Räumen kommt später dazu. <a href="#mitmachen">Zu den Gesprächen ›</a>'],
+    [/offen|oer|lizenz|kosten|gratis/i, 'Offenes Material darfst du an deine Lerngruppe anpassen und weitergeben. Der ReliHub ist kostenlos.'],
+    [/relihub|was ist|wer seid|hilfe|wie geht/i, 'Der ReliHub verbindet Material, Termine, News und Menschen aus den religionspädagogischen Instituten und Communities. Die Blume ist dein Wegweiser: von den Dingen her oder vom Tun her.']
+  ];
+  const flFeld = document.getElementById('flFeld'), flLog = document.getElementById('flLog'), flKnopf = document.getElementById('flKnopf'), flEin = document.getElementById('flEin');
+  const flSagt = (wer, html) => { const p = document.createElement('p'); p.className = wer; p.innerHTML = html; flLog.appendChild(p); flLog.scrollTop = flLog.scrollHeight; };
+  function flAntwort(text) {
+    const t = String(text || '').trim(); if (!t) return;
+    flSagt('i', esc(t));
+    const r = FLOWI.find(x => x[0].test(t));
+    flSagt('f', r ? r[1] : `Dazu habe ich noch keine Antwort. Ich bin ein Entwurf mit festen Antworten. Du kannst aber danach suchen: <a href="#start" data-fl-suche="${esc(t)}">„${esc(t)}“ im Ökosystem suchen ›</a>`);
+  }
+  function flAuf(auf) {
+    flFeld.hidden = !auf; flKnopf.setAttribute('aria-expanded', String(auf));
+    if (auf && !flLog.firstChild) { flSagt('f', 'Hallo, ich bin Flowi. Ich helfe dir, dich im ReliHub zurechtzufinden. Was suchst du?'); document.getElementById('flChips').innerHTML = ['Material finden', 'Termine', 'Warum anmelden?', 'Was ist der ReliHub?'].map(c => `<button type="button">${c}</button>`).join(''); }
+    if (auf) flEin.focus();
+  }
+  flKnopf.addEventListener('click', () => flAuf(flFeld.hidden));
+  document.getElementById('flZu').addEventListener('click', () => { flAuf(false); flKnopf.focus(); });
+  document.getElementById('flChips').addEventListener('click', e => { const b = e.target.closest('button'); if (b) flAntwort(b.textContent); });
+  document.getElementById('flForm').addEventListener('submit', e => { e.preventDefault(); flAntwort(flEin.value); flEin.value = ''; });
+  flLog.addEventListener('click', e => { const a = e.target.closest('[data-fl-suche]'); if (a) { e.preventDefault(); e.stopPropagation(); flAuf(false); if (CUR.split('?')[0] !== 'start') go('start'); stFeld.value = a.dataset.flSuche; ozPopAuf(stFeld.value); } else if (e.target.closest('a')) flAuf(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !flFeld.hidden) { flAuf(false); flKnopf.focus(); } });
   // Einstellbare Blume am Beispiel relilab
   let rkBsp = 'relilab', rkArt = 'fuenf';
   function rlKonfigRender() {
@@ -6826,7 +7000,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const wahl = (attr, wert, akt, text) => `<button type="button" ${attr}="${wert}" aria-pressed="${wert === akt}">${text}</button>`;
     box.innerHTML = `<p class="rl-hubmarke">Einstellbare Blume · Entwurf</p><h2>Die Blume von ${esc(b.name)}</h2>`
       + `<p>Die Community stellt ihre Blume selbst ein: welche Blätter sie zeigt, wie sie heißen und wohin sie führen. Fest bleiben Farbe und Platz je Ding, höchstens fünf Blätter und eine Stufe. So bleibt die Blume überall wiedererkennbar.</p>`
-      + `<div class="rk-wahl"><span>Beispiel</span>${wahl('data-rk-bsp', 'relilab', rkBsp, 'relilab')}${wahl('data-rk-bsp', 'wissenschaft', rkBsp, 'Wissenschaft')}${wahl('data-rk-bsp', 'konfi', rkBsp, 'Konfi-Arbeit')}</div>`
+      + `<div class="rk-wahl"><span>Beispiel</span>${wahl('data-rk-bsp', 'relilab', rkBsp, 'relilab')}${wahl('data-rk-bsp', 'religlobal', rkBsp, 'reliGLOBAL')}${wahl('data-rk-bsp', 'wissenschaft', rkBsp, 'Wissenschaft')}${wahl('data-rk-bsp', 'konfi', rkBsp, 'Konfi-Arbeit')}</div>`
       + `<div class="rk-wahl"><span>Spielart</span>${wahl('data-rk-art', 'fuenf', rkArt, 'Fünf Verben')}${wahl('data-rk-art', 'geteilt', rkArt, 'Geteilte Blätter')}</div>`
       + `<table><thead><tr><th>Ding</th><th>Wortlaut</th><th>Ziel</th></tr></thead><tbody>${b.blaetter.map(x => `<tr><td><span class="pk" style="--c:${D_FARBE[x.ding][0]}"></span>${D_NAME[x.ding]}</td><td>${esc(x.wort)}</td><td>${ZIEL_TEXT[x.aktion]}</td></tr>`).join('')}</tbody></table>`
       + `<p class="rl-hint">Anmelden allein genügt nicht: Die Community nimmt auf, wer bei ihr veröffentlicht. Wer nicht dazugehört, teilt in den Materialpool von rpi-virtuell. Das Material ist dann im gemeinsamen Datenraum zu finden, aber nicht im Pool von ${esc(b.name)}.</p>`

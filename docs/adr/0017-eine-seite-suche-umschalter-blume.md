@@ -29,6 +29,17 @@ Der Entwurfsvergleich hat fünf Fassungen nebeneinandergestellt. Nach dem Treffe
 12. **Vier Antworten.** Was du hier findest, was du hier tun kannst, warum offen, was wir dir bieten: Sie stehen jetzt unter der Blume.
 13. **Communities.** Die einstellbare Blume aus ADR-0016 bleibt, am Beispiel relilab: unten rechts, fünf Blätter mit Verb, Mitte als Anmeldung. Dazu kommen aus dem Entwurf „rein und raus“ die gefilterten Ansichten mit Hinweiszeile und Unternavigation. Die Redaktion der Community entscheidet weiter, was in ihrem Pool erscheint.
 
+## Fortschreibung nach dem Abgleich mit dem Treffen (25.11.2026)
+Die Punkte 5, 8 und 10 sind damit geändert, Punkt 13 ergänzt.
+
+- **Von den Dingen her reduziert.** Ein Klick auf Material, Termine, News oder Gespräche führt direkt zur Seite. Was man dort tun kann, steht auf der Seite als Knopfzeile in der Farbe des Dings: veröffentlichen, erstellen, sammeln. Nur Menschen trägt zwei Knospen, Personen und Communities. Vom Tun her bleibt ausdifferenziert, dort sind die Knospen ohne Anmeldung grau.
+- **Erläuterung am Blatt.** Der Satz zum Blatt steht auf breiten Schirmen rechts neben der Blume, mit einem Rand in der Farbe des Blatts. Auf schmalen Schirmen steht er darunter.
+- **Blüten am linken Rand.** Am linken Rand ragen sechs Blütenblätter ein Stück herein. Beim Überfahren, Antippen oder mit der Tastatur blättern sie auf: oben der Weg zum Start, dann die Dinge, die Anmeldung und die Orte. Sie ersetzen die schwarze Leiste und die kleine Blume unten rechts. Bei jedem Ort steht, was er ist: Ort, Community, Werkzeug oder Projekt. In einer Community zeigen die Blüten deren eigene Wörter.
+- **Farben aus dem Erscheinungsbild des Instituts.** Material grün `#85992C`, Termine gelb `#DAB000`, Menschen und Communities rot `#AF4112`, Gespräche orange `#DA8D00`, die Mitte blau `#2A3B8E`. News tragen ein aufgehelltes Blau `#7F89BB`, weil die Palette keinen sechsten Ton hat. Die Farben gelten für Blume, Blüten am Rand und Ökosystem. Die Nachbau-Ansichten behalten vorerst ihre Farben.
+- **Flowi.** Unten rechts sitzt eine Chat-Blume als Hilfe. Im Entwurf antwortet sie nach Stichwort mit festen Sätzen und Links, ohne Sprachmodell, und sendet nichts. Sie sagt das selbst.
+- **reliGLOBAL als zweites Beispiel.** Neben relilab steht reliGLOBAL: eine Community mit einem Schaufenster. Die Blüten heißen dort „Material zum Globalen Lernen finden“ und „Werkstätten finden“ und führen in den Raum der Community.
+- **In Entwicklung.** Über Ansichten, hinter denen noch keine eigene Entwicklung steht, liegt quer der Schriftzug „In Entwicklung“ und oben ein Band: Materialpool, Sammlung, relidesk, rpi-virtuell, Eigene Instanz, die Räume der übrigen Communities und das Beispielprofil ohne Anmeldung.
+
 ## Technik
 - Vier Belegungen der Steuerkonsole: `eins-dinge-gast`, `eins-dinge-ich`, `eins-tun-gast`, `eins-tun-ich`. Welche gilt, folgt aus Sicht und Anmeldung.
 - Neues Attribut `mitte-knopf`: Die Mitte ist klickbar, auch ohne Unterzeile.
@@ -41,7 +52,9 @@ Der Entwurfsvergleich hat fünf Fassungen nebeneinandergestellt. Nach dem Treffe
 
 ## Offen
 - Die Suche findet nur über Namen und Titel, nicht über Schlagworte oder Beschreibungen.
-- Die Farbwerte aus dem Erscheinungsbild des Instituts sind noch nicht übernommen. Dort liegen Gelb und Orange nah beieinander, und es gibt kein Violett und kein Pink. Welche Inhaltsart welche Farbe bekommt, ist zu entscheiden.
+- Gelb und Orange liegen nah beieinander. Ob Termine und Gespräche so unterscheidbar genug sind, zeigt der Test. Grün und Gelb tragen dunkle Schrift, damit der Kontrast reicht.
+- Flowi braucht eine Entscheidung, woher die Antworten später kommen.
+- Im relilab tragen je zwei Blätter dieselbe Farbe, weil zwei Blätter zum selben Ding gehören.
 - „News“ in der Blume und „Artikel“ in den Ansichten meinen dasselbe. Ein Wort für beides steht aus.
 - Die Platzhalter im Suchschlitz sind fest eingetragen und wechseln noch nicht mit dem Jahr.
 - Nach der Anmeldung öffnet sich das Formular nicht von selbst.
