@@ -5581,9 +5581,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       + `<section id="rlMenschen" aria-label="Menschen"><h2>Menschen</h2><p class="rl-hint">Wer hier steht, hat im Labor veröffentlicht oder geteilt.</p>`
       + (men.length ? men.slice(0, 8).map(pr => `<a class="pe-card rl-person" href="${esc('#person?p=' + pr.npub)}">${peAv(pr)}<div><b>${pr.name}</b>${pr.about ? `<p>${pr.about}</p>` : ''}</div></a>`).join('') : leer(antwort ? 'Noch niemand mit Profil.' : stumm))
       + `</section>`
-      + `<section id="rlMitmachen" aria-label="Mitmachen"><h2>Mitmachen</h2><p class="rl-hint">Die nächsten Labortermine.</p>`
+      + `<section id="rlMitmachen" aria-label="Nächste Termine"><h2>Nächste Termine</h2><p class="rl-hint">Die nächsten Labortermine.</p>`
       + (termine.length ? termine.map(t => `<a class="rl-termin" href="${esc(sichereUrl(t.u))}"><b>${esc(t.t || t.id)}</b><span>${esc(fZeit.format(new Date(t.s * 1000)))}</span></a>`).join('') : leer(!daten || antwort ? 'Keine bevorstehenden Termine.' : stumm))
-      + `<a class="rl-mehr" href="${esc('#finden/fortbildungen?logik=labor')}">Alle Labortermine ›</a><br><a class="rl-mehr" href="${esc('#relilab?tab=mitmachen')}">Zum Raum Mitmachen ›</a></section>`;
+      + `<a class="rl-mehr" href="${esc('#finden/fortbildungen?logik=labor')}">Alle Labortermine ›</a><br><a class="rl-mehr" href="${esc('#relilab?tab=mitmachen')}">Sehen, was im relilab gerade passiert ›</a></section>`;
     if (document.querySelector('#v-relilab [data-rlsec="home"]').classList.contains('on')) {
       if (antwort) datenstand('v-relilab', 'live', `${daten.materialien.length} Materialien · ${daten.menschen.length} Menschen · ${daten.termineZahl} Labortermine`);
       else datenstand('v-relilab', 'stand', RT_STAND);
