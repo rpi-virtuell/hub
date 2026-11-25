@@ -102,6 +102,52 @@ Deno.test('News: längere Beiträge als Kacheln mit Bild und Auszug, lesbar im H
   assert(/news: \['news', 'News', \[\['news\.veroeffentlichen', 'Beitrag schreiben'\]\]\]/.test(s), 'Tun auf der Seite fehlt');
 });
 
+Deno.test('Beispielprofil: ohne Anmeldung ein echtes Profil mit Einwilligung, im Code nur der öffentliche Schlüssel', () => {
+  assert(/const BEISPIEL_NPUB = 'npub1[0-9a-z]{58}';/.test(s) && /if \(CUR\.split\('\?'\)\[0\] === 'profil' && !LOGGED\) CUR = 'person\?p=' \+ BEISPIEL_NPUB \+ '&beispiel=1';/.test(s), 'ohne Anmeldung zeigt Mein Profil noch die erfundene Person');
+  const b = (html.match(/<section class="bsp" id="prBeispiel" hidden>[\s\S]*?<\/section>/) || [''])[0];
+  assert(/mit Einwilligung der Person/.test(b) && /data-anmelden/.test(b) && /Konto anlegen/.test(b), 'Hinweis auf Einwilligung oder Wege zum eigenen Profil fehlen');
+  assert(/document\.getElementById\('prBeispiel'\)\.hidden = !\(v === 'person' && new URLSearchParams\(qs \|\| ''\)\.get\('beispiel'\)\);/.test(s), 'Hinweis steht auch an anderen Profilen');
+  assert(/data-an-beispiel/.test(html), 'Anmeldedialog führt nicht zum Beispielprofil');
+});
+
+Deno.test('Personenseite: Über mit Bereich, Fächern, Interessen und Orten, alle Communities; Kopf mit ReliHub links', () => {
+  assert(/kinds: \[0, 10015\], authors: \[hex\]/.test(s) && /c0\.edufeed/.test(s) && /ef\.educationalLevels/.test(s) && /ef\.subjects/.test(s) && /ef\.locations/.test(s), 'Angaben aus dem Profil werden nicht gelesen');
+  assert(/zeile\('Bildungsbereich', m\.bereiche/.test(s) && /zeile\('Fächer', m\.faecher/.test(s) && /zeile\('Interessen', m\.interessen/.test(s) && /zeile\('Orte', m\.orte/.test(s), 'Über zeigt die Angaben nicht');
+  assert(/<h2>Communities<\/h2>/.test(s) && /hubFetch\('person:communities:' \+ hex/.test(s), 'Communities der Person fehlen oder bleiben ohne Namen');
+  const kopf = (html.match(/<div class="view" id="v-person"[\s\S]*?<\/header>/) || [''])[0];
+  assert(/class="hub-top"/.test(kopf) && /<a class="brand" href="#start">/.test(kopf) && !/mp-head/.test(kopf), 'Kopfzeile der Personenseite bricht mit dem Hub');
+  const start = (html.match(/<div class="view" id="v-start">[\s\S]*?<\/header>/) || [''])[0];
+  assert(/<a href="#profil">Mein Profil<\/a>\s*<a class="btn btn-profil" href="#profil">Anmelden<\/a>/.test(start) && !/#oekosystem/.test(start), 'Startseite: Mein Profil fehlt oder Ökosystem steht noch im Menü');
+});
+
+Deno.test('Material und Termine: Hub-Seiten mit allem aus dem Ökosystem, Kopf des Hubs, „Termine“ statt „Fortbildungen“', () => {
+  assert(/<div class="view" id="v-material"/.test(html) && /'material\.finden': 'material',/.test(s) && /if \(v === 'material'\) mtOpen\(\);/.test(s), 'Material führt nicht auf die Hub-Seite');
+  assert(/e\.typ === 'material' && e\.ev && e\.ev\.kind === 30142 && ozSichtbar\(e\)/.test(s) && /data-mt-mehr/.test(s), 'Material zeigt nicht alles aus dem Gefüge');
+  assert(/mpLaden\(\)\.then\(ms => \{ if \(lauf !== mtStart \|\| mtVoll \|\| !ms\.length\) return; mtSetzen\(ms, false\); mtRender\(\); \}/.test(s), 'Material wartet auf das ganze Gefüge, statt erst die schnelle Abfrage zu zeigen');
+  const k = (s.match(/function mtKarte\(m\) \{[\s\S]*?\n  \}/) || [''])[0];
+  assert(/class="mt-bild"/.test(k) && /mtBild\(m\.bild\)/.test(k) && /class="stufe"/.test(k) && /m\.art/.test(k) && /m\.fach/.test(k), 'Karte ohne Vorschaubild oder ohne Bildungsstufe');
+  assert(/class="mt-lic lic-\$\{m\.stand\} amp-\$\{m\.ampel\}/.test(k) && /cc \? CC_ZEICHEN : ''/.test(k) && /\.mt-lic\{position:absolute/.test(html), 'Lizenzpille liegt nicht auf dem Bild oder trägt kein CC-Zeichen');
+  assert(/<b>Materialfeed<\/b>/.test(html) && /Materialpool mit Redaktion und Filtern nach Alter und Thema ist noch in Entwicklung/.test(html), 'Seite sagt nicht, dass sie ein Feed ist und der Pool noch aussteht');
+  assert(/#v-fortbildungen\{--c-finden:var\(--n-termine\)/.test(html), 'Terminseite trägt noch Grün');
+  for (const v of ['v-material', 'v-fortbildungen', 'v-personen', 'v-person', 'v-news']) {
+    const kopf = (html.match(new RegExp('<div class="view" id="' + v + '"[\\s\\S]*?</header>')) || [''])[0];
+    assert(/class="hub-top"/.test(kopf) && /<a class="brand" href="#start">/.test(kopf), v + ': Kopf ohne ReliHub links');
+  }
+  const termine = (html.match(/<div class="view" id="v-fortbildungen"[\s\S]*?<\/main>/) || [''])[0];
+  assert(/<h1>Termine<\/h1>/.test(termine) && !/Fortbildungskalender|<h1>Fortbildungen<\/h1>/.test(termine) && /fortbildungen: 'ReliHub · Termine'/.test(s), 'Terminseite heißt noch Fortbildungen');
+});
+
+Deno.test('OER-Ampel an den Lizenzpillen; Termine ohne „nostr:“', () => {
+  const f = (s.match(/function lizenzAmpel\(url\) \{[\s\S]*?\n  \}/) || [''])[0];
+  const ampel = new Function(f + '; return lizenzAmpel;')();
+  assertEquals(['https://creativecommons.org/publicdomain/zero/1.0/', 'https://creativecommons.org/licenses/by/4.0/', 'https://creativecommons.org/licenses/by-sa/4.0/'].map(ampel), ['gruen', 'gruen', 'gruen']);
+  assertEquals(['https://creativecommons.org/licenses/by-nc/4.0/', 'https://creativecommons.org/licenses/by-nd/4.0/', 'https://creativecommons.org/licenses/by-nc-sa/4.0/', 'https://creativecommons.org/licenses/by-nc-nd/4.0/'].map(ampel), ['orange', 'orange', 'orange', 'orange']);
+  assertEquals(['https://de.wikipedia.org/wiki/Urheberrecht', '', 'https://example.org/lizenz'].map(ampel), ['rot', '', '']);
+  assert(/\.amp-gruen\{background:#1F6B2B!important/.test(html) && /\.amp-orange\{/.test(html) && /\.amp-rot\{background:#B3261E!important/.test(html), 'Farben der Ampel fehlen');
+  assertEquals((s.match(/class="lic lic-\$\{m\.stand\} amp-\$\{m\.ampel\}"/g) || []).length, 5, 'nicht jede Lizenzpille trägt die Ampel');
+  assert(!/>nostr:<\/button><\/div><\/div><\/article>/.test(s) && !/data-kan="\$\{i\}"/.test(s), 'Terminliste zeigt noch den Knopf nostr:');
+});
+
 Deno.test('reliGLOBAL als zweites Beispiel neben relilab', () => {
   const b = (s.match(/religlobal: \{ name: 'reliGLOBAL', blaetter: \[[\s\S]*?\] \}/) || [''])[0];
   assertEquals([...b.matchAll(/ding: '([a-z]+)'/g)].map((m) => m[1]), ['menschen', 'material', 'material', 'termine', 'termine']);

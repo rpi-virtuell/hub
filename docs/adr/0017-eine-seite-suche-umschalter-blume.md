@@ -52,6 +52,17 @@ Die Punkte 5, 8 und 10 sind damit geändert, Punkt 13 ergänzt.
 
 - **News sind längere Beiträge.** Das Blatt News führt auf eine eigene Ansicht mit Kacheln: Beitragsbild, Quelle und Datum, Titel, Auszug, Schlagworte. Ein Klick öffnet den Beitrag im Hub. Quellen sind die Beiträge der OER-Community und längere Beiträge anderer aus dem laufenden Strom. News und Aktivitäten führen damit nicht mehr auf dieselbe Seite.
 
+- **Beispielprofil statt erfundener Person.** Ohne Anmeldung zeigt „Mein Profil“ nicht mehr die erfundene Persona, sondern ein echtes Profil aus dem Projektteam, mit Einwilligung der Person. Ein Hinweis darüber sagt das und führt zur Anmeldung. Im Code steht nur der öffentliche Schlüssel; Name, Bild und Veröffentlichungen kommen live aus dem Profil. Der Anmeldedialog bietet an, das Beispiel zuerst anzusehen. Die erfundene Persona steht noch in den Nachbau-Ansichten, etwa im relidesk.
+
+- **Personenseite mit „Über“.** Die Seite einer Person zeigt den vollen Text aus ihrem Profil, dazu Bildungsbereich, Fächer, Interessen und Orte, soweit sie dort stehen, und alle Communities aus ihrer Liste mit Namen. Der Kopf der Seite ist der des Hubs, mit ReliHub oben links.
+- **Kopf der Startseite.** Neben „Anmelden“ steht „Mein Profil“. Ohne Anmeldung führt es zum Beispielprofil. „Ökosystem“ steht dort nicht mehr, es öffnet sich über die Suche.
+
+- **Alle Personen.** Die Seite „Personen“ zeigt alle Menschen des Ökosystems: wer ein Profil hat und mit einer Community, einem Material oder einem Termin verbunden ist. Sie zeigte bisher ersatzweise die Teamliste eines Projekts. Das Projektteam steht im Schaufenster der OER-Community. Automatische Konten bleiben draußen. Einzelne Konten, die nicht zu religionsbezogener Bildung gehören, nimmt eine Ausschlussliste aus der Ansicht; sie ist noch leer. Offen: Wer die Ausschlussliste pflegt und ob sie als Liste des Projektkontos im Netz liegt statt im Code, ebenso die Teamliste.
+
+- **Material und Termine als Seiten des Hubs.** Wie bei den Personen führt das Blatt auf eine Seite des Hubs, die alles aus dem Ökosystem zeigt, mit ReliHub oben links. „Material“ ist neu und ein Materialfeed: alles, was im Netz als Material geteilt wird, ungeprüft und nach Zeit, mit Suche. Die Seite sagt das selbst und auch, dass der gemeinsame Materialpool mit Redaktion und Filtern noch aussteht. Jede Karte zeigt Vorschaubild, Titel, Kurztext, Quelle, Bildungsstufe, Art und Fach. Die Lizenz liegt als Pille auf dem Bild, offene Lizenzen grün, CC-Lizenzen mit CC-Zeichen. Zuerst erscheint die eine schnelle Abfrage der Materialien, die übrigen Quellen kommen nach. Die Terminseite trägt Gelb, die Farbe ihrer Inhaltsart. Die Terminseite heißt „Termine“ statt „Fortbildungen“, im Kopf, im Titel und in den Hinweisen. Wo ein Ort selbst von Fortbildungen spricht, bleibt sein Wort.
+
+- **OER-Ampel.** Alle Lizenzpillen folgen der Ampel: grün für CC0, CC BY und CC BY-SA, orange für alle anderen CC-Lizenzen, rot für urheberrechtlich geschützt. Unbekannte Lizenzen bleiben neutral. Die Terminliste zeigt den Knopf „nostr:“ nicht mehr.
+
 ## Technik
 - Vier Belegungen der Steuerkonsole: `eins-dinge-gast`, `eins-dinge-ich`, `eins-tun-gast`, `eins-tun-ich`. Welche gilt, folgt aus Sicht und Anmeldung.
 - Neues Attribut `mitte-knopf`: Die Mitte ist klickbar, auch ohne Unterzeile.

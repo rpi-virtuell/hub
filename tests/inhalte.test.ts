@@ -172,7 +172,7 @@ Deno.test('ADR-0007 und README nennen die Etappe', async () => {
 
 Deno.test('Feindlicher Relay-Text: mpMaterial liefert Zeichenketten, die maskiert harmlos sind; fremder Schlüssel fällt durch', () => {
   const fn = (n: string) => block(new RegExp(`  function ${n}\\([^)]*\\) \\{[\\s\\S]*?\\n  \\}`));
-  const namen = ['tagWert', 'tagWerte', 'ambWerte', 'ambFeld', 'lizenzLabel', 'lizenzStand', 'mpMaterial', 'istHex64'];
+  const namen = ['tagWert', 'tagWerte', 'ambWerte', 'ambFeld', 'lizenzLabel', 'lizenzAmpel', 'lizenzStand', 'mpMaterial', 'istHex64'];
   const quelle = namen.map(fn).join('\n');
   for (const n of namen) assert(fn(n), 'Quelltext gefunden: ' + n);
   const f = new Function('esc', 'sichereUrl', quelle + '; return { mpMaterial, istHex64 };')(esc, sichereUrl);
