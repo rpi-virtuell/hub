@@ -59,7 +59,7 @@ Deno.test('Konsole: jede Aktion hat Route, Erklärung und Farben', () => {
 Deno.test('Graustufen: Stand an der Knospe, im Ereignis, in der Karte; lesbar', () => {
   const grau = FUNCS.flatMap((f) => f.subs).filter((u) => u.stand);
   assertEquals(grau.map((u) => `${u.id}:${u.stand}`).sort(), [], 'keine Knospe ist mehr grau');
-  assert(/const GRAU = \{ spaeter: \{ fill: '#5F6672', text: '#FFFFFF' \}, offen: \{ fill: '#C9CED6', text: '#2B2F36' \} \}/.test(c), 'GRAU');
+  assert(/const GRAU = \{ spaeter: \{ fill: '#5F6672', text: '#FFFFFF' \}, offen: \{ fill: '#C9CED6', text: '#2B2F36' \}, anmelden: \{ fill: '#C9CED6', text: '#2B2F36' \} \}/.test(c), 'GRAU');
   assert(contrast('#FFFFFF', '#5F6672') >= 4.5 && contrast('#2B2F36', '#C9CED6') >= 4.5, 'Kontrast der Graustufen');
   assert(/stand: STAND\[action\] \|\| null/.test(c) && /\(später\)/.test(c) && /\(noch nicht gebaut\)/.test(c), 'Stand fehlt im Ereignis oder im Linktext');
   assert(/'termine\.bearbeiten': \{[^\n]*\['Im Hub ändern','','offen'\]/.test(s) && /'material\.bearbeiten': \{[^\n]*\['Übernehmen und verändern','#relidesk\?tab=schreibtisch','spaeter'\]/.test(s), 'Karte oder Handlung ohne Graustufe');
@@ -87,7 +87,7 @@ Deno.test('themaPasst: Name, Untertitel und t-Tags; ohne Themen passt alles', ()
 });
 
 Deno.test('Startseite: Themenfeld, Vorschau mit Rückfall, maskiert, Laden nur einmal', () => {
-  assert(/<form class="st-themen" id="stThemen"[^>]*>\s*<label for="stThemenFeld">/.test(html) && /placeholder="#Frieden #Konfi #Schöpfung"/.test(html), 'Themenfeld fehlt oder ohne Beschriftung');
+  assert(/<form class="st-themen" id="stThemen"[^>]*>\s*<label for="stThemenFeld">/.test(html) && /placeholder="Advent, Frieden, relilab"/.test(html), 'Themenfeld fehlt oder ohne Beschriftung');
   assert(/speicher\('relihub-themen'/.test(s), 'Themen bleiben nicht im Browser');
   assert(/\n  themenRender\(\);[^\n]*\n  route\(\);\n\}\)\(\);/.test(s) && !/stChips\.addEventListener[^\n]*\n  themenRender\(\);/.test(s), 'Gespeicherte Themen werden vor der Definition von esc gezeichnet');
   const v = fn('stVorschau'), h = fn('stVorschauHtml'), l = fn('stLaden');
@@ -103,9 +103,9 @@ Deno.test('Sicht vom Tun her: dieselbe Belegung, Blätter sind die vier Wege, Kn
   assert(/const FUNCS_F = \[FUNCS\[0\]\]\.concat\(FORM_ORDER\.map\(/.test(c) && /f\.subs\.filter\(u => u\.form === k\)/.test(c), 'Zweite Sicht wird nicht aus der Belegung abgeleitet');
   assert(/'sicht', 'mitte', 'stiel'\]/.test(c) && /get funcs\(\) \{ return this\.belegung \|\| \(this\.sicht === 'formen' \? FUNCS_F : FUNCS\); \}/.test(c), 'Attribut sicht fehlt');
   assert(/sicht: this\.sicht/.test(c) && /'data-form', s\.form/.test(c) && /s\.form \? FORMEN\[s\.form\]\.d/.test(c), 'Ereignis ohne Sicht oder Knospe ohne Zeichen ihres Wegs');
-  assert(/<div class="st-sicht" id="stSicht" role="group"[^>]*>.*data-sicht="dinge" aria-pressed="true".*data-sicht="formen" aria-pressed="false"/.test(html), 'Umschalter fehlt');
+  assert(/<div class="st-sicht" id="stSicht" role="group"[^>]*>.*data-sicht="dinge".*role="switch" aria-checked="false".*data-sicht="formen"/.test(html), 'Umschalter fehlt');
   const z = fn('sichtSetzen');
-  assert(/speicher\('relihub-sicht', SICHT\)/.test(z) && /setAttribute\('sicht', 'formen'\)/.test(z) && /removeAttribute\('sicht'\)/.test(z) && /aria-pressed/.test(z), 'Umschalter merkt oder setzt die Sicht nicht');
+  assert(/speicher\('relihub-sicht', SICHT\)/.test(z) && /mitteStand\(\)/.test(z) && /aria-checked/.test(z), 'Umschalter merkt oder setzt die Sicht nicht');
   assert(/\n  sichtSetzen\(speicher\('relihub-sicht'\)\);\n  themenRender\(\);/.test(s), 'Gemerkte Sicht wird beim Start nicht gesetzt');
   const zahl: Record<string, number> = { suchen: 5, teilen: 3, anlegen: 3, bearbeiten: 3 };
   assert(/k === 'bearbeiten' \? \[Object\.assign\(\{ ding: 'ich', name: 'mein Profil' \}/.test(c) && /subs:\['material\.bearbeiten','termine\.bearbeiten','news\.bearbeiten','ich\.profil'\]/.test(s), 'unter bearbeiten steht zuletzt das eigene Profil');
@@ -141,7 +141,7 @@ Deno.test('Stiel mit den Orten (ADR-0014): Aufbau, Schnittstelle, Weitergabe aus
   assert(/RelihubSteuerkonsole\.setOrt\(leisteEl\.getAttribute\('current'\)\)/.test(s), 'aktueller Ort folgt der Leiste');
   assert(/setWeitereOrte\(items\) \{/.test(c) && /RelihubSteuerkonsole\.setWeitereOrte\(PARTNERS\.filter\(/.test(s) && /kind: p\[4\] \? 'instanz' : 'ausblick'/.test(s), 'weitere Orte des Ökosystems aus der Partnerliste');
   assert(/if \(d\.kind === 'ausblick'\) \{/.test(s) && /a\.rel = 'noopener'/.test(c), 'Ort ohne Ansicht führt zur Kachel, fremde Seite öffnet neu');
-  assert(/id="startFlower"[^>]* stiel>/.test(html) && !/id="rlBlume"[^>]* stiel/.test(html), 'Startseite mit Stiel, Abschnitt bei relilab ohne');
+  assert(!/id="startFlower"[^>]* stiel/.test(html) && !/id="rlBlume"[^>]* stiel/.test(html), 'Startseite und Abschnitt bei relilab ohne Stiel (ADR-0017)');
   assert(contrast('#1F3A22', '#E4F0E1') >= 4.5 && contrast('#FFFFFF', '#2E7D4F') >= 4.5, 'Kontrast der Blätter am Stiel');
   assert(/id="rlFilterHinweis" hidden/.test(html) && /gefiltert auf <b>relilab<\/b>/.test(s), 'Hinweiszeile zum Filter in der relilab-Ansicht');
   const adr = await Deno.readTextFile(new URL('../docs/adr/0014-stiel-mit-orten.md', import.meta.url));

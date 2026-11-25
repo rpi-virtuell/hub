@@ -121,7 +121,7 @@ Deno.test('Partnerseiten: verlinkte Seite ohne Nostr, Logo nur mit Erlaubnis und
 Deno.test('Noch nicht Gebautes trägt das Wort „bald“ statt einer gestrichelten Linie', () => {
   const k = consoleScript(), a = appScript();
   assert(!/\.btn\.st-grau\{[^}]*dashed/.test(html), 'Knopf nicht mehr gestrichelt');
-  assert(/const GRAU_WORT = \{ spaeter: 'später', offen: 'bald' \}/.test(k) && /grauWort: GRAU_WORT,/.test(k), 'ein Wort je Graustufe, an der Konsole abrufbar');
+  assert(/const GRAU_WORT = \{ spaeter: 'später', offen: 'bald', anmelden: 'anmelden' \}/.test(k) && /grauWort: GRAU_WORT,/.test(k), 'ein Wort je Graustufe, an der Konsole abrufbar');
   assert(/class: 'bald'/.test(k) && /GRAU_WORT\[s\.stand\]/.test(k), 'Knospe trägt das Wort als eigene Zeile');
   const kn = a.slice(a.indexOf('function exKnopf('), a.indexOf('function explain('));
   assert(/st-wort/.test(kn) && /grauWort\[stand\]/.test(kn), 'Knopf einer Handlung nennt das Wort');

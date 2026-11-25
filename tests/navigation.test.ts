@@ -54,8 +54,8 @@ Deno.test('Konsole: Tutorial- und Direktmodus, eine Standardkette', () => {
   assert(/function standardAktion\(d, ctx\)/.test(s), 'standardAktion fehlt');
   assert((s.match(/later\(d\); return false;/g) || []).length === 1, 'later() nur in standardAktion');
   assert((s.match(/return standardAktion\(d,/g) || []).length >= 8, 'nicht alle Kontexte enden in der Standardkette');
-  assert(/MODUS === 'direkt'/.test(block(/registerContext\('hub-start'[\s\S]*?\n  \}\);/)), 'hub-start kennt den Direktmodus nicht');
-  assert(html.includes('href="#hilfe"') && /data-modus="direkt"/.test(s) && /data-modus="tutorial"/.test(s), 'Umschalter');
+  assert(/standardAktion\(d, 'hub'\)/.test(block(/registerContext\('hub-start'[\s\S]*?\n  \}\);/)), 'hub-start führt nicht direkt hin');
+  assert(/data-modus="direkt"/.test(s) && /data-modus="tutorial"/.test(s), 'Umschalter');
   assert(/view === 'hilfe'/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'route kennt hilfe nicht');
 });
 
@@ -117,7 +117,7 @@ Deno.test('Konsole auf der Startseite verankert', () => {
   const s = appScript(), start = hblock(/id="v-start"[\s\S]*?<!-- =+ Ansicht 2/);
   assert(/<relihub-steuerkonsole id="startFloat" floating[^>]*context="hub-start-float"/.test(start), 'schwebende Konsole fehlt auf der Startseite');
   assert(/new IntersectionObserver\(/.test(s) && /\.observe\(document\.getElementById\('startFlower'\)\)/.test(s), 'Observer fehlt');
-  assert(/registerContext\('hub-start-float'/.test(s) && /MODUS === 'direkt'/.test(block(/registerContext\('hub-start-float'[\s\S]*?\n  \}\);/)), 'Kontext fehlt');
+  assert(/registerContext\('hub-start-float'/.test(s) && /standardAktion\(d, 'hub'\)/.test(block(/registerContext\('hub-start-float'[\s\S]*?\n  \}\);/)), 'Kontext fehlt');
   assert(/unten rechts/.test(block(/function explainDefault[\s\S]*?\n  \}/)), 'Hinweissatz fehlt');
 });
 
@@ -172,7 +172,7 @@ Deno.test('Nacharbeit: Fokus der Leiste bleibt erhalten', () => {
 Deno.test('Nacharbeit: Karte bleibt nach Klick stehen', () => {
   const s = appScript();
   const ctx = block(/registerContext\('hub-start', \{[\s\S]*?\n  \}\);/);
-  assert(/onActivate: d => \{ if \(exPinned && d\.source === 'pointer'\) return;/.test(ctx), 'onActivate prüft exPinned nicht');
+  assert(/onActivate: \(\) => \{\}/.test(ctx) && /exPinned = true;/.test(ctx), 'Überfahren zeichnet wieder eine Erklärkarte');
   assert(/handler: d => \{\s*exPinned = true;/.test(ctx), 'Klick heftet die Karte nicht an');
   assert(/addEventListener\('pointerleave', \(\) => \{ exPinned = false; \}\)/.test(s), 'Verlassen der Konsole löst nicht');
   assert(/function route\(\) \{[\s\S]{0,200}exPinned = false;/.test(s), 'Routenwechsel löst nicht');
