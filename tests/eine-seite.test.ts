@@ -47,8 +47,8 @@ Deno.test('Tun auf der Seite des Dings: Knöpfe im Materialpool, im Kalender und
 });
 
 Deno.test('Farbnavigation: eine Farbe je Inhaltsart aus dem Erscheinungsbild des Instituts', () => {
-  assert(/--n-ich:#2A3B8E;--n-material:#85992C;--n-termine:#DAB000;--n-menschen:#AF4112;--n-gespraeche:#B549F0;--n-news:#0072AA;/.test(html), 'Farbwerte fehlen');
-  assert(/material: \['#85992C', '#1B2400'\], termine: \['#DAB000', '#2B1A00'\], news: \['#0072AA', '#FFFFFF'\], gespraeche: \['#B549F0', '#1B0A2A'\]/.test(c), 'Blume trägt die Farben nicht');
+  assert(/--n-ich:#2A3B8E;--n-material:#85992C;--n-termine:#DAB000;--n-menschen:#AF4112;--n-gespraeche:#B549F0;--n-news:#F1693E;/.test(html), 'Farbwerte fehlen');
+  assert(/material: \['#85992C', '#1B2400'\], termine: \['#DAB000', '#2B1A00'\], news: \['#F1693E', '#2B1000'\], gespraeche: \['#B549F0', '#1B0A2A'\]/.test(c), 'Blume trägt die Farben nicht');
   assert(/\[data-typ="material"\]\{--tc:var\(--n-material\)/.test(html) && /\[data-typ="event"\]\{--tc:var\(--n-termine\)/.test(html) && /\[data-typ="person"\]\{--tc:var\(--n-menschen\)/.test(html), 'Ökosystem trägt andere Farben als die Blume');
   assert(/vInfo\.style\.setProperty\('--hc', blattFarbe\(e\.detail\.action\)\)/.test(s) && /@media \(min-width:1100px\)\{\.v-info\{position:absolute;left:calc\(50% \+ 268px\)/.test(html), 'Erläuterung steht nicht neben dem Blatt in dessen Farbe');
 });
@@ -63,9 +63,16 @@ Deno.test('Vorschau um die Erläuterung: echte Einträge als Kreise mit Ring in 
 Deno.test('Blüten am linken Rand ersetzen Leiste und kleine Blume', () => {
   assert(/<nav class="sb" id="sb" aria-label="ReliHub-Navigation">/.test(html) && /#leiste,relihub-steuerkonsole\[floating\]\{display:none!important\}/.test(html), 'Blüten fehlen oder Leiste und kleine Blume stehen noch');
   assertEquals((html.match(/<button type="button" class="sb-griff"[\s\S]*?<\/button>/) || [''])[0].match(/<i /g)!.length, 6);
-  assert(/const ORT_ART = \{ materialpool: 'Ort', 'rpi-virtuell': 'Ort', relilab: 'Community', relidesk: 'Werkzeug', oercommunity: 'Projekt' \};/.test(s), 'Ort, Community, Werkzeug und Projekt sind nicht unterschieden');
+  assert(/const ORT_ART = \{ materialpool: 'Ort', 'rpi-virtuell': 'Ort', relilab: 'Community · Labor', relidesk: 'Werkzeug', oercommunity: 'Projekt' \};/.test(s), 'Ort, Community, Werkzeug und Projekt sind nicht unterschieden');
   assert(/if \(ort === 'relilab'\) rlAktion\(d\); else if \(ort === 'religlobal'\) rgAktion\(d\); else standardAktion\(d, 'hub'\);/.test(s), 'in einer Community führen die Blüten nicht an ihren Ort');
   assert(/ReliHub · Start<\/a>/.test(s) && /e\.key === 'Escape' && sbEl\.classList\.contains\('auf'\)/.test(s), 'Weg zum Start oder Schließen fehlt');
+});
+
+Deno.test('Orte tragen keine Inhaltsfarbe: Art in Worten, Beiträge als Punkte; Wendekarten ohne durchscheinendes Logo', () => {
+  assert(/'relilab': \[\['Community', 'Labor'\], \['termine', 'material', 'menschen'\]\]/.test(s), 'ein Ort kann nicht mehreres zugleich sein');
+  assert(/<span class="art">\$\{ORT_INFO\[n\]\[0\]\.join\(' · '\)\}<\/span>/.test(s) && /<i style="--c:var\(--n-\$\{x\}\)"><\/i>/.test(s), 'Art oder Beiträge fehlen auf der Kachel');
+  assert(!/class="cc\$\{logo \? ' cc-logo' : ''\}" style="background/.test(s), 'Kreis des Orts trägt noch eine Bereichsfarbe');
+  assert(/\.cy-f \*,\.cy-av::before,\.cy-av::after\{backface-visibility:hidden/.test(html), 'Logo scheint durch die gedrehte Karte');
 });
 
 Deno.test('reliGLOBAL als zweites Beispiel neben relilab', () => {
