@@ -6030,6 +6030,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (d.action === 'material.teilen') { go('materialpool'); openChooser('materialpool'); return false; }
     if (brauchtAnmeldung(d)) return false;
     if (d.action === 'ich') { if (VERSION === 'light' && !LOGGED) anDialogAuf(); else go(LOGGED ? 'profil' : 'start'); return false; }
+    if (d.action === 'ich.suche') { go('oekosystem'); return false; }   // vernetzte Suche: das Ökosystem, ohne Anmeldung
     if (d.action.startsWith('ich.') && d.action !== 'ich.profil' && !LOGGED) { anmelden(); return false; }
     if (d.stand === 'offen') { toast(`<b>${EX[d.action] ? EX[d.action].t : d.label}</b> ${GRAU_TEXT.offen}.`); return false; }
     if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); if (d.stand) toast(`<b>${d.label}</b> ${GRAU_TEXT[d.stand]}. Das hier ist ein Ausblick.`); return false; }
@@ -6728,19 +6729,21 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   // ---------- Entwurfsvergleich (ADR-0016): fünf Fassungen der Navigation, umschaltbar über die Reiterzeile oder ?v= ----------
   const VERSIONEN = {
     heute: 'Blume mit Umschalter, Stiel und Leiste. So steht der Entwurf bisher.',
-    reinraus: 'Vier Dinge, je zwei Wege: finden und veröffentlichen. Der Stiel trägt die Orte, die Leiste entfällt.',
+    reinraus: 'Oben ich, ringsum vier Dinge mit je zwei Wegen: finden und veröffentlichen. Der Stiel trägt die Orte, die Leiste entfällt.',
     light: 'Fünf Blätter mit Verb, ein Klick führt direkt hin. Die Mitte führt zur Anmeldung, die Blume sitzt unten rechts. Im relilab ist die Blume einstellbar.',
     suche: 'Die Suche ist der Einstieg und führt ins Ökosystem. Die Orte liegen unten als Blütenreihe.',
     links: 'Gegenprobe ohne Blume als Steuerung: Die Navigation steht links als Liste.'
   };
   const D_FARBE = RelihubSteuerkonsole.farben, D_NAME = { menschen: 'Menschen', material: 'Material', termine: 'Termine', news: 'Artikel' };
   const blatt = (id, label, ding, mehr) => Object.assign({ id, label, color: D_FARBE[ding][0], text: D_FARBE[ding][1] }, mehr);
-  // Version 2, rein und raus: Jedes Ding kennt finden und veröffentlichen; bei den Menschen sind es Personen und Communities
+  // Version 2, rein und raus, nach dem Entwurf aus dem Maintainer-Kreis: oben „ich“ mit Profil und vernetzter Suche,
+  // dann Materialien, Termine, Artikel mit je finden und veröffentlichen, zuletzt Menschen mit Personen und Communities
   RelihubSteuerkonsole.registerBelegung('reinraus', [
-    blatt('rr-menschen', 'Menschen', 'menschen', { subs: [{ id: 'menschen.personen', label: 'Personen' }, { id: 'menschen.communities', label: 'Communities' }] }),
-    blatt('rr-material', 'Materialien', 'material', { subs: [{ id: 'material.finden', label: 'finden', form: 'suchen' }, { id: 'material.teilen', label: 'veröffentlichen', form: 'teilen' }] }),
-    blatt('rr-termine', 'Termine', 'termine', { subs: [{ id: 'termine.finden', label: 'finden', form: 'suchen' }, { id: 'termine.erstellen', label: 'veröffentlichen', form: 'teilen' }] }),
-    blatt('rr-news', 'Artikel', 'news', { subs: [{ id: 'news.finden', label: 'finden', form: 'suchen' }, { id: 'news.veroeffentlichen', label: 'veröffentlichen', form: 'teilen' }] })
+    blatt('rr-ich', 'ich', 'ich', { subs: [{ id: 'ich.profil', label: 'mein Profil' }, { id: 'ich.suche', label: 'vernetzte Suche' }] }),
+    blatt('rr-material', 'Materialien', 'material', { subs: [{ id: 'material.finden', label: 'finden' }, { id: 'material.teilen', label: 'veröffentlichen' }] }),
+    blatt('rr-termine', 'Termine', 'termine', { subs: [{ id: 'termine.finden', label: 'finden' }, { id: 'termine.erstellen', label: 'veröffentlichen' }] }),
+    blatt('rr-news', 'Artikel', 'news', { subs: [{ id: 'news.finden', label: 'finden' }, { id: 'news.veroeffentlichen', label: 'veröffentlichen' }] }),
+    blatt('rr-menschen', 'Menschen', 'menschen', { subs: [{ id: 'menschen.personen', label: 'Personen' }, { id: 'menschen.communities', label: 'Communities' }] })
   ]);
   // Version 3, Light: eine Stufe, fünf Blätter mit Verb. Dieselbe Form trägt die einstellbare Blume einer Community (BLUMEN).
   // Fest sind Farbe und Platz je Ding; die Community wählt Blätter, Wortlaut und Ziel.
@@ -6775,6 +6778,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     'menschen.personen': 'Sieh, wer hier mitarbeitet, und nimm Kontakt auf.', 'menschen.communities': 'Finde Communities, die an deinen Themen arbeiten.',
     'material.finden': 'Suche Material aus allen Instituten und Communities.', 'material.teilen': 'Gib eigenes Material weiter. Es erscheint überall, wo es gebraucht wird.',
     'termine.erstellen': 'Trag einen Termin einmal ein. Er erscheint in jedem Kalender, der dazu passt.', 'termine.finden': 'Finde Fortbildungen und Treffen, meist online.',
+    'rr-ich': 'Ich: mein Profil und die vernetzte Suche über alles.', 'ich.profil': 'Dein Profil: was du teilst und wo du dabei bist.', 'ich.suche': 'Die vernetzte Suche zeigt, wie Menschen, Communities, Materialien und Termine zusammenhängen.',
     'rr-menschen': 'Menschen: Personen und Communities finden.', 'rr-material': 'Materialien: finden oder veröffentlichen.',
     'rr-termine': 'Termine: finden oder veröffentlichen.', 'rr-news': 'Artikel: lesen oder selbst veröffentlichen.'
   };
@@ -6789,9 +6793,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     }));
   });
   const V_START = {
-    reinraus: 'Vier Dinge, je zwei Wege: finden und veröffentlichen. <a href="#profil">Mein Profil</a> · <a href="#oekosystem">Vernetzte Suche</a>',
+    reinraus: 'Oben stehst du. Ringsum vier Dinge, je zwei Wege: finden und veröffentlichen.',
     light: 'Diese Blume ist dein Wegweiser im ReliHub. Du findest sie auf jeder Seite unten rechts wieder. Die Mitte führt zur Anmeldung.',
-    suche: 'Oder geh direkt über die Blume: vier Dinge, je zwei Wege.'
+    suche: 'Oder geh direkt über die Blume: oben du, ringsum vier Dinge mit je zwei Wegen.'
   };
   const vHinweis = document.getElementById('vHinweis'), startBlume = document.getElementById('startFlower');
   startBlume.addEventListener('relihub-activate', e => { if (VERSION !== 'heute' && V_SATZ[e.detail.action]) vHinweis.textContent = V_SATZ[e.detail.action]; });

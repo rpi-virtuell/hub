@@ -23,13 +23,14 @@ Deno.test('Steuerkonsole: weitere Belegungen, direkte Blätter, dauerhafte Besch
   assert(/const unter = this\.getAttribute\('mitte-unter'\)/.test(c) && /mitte\.addEventListener\('click', e => \{ e\.stopPropagation\(\); this\.fire\('ich'\); \}\)/.test(c), 'Mitte wird nicht zum Knopf für ich');
 });
 
-Deno.test('Version 2, rein und raus: vier Dinge, je zwei Wege', () => {
+Deno.test('Version 2, rein und raus: oben ich, dann vier Dinge mit je zwei Wegen', () => {
   const b = (s.match(/registerBelegung\('reinraus', \[[\s\S]*?\n  \]\);/) || [''])[0];
-  assertEquals([...b.matchAll(/blatt\('rr-([a-z]+)'/g)].map((m) => m[1]), ['menschen', 'material', 'termine', 'news']);
-  assertEquals((b.match(/label: 'finden', form: 'suchen'/g) || []).length, 3);
-  assertEquals((b.match(/label: 'veröffentlichen', form: 'teilen'/g) || []).length, 3);
+  assertEquals([...b.matchAll(/blatt\('rr-([a-z]+)'/g)].map((m) => m[1]), ['ich', 'material', 'termine', 'news', 'menschen']);
+  assert(/id: 'ich\.profil', label: 'mein Profil' \}, \{ id: 'ich\.suche', label: 'vernetzte Suche'/.test(b), 'ich: mein Profil und vernetzte Suche');
+  assertEquals((b.match(/\{ id: '[a-z]+\.[a-z]+', label: 'finden' \}, \{ id: '[a-z]+\.[a-z]+', label: 'veröffentlichen' \}/g) || []).length, 3);
   assert(/id: 'menschen\.personen', label: 'Personen'/.test(b) && /id: 'menschen\.communities', label: 'Communities'/.test(b), 'Menschen: Personen und Communities');
-  assert(!/farbe: 'ich'/.test(b), 'Sonderfarbe für Eigenes in der Version rein und raus');
+  assert(!/farbe: 'ich'/.test(b) && !/form:/.test(b), 'Sonderfarbe oder Wegzeichen in der Version rein und raus');
+  assert(/if \(d\.action === 'ich\.suche'\) \{ go\('oekosystem'\); return false; \}/.test(s), 'vernetzte Suche führt nicht ins Ökosystem');
   assert(/body\[data-v="reinraus"\] #leiste,body\[data-v="links"\] #leiste\{display:none\}/.test(html), 'Leiste bleibt in Version 2 stehen');
 });
 
