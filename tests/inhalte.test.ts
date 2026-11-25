@@ -108,7 +108,7 @@ Deno.test('Materialpool live: Karten ohne unsichere Adressen, Zähler, Rückfall
   const m = block(/function mpMaterial\(ev\)[\s\S]*?\n  \}/);
   assert(/sichereUrl\(/.test(m) && /lizenzStand\(/.test(m) && /lizenzLabel\(/.test(m) && /vollstaendig/.test(m), 'Felder');
   const r = block(/function mpRender\(\)[\s\S]*?\n  \}/);
-  assert(/#materialpool\?d=/.test(r) && /encodeURIComponent/.test(r) && /Lizenz nicht angegeben/.test(r) && /vollständigen Metadaten/.test(r), 'Karten, Pille, Zähler');
+  assert(/#material\?d=/.test(r) && /encodeURIComponent/.test(r) && /Lizenz nicht angegeben/.test(r) && /vollständigen Metadaten/.test(r), 'Karten, Pille, Zähler');
   assert(/MP\.map\(/.test(r), 'Rückfall auf den Schnappschuss');
   assert(/function mpOpen\(qs\)/.test(s) && /mpOpen\(qs\)/.test(block(/function route\(\)[\s\S]*?window\.scrollTo/)), 'route ruft mpOpen');
   assert(/lic-offen/.test(html) && /lic-geschuetzt/.test(html) && /lic-unbekannt/.test(html), 'drei Pillen im CSS');
@@ -155,7 +155,10 @@ Deno.test('Material-Detail: Felder, Lizenzstand, Rohdaten, kein zweiter REQ bei 
   assert(/Offen lizenziert/.test(det) && /nur mit offener Lizenz/.test(det) && /disabled aria-disabled="true"/.test(det), 'Lizenzstand mit ausgegrauten Aktionen');
   assert(/image:license:id|image:creator:name/.test(det), 'Bildnachweis nur mit Tag');
   const mo = block(/function mpOpen\(qs\)[\s\S]*?\n  \}/);
-  assert(mo.includes("mpDetail(p.get('d')") && mo.includes("p.get('p')") && !/decodeURIComponent/.test(mo), 'mpOpen wertet ?d= und &p= aus, ohne zweites Entschlüsseln');
+  const mt = block(/function mtOpen\(qs\)[\s\S]*?\n  \}/);
+  assert(mo.includes("go('material?d=' + encodeURIComponent(d)") && mo.includes("p.get('p')") && !/decodeURIComponent/.test(mo), 'alte Links führen auf die Materialseite, ohne zweites Entschlüsseln');
+  assert(/mpDetail\(d, istHex64\(p\.get\('p'\)\) \? p\.get\('p'\) : null\)/.test(mt) && /classList\.toggle\('detail', !!d\)/.test(mt) && /id="mtDetail"/.test(html), 'Detail steht auf der Materialseite');
+  assert(!/#materialpool\?d=/.test(s) && (s.match(/#material\?d=/g) || []).length >= 6, 'kein Materiallink führt mehr in den alten Materialpool');
   assert(s.includes('function leseHash()') && (s.match(/= leseHash\(\)/g) || []).length === 3 && !/decodeURIComponent\(location\.hash/.test(s), 'leseHash an drei Stellen');
   assert(/authors: \[p\]/.test(det) && /&p=\$\{m\.pk\}/.test(block(/function mpRender\(\)[\s\S]*?\n  \}/)), 'Material wird über pubkey und d bestimmt');
   assert(/\[0-9a-f\]\{64\}/.test(s) && block(/function mpLaden\(\)[\s\S]*?\n  \}/).includes('istHex64(ev.pubkey)') && mo.includes('istHex64(p.get(\'p\'))'), 'Schlüssel aus dem Relay wird vor Karte, Filter und naddr geprüft');

@@ -72,7 +72,7 @@ Deno.test('Communities live: cyAus, Partnerkacheln, RpiCommunity ausgeblendet', 
   const c = ca(ev, { name: '<b>Kreis</b>', about: 'x'.repeat(200), picture: 'javascript:x' });
   assertEquals(c.hex, 'ab'.repeat(32)); assertEquals(c.n, '<b>Kreis</b>'); assert(c.bio.length <= 92 && c.bild === '' && c.live === true);
   const cy = fn('cyRender');
-  assert(/cy-partner/.test(cy) && /Partner ohne eigenen Schlüssel/.test(cy), 'Partnerkacheln');
+  assert(!/cyCards\(hinten/.test(cy) && /cy-ohne/.test(cy) && /crHex\(c\.id\) \|\| c\.id === 'oercommunity'/.test(cy), 'Kacheln nur für Communities mit Schlüssel');
   assert(/npub1gc2zfp/.test(s) && /ausgeblendet|RpiCommunity/.test(block(/const CY_HEX[\s\S]*?\n  \]\)?;/) + fn('cyLaden')), 'RpiCommunity ausgeblendet');
   assert(html.includes('id="v-communities" data-stand="stand:26.10.2026 · Texte teils Beispiel"'), 'Startwert bleibt');
 });
@@ -170,7 +170,7 @@ Deno.test('relilab als Labor: Kriterien, Trias, Menschen nur mit Profil', () => 
   const k = block(/const RL_KRITERIEN = \[[\s\S]*?\];/);
   assert(k.includes('offen ohne Anmeldung') && k.includes('Ergebnisse unter freier Lizenz') && (k.match(/'/g) || []).length === 14, 'sieben Kriterien');
   const l = fn('rlLaden');
-  assert(/coLaden\(RL_HEX\)/.test(l) && /terminLogik\(/.test(l) && /hubFetch\('relilab:menschen', \[\{ kinds: \[0\], authors:/.test(l) && (l.match(/hubFetch\(/g) || []).length === 1 && /\.bot/.test(l), 'Quellen und eine Nachfrage');
+  assert(/coLaden\(RL_HEX\)/.test(l) && /terminLogik\(/.test(l) && /hubFetch\('relilab:menschen', \[\{ kinds: \[0\], authors:/.test(l) && /hubFetch\('relilab:communities', \[\{ kinds: \[0\], authors:/.test(l) && (l.match(/hubFetch\(/g) || []).length === 2 && /\.bot/.test(l), 'Quellen und zwei Nachfragen nach Profilen');
   assert(/!CO_SCHLUESSEL\.some\(c => c\.hex === pk\) && !KAL_HEX\.has\(pk\)/.test(l), 'Funktionsschlüssel (Community, Kalenderquellen) sind keine Menschen');
   const h = fn('rlHome');
   assert(/Materialien/.test(h) && /Menschen/.test(h) && /Mitmachen/.test(h) && /#person\?p=/.test(h) && /zu=katalog/.test(h) && /esc\(/.test(h), 'Abschnitte mit Links');

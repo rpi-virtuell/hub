@@ -69,6 +69,12 @@ Die Punkte 5, 8 und 10 sind damit geändert, Punkt 13 ergänzt.
 
 - **Reihenfolge im relilab.** Die Seite zeigt ihre Abschnitte untereinander: Termine, Communities, Personen, Material, News. Vorher standen Material, Menschen und Termine als drei Spalten nebeneinander.
 
+- **Nur echte Schlüsselinhalte.** Der ReliHub zeigt in den Räumen der Communities nur noch, was unter einem echten Schlüssel im Netz steht. Erfundene Aktivität, erfundene Termine, erfundene Mitglieder und das erfundene Gespräch sind entfernt. Jeder Raum mit Schlüssel zeigt Materialien, Beiträge, Termine und Personen aus dem Netz: was die Community selbst veröffentlicht hat und was mit ihr geteilt ist. Ein Raum ohne Schlüssel sagt, dass es noch kein Konto gibt, und zeigt nichts. Der Hinweis „In Entwicklung“ über den Räumen entfällt. Die Übersicht der Communities zeigt nur noch Konten mit Schlüssel, Partner ohne Schlüssel bekommen keine Kachel mehr. Das Gespräch einer Community verweist auf die edufeed-App.
+
+- **Communities im relilab.** Der Abschnitt heißt „Communities im relilab“ und zeigt nur Gruppen mit eigenem Schlüssel: die relilab-Community, ALPIKA Grundschule und relilab-impuls. Name, Bild und Text kommen aus ihrem Profil. relilab-impuls hat kein Community-Konto, veröffentlicht seine Termine aber ins relilab und bekommt deshalb einen Raum. Die News im relilab sind die längeren Beiträge, die ins relilab geteilt sind, als Kacheln mit Bild und Auszug.
+
+- **Namensnennung in der Lizenzpille.** Die Pille auf dem Bild nennt hinter dem Kürzel den Urheber, nach dem Muster der Lizenzpille der OER-Community: Kürzel, Punkt, Name. Die Namen kommen aus dem Feld für die Urheber am Material. Fehlt es, steht der Herausgeber, sonst das Konto, das veröffentlicht hat. Bei CC0 und Public Domain steht kein Name. Die volle Angabe mit Titel steht als Hinweistext an der Pille.
+
 ## Technik
 - Vier Belegungen der Steuerkonsole: `eins-dinge-gast`, `eins-dinge-ich`, `eins-tun-gast`, `eins-tun-ich`. Welche gilt, folgt aus Sicht und Anmeldung.
 - Neues Attribut `mitte-knopf`: Die Mitte ist klickbar, auch ohne Unterzeile.

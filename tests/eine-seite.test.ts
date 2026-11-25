@@ -121,7 +121,7 @@ Deno.test('Personenseite: Über mit Bereich, Fächern, Interessen und Orten, all
 });
 
 Deno.test('Material und Termine: Hub-Seiten mit allem aus dem Ökosystem, Kopf des Hubs, „Termine“ statt „Fortbildungen“', () => {
-  assert(/<div class="view" id="v-material"/.test(html) && /'material\.finden': 'material',/.test(s) && /if \(v === 'material'\) mtOpen\(\);/.test(s), 'Material führt nicht auf die Hub-Seite');
+  assert(/<div class="view" id="v-material"/.test(html) && /'material\.finden': 'material',/.test(s) && /if \(v === 'material'\) mtOpen\(qs\);/.test(s), 'Material führt nicht auf die Hub-Seite');
   assert(/e\.typ === 'material' && e\.ev && e\.ev\.kind === 30142 && ozSichtbar\(e\)/.test(s) && /data-mt-mehr/.test(s), 'Material zeigt nicht alles aus dem Gefüge');
   assert(/mpLaden\(\)\.then\(ms => \{ if \(lauf !== mtStart \|\| mtVoll \|\| !ms\.length\) return; mtSetzen\(ms, false\); mtRender\(\); \}/.test(s), 'Material wartet auf das ganze Gefüge, statt erst die schnelle Abfrage zu zeigen');
   const k = (s.match(/function mtKarte\(m\) \{[\s\S]*?\n  \}/) || [''])[0];
@@ -156,8 +156,32 @@ Deno.test('reliGLOBAL als zweites Beispiel neben relilab', () => {
   for (const z of ["if (d.action === 'material.finden') return zu('katalog');", "if (d.action === 'termine.finden') return zu('kal');", "if (d.action === 'menschen.personen') return zu('mem');", "if (d.action === 'news.finden') return zu('art');", "if (d.action === 'gespraeche.oeffentlich') return zu('chat');"]) assert(rg.includes(z), 'Ziel fehlt: ' + z);
   assert(/\.cr \.cr-side\{display:none\}/.test(html) && /b\('raum\.home', 'Übersicht', 'ich'\)/.test(s) && /BLUMEN\[crId\] \? BLUMEN\[crId\]\.blaetter : BLUETEN_STANDARD/.test(s), 'Raum hat noch eine zweite linke Leiste oder die Blüten tragen seine Wege nicht');
   assert(/#rlBlume,\.rl-hubband\{display:none!important\}/.test(html) && /const an = false, box = document\.getElementById\('rlKonfig'\)/.test(s) && /BLUMEN\[rkBsp\]\.blaetter/.test(s), 'relilab zeigt noch Blume oder Kasten in der Mitte');
-  assert(/const RAUM_BLAUPAUSE = \['religlobal', 'konfi', 'frieden'\];/.test(s) && /frieden: \{ name: 'Friedensarbeit', blaetter: \[/.test(s) && /!RAUM_BLAUPAUSE\.includes\(crId\)/.test(s), 'Blaupause gilt nicht für Friedensarbeit und Konfi');
-  assert(/<section class="cr-mat"><h2 class="cr-h">Materialien<\/h2><div id="crMat"><\/div><\/section>/.test(s) && /e\.pk === hx \|\| \(g\.kanten\.get\(e\.id\) \|\| new Set\(\)\)\.has\(k\)/.test(s) && /ms\.slice\(0, 6\)\.map\(mtKarte\)/.test(s), 'Raum zeigt keine echten Materialien');
+  assert(/frieden: \{ name: 'Friedensarbeit', blaetter: \[/.test(s) && !/RAUM_BLAUPAUSE/.test(s) && !/v === 'community' &&/.test((s.match(/function entwStand\(v\) \{.*/) || [''])[0]), 'Räume tragen noch den Hinweis In Entwicklung');
+  assert(/<section class="cr-mat"><h2 class="cr-h">Materialien<\/h2><div id="crMat"><\/div><\/section>/.test(s) && /e\.pk === hx \|\| \(g\.kanten\.get\(e\.id\) \|\| new Set\(\)\)\.has\(k\)/.test(s) && /ms\.slice\(0, 6\)/.test(s) && /sicht\.map\(mtKarte\)/.test(s), 'Raum zeigt keine echten Materialien');
+});
+Deno.test('Räume und relilab zeigen nur, was unter echten Schlüsseln im Netz steht', () => {
+  const fn = (n: string) => (s.match(new RegExp('function ' + n + '\\([^)]*\\) \\{[\\s\\S]*?\\n  \\}')) || [''])[0];
+  assert(!/Anna Krüger|Willkommen im Kanal|Kürzliche Aktivität|Digitales Community-Treffen/.test(s), 'erfundene Inhalte in den Räumen');
+  assert(/const CR = \{\};/.test(s) && /function crHex\(id\)/.test(s), 'Sitzungsspeicher und Schlüsselsuche');
+  const m = fn('crMain');
+  assert(/if \(!hx\) return/.test(m) && /Noch kein Schlüssel im Datenraum/.test(m) && /id="crBeitr"/.test(m) && /id="crTerm"/.test(m) && /id="crPers"/.test(m) && /edufeed\.org\/c\//.test(m), 'Raum ohne Schlüssel bleibt leer, mit Schlüssel füllt das Netz');
+  const l = fn('crLaden');
+  assert(/coLaden\(hx\)/.test(l) && /kinds: \[30023, 31923\], authors: \[hx\]/.test(l) && /eintraegeAufloesen\(es\)/.test(l) && /nwExtra\.set\(/.test(l), 'Beiträge und Termine: eigene und geteilte');
+  const f = fn('crFuellen');
+  assert(/ls\.map\(nwKarte\)/.test(f) && /class="cr-ev" href="\$\{esc\(sichereUrl\(x\.u\)\)\}"/.test(f) && /lauf !== crFuellLauf \|\| crId !== c\.id/.test(f), 'Kacheln, Termine, Schutz gegen späte Antworten');
+  assert(/nwExtra\.forEach\(ev => auf\(ev, ev\.pubkey !== FO_HEX\)\)/.test(fn('nwListe')), 'Beiträge aus den Räumen öffnen sich unter News');
+  // relilab: Überschrift, echte Communities, Beiträge als Kacheln
+  const h = fn('rlHome');
+  assert(/<h2>Communities im relilab<\/h2>/.test(h) && /CY\.filter\(c => c\.rl && crHex\(c\.id\)\)/.test(h) && /news\.map\(nwKarte\)/.test(h) && /daten\.beitraege/.test(h), 'relilab: Überschrift, Schlüssel, News aus dem Netz');
+  const rl = [...s.matchAll(/\{ id: '([a-z-]+)', n: [^\n]*\n/g)].filter((x) => / rl: 1[, ]/.test(x[0])).map((x) => x[1]);
+  assertEquals(rl.sort(), ['alpika-gs', 'relilab', 'relilab-impuls']);
+  assert(/npub1lde034983zllh2nhe48lt60q6p3a6lsxn0g90uemhg0906jsnzesh5vz8y'\), 'relilab-impuls'\]/.test(s), 'Schlüssel von relilab-impuls');
+});
+Deno.test('Lizenzpille nennt den Urheber', () => {
+  assert(/urheber: \[\.\.\.new Set\(tagWerte\(ev, 'creator:name'\)/.test(s), 'Urheber aus creator:name');
+  const k = (s.match(/function mtKarte\(m\) \{[\s\S]*?\n  \}/) || [''])[0];
+  assert(/!\/\^\(CC0\|Public Domain\)\/\.test\(m\.licLabel\)/.test(k) && /m\.urheber \? esc\(m\.urheber\) : m\.quelle \? esc\(m\.quelle\)/.test(k) && /<span class="mt-urh">· \$\{wer\}<\/span>/.test(k) && /title="\$\{esc\(voll\)\}"/.test(k), 'Kürzel · Urheber, volle Angabe im title');
+  assert(/\.mt-urh\{[^}]*text-overflow:ellipsis/.test(html), 'lange Namen werden gekürzt');
 });
 
 Deno.test('In Entwicklung liegt über Ansichten ohne eigene Entwicklung; Flowi sitzt unten rechts', () => {
