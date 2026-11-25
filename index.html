@@ -863,6 +863,12 @@ relihub-steuerkonsole[hidden]{display:none}
 .amp-orange{background:#E08A00!important;color:#2B1A00!important}
 .amp-rot{background:#B3261E!important;color:#fff!important}
 .mt-lic.ohne{padding-left:11px}
+.mt-lic{max-width:calc(100% - 20px)}
+.mt-kurz{white-space:nowrap;flex:none}
+.mt-urh{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.cr-ev{text-decoration:none}
+.cr-leer{color:var(--muted);margin:0 0 14px}
+.cy-ohne{grid-column:1/-1;color:var(--muted);font-size:15px;margin:6px 0 0}
 .mt-lic svg{width:20px;height:20px;flex:none}
 .mt-text{display:flex;flex-direction:column;gap:7px;padding:14px 16px 16px;flex:1}
 .mt-karte h2{margin:0;font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:22px;line-height:1.14}
@@ -872,6 +878,10 @@ relihub-steuerkonsole[hidden]{display:none}
 .mt-meta span.stufe{background:var(--nt-material);color:var(--nx-material)}
 .mt-quelle{font-size:13px;color:var(--muted)}
 .mt-feed{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin:0 0 18px;padding:12px 16px;border-radius:14px;background:var(--nt-material);border-left:6px solid var(--n-material);font-size:15.5px;max-width:860px}
+#v-material.detail .mt-wrap>h1,#v-material.detail .mt-feed,#v-material.detail #mtAus{display:none}
+.mt-detail{--mp-dark:var(--nx-material);--mp-soft:var(--nt-material);padding-left:0;padding-right:0;margin:0}
+.mt-detail .mp-bild{border-top:5px solid var(--n-material)}
+.mp-urh{font-weight:500;margin-left:4px}
 .mt-feed b{font-family:"Barlow Condensed",sans-serif;font-size:20px;color:var(--nx-material)}
 .mt-mehr{display:block;margin:22px auto 0;font:inherit;font-weight:600;min-height:44px;padding:8px 22px;border-radius:999px;border:0;background:var(--n-material);color:#1B2400;cursor:pointer}
 .mt-ort{margin:20px 0 0;font-size:15px}
@@ -1650,6 +1660,7 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
     <h1>Material</h1>
     <p class="mt-feed"><b>Materialfeed</b><span>Hier läuft zusammen, was im Netz als Material geteilt wird: alles, ungeprüft und nach Zeit. Der gemeinsame Materialpool mit Redaktion und Filtern nach Alter und Thema ist noch in Entwicklung.</span></p>
     <div id="mtAus"></div>
+    <section class="mp-detail mt-detail" id="mtDetail" hidden></section>
   </main>
   <footer class="hub-foot"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> ReliHub · ein Vorhaben von FOERBICO · Prototyp</footer>
 </div>
@@ -3431,7 +3442,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const datum = sek => sek ? new Date(sek * 1000).toLocaleDateString('de-DE') : '';
     if (ev.kind === 30142) {
       const m = mpMaterial(ev), zeile = [m.art, m.quelle, m.stufe].filter(Boolean).map(esc).join(' · ');
-      return `<a class="mp-card" href="#materialpool?d=${encodeURIComponent(m.d)}${istHex64(m.pk) ? '&p=' + m.pk : ''}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand} amp-${m.ampel}">${esc(m.licLabel || 'Lizenz nicht angegeben')}</span>${von}</a>`;
+      return `<a class="mp-card" href="#material?d=${encodeURIComponent(m.d)}${istHex64(m.pk) ? '&p=' + m.pk : ''}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand} amp-${m.ampel}">${esc(m.licLabel || 'Lizenz nicht angegeben')}</span>${von}</a>`;
     }
     if (ev.kind === 31923) {
       const t = evToTermin(ev);
@@ -4013,6 +4024,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       lic, licLabel: lizenzLabel(lic), stand: lizenzStand(lic), ampel: lizenzAmpel(lic),
       bild: sichereUrl(tagWert(ev, 'image')),
       quelle: tagWert(ev, 'publisher:name') || tagWert(ev, 'creator:name'),
+      urheber: [...new Set(tagWerte(ev, 'creator:name').map(x => String(x).trim()).filter(Boolean))].join(', '),   // Namensnennung für die Lizenzpille
       url: sichereUrl(tagWert(ev, 'r')) || sichereUrl(tagWert(ev, 'd')),
       datum: roh ? Math.floor(roh / 1000) : ev.created_at,
       vollstaendig: !!(name && tagWert(ev, 'description') && lic && art.id && (fach.id || stufe.id))
@@ -4067,8 +4079,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     ];
   }
   /** Detailansicht: erst aus der Liste der Sitzung (kein Netz), sonst eine gezielte Abfrage `#d`; Text maskiert, Adressen über sichereUrl */
+  let mpOrt = 'material';   // Ansicht, in der das Detail steht: die Materialseite; der alte Materialpool leitet dorthin weiter
   function mpDetail(d, p) {
-    const box = document.getElementById('mpDetail'), zurueck = '<a class="mp-zurueck" href="#materialpool">‹ Materialpool</a>';
+    const ort = mpOrt, neu = ort === 'material', box = document.getElementById(neu ? 'mtDetail' : 'mpDetail'), zurueck = neu ? '<a class="mp-zurueck" href="#material">‹ Alles Material</a>' : '<a class="mp-zurueck" href="#materialpool">‹ Materialpool</a>';
     const datumText = ts => { const x = new Date(ts * 1000), z = n => String(n).padStart(2, '0'); return z(x.getDate()) + '.' + z(x.getMonth() + 1) + '.' + x.getFullYear(); };
     const chips = (ev, feld) => ambWerte(ev, feld).map(w => {
       const u = sichereUrl(w.id);
@@ -4088,6 +4101,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       const bildL = tagWert(ev, 'image:license:id'), bildU = tagWert(ev, 'image:creator:name');
       const nachweis = bildL || bildU ? `<p class="mp-nachweis">Bildnachweis: ${[bildU && esc(bildU), bildL && esc(lizenzLabel(bildL))].filter(Boolean).join(' · ')}</p>` : '';
       const licU = sichereUrl(m.lic), pille = `<span class="lic lic-${m.stand} amp-${m.ampel}">${esc(m.licLabel || 'Lizenz nicht angegeben')}</span>`;
+      const nenn = m.licLabel && !/^(CC0|Public Domain)/.test(m.licLabel) ? (m.urheber ? esc(m.urheber) : m.quelle ? esc(m.quelle) : kontoName(m.pk)) : '';   // Namensnennung wie auf der Karte
       const satz = {
         offen: 'Offen lizenziert: Du kannst es auf den Schreibtisch holen, in der Community weiterbearbeiten und in Sammlungen aufnehmen.',
         geschuetzt: 'Geschützt: Du kannst es ansehen, verlinken und empfehlen; Weiterbearbeiten und Sammeln gehen nur mit offener Lizenz.',
@@ -4105,7 +4119,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       box.innerHTML = `${zurueck}<h1>${esc(m.t)}</h1>${bild}<p class="mp-beschr">${esc(m.x)}</p>
         <dl>${felder.map(f => `<dt>${f[0]}</dt><dd>${f[1]}</dd>`).join('')}</dl>
         <div class="mp-links">${links}</div>
-        <p>${licU ? `<a class="lic lic-${m.stand} amp-${m.ampel}" href="${esc(licU)}" target="_blank" rel="noopener">${esc(m.licLabel)}</a>` : pille}</p>${nachweis}
+        <p>${licU ? `<a class="lic lic-${m.stand} amp-${m.ampel}" href="${esc(licU)}" target="_blank" rel="noopener">${esc(m.licLabel)}</a>` : pille}${nenn ? ` <span class="mp-urh">· ${nenn}</span>` : ''}</p>${nachweis}
         <p class="mp-stand">${satz}</p><div class="mp-aktionen">${aktionen}</div>${adr ? `<div class="an-zeile">${akKnopf('gefaellt', adr, 'Gefällt mir')}</div>` : ''}
         <p class="mp-pruef">${pruef}</p>
         <details class="mp-roh"><summary>Rohdaten (JSON-LD)</summary><p class="hint">aus dem Event gebildet (AMB-Kontext)</p><pre>${esc(roh)}</pre><button type="button" data-mp-copy>Kopieren</button></details>`;
@@ -4113,12 +4127,12 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const fehlt = () => {
       // ohne Listenantwort ist offen, ob das Material fehlt oder nur keine Verbindung besteht
       const text = mpDaten ? 'Material nicht gefunden.' : 'Gerade keine Verbindung zu den Relays oder Material nicht vorhanden.';
-      box.innerHTML = `${zurueck}<h1>${text}</h1><p><a href="#materialpool">‹ Zum Materialpool</a></p>`;
+      box.innerHTML = `${zurueck}<h1>${text}</h1>`;
     };
     const dort = () => (mpDaten || []).find(m => m.d === d && (!p || m.pk === p));
-    const lauf = ++mpDetailLauf, aktuell = () => lauf === mpDetailLauf && CUR.split('?')[0] === 'materialpool';
+    const lauf = ++mpDetailLauf, aktuell = () => lauf === mpDetailLauf && CUR.split('?')[0] === ort;
     box.hidden = false;
-    document.getElementById('v-materialpool').classList.add('detail');
+    document.getElementById('v-' + ort).classList.add('detail');
     box.innerHTML = zurueck + '<p>Lade Material …</p>';
     Promise.resolve(mpDaten ? null : mpLauf).catch(() => null).then(() => {
       if (!aktuell()) return;
@@ -4149,7 +4163,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     liste.innerHTML = treffer.length ? treffer.map(m => {
       const zeile = [m.art, m.quelle, m.stufe].filter(Boolean).map(esc).join(' · ');
       const pille = m.licLabel || (m.stand === 'unbekannt' && !m.lic ? 'Lizenz nicht angegeben' : '');
-      return `<a class="mp-card" href="#materialpool?d=${encodeURIComponent(m.d)}&p=${m.pk}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand} amp-${m.ampel}">${esc(pille || 'Lizenz nicht angegeben')}</span></a>`;
+      return `<a class="mp-card" href="#material?d=${encodeURIComponent(m.d)}&p=${m.pk}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand} amp-${m.ampel}">${esc(pille || 'Lizenz nicht angegeben')}</span></a>`;
     }).join('') : '<p>Nichts gefunden; Vorauswahl entfernen oder anders suchen.</p>';
     // k = Zahl der abgefragten Relays: hubFetch meldet nicht, welche geantwortet haben
     const n = mpDaten.filter(m => m.vollstaendig).length;
@@ -4172,18 +4186,19 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
         if (CUR.split('?')[0] === 'materialpool') mpRender();
       });
     };
-    if (d) { ladeEinmal(); mpDetail(p.get('d'), istHex64(p.get('p')) ? p.get('p') : null); return; }
+    if (d) { go('material?d=' + encodeURIComponent(d) + (istHex64(p.get('p')) ? '&p=' + p.get('p') : '')); return; }   // ein Material öffnet sich auf der Materialseite, auch über alte Links
     mpDetailLauf++; mpAktuell = null;
     document.getElementById('mpDetail').hidden = true;
     document.getElementById('v-materialpool').classList.remove('detail');
     mpRender();
     ladeEinmal();
   }
-  document.getElementById('v-materialpool').addEventListener('click', e => {
+  const mpKlick = e => {
     const k = e.target.closest('[data-mp-copy]'), a = e.target.closest('[data-mp-aktion]');
     if (k && mpAktuell) rtCopy(JSON.stringify(ambJsonLd(mpAktuell.ev), null, 2), 'Rohdaten kopiert.');
     if (a && !a.disabled && mpAktionen[a.dataset.mpAktion]) mpAktionen[a.dataset.mpAktion].tu();
-  });
+  };
+  ['v-materialpool', 'v-material'].forEach(id => document.getElementById(id).addEventListener('click', mpKlick));
   document.querySelector('#v-materialpool input[type=search]').addEventListener('input', e => { mpSuche = e.target.value; mpRender(); });
   mpRender();
   const ROT = ['für die Schule', 'für die Kita', 'für die Gemeinde', 'für die Jugendarbeit', 'für die Erwachsenenbildung'];
@@ -4281,7 +4296,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     else datenstand('v-sammlung', 'live', `${treffer.length} von ${liste.length} Materialien · abgefragt bei ${RELAYS.length} Relays${saF.c && saCoFehler ? ' · ' + saCoFehler : ''}${saF.c && saFehlt ? ` · ${saFehlt} geteilt, aber nicht auffindbar` : ''}`);
     document.getElementById('saListe').innerHTML = treffer.length ? treffer.map(m => {
       const zeile = [m.art, m.quelle, m.stufe].filter(Boolean).map(esc).join(' · ');
-      return `<a class="mp-card" href="#materialpool?d=${encodeURIComponent(m.d)}&p=${m.pk}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand} amp-${m.ampel}">${esc(m.licLabel || 'Lizenz nicht angegeben')}</span></a>`;
+      return `<a class="mp-card" href="#material?d=${encodeURIComponent(m.d)}&p=${m.pk}"><b>${esc(m.t)}</b><span>${zeile}</span><br><span class="lic lic-${m.stand} amp-${m.ampel}">${esc(m.licLabel || 'Lizenz nicht angegeben')}</span></a>`;
     }).join('') : `<p>${liste.length ? (saCoFehler ? 'Die Community antwortet gerade nicht; Filter „Community“ entfernen oder später erneut versuchen.' : 'Nichts gefunden; Filter lockern.') : (saStand === 'fehler' ? 'Gerade keine Verbindung zu den Relays.' : 'Materialien werden geladen …')}</p>`;
     // Kennungen der gewählten Begriffe aus den Materialien (für fixed_level und fixed_subject)
     const kennung = (feld, name) => { for (const m of liste) for (const w of ambWerte(m.ev, feld)) if (name && w.label.toLowerCase() === name.toLowerCase()) return w.id; return ''; };
@@ -4656,25 +4671,26 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   const SHIELD = '<svg viewBox="0 0 24 24" aria-label="verifiziert"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z" fill="#4E8FE0"/><path d="M12 4.2 6 6.5V11c0 3.9 2.5 7.4 6 8.8z" fill="#7FB1EE"/></svg>';
   const CY = [
     { id: 'relilab', n: 'relilab', ab: 'rl', nl: [['relilab-Newsletter', 'monatlich', null]], col: C.erstellen, tx: '#2B1A00', ty: 'netz', mine: 'Mitglied', bio: 'Die Menschen hinter dem relilab.', back: 'Die relilab-Community steuert und entwickelt das relilab gemeinsam weiter: Lernbausteine, Live-Anlässe und Serien. Wer mitgestalten möchte, ist eingeladen.', inst: ['relilab', 'relilab'], m: 214, rl: 1, series: [['Live-Anlässe im relilab', 'laufend']] },
-    { id: 'religlobal', n: 'reliGlobal', ab: 'rG', col: C.kooperieren, ty: 'thema', bio: 'Globales Lernen im Religionsunterricht fördern.', back: 'Die Hauptamtlichen, die für reliGlobal arbeiten, und verbundene Personen, die gemeinsam mit dem Team Globales Lernen im Religionsunterricht fördern möchten.', inst: ['reliGlobal', null], m: 63, rl: 1, series: [['reliGlobal.Werkstatt', 'mehrmals im Jahr']] },
+    { id: 'religlobal', n: 'reliGlobal', ab: 'rG', col: C.kooperieren, ty: 'thema', bio: 'Globales Lernen im Religionsunterricht fördern.', back: 'Die Hauptamtlichen, die für reliGlobal arbeiten, und verbundene Personen, die gemeinsam mit dem Team Globales Lernen im Religionsunterricht fördern möchten.', inst: ['reliGlobal', null], m: 63, series: [['reliGlobal.Werkstatt', 'mehrmals im Jahr']] },
     { id: 'konfi', n: 'Konfiarbeit EKD', ab: 'KA', col: C.kooperieren, ty: 'ziel', ver: true, bio: 'Hier vernetzt sich die ALPIKA-AG Konfiarbeit und erprobt den nostr-Datenraum und die edufeed-Logik für die EKD-weite Konfiarbeit.', back: 'Die ALPIKA-AG Konfiarbeit vernetzt sich hier und erprobt den nostr-Datenraum und die edufeed-Logik für die Konfiarbeit in der ganzen EKD.', inst: ['Konfi-Arbeit bundesweit', null], m: 41 },
     { id: 'narrt', n: 'narrt', ab: 'na', col: C.kooperieren, ty: 'thema', mine: 'Mitglied', bio: 'Antisemitismus- und rassismuskritische Religionspädagogik und Theologie.', back: 'Menschen, die kritisch reflektieren, wie Religionspädagogik und Theologie in antisemitische und rassistische Verhältnisse verstrickt sind – und gemeinsam nach Alternativen für Denken, Handeln und Material suchen.', inst: ['narrt', null], m: 102 },
-    { id: 'relimentar', n: 'relimentar', ab: 're', col: C.kooperieren, ty: 'ziel', mine: 'folge ich', bio: 'Religionspädagogik in der Kita.', back: 'Fachkräfte aus Krippe, Kindergarten und Hort teilen religionspädagogisches Material, Fortbildungen und Erfahrungen aus der Praxis.', inst: ['relimentar', null], m: 87, rl: 1, series: [['Bilderbuchstunde', 'im relilab'], ['Café relimentar', 'im relilab']] },
+    { id: 'relimentar', n: 'relimentar', ab: 're', col: C.kooperieren, ty: 'ziel', mine: 'folge ich', bio: 'Religionspädagogik in der Kita.', back: 'Fachkräfte aus Krippe, Kindergarten und Hort teilen religionspädagogisches Material, Fortbildungen und Erfahrungen aus der Praxis.', inst: ['relimentar', null], m: 87, series: [['Bilderbuchstunde', 'im relilab'], ['Café relimentar', 'im relilab']] },
     { id: 'campuscom', n: 'CampusCom – die Hochschul-Community', ab: 'CC', col: C.veroeffentlichen, ty: 'ziel', bio: 'Die Community CampusCom macht Personen, Materialien, Artikel, Projekte, Termine und Veranstaltungen zur Hochschullehre sichtbar.', back: 'CampusCom macht Personen, Materialien, Artikel, Projekte, Termine und Veranstaltungen zur Hochschullehre sichtbar – für Lehrende in Religionspädagogik und Theologie.', m: 56 },
     { id: 'kuru', n: 'KuRU & Schuldek.de', ab: 'KS', col: C.hub, ty: 'ziel', bio: 'Kirche-und-Religionsunterricht.de & schuldek.de – die Community der Büros der Schuldekaninnen und Schuldekane.', back: 'Kirche-und-Religionsunterricht.de und schuldek.de: die Community der Büros der Schuldekaninnen und Schuldekane – Austausch, Material und Termine rund um den Religionsunterricht.', m: 38 },
     { id: 'agdm', n: 'AG Didaktische Metadaten', ab: 'DM', col: C.finden, ty: 'thema', ver: true, bio: 'Keine Biografie verfügbar', back: 'Arbeitsgruppe rund um didaktische Metadaten für offene Bildungsmaterialien: Wie lassen sich Materialien so beschreiben, dass sie nach Lernzielen und Einsatz gefunden werden?', m: 19 },
     { id: 'kph', n: 'KPH Wien/NÖ Zentrum Fortbildung Religion', ab: 'PH', col: C.finden, ty: 'netz', ver: true, bio: 'Keine Biografie verfügbar', back: 'Zentrum Fortbildung Religion der Kirchlichen Pädagogischen Hochschule Wien/Niederösterreich – Fortbildungen für Religionslehrkräfte.', m: 24 },
     { id: 'rpi', n: 'Religionspädagogisches Institut von EKKW und EKHN', ab: 'RPI', col: C.hub, ty: 'netz', bio: 'Keine Biografie verfügbar', back: 'Religionspädagogisches Institut der Evangelischen Kirche von Kurhessen-Waldeck und der Evangelischen Kirche in Hessen und Nassau – Fortbildung, Beratung und Material.', m: 73 },
-    { id: 'schulseelsorge', n: 'relilab.Schulseelsorge', ab: 'SS', col: C.hub, ty: 'ziel', rl: 1, bio: 'voneinander lernen. miteinander entwickeln.', back: 'Schulseelsorgende aus Deutschland und Österreich reflektieren in kurzen Online-Fortbildungen ihre Praxis und entwickeln Schulseelsorge gemeinsam weiter.', inst: ['relilab', 'relilab'], m: 58, series: [['Relilab.Schulseelsorge – Learningsnacks', 'monatlich, donnerstags 16–17 Uhr']] },
-    { id: 'muenchen', n: 'Münchner Reli Room', ab: 'MR', nl: [['Münchner Reli Room-Newsletter', '4–6 Mal im Jahr', null]], col: C.finden, ty: 'ziel', rl: 1, bio: 'Updates zur digitalen Religionspädagogik für katholische Religionslehrkräfte.', back: 'Die Fachstelle Medien und Digitalität und die Religionspädagogische Materialstelle Bayern (RPZ) bieten mit weiteren Fachleuten regelmäßige Online-Updates für katholische Religionslehrkräfte im Erzbistum München und Freising.', inst: ['relilab', 'relilab'], m: 77, series: [['Münchner Reli Room-Snack', 'ca. 90 Minuten online'], ['Münchner Reli Room-Newsletter', '4–6 Mal im Jahr']] },
-    { id: 'nrw', n: 'relilab NRW', ab: 'NRW', col: C.erstellen, tx: '#2B1A00', ty: 'netz', rl: 1, bio: 'Kurzer Input, Austausch, Praxisphase – in der reli.werkstatt.', back: 'Das relilab NRW verantwortet die reli.werkstatt: ein kurzer thematischer Input zu Digitalität, Heterogenität, Methodik oder Theologie, danach Austausch und eine Praxisphase.', inst: ['relilab', 'relilab'], m: 64, series: [['reli.werkstatt', 'meist alle zwei Wochen, dienstags 16:30–17:30']] },
-    { id: 'impulse', n: '#relilab Impulse', ab: '#I', col: C.veroeffentlichen, ty: 'thema', rl: 1, bio: 'Neue Perspektiven auf Jesus Christus – theologische Tiefe und multikulturelle Weite.', back: 'RPZ Zweibrücken und RPI Baden laden gemeinsam zu Workshops mit Fachleuten ein – zu neuer theologischer Forschung über Jesus und zu ihrer Umsetzung im Unterricht der Sekundarstufen.', inst: ['relilab', 'relilab'], m: 45, series: [['Spotlight Jesus', 'freitags 16–17 Uhr, Herbst'], ['Jesus Christus im Unterricht (Sek I+II)', 'freitags 16–17 Uhr, Frühjahr']] },
-    { id: 'bru', n: 'relilab|BRU', ab: 'BRU', col: C.hub, ty: 'ziel', rl: 1, bio: 'Religionsunterricht an beruflichen Schulen.', back: 'Kirchliche Institute und das ZSL Baden-Württemberg teilen Angebote und Ideen für Religionslehrkräfte an beruflichen Schulen.', inst: ['relilab', 'relilab'], m: 39, series: [['relilab|BRU', 'meist 1. und 2. Donnerstag im Monat, 15:30–17 Uhr']] },
-    { id: 'junior', n: 'relilab|Junior', ab: 'Jr', col: C.finden, ty: 'ziel', rl: 1, bio: 'Digitale Unterrichtsideen für die Klassen 1–6.', back: 'ZSL, ptz Stuttgart-Birkach und Fachberatungen geben einfache, praxisnahe digitale Ideen und Materialien für den Religionsunterricht der Klassen 1 bis 6 weiter.', inst: ['relilab', 'relilab'], m: 52, series: [['relilab|Junior', '1. Donnerstag im Monat (Schulwochen BW und Bayern)']] },
-    { id: 'interrel', n: 'relilab|interreligiös', ab: 'ir', col: C.kooperieren, ty: 'thema', rl: 1, bio: 'Christentum und Islam im Klassenzimmer.', back: 'ptz und ZSL Baden-Württemberg entwickeln kreative digitale Ideen zu Themen, die Christentum und Islam gleichermaßen betreffen – für Klassen mit Schüler:innen verschiedener Religionen.', inst: ['relilab', 'relilab'], m: 33, series: [['relilab|interreligiös', 'mit Anmeldung, im geschützten Moodle-Raum']] },
-    { id: 'makerspace', n: 'Makerspace asynchrone Lernressourcen', ab: 'MS', col: C.erstellen, tx: '#2B1A00', ty: 'thema', rl: 1, bio: 'Wie lassen sich asynchrone Lernressourcen didaktisch gestalten?', back: 'Im Makerspace geht es um die Frage, wie asynchrone Lernressourcen didaktisch gestaltet werden können – einmal im Monat, praktisch und gemeinsam.', inst: ['relilab', 'relilab'], m: 27, series: [['Makerspace „asynchrone Lernressourcen“', 'einmal im Monat']] },
+    { id: 'schulseelsorge', n: 'relilab.Schulseelsorge', ab: 'SS', col: C.hub, ty: 'ziel', bio: 'voneinander lernen. miteinander entwickeln.', back: 'Schulseelsorgende aus Deutschland und Österreich reflektieren in kurzen Online-Fortbildungen ihre Praxis und entwickeln Schulseelsorge gemeinsam weiter.', inst: ['relilab', 'relilab'], m: 58, series: [['Relilab.Schulseelsorge – Learningsnacks', 'monatlich, donnerstags 16–17 Uhr']] },
+    { id: 'muenchen', n: 'Münchner Reli Room', ab: 'MR', nl: [['Münchner Reli Room-Newsletter', '4–6 Mal im Jahr', null]], col: C.finden, ty: 'ziel', bio: 'Updates zur digitalen Religionspädagogik für katholische Religionslehrkräfte.', back: 'Die Fachstelle Medien und Digitalität und die Religionspädagogische Materialstelle Bayern (RPZ) bieten mit weiteren Fachleuten regelmäßige Online-Updates für katholische Religionslehrkräfte im Erzbistum München und Freising.', inst: ['relilab', 'relilab'], m: 77, series: [['Münchner Reli Room-Snack', 'ca. 90 Minuten online'], ['Münchner Reli Room-Newsletter', '4–6 Mal im Jahr']] },
+    { id: 'nrw', n: 'relilab NRW', ab: 'NRW', col: C.erstellen, tx: '#2B1A00', ty: 'netz', bio: 'Kurzer Input, Austausch, Praxisphase – in der reli.werkstatt.', back: 'Das relilab NRW verantwortet die reli.werkstatt: ein kurzer thematischer Input zu Digitalität, Heterogenität, Methodik oder Theologie, danach Austausch und eine Praxisphase.', inst: ['relilab', 'relilab'], m: 64, series: [['reli.werkstatt', 'meist alle zwei Wochen, dienstags 16:30–17:30']] },
+    { id: 'impulse', n: '#relilab Impulse', ab: '#I', col: C.veroeffentlichen, ty: 'thema', bio: 'Neue Perspektiven auf Jesus Christus – theologische Tiefe und multikulturelle Weite.', back: 'RPZ Zweibrücken und RPI Baden laden gemeinsam zu Workshops mit Fachleuten ein – zu neuer theologischer Forschung über Jesus und zu ihrer Umsetzung im Unterricht der Sekundarstufen.', inst: ['relilab', 'relilab'], m: 45, series: [['Spotlight Jesus', 'freitags 16–17 Uhr, Herbst'], ['Jesus Christus im Unterricht (Sek I+II)', 'freitags 16–17 Uhr, Frühjahr']] },
+    { id: 'bru', n: 'relilab|BRU', ab: 'BRU', col: C.hub, ty: 'ziel', bio: 'Religionsunterricht an beruflichen Schulen.', back: 'Kirchliche Institute und das ZSL Baden-Württemberg teilen Angebote und Ideen für Religionslehrkräfte an beruflichen Schulen.', inst: ['relilab', 'relilab'], m: 39, series: [['relilab|BRU', 'meist 1. und 2. Donnerstag im Monat, 15:30–17 Uhr']] },
+    { id: 'junior', n: 'relilab|Junior', ab: 'Jr', col: C.finden, ty: 'ziel', bio: 'Digitale Unterrichtsideen für die Klassen 1–6.', back: 'ZSL, ptz Stuttgart-Birkach und Fachberatungen geben einfache, praxisnahe digitale Ideen und Materialien für den Religionsunterricht der Klassen 1 bis 6 weiter.', inst: ['relilab', 'relilab'], m: 52, series: [['relilab|Junior', '1. Donnerstag im Monat (Schulwochen BW und Bayern)']] },
+    { id: 'interrel', n: 'relilab|interreligiös', ab: 'ir', col: C.kooperieren, ty: 'thema', bio: 'Christentum und Islam im Klassenzimmer.', back: 'ptz und ZSL Baden-Württemberg entwickeln kreative digitale Ideen zu Themen, die Christentum und Islam gleichermaßen betreffen – für Klassen mit Schüler:innen verschiedener Religionen.', inst: ['relilab', 'relilab'], m: 33, series: [['relilab|interreligiös', 'mit Anmeldung, im geschützten Moodle-Raum']] },
+    { id: 'makerspace', n: 'Makerspace asynchrone Lernressourcen', ab: 'MS', col: C.erstellen, tx: '#2B1A00', ty: 'thema', bio: 'Wie lassen sich asynchrone Lernressourcen didaktisch gestalten?', back: 'Im Makerspace geht es um die Frage, wie asynchrone Lernressourcen didaktisch gestaltet werden können – einmal im Monat, praktisch und gemeinsam.', inst: ['relilab', 'relilab'], m: 27, series: [['Makerspace „asynchrone Lernressourcen“', 'einmal im Monat']] },
     { id: 'frieden', n: 'Friedenspädagogik', ab: 'FP', col: C.kooperieren, ty: 'thema', mine: 'Mitglied', bio: 'Frieden lernen – in Schule und Gemeinde.', back: 'Lehrkräfte, Gemeindepädagog:innen und Engagierte aus der Friedensarbeit teilen Material und Erfahrungen zur Friedensbildung.', inst: ['Friedensarbeit EKD', null], m: 49 },
-    { id: 'alpika-gs', n: 'ALPIKA Grundschule', ab: 'AG', col: C.kooperieren, ty: 'netz', bio: 'Arbeitsgruppe der religionspädagogischen Institute für die Grundschule.', back: 'Dozentinnen und Dozenten der Pädagogischen Institute und Zentren arbeiten hier an Material und Vokabular für den Religionsunterricht in der Grundschule.', m: 6 },
+    { id: 'alpika-gs', n: 'ALPIKA Grundschule', ab: 'AG', col: C.kooperieren, ty: 'netz', bio: 'Arbeitsgruppe der religionspädagogischen Institute für die Grundschule.', back: 'Dozentinnen und Dozenten der Pädagogischen Institute und Zentren arbeiten hier an Material und Vokabular für den Religionsunterricht in der Grundschule.', m: 6, rl: 1 },
+    { id: 'relilab-impuls', n: 'relilab-impuls', ab: 'ri', col: C.veroeffentlichen, ty: 'thema', rl: 1, bio: 'Kurze, praxisnahe Impulse für den Religionsunterricht in Grundschule, Sekundarstufe I und II.', back: 'In dieser Fortbildungsreihe bieten Referentinnen und Referenten kurze, praxisnahe Impulse für den Religionsunterricht. #relilab Impuls ist eine Kooperation der religionspädagogischen Institute aus Baden, der Pfalz und dem Saarland.', inst: ['relilab', 'relilab'], m: 0 },
     { id: 'rpi-virtuell', n: 'rpi-virtuell', ab: 'rv', col: C.finden, ty: 'netz', bio: 'Redaktionskreis und Institute hinter Materialpool, Fortbildungskalender und Bildungsnews.', back: 'Der Redaktionskreis von rpi-virtuell und die religionspädagogischen Institute, die Material sichten, Fortbildungen in den gemeinsamen Kalender stellen und die Bildungsnews schreiben: die Menschen hinter den rezeptiven Angeboten.', inst: ['rpi-virtuell', 'rpi-virtuell'], m: 35 },
     { id: 'oercommunity', n: 'OER-Community', ab: 'OC', col: C.hub, ty: 'netz', ver: true, mine: 'folge ich', bio: 'Community of Communities des Projekts FOERBICO: Vernetzung religionsbezogener OER-Communities, gemeinsame Qualitätskriterien und Metadatenstandards.', back: 'Wer selbst offene Materialien erstellt oder in einem Netzwerk daran mitarbeitet, findet hier Austausch, Tagungen und Wissensgrundlagen zu OER.', inst: ['OER-Community', 'oercommunity'], m: 9, series: [] }
   ];
@@ -4691,8 +4707,18 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     [npubToHex('npub1dnyvcxlxnpvk5r0xt7r0ww5046l4pjnd22k3adjndzf3zgl3qshqhsk6et'), 'agdm'],
     [npubToHex('npub1vkn99j7kufchmgcly98lg9uexfste9epxe6jhgdt20wn4adzrvpqxhac4w'), 'kph'],
     [npubToHex('npub1wak8hljj3szpe5g3fmak6jqspvhyn4867flrq8anlq7xfg5xjn6qtmtpsw'), 'rpi'],
-    [npubToHex('npub1deah5w4wj5ke43580cp4n33zx8433gevey5xv8lfxxzf8qwyl3ss06nnst'), 'campuscom']
+    [npubToHex('npub1deah5w4wj5ke43580cp4n33zx8433gevey5xv8lfxxzf8qwyl3ss06nnst'), 'campuscom'],
+    [npubToHex('npub1lde034983zllh2nhe48lt60q6p3a6lsxn0g90uemhg0906jsnzesh5vz8y'), 'relilab-impuls']   // Konto ohne kind:10222, veröffentlicht seine Termine ins relilab
   ]);
+  /** Schlüssel (Hex) einer Community-Kennung oder ''. Nur Communities mit Schlüssel zeigen Inhalte: Der ReliHub zeigt, was unter echten Schlüsseln im Netz steht. */
+  /** Name eines Kontos, schon maskiert: aus dem Profil, sonst der Name der Community oder der Kalenderquelle im Hub, sonst '' */
+  function kontoName(pk) {
+    if (!istHex64(pk)) return '';
+    const p = bzProfil(pk); if (p && p.name) return p.name;
+    const c = CO_SCHLUESSEL.find(k => k.hex === pk) || CY.find(x => x.id === CY_HEX.get(pk)) || KAL_HEX.get(pk);
+    return c ? esc(c.n) : '';
+  }
+  function crHex(id) { return (CO_SCHLUESSEL.find(k => k.id === id) || {}).hex || ([...CY_HEX].find(x => x[1] === id) || [])[0] || ''; }
   let cyDaten = null, cyLauf = null, cyLaufNr = 0, cyBz = null;   // Antwort (gehalten, wenn Konten da sind), laufende Abfrage, Zähler gegen späte Antworten, Gefüge für die Mitgliederzahlen
   /** Community-Eintrag aus einem kind:10222 und dem rohen Profil (kind:0, schon geparst) oder null; Texte bleiben roh, die Karten maskieren beim Ausgeben */
   function cyAus(ev, profil, mitglieder) {
@@ -4748,7 +4774,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const nm = esc(c.n), eigen = c.live && !CY.some(x => x.id === c.id), ziel = eigen ? 'oekosystem?wahl=' + encodeURIComponent('c:' + c.hex) : '';
     const hinweis = art ? `<span class="cy-hinweis">${esc(art.hinweis)}</span>` : '', seite = art ? PARTNERS.find(x => x[0] === c.n && x[4]) : null;
     const raum = art ? (seite ? `<a class="cy-katalog" href="${esc(seite[4])}">Zur Seite ›</a>` : '') : ziel ? `<a class="cy-follow open" href="#${esc(ziel)}">Im Ökosystem zeigen ›</a>` : `<button type="button" class="cy-follow open" data-cyopen="${esc(c.id)}">Community-Raum öffnen ›</button>`;
-    const meta = art ? '' : `<div class="meta">${c.m} Mitglieder${c.series ? ' · ' + c.series.map(x => x[1]).filter(Boolean)[0] : ''}</div>`;
+    const meta = art || !c.live ? '' : `<div class="meta">${c.m} Mitglieder</div>`;   // Zahlen nur aus dem Netz
     return `<div class="cy-card${art ? ' ' + art.klasse : ''}" ${ctxRel ? `id="cy-${esc(c.id)}"` : `data-rid="cy-${esc(c.id)}"`}${ziel ? ` data-ziel="${esc(ziel)}"` : ''} tabindex="0" aria-label="${nm}">
       <div class="cy-in">
         <div class="cy-f">${cyAv(c)}<h3>${nm}${c.ver ? SHIELD : ''}</h3><p class="cy-bio">${esc(c.bio)}</p>${hinweis}${c.series ? `<div class="cy-ser">${c.series.map(x => `<span>Serie: ${x[0]}</span>`).join('')}</div>` : ''}${c.nl ? `<div class="cy-nl">${c.nl.map(x => `<span>Newsletter: ${x[0]}</span>`).join('')}</div>` : ''}${ctxRel && !art ? cyRel(c) : ''}<span style="flex:1"></span>${knopf}</div>
@@ -4756,17 +4782,17 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       </div></div>`; }).join('') || '<p class="cy-empty">Keine Community gefunden.</p>'; }
   /** Liste der Communities: mit Antwort die Live-Einträge (nach Mitgliedern), dahinter Partnerkacheln der eingebetteten Einträge ohne Schlüssel (cy-partner); ohne Antwort der eingebettete Stand vom 26.10.2026 */
   function cyRender() {
-    const art = { klasse: 'cy-partner', hinweis: 'Partner ohne eigenen Schlüssel im Datenraum' };
     const live = cyDaten && cyDaten.liste.length ? cyDaten.liste : null;
     const meine = c => live ? !!(istHex64(c.hex) && akZustand('beitreten', c.hex)) : cyFollow.has(c.id);   // live: nur die eigene Mitgliedsliste, keine Persona
     const passt = c => (cyFilter === 'alle' || (cyFilter === 'meine' ? meine(c) : c.ty === cyFilter)) && c.n.toLowerCase().includes(cyQ);
-    if (!live) document.getElementById('cyGrid').innerHTML = cyCards(CY.filter(passt), true);
+    const ohne = '<p class="cy-ohne">Hier stehen Communities mit eigenem Schlüssel im Datenraum. Weitere Partner erscheinen, sobald ihr Konto angelegt ist.</p>';
+    if (!live) document.getElementById('cyGrid').innerHTML = cyCards(CY.filter(c => (crHex(c.id) || c.id === 'oercommunity') && passt(c)), true) + ohne;
     else {
       live.forEach(c => { c.m = cyMitglieder(c.hex); });
-      const ids = new Set([...CY_HEX.values(), 'oercommunity']), partner = CY.filter(c => !ids.has(c.id));
-      const vorn = [...live].sort((a, b) => b.m - a.m || a.n.localeCompare(b.n, 'de')).filter(passt), schau = CY.filter(c => c.id === 'oercommunity' && passt(c)), hinten = partner.filter(passt);
-      document.getElementById('cyGrid').innerHTML = cyCards([...vorn, ...schau], true, null, true) + (hinten.length ? `<h2 class="cy-trenn">${esc(art.hinweis)}</h2>` + cyCards(hinten, true, art) : '');
-      datenstand('v-communities', 'live', `${live.length} Communities · ${partner.length} Partner ohne Schlüssel`);
+      // Partner ohne eigenen Schlüssel im Datenraum bekommen keine Kachel mehr (ADR-0017): gezeigt wird nur, was unter einem echten Schlüssel steht
+      const vorn = [...live].sort((a, b) => b.m - a.m || a.n.localeCompare(b.n, 'de')).filter(passt), schau = CY.filter(c => c.id === 'oercommunity' && passt(c));
+      document.getElementById('cyGrid').innerHTML = cyCards([...vorn, ...schau], true, null, true) + ohne;
+      datenstand('v-communities', 'live', `${live.length} Communities mit Schlüssel`);
     }
     if (typeof rlCommRender === 'function') rlCommRender();
   }
@@ -4978,7 +5004,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (!e.ev) return '';
     if (e.typ === 'event') return sichereUrl(evToTermin(e.ev).u);
     const d = tagWert(e.ev, 'd');
-    if (e.ev.kind === 30142) return `#materialpool?d=${encodeURIComponent(d)}&p=${e.pk}`;
+    if (e.ev.kind === 30142) return `#material?d=${encodeURIComponent(d)}&p=${e.pk}`;
     return sichereUrl(e.pk === FO_HEX ? beitragUrl(e.ev) : 'https://edufeed.org/' + naddr(d, e.pk, e.ev.kind));
   }
   /** Zahl der sichtbaren Nachbarn je Typ als Satzteil („3 Communities · 1 Termin“) */
@@ -5209,7 +5235,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const wer = hex => `<a class="pk-wer" href="${esc(co(hex) ? '#community?c=' + co(hex).id : '#person?p=' + voll(hex))}">${name(hex)}</a>`;
     const comm = hex => co(hex) ? `<a href="${esc('#community?c=' + co(hex).id)}">${name(hex)}</a>` : `<a href="${esc('#oekosystem?wahl=' + encodeURIComponent('c:' + hex))}" data-wahl="c:${hex}">${name(hex)}</a>`;
     const titel = e => { const t = e.ev, n = e.ev.kind === 30142 ? tagWert(t, 'name') || tagWert(t, 'title') : tagWert(t, 'title') || tagWert(t, 'name'); return esc(kurz(n || tagWert(t, 'd'), 80)); };
-    const link = e => e.ev.kind === 30142 ? `<a href="${esc('#materialpool?d=' + encodeURIComponent(tagWert(e.ev, 'd')) + '&p=' + e.pk)}">${titel(e)}</a>`
+    const link = e => e.ev.kind === 30142 ? `<a href="${esc('#material?d=' + encodeURIComponent(tagWert(e.ev, 'd')) + '&p=' + e.pk)}">${titel(e)}</a>`
       : ents.has(e.id) ? `<a href="${esc('#oekosystem?wahl=' + encodeURIComponent(e.id))}" data-wahl="${esc(e.id)}">${titel(e)}</a>` : `<b>${titel(e)}</b>`;
     const entId = (kind, a) => ([30142, 30023].includes(kind) ? 'm:' : 'e:') + a;
     const byId = gefuege.byId || (gefuege.byId = new Map([...ents.values()].filter(e => e.ev && e.ev.id).map(e => [e.ev.id, e.id])));
@@ -5596,36 +5622,13 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     document.getElementById(b.dataset.ocs).scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
-  const CR = {
-    oercommunity: { act: OC_POSTS.map(p => T_('Artikel', esc(p.t), { who: 'OER-Community', ago: p.ago, x: esc(p.x), tags: p.tags.map(esc), url: p.url })) },
-    relilab: { act: [
-        T_('Termin', 'Den Ramadan in der Schule gestalten – Interreligiöses Lernen', { who: 'relilab', ago: 'vor 4 Tagen', d: ['11', 'JAN', '2027, 16:00'], tags: ['Ramadan', 'Fastenbrechen', 'Id al-Fitr'] }),
-        T_('Termin', 'Weihnachten religionssensibel gestalten – Interreligiöses Lernen', { who: 'relilab', ago: 'vor 4 Tagen', d: ['12', 'NOV', '2026, 16:00'], tags: ['Weihnachten', 'Advent', 'Maria'] }),
-        T_('Termin', 'reliGlobal.Werkstatt – Schulgottesdienst', { who: 'reliGlobal', ago: '15. Okt.', d: ['17', 'NOV', '2026, 16:00'], tags: ['Schulgottesdienst', 'Globales Lernen'] }),
-        T_('Artikel', 'Psalmen kreativ – ein Werkstattbericht', { who: 'Luca Beispiel', ago: '12. Okt.', x: 'Wie wir im Labor Psalm 23 als Bildkarten neu erschlossen haben – und was wir dabei gelernt haben.', tags: ['Psalmen', 'Labor'] }),
-        T_('Lerninhalt', 'Gen 1 kreativ gestalten', { who: 'relilab', ago: '8. Okt.', x: 'Unterrichtsidee für Klasse 5/6 · CC BY-SA 4.0', tags: ['Schöpfung', 'Sek I'] })],
-      ev: [['28. Okt., 16:00', 'Online im Trialog (mit Anmeldung, extern)'], ['3. Nov., 14:30', 'Gamifikation im Schulhof – Schöpfung und Sankt Martin ganzheitlich entdecken'], ['3. Nov., 16:00', 'Haltung zeigen – populistische Parolen erwidern'], ['3. Nov., 16:30', 'relilab 2026/2027 – Religiöses Lernen in und mit digitalen Medien – Zutiefst…']] },
-    religlobal: { act: [T_('Termin', 'reliGlobal.Werkstatt – Schulgottesdienst', { ago: '15. Okt.', d: ['17', 'NOV', '2026, 16:00'], tags: ['Schulgottesdienst', 'Globales Lernen'] }), T_('Lerninhalt', 'Fairer Handel im Religionsunterricht', { ago: '2. Okt.', x: 'Arbeitsmaterial Sek I · CC BY 4.0', tags: ['Globales Lernen', 'Gerechtigkeit'] }), T_('Artikel', 'Globales Lernen – drei Zugänge für den Religionsunterricht', { ago: '20. Sep.', x: 'Perspektivwechsel, Partnerschaft, Handeln: drei Wege, die Welt in den RU zu holen.', tags: ['Globales Lernen'] })], ev: [['17. Nov., 16:00', 'reliGlobal.Werkstatt – Schulgottesdienst'], ['1. Dez., 17:00', 'Online-Impuls: Klimagerechtigkeit']] },
-    narrt: { act: [T_('Artikel', 'Antisemitismuskritische Bibeldidaktik – eine Handreichung', { ago: 'gestern', x: 'Wie biblische Texte im Unterricht so erschlossen werden können, dass antijüdische Deutungsmuster nicht fortgeschrieben werden.', tags: ['Bibeldidaktik', 'Antisemitismuskritik'] }), T_('Termin', 'Digitale Austauschrunde', { ago: '18. Okt.', d: ['5', 'NOV', '2026, 18:00'], tags: ['Austausch'] })], ev: [['5. Nov., 18:00', 'Digitale Austauschrunde'], ['20. Nov., 10:00', 'Jahrestreffen der Mitglieder']] },
-    konfi: { act: [T_('Termin', 'Werkstatt: Konfi-Material im nostr-Datenraum', { ago: '19. Okt.', d: ['6', 'NOV', '2026, 15:00'], tags: ['Konfiarbeit', 'nostr'] }), T_('Lerninhalt', 'Konfi-Einheit: Taufe erleben', { ago: '9. Okt.', x: 'Ablauf und Material für zwei Konfi-Treffen · CC BY-SA 4.0', tags: ['Taufe', 'Konfiarbeit'] })], ev: [['6. Nov., 15:00', 'Werkstatt: Konfi-Material im nostr-Datenraum']] },
-    relimentar: { act: [T_('Lerninhalt', 'Sankt Martin mit Kita-Kindern feiern', { ago: '14. Okt.', x: 'Bausteine für Krippe und Kindergarten · CC BY 4.0', tags: ['Sankt Martin', 'Kita'] }), T_('Termin', 'Fortbildung: Religiöse Feste in der Kita', { ago: '10. Okt.', d: ['11', 'NOV', '2026, 9:30'], tags: ['Kita', 'Feste'] })], ev: [['11. Nov., 9:30', 'Fortbildung: Religiöse Feste in der Kita']] },
-    frieden: { act: [T_('Artikel', 'Frieden lernen in Zeiten von Krieg', { ago: '16. Okt.', x: 'Was Friedensbildung im Religionsunterricht heute leisten kann – Impulse aus der Community.', tags: ['Friedensbildung'] }), T_('Termin', 'Friedensdekade 2026: Materialbörse', { ago: '11. Okt.', d: ['8', 'NOV', '2026, 18:00'], tags: ['Friedensdekade'] })], ev: [['8. Nov., 18:00', 'Friedensdekade 2026: Materialbörse']] }
-  };
-  function crData(c) {
-    if (CR[c.id]) return CR[c.id];
-    if (c.series) {
-      const D = [['5', 'NOV', '5. Nov.'], ['12', 'NOV', '12. Nov.'], ['19', 'NOV', '19. Nov.']];
-      return { act: c.series.map((x, i) => T_('Termin', x[0], { ago: (14 - i * 3) + '. Okt.', d: [D[i][0], D[i][1], '2026, 16:00 · ' + x[1]], tags: ['Serie', 'relilab'] })).concat([T_('Artikel', `Rückblick: ${c.series[0][0]}`, { ago: '2. Okt.', x: c.back, tags: ['Rückblick'] })]),
-        ev: c.series.map((x, i) => [D[i][2] + ', 16:00', x[0]]) };
-    }
-    return { act: [T_('Artikel', `Willkommen in der Community ${c.n}`, { ago: '1. Okt.', x: c.back, tags: ['Community'] }), T_('Termin', 'Digitales Community-Treffen', { ago: '5. Okt.', d: ['12', 'NOV', '2026, 17:00'], tags: ['Austausch'] })], ev: [['12. Nov., 17:00', 'Digitales Community-Treffen']] };
-  }
-  const PEOPLE = ['Anna Krüger', 'Tobias Meyer', 'Sara Köhler', 'Jonas Becker', 'Miriam Lange', 'Deniz Aydın', 'Ruth Hoffmann', 'Paul Neumann', 'Lea Schulz', 'Ben Wagner'];
+  // Was in dieser Sitzung über die Formulare geteilt wurde (nichts davon geht ins Netz); erfundene Inhalte gibt es in den Räumen nicht mehr
+  const CR = {};
+  function crData(c) { return CR[c.id] || (CR[c.id] = { act: [], ev: [] }); }
   const PCOL = [C.hub, C.finden, C.erstellen, C.kooperieren, C.veroeffentlichen];
   const ini = n => n.split(' ').map(x => x[0]).join('').slice(0, 2);
   const crMember = {}; const crReq = {};
   CY.forEach(c => { crMember[c.id] = c.mine === 'Mitglied'; });
-  const CHAT = {};
   let crId = null, crTab = 'home';
   function crAv(c, size) { const s = `width:${size}px;height:${size}px;font-size:${Math.round(size * .36)}px`; return c.id === 'relilab' ? `<span class="cr-av rl" style="${s}">#</span>` : `<span class="cr-av" style="${s};background:${c.col};color:${c.tx || '#fff'}">${c.ab}</span>`; }
   let crRootEl = null;
@@ -5637,45 +5640,84 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       <h4>${it.t}</h4>${it.d ? `<div class="cr-date"><div><b>${it.d[0]}</b><small>${it.d[1]}</small></div><span>${it.d[2]}</span></div>` : ''}${it.x ? `<p>${it.x}</p>` : ''}
       <div class="cr-tags">${(it.tags || []).map(t => `<span>${t}</span>`).join('')}</div></div></article>`;
   }
-  function crMain(c) {
-    // Der Katalog braucht keine Beispieldaten (crData): er läuft auch für Communities, die nur im Datenraum existieren
+  function crMain(c, hx) {
     if (crTab === 'katalog') return `<div class="cr-cols one"><section class="kat" id="katRoot" aria-live="polite"></section></div>`;
-    const D0 = crData(c), D = { act: [], ev: [], ...D0 }, mem = crMember[c.id], lock = (what) => `<div class="cr-lock"><b>${what} nur für Mitglieder</b>Tritt der Community bei, um ${what === 'Kalender' ? 'alle Termine zu sehen und eigene anzulegen' : 'die Einstellungen zu verwalten'}.<div style="margin-top:14px"><button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button></div></div>`;
-    const evList = D.ev.map(([d, t]) => `<button type="button" class="cr-ev" data-todo="Termin „${t}“"><small>${d}</small><b>${t}</b></button>`).join('');
-    if (crTab === 'home') return `<section class="cr-mat"><h2 class="cr-h">Materialien</h2><div id="crMat"></div></section><div class="cr-cols"><section><h2 class="cr-h">Kürzliche Aktivität</h2>${D.act.map(i => crItem(i, c)).join('')}</section><aside><h2 class="cr-h"><span>Kommende Veranstaltungen ›</span></h2>${evList}</aside></div>`;
-    if (crTab === 'art' || crTab === 'lern') {
-      const ty = crTab === 'art' ? 'Artikel' : 'Lerninhalt', list = D.act.filter(i => i.type === ty);
-      const btn = crTab === 'art' ? `<button type="button" class="cr-pill" data-cract="blog">+ Artikel schreiben</button>` : `<button type="button" class="cr-pill" data-cract="learn">+ Lerninhalt teilen</button>`;
-      return `<div class="cr-cols one"><section><h2 class="cr-h"><span>${crTab === 'art' ? 'Artikel' : 'Lernen'}</span>${btn}</h2>${list.map(i => crItem(i, c)).join('') || `<div class="cr-lock">Hier ist noch nichts veröffentlicht.</div>`}</section></div>`;
-    }
-    if (crTab === 'kal') return `<div class="cr-cols one"><section><h2 class="cr-h"><span>Kalender</span>${mem ? '<button type="button" class="cr-pill" data-cract="event">+ Termin anlegen</button>' : ''}</h2>${mem ? evList : lock('Kalender')}</section></div>`;
-    if (crTab === 'chat') {
-      const msgs = CHAT[c.id] || (CHAT[c.id] = [[PEOPLE[0], `Willkommen im Kanal #allgemein von ${c.n}!`, 'Mo'], [PEOPLE[2], 'Hat jemand Material zum Reformationstag für Klasse 7?', 'gestern'], [PEOPLE[5], 'Im Materialpool gibt es ein paar gute Sachen – ich teile den Link gleich.', 'gestern']]);
-      return `<div class="cr-cols one"><section><h2 class="cr-h"># Allgemein</h2><div class="cr-chat"><div class="cr-msgs">${msgs.map(([w, t, d], i) => `<div class="cr-msg"><span class="cr-av" style="width:36px;height:36px;font-size:13px;background:${PCOL[i % 5]}">${ini(w)}</span><div><b>${esc(w)}</b><small>${d}</small><p>${esc(t)}</p></div></div>`).join('')}</div>
-        <form class="cr-in" data-crchat><input id="crMsg" placeholder="${mem ? 'Nachricht an #allgemein' : 'Tritt bei, um mitzuschreiben'}" ${mem ? '' : 'disabled'} aria-label="Nachricht"><button type="submit" class="cr-pill" ${mem ? '' : 'disabled'}>Senden</button></form></div></section></div>`;
-    }
-    if (crTab === 'mem') {
-      const ppl = (mem ? ['Luca Beispiel'] : []).concat(PEOPLE.slice(0, 8));
-      return `<div class="cr-cols one"><section><h2 class="cr-h">Mitglieder · ${c.m}</h2><div class="cr-members">${ppl.map((p, i) => `<div><span class="cr-av" style="background:${PCOL[i % 5]}">${ini(p)}</span>${p}<small>${i === 0 && mem ? 'du' : i < 2 ? 'Moderation' : 'Mitglied'}</small></div>`).join('')}</div><p style="color:#6A645A">… und ${Math.max(0, c.m - ppl.length)} weitere</p></section></div>`;
-    }
+    // Alle Inhalte kommen aus dem Netz (crFuellen); ohne Schlüssel gibt es nichts zu zeigen
+    if (!hx) return `<div class="cr-cols one"><section><div class="cr-lock"><b>Noch kein Schlüssel im Datenraum</b>Diese Community hat noch kein eigenes Konto im Netz. Der ReliHub zeigt deshalb hier keine Inhalte.</div></section></div>`;
+    const lade = '<p class="cr-leer">Wird geladen …</p>', sitz = crData(c).act;
+    const mem = crMember[c.id], lock = (what) => `<div class="cr-lock"><b>${what} nur für Mitglieder</b>Tritt der Community bei, um die Einstellungen zu verwalten.<div style="margin-top:14px"><button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button></div></div>`;
+    if (crTab === 'home') return `<section class="cr-mat"><h2 class="cr-h">Materialien</h2><div id="crMat"></div></section><div class="cr-cols"><section><h2 class="cr-h">Beiträge</h2>${sitz.map(i => crItem(i, c)).join('')}<div id="crBeitr">${lade}</div></section><aside><h2 class="cr-h"><span>Kommende Termine</span></h2><div id="crTerm">${lade}</div></aside></div>`;
+    if (crTab === 'art') return `<div class="cr-cols one"><section><h2 class="cr-h"><span>Artikel</span><button type="button" class="cr-pill" data-cract="blog">+ Artikel schreiben</button></h2>${sitz.filter(i => i.type === 'Artikel').map(i => crItem(i, c)).join('')}<div id="crBeitr" data-alle>${lade}</div></section></div>`;
+    if (crTab === 'lern') return `<div class="cr-cols one"><section><h2 class="cr-h"><span>Lernen</span><button type="button" class="cr-pill" data-cract="learn">+ Lerninhalt teilen</button></h2><div id="crMat" data-alle></div></section></div>`;
+    if (crTab === 'kal') return `<div class="cr-cols one"><section><h2 class="cr-h"><span>Kalender</span>${mem ? '<button type="button" class="cr-pill" data-cract="event">+ Termin anlegen</button>' : ''}</h2><div id="crTerm" data-alle>${lade}</div></section></div>`;
+    if (crTab === 'chat') return `<div class="cr-cols one"><section><h2 class="cr-h"># Allgemein</h2><div class="cr-lock"><b>Das Gespräch läuft in der edufeed-App</b>Der ReliHub zeigt die Unterhaltungen einer Community noch nicht.<div style="margin-top:14px"><a class="cr-pill" href="${esc(sichereUrl('https://edufeed.org/c/' + bech32('npub', hx.match(/../g).map(h => parseInt(h, 16)))))}" target="_blank" rel="noopener">In der edufeed-App öffnen ›</a></div></div></section></div>`;
+    if (crTab === 'mem') return `<div class="cr-cols one"><section><h2 class="cr-h">Mitglieder</h2><div id="crPers">${lade}</div></section></div>`;
     return `<div class="cr-cols one"><section><h2 class="cr-h">Einstellungen</h2>${mem ? ['Benachrichtigungen bei neuen Terminen', 'Benachrichtigungen bei neuen Artikeln', 'Wöchentliche Zusammenfassung per E-Mail'].map((t, i) => `<div class="cr-set"><label>${t}<input type="checkbox" ${i < 2 ? 'checked' : ''}></label></div>`).join('') + '<button type="button" class="cr-pill ghost" data-cract="leave">Community verlassen</button>' : lock('Einstellungen')}</section></div>`;
   }
   /** Materialien der Community auf ihrer Übersicht: was ihr Konto veröffentlicht hat oder was mit ihr geteilt ist, als Karten wie im Materialfeed */
   let crMatLauf = 0;
   function crMaterial(hx) {
-    const lauf = ++crMatLauf, ziel = () => crRootEl && crRootEl.querySelector('#crMat');
+    const lauf = ++crMatLauf, ziel = () => crRootEl && (crRootEl.querySelector('#crMat') || document.createElement('div'));
     const zeigen = () => {
       const z = ziel(); if (!z || lauf !== crMatLauf) return;
       const g = ozGefuege, k = 'c:' + hx;
       const ms = !g || !hx ? [] : [...g.ents.values()].filter(e => e.typ === 'material' && e.ev && e.ev.kind === 30142 && (e.pk === hx || (g.kanten.get(e.id) || new Set()).has(k))).map(e => mpMaterial(e.ev)).sort((a, b) => b.datum - a.datum);
-      z.innerHTML = ms.length ? `<div class="mt-raster">${ms.slice(0, 6).map(mtKarte).join('')}</div>${ms.length > 6 ? `<p class="mt-ort"><a href="#community?c=${esc(crId)}&zu=katalog">Alle ${ms.length} Materialien ›</a></p>` : ''}` : `<p class="pk-leer">${ozLive ? 'Noch kein Material von dieser Community im Netz.' : 'Material wird geladen …'}</p>`;
+      const alle = z.hasAttribute('data-alle'), sicht = alle ? ms.slice(0, 60) : ms.slice(0, 6);
+      z.innerHTML = ms.length ? `<div class="mt-raster">${sicht.map(mtKarte).join('')}</div>${!alle && ms.length > 6 ? `<p class="mt-ort"><button type="button" class="cr-pill ghost" data-crtab="lern">Alle ${ms.length} Materialien ›</button></p>` : ''}` : `<p class="cr-leer">${ozLive ? 'Noch kein Material von dieser Community im Netz.' : 'Material wird geladen …'}</p>`;
+      // Mitglieder: Personen mit Beziehung zur Community im Gefüge, nur mit Profil
+      const leute = !g ? [] : bzNachbarn(g.kanten, g.ents, k, 'person').map(e => bzProfil(String(e.id).slice(2))).filter(pr => pr && !pr.bot);
+      const zahl = crRootEl.querySelector('#crZahl'); if (zahl) zahl.textContent = ozLive ? `${leute.length} ${leute.length === 1 ? 'Person' : 'Personen'} mit Profil` : 'Mitglieder';
+      const pers = crRootEl.querySelector('#crPers');
+      if (pers) pers.innerHTML = leute.length ? `<div class="rl-reihe">${leute.map(pr => `<a class="pe-card rl-person" href="${esc('#person?p=' + pr.npub)}">${peAv(pr)}<div><b>${pr.name}</b>${pr.about ? `<p>${pr.about}</p>` : ''}</div></a>`).join('')}</div>` : `<p class="cr-leer">${ozLive ? 'Noch niemand mit Profil ist mit dieser Community verbunden.' : 'Wird geladen …'}</p>`;
     };
     zeigen();
     ozQuellenLaden().then(r => { if (r[4].antwort && !ozLive) ozBauen(); zeigen(); }, () => {});
   }
+  /** Beiträge und Termine einer Community aus dem Netz: was sie selbst veröffentlicht hat und was mit ihr geteilt ist (h-Tag oder Repost); einmal je Sitzung */
+  const crDaten = new Map(), nwExtra = new Map();   // nwExtra: Beiträge aus den Räumen, damit sie sich unter #news?b= öffnen
+  function crLaden(hx) {
+    if (crDaten.has(hx)) return crDaten.get(hx);
+    const lauf = Promise.all([coLaden(hx), hubFetch('raum:' + hx, [{ kinds: [30023, 31923], authors: [hx], limit: 200 }])]).then(([co, eigen]) => {
+      const es = coEintraege(co);
+      return eintraegeAufloesen(es).then(() => {
+        const je = new Map();
+        [...es.map(e => e.ev).filter(Boolean), ...eigen.filter(ev => ev && ev.pubkey === hx)].forEach(ev => {
+          if (!istHex64(ev.pubkey) || ![30023, 31923].includes(ev.kind)) return;
+          const k = ev.kind + ':' + ev.pubkey + ':' + tagWert(ev, 'd'), alt = je.get(k); if (!alt || ev.created_at > alt.created_at) je.set(k, ev);
+        });
+        const alle = [...je.values()];
+        const beitraege = alle.filter(ev => ev.kind === 30023 && tagWert(ev, 'title') && tagWert(ev, 'd') && !tagWerte(ev, 'l').includes('seite')).map(ev => ({ ev, t: tagWert(ev, 'title'), zeit: +tagWert(ev, 'published_at') || ev.created_at, fremd: ev.pubkey !== FO_HEX })).sort((a, b) => b.zeit - a.zeit);
+        beitraege.forEach(x => nwExtra.set(x.ev.pubkey + ':' + tagWert(x.ev, 'd'), x.ev));
+        const termine = alle.filter(ev => ev.kind === 31923).map(evToTermin).filter(t => t.s > 0).sort((a, b) => a.s - b.s);
+        return { antwort: co.antwort || eigen.length > 0, beitraege, termine };
+      });
+    });
+    crDaten.set(hx, lauf); lauf.then(d => { if (!d.antwort) crDaten.delete(hx); }, () => crDaten.delete(hx));
+    return lauf;
+  }
+  let crFuellLauf = 0;
+  const fCrZeit = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  function crFuellen(c, hx) {
+    const lauf = ++crFuellLauf, el = id => crRootEl && crRootEl.querySelector('#' + id);
+    if (!el('crBeitr') && !el('crTerm')) return;
+    const leer = t => `<p class="cr-leer">${t}</p>`;
+    crLaden(hx).then(d => {
+      if (lauf !== crFuellLauf || crId !== c.id) return;
+      const b = el('crBeitr'), t = el('crTerm'), jetzt = Date.now() / 1000, stumm = 'Die Relays antworten gerade nicht.';
+      if (b) {
+        const alle = b.hasAttribute('data-alle'), ls = alle ? d.beitraege.slice(0, 90) : d.beitraege.slice(0, 4);
+        b.innerHTML = ls.length ? `<div class="nw-raster">${ls.map(nwKarte).join('')}</div>` + (!alle && d.beitraege.length > 4 ? `<p class="mt-ort"><button type="button" class="cr-pill ghost" data-crtab="art">Alle ${d.beitraege.length} Beiträge ›</button></p>` : '') : leer(d.antwort ? 'Noch keine Beiträge von dieser Community im Netz.' : stumm);
+      }
+      if (t) {
+        const alle = t.hasAttribute('data-alle'), kommend = d.termine.filter(x => (x.e || x.s) >= jetzt), vergangen = d.termine.length - kommend.length, ls = alle ? kommend : kommend.slice(0, 5);
+        t.innerHTML = (ls.length ? ls.map(x => `<a class="cr-ev" href="${esc(sichereUrl(x.u))}" target="_blank" rel="noopener"><span><small>${esc(fCrZeit.format(new Date(x.s * 1000)))}</small><b>${esc(x.t || x.id)}</b></span></a>`).join('') : leer(d.antwort ? 'Keine bevorstehenden Termine von dieser Community im Netz.' : stumm))
+          + (!alle && kommend.length > 5 ? `<p class="mt-ort"><button type="button" class="cr-pill ghost" data-crtab="kal">Alle ${kommend.length} Termine ›</button></p>` : '') + (alle && vergangen ? leer(`und ${vergangen} vergangene`) : '');
+      }
+    }, () => { ['crBeitr', 'crTerm'].forEach(id => { const x = el(id); if (x && lauf === crFuellLauf) x.innerHTML = leer('Die Relays antworten gerade nicht.'); }); });
+  }
   function crRender() {
     const c = CY.find(x => x.id === crId); if (!c) return;
-    const mem = crMember[c.id], fol = cyFollow.has(c.id), req = crReq[c.id], hx = (CO_SCHLUESSEL.find(k => k.id === c.id) || {}).hex || ([...CY_HEX].find(x => x[1] === c.id) || [])[0] || '';   // Schlüssel der Community für „Beitreten“
+    const mem = crMember[c.id], fol = cyFollow.has(c.id), req = crReq[c.id], hx = crHex(c.id);   // Schlüssel der Community: für „Beitreten“ und für alle Inhalte
     const nav = (k, ic, l, extra) => `<button type="button" data-crtab="${k}" class="${crTab === k ? 'on' : ''}">${ic}${l}${extra || ''}</button>`;
     crRootEl.innerHTML = `
       <aside class="cr-side"><div class="cr-sh" style="--sht:color-mix(in srgb, ${c.col} 13%, white)">${cyAv(c)}<span>${c.n}</span></div>
@@ -5683,13 +5725,13 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
           <div class="cr-bottom">${nav('mem', CR_ICON.mem, 'Mitglieder')}${nav('set', CR_ICON.set, 'Einstellungen')}</div></nav></aside>
       <main>
         <div class="cr-top"><span class="ring" style="width:240px;height:240px;background:${c.col};right:-50px;top:-120px"></span><span class="ring" style="width:170px;height:170px;background:var(--c-koop);right:130px;bottom:-120px"></span><div class="cr-id"><div class="cr-name">${crAv(c, 64)}<h1>${c.n}</h1>${hx ? '' : `<button type="button" class="cr-fol${fol ? '' : ' off'}" data-cract="follow">${fol ? '✓ Folge ich' : '+ Folgen'}</button>`}</div>
-          <button type="button" class="cr-mem" data-crtab="mem"><span class="st">${PEOPLE.slice(0, 3).map((p, i) => `<span style="background:${PCOL[i]}">${ini(p)}</span>`).join('')}</span>${c.m} Mitglieder ›</button>${c.inst ? `<div>${cyRel(c)}</div>` : ''}${nlLine(c)}</div>
+          ${hx ? '<button type="button" class="cr-mem" data-crtab="mem"><span id="crZahl">Mitglieder</span> ›</button>' : ''}${c.inst ? `<div>${cyRel(c)}</div>` : ''}${nlLine(c)}</div>
           <div class="cr-act">${hx ? akKnopf('beitreten', hx, 'Beitreten') : mem ? '<span class="cr-badge">✓ Mitglied</span>' : req ? '<span class="cr-badge">Anfrage gesendet</span>' : '<button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button>'}${mem ? '' : '<a data-cract="code">Einladungscode einlösen</a><div class="cr-code" id="crCode" hidden><input placeholder="Code eingeben" aria-label="Einladungscode"><button type="button" class="cr-pill" data-cract="redeem">Einlösen</button></div>'}</div></div>
-        ${crMain(c)}
+        ${crMain(c, hx)}
       </main>`;
-    if (crTab === 'home') crMaterial(hx);
+    if (hx && crTab !== 'katalog') { crMaterial(hx); crFuellen(c, hx); }
     if (crTab === 'katalog') katRender(c);
-    else { katLauf++; if (crRootEl.id === 'crRoot') datenstand('v-community', 'nachbau', 'Beispielinhalte'); }
+    else { katLauf++; if (crRootEl.id === 'crRoot') datenstand('v-community', hx ? 'live' : 'nachbau', hx ? 'Inhalte aus dem Netz' : 'kein Schlüssel im Datenraum'); }
   }
   // ---------- Katalog je Community: geteilte Inhalte als Grundschicht, Kuratierung darüber ----------
   let katLauf = 0;   // Lauf-Zähler gegen späte Antworten nach Tab- oder Community-Wechsel
@@ -5764,7 +5806,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   function crSubmit(e) {
     if (!e.target.matches('[data-crchat]')) return; e.preventDefault();
     const inp = document.getElementById('crMsg'), v = inp.value.trim(); if (!v) return;
-    CHAT[crId].push(['Luca Beispiel', v, 'jetzt']); crRender(); setTimeout(() => { const m = document.getElementById('crMsg'); if (m) m.focus(); }, 0);
+    inp.value = '';
   }
   ['crRoot', 'rlCrRoot'].forEach(id => { const r = document.getElementById(id); r.addEventListener('click', crClick); r.addEventListener('submit', crSubmit); });
   // Ein Community-Raum kann im ReliHub oder eingebettet in einer Instanz (z. B. relilab) erscheinen
@@ -5824,7 +5866,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       const eintraege = coEintraege(co), jetzt = Math.floor(Date.now() / 1000);
       return eintraegeAufloesen(eintraege).then(() => {
         const mit = eintraege.filter(e => e.ev && [30142, 30023].includes(e.ev.kind));
-        const materialien = mit.filter(e => e.ev.kind === 30142), beitraege = mit.filter(e => e.ev.kind === 30023);
+        const materialien = mit.filter(e => e.ev.kind === 30142);
+        const beitraege = mit.filter(e => e.ev.kind === 30023 && tagWert(e.ev, 'title') && tagWert(e.ev, 'd')).map(e => ({ ev: e.ev, t: tagWert(e.ev, 'title'), zeit: +tagWert(e.ev, 'published_at') || e.ev.created_at, fremd: e.ev.pubkey !== FO_HEX })).sort((a, b) => b.zeit - a.zeit);
+        beitraege.forEach(x => nwExtra.set(x.ev.pubkey + ':' + tagWert(x.ev, 'd'), x.ev));
         const alle = kal.filter(ev => ev && istHex64(ev.pubkey) && terminLogik(ev) === 'labor').map(evToTermin).filter(t => t.s >= jetzt).sort((a, b) => a.s - b.s);
         const zahl = new Map(), liste = new Set((peDaten && peDaten.pks) || []);
         mit.forEach(e => { const pk = e.ev.pubkey; if (istHex64(pk) && !CO_SCHLUESSEL.some(c => c.hex === pk) && !KAL_HEX.has(pk)) zahl.set(pk, (zahl.get(pk) || 0) + 1); });
@@ -5832,7 +5876,21 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
         const profile = new Map();
         schluessel.forEach(h => { const pr = bzProfil(h); if (pr) profile.set(h, pr); });
         const fehlend = schluessel.filter(h => !profile.has(h));
-        const nach = fehlend.length ? hubFetch('relilab:menschen', [{ kinds: [0], authors: fehlend, limit: 80 }]) : Promise.resolve([]);
+        // Name, Bild und Text der Communities im relilab kommen aus ihrem Profil (kind 0)
+        const sub = CY.filter(c => c.rl).map(c => [c, crHex(c.id)]).filter(x => x[1]);
+        const subLauf = sub.length ? hubFetch('relilab:communities', [{ kinds: [0], authors: sub.map(x => x[1]), limit: 20 }]).then(evs => {
+          sub.forEach(([c, hex]) => {
+            const ev = evs.filter(e => e && e.kind === 0 && e.pubkey === hex).sort((a, b) => b.created_at - a.created_at)[0]; if (!ev) return;
+            try {
+              const p = JSON.parse(ev.content), txt = (x, n) => typeof x === 'string' ? x.replace(/\s+/g, ' ').trim().slice(0, n) : '';
+              const about = txt(p.about, 600), name = txt(p.display_name, 80) || txt(p.name, 80);
+              if (name) c.n = name;
+              if (about) { c.back = about; c.bio = about.length > 150 ? about.slice(0, about.lastIndexOf(' ', 150)).trimEnd() + ' …' : about; }
+              c.bild = sichereUrl(txt(p.picture, 500));
+            } catch (e) {}
+          });
+        }, () => {}) : Promise.resolve();
+        const nach = subLauf.then(() => fehlend.length ? hubFetch('relilab:menschen', [{ kinds: [0], authors: fehlend, limit: 80 }]) : []);
         return nach.then(evs => {
           const neu = new Map();
           evs.filter(ev => ev && ev.kind === 0 && fehlend.includes(ev.pubkey)).forEach(ev => { const a = neu.get(ev.pubkey); if (!a || ev.created_at > a.created_at) neu.set(ev.pubkey, ev); });
@@ -5857,12 +5915,12 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const fZeit = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
     // Reihenfolge der Seite (ADR-0017): Termine, Communities, Personen, Material, News
     const reihe = (inhalt, sonst) => inhalt ? `<div class="rl-reihe">${inhalt}</div>` : sonst;
-    const comms = CY.filter(c => c.rl), news = nwListe().filter(x => /relilab/i.test(x.t + ' ' + tagWerte(x.ev, 't').join(' '))).slice(0, 3);
+    const comms = CY.filter(c => c.rl && crHex(c.id)), newsAlle = antwort ? daten.beitraege : [], news = newsAlle.slice(0, 3);   // Communities nur mit echtem Schlüssel; News sind die Beiträge, die ins relilab geteilt sind
     tr.innerHTML = `<section id="rlMitmachen" aria-label="Termine"><h2>Termine</h2><p class="rl-hint">Die nächsten Labortermine.</p>`
       + reihe(termine.map(t => `<a class="rl-termin" href="${esc(sichereUrl(t.u))}"><b>${esc(t.t || t.id)}</b><span>${esc(fZeit.format(new Date(t.s * 1000)))}</span></a>`).join(''), leer(!daten || antwort ? 'Keine bevorstehenden Termine.' : stumm))
       + `<a class="rl-mehr" href="${esc('#relilab?tab=termine&von=konsole')}">Alle Labortermine ›</a></section>`
-      + `<section id="rlCommunities" aria-label="Communities"><h2>Communities</h2><p class="rl-hint">Gruppen, die im relilab an einem Thema arbeiten.</p>`
-      + reihe(comms.map(c => `<a class="pe-card rl-person" href="${esc('#relilab?room=' + c.id)}">${cyAv(c)}<div><b>${c.n}</b>${c.bio ? `<p>${esc(c.bio)}</p>` : ''}</div></a>`).join(''), leer('Noch keine Communities.'))
+      + `<section id="rlCommunities" aria-label="Communities im relilab"><h2>Communities im relilab</h2><p class="rl-hint">Gruppen mit eigenem Schlüssel, die im relilab veröffentlichen.</p>`
+      + reihe(comms.map(c => `<a class="pe-card rl-person" href="${esc('#relilab?room=' + c.id)}">${cyAv(c)}<div><b>${esc(c.n)}</b>${c.bio ? `<p>${esc(c.bio)}</p>` : ''}</div></a>`).join(''), leer('Noch keine Communities.'))
       + `<a class="rl-mehr" href="${esc('#relilab?tab=communities&von=konsole')}">Alle Communities im relilab ›</a></section>`
       + `<section id="rlMenschen" aria-label="Personen"><h2>Personen</h2><p class="rl-hint">Wer hier steht, hat im Labor veröffentlicht oder geteilt.</p>`
       + reihe(men.slice(0, 8).map(pr => `<a class="pe-card rl-person" href="${esc('#person?p=' + pr.npub)}">${peAv(pr)}<div><b>${pr.name}</b>${pr.about ? `<p>${pr.about}</p>` : ''}</div></a>`).join(''), leer(antwort ? 'Noch niemand mit Profil.' : stumm))
@@ -5871,8 +5929,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       + reihe(mat.map(e => e.ev && e.ev.kind === 30142 ? mtKarte(mpMaterial(e.ev)) : eintragKarte(e)).join(''), leer(antwort ? 'Noch nichts im Katalog.' : stumm))
       + `<a class="rl-mehr" href="${esc('#community?c=relilab&zu=katalog')}">Alle im Katalog ›</a></section>`
       + `<section id="rlNews" aria-label="News"><h2>News</h2><p class="rl-hint">Längere Beiträge aus dem relilab.</p>`
-      + reihe(news.map(x => `<a class="rl-termin" href="${esc('#news?b=' + encodeURIComponent(x.ev.pubkey + ':' + tagWert(x.ev, 'd')))}"><b>${esc(x.t)}</b><span>${esc(new Date(x.zeit * 1000).toLocaleDateString('de-DE'))}</span></a>`).join(''), leer('Noch keine Beiträge aus dem relilab im Netz.'))
-      + `<a class="rl-mehr" href="${esc('#relilab?room=relilab&rtab=art&von=konsole')}">Artikel im relilab ›</a><br><a class="rl-mehr" href="${esc('#relilab?tab=mitmachen')}">Sehen, was im relilab gerade passiert ›</a></section>`;
+      + (news.length ? `<div class="nw-raster">${news.map(nwKarte).join('')}</div>` : leer(antwort ? 'Noch keine Beiträge aus dem relilab im Netz.' : stumm))
+      + `<a class="rl-mehr" href="${esc('#relilab?room=relilab&rtab=art&von=konsole')}">${newsAlle.length > 3 ? `Alle ${newsAlle.length} Beiträge im relilab ›` : 'Artikel im relilab ›'}</a><br><a class="rl-mehr" href="${esc('#relilab?tab=mitmachen')}">Sehen, was im relilab gerade passiert ›</a></section>`;
     if (document.querySelector('#v-relilab [data-rlsec="home"]').classList.contains('on')) {
       if (antwort) datenstand('v-relilab', 'live', `${daten.materialien.length} Materialien · ${daten.menschen.length} Menschen · ${daten.termineZahl} Labortermine`);
       else datenstand('v-relilab', 'stand', RT_STAND);
@@ -7060,7 +7118,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (v === 'oekosystem') ozOpen(qs);
     if (v === 'mitmachen') pkOpen(qs);
     if (v === 'news') nwOpen(qs);
-    if (v === 'material') mtOpen();
+    if (v === 'material') mtOpen(qs);
     if (v === 'eigene-instanz') eiOpen(qs);
     if (v === 'oercommunity') ocOpen(sub);
     if (v === 'relilab') rlShow(qs);
@@ -7221,8 +7279,11 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   const mtBild = url => url ? `https://edufeed.org/api/image?url=${encodeURIComponent(url)}&w=540&h=338&fit=cover&fmt=webp` : '';   // kleine Vorschau über den Bildproxy: lädt schnell, und die fremde Seite sieht keine Besucher des Hubs
   function mtKarte(m) {
     const cc = /^CC/i.test(m.licLabel || ''), lic = m.licLabel || 'Lizenz nicht angegeben';
-    return `<a class="mt-karte" href="#materialpool?d=${encodeURIComponent(m.d)}${istHex64(m.pk) ? '&p=' + m.pk : ''}"><span class="mt-bild">${esc(ozIni(m.t))}${m.bild ? `<img src="${esc(mtBild(m.bild))}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}`
-      + `<span class="mt-lic lic-${m.stand} amp-${m.ampel}${cc ? '' : ' ohne'}">${cc ? CC_ZEICHEN : ''}${esc(lic)}</span></span>`
+    // Namensnennung wie in der Lizenzpille der OER-Community: Kürzel · Urheber. Ohne Angabe im Material steht der Herausgeber, sonst das veröffentlichende Konto.
+    const nenn = m.licLabel && !/^(CC0|Public Domain)/.test(m.licLabel), wer = !nenn ? '' : m.urheber ? esc(m.urheber) : m.quelle ? esc(m.quelle) : kontoName(m.pk);
+    const voll = [m.t, m.urheber || m.quelle, lic].filter(Boolean).join(', ');
+    return `<a class="mt-karte" href="#material?d=${encodeURIComponent(m.d)}${istHex64(m.pk) ? '&p=' + m.pk : ''}"><span class="mt-bild">${esc(ozIni(m.t))}${m.bild ? `<img src="${esc(mtBild(m.bild))}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}`
+      + `<span class="mt-lic lic-${m.stand} amp-${m.ampel}${cc ? '' : ' ohne'}" title="${esc(voll)}">${cc ? CC_ZEICHEN : ''}<span class="mt-kurz">${esc(lic)}</span>${wer ? `<span class="mt-urh">· ${wer}</span>` : ''}</span></span>`
       + `<span class="mt-text"><h2>${esc(m.t)}</h2>${m.x ? `<p>${esc(m.x)}</p>` : ''}${m.quelle ? `<span class="mt-quelle">${esc(m.quelle)}</span>` : ''}`
       + `<span class="mt-meta">${m.stufe ? `<span class="stufe">${esc(m.stufe)}</span>` : ''}${m.art ? `<span>${esc(m.art)}</span>` : ''}${m.fach ? `<span>${esc(m.fach)}</span>` : ''}</span></span></a>`;
   }
@@ -7245,7 +7306,12 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   document.getElementById('mtAus').addEventListener('input', e => { if (e.target.id !== 'mtFilter') return; mtWort = e.target.value; mtZahl = 48; const pos = e.target.selectionStart; mtRender(); const f = document.getElementById('mtFilter'); f.focus(); try { f.setSelectionRange(pos, pos); } catch (er) {} });
   document.getElementById('mtAus').addEventListener('click', e => { if (e.target.closest('[data-mt-mehr]')) { mtZahl += 48; mtRender(); } });
   /** Erst die eine schnelle Abfrage der Materialien, dann das ganze Gefüge mit den Materialien aus den Communities */
-  function mtOpen() {
+  function mtOpen(qs) {
+    const p = new URLSearchParams(qs || ''), d = p.get('d'), det = document.getElementById('mtDetail');
+    // Ein Material: Detail auf der Materialseite, die Liste tritt zurück
+    document.getElementById('v-material').classList.toggle('detail', !!d);
+    if (d) { mtStart++; mpOrt = 'material'; mpLaden().catch(() => {}); mpDetail(d, istHex64(p.get('p')) ? p.get('p') : null); datenstand('v-material', 'live', 'ein Material'); window.scrollTo(0, 0); return; }
+    mpDetailLauf++; mpAktuell = null; det.hidden = true; det.innerHTML = '';
     const lauf = ++mtStart;
     if (mtListe.length) mtRender(); else mtRender('laden');
     mpLaden().then(ms => { if (lauf !== mtStart || mtVoll || !ms.length) return; mtSetzen(ms, false); mtRender(); }, () => {});
@@ -7268,9 +7334,20 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     OC_RAW.forEach(ev => { if (ev.kind === 30023) auf(ev, false); });
     ((ocDaten && ocDaten.beitraege) || []).forEach(ev => auf(ev, false));
     pkListe.forEach(e => { if (e.ev && e.ev.kind === 30023) auf(e.ev, e.ev.pubkey !== FO_HEX); });
+    nwExtra.forEach(ev => auf(ev, ev.pubkey !== FO_HEX));   // Beiträge aus den Räumen der Communities
     return [...je.values()].sort((a, b) => b.zeit - a.zeit);
   }
   let nwB = '';   // gewählter Beitrag (pubkey:d) oder leer für die Kacheln
+  /** Kachel eines Beitrags { ev, t, zeit, fremd } mit Bild, Auszug und Schlagworten; öffnet die Lesefassung im Hub */
+  function nwKarte(x) {
+    const datum = z => new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(z * 1000));
+    const ev = x.ev, bild = sichereUrl(x.fremd ? tagWert(ev, 'image') : beitragBild(ev)), auszug = tagWert(ev, 'summary') || String(ev.content || '').replace(/[#>*_`\[\]()!]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 240);
+    const href = '#news?b=' + encodeURIComponent(ev.pubkey + ':' + tagWert(ev, 'd'));
+    const wer = !x.fremd ? 'OER-Community' : kontoName(ev.pubkey) || 'Aus dem Netz';
+    return `<a class="nw-karte" href="${esc(href)}"><span class="nw-bild">${esc(ozIni(x.t))}${bild ? `<img src="${esc(bild)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`
+      + `<span class="nw-text"><span class="nw-meta">${wer} · ${datum(x.zeit)}</span><h2>${esc(x.t)}</h2><p>${esc(auszug.length > 240 ? auszug.slice(0, 240).trimEnd() + ' …' : auszug)}</p>`
+      + `<span class="nw-tags">${tagWerte(ev, 't').slice(0, 4).map(t => `<span>${esc(t)}</span>`).join('')}</span><span class="nw-mehr">Weiterlesen ›</span></span></a>`;
+  }
   function nwRender() {
     const root = document.getElementById('nwRoot'), liste = nwListe();
     const datum0 = z => new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(z * 1000));
@@ -7284,15 +7361,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       datenstand('v-news', 'live', 'Beitrag'); return;
     }
     const datum = z => new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(z * 1000));
-    const karte = x => {
-      const ev = x.ev, bild = sichereUrl(x.fremd ? tagWert(ev, 'image') : beitragBild(ev)), auszug = tagWert(ev, 'summary') || String(ev.content || '').replace(/[#>*_`\[\]()!]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 240);
-      const href = '#news?b=' + encodeURIComponent(ev.pubkey + ':' + tagWert(ev, 'd'));   // der Beitrag öffnet sich im Hub
-      return `<a class="nw-karte" href="${esc(href)}"><span class="nw-bild">${esc(ozIni(x.t))}${bild ? `<img src="${esc(bild)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`
-        + `<span class="nw-text"><span class="nw-meta">${x.fremd ? (pkAutor(ev.pubkey) || 'Aus dem Netz') : 'OER-Community'} · ${datum(x.zeit)}</span><h2>${esc(x.t)}</h2><p>${esc(auszug)}</p>`
-        + `<span class="nw-tags">${tagWerte(ev, 't').slice(0, 4).map(t => `<span>${esc(t)}</span>`).join('')}</span><span class="nw-mehr">Weiterlesen ›</span></span></a>`;
-    };
     root.innerHTML = `<h1>News</h1><p class="nw-sub">Längere Beiträge aus den Instituten und Communities: Berichte, Einblicke und Hintergründe.</p>`
-      + (liste.length ? `<div class="nw-raster">${liste.slice(0, 30).map(karte).join('')}</div>` : '<p class="pk-leer">Noch keine Beiträge.</p>');
+      + (liste.length ? `<div class="nw-raster">${liste.slice(0, 30).map(nwKarte).join('')}</div>` : '<p class="pk-leer">Noch keine Beiträge.</p>');
     datenstand('v-news', pkGeladen || ocDaten ? 'live' : 'stand', pkGeladen || ocDaten ? `${liste.length} Beiträge` : OC_STAND);
   }
   function nwOpen(qs) {
@@ -7338,8 +7408,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 
   // ---------- In Entwicklung: Ansichten ohne eigene Entwicklung ----------
   const IN_ENTW = ['materialpool', 'sammlung', 'relidesk', 'rpi-virtuell', 'eigene-instanz'];
-  const RAUM_BLAUPAUSE = ['religlobal', 'konfi', 'frieden'];   // Räume nach der Blaupause: eigene Wörter in den Blüten, echte Materialien, kein Hinweis „In Entwicklung“
-  function entwStand(v) { document.body.classList.toggle('in-entw', IN_ENTW.includes(v) || (v === 'community' && !RAUM_BLAUPAUSE.includes(crId)) || (v === 'profil' && !LOGGED)); }
+  function entwStand(v) { document.body.classList.toggle('in-entw', IN_ENTW.includes(v) || (v === 'profil' && !LOGGED)); }
 
   // ---------- Flowi: Chat-Blume unten rechts. Entwurf: feste Antworten nach Stichwort, noch kein Sprachmodell, nichts wird gesendet ----------
   const FLOWI = [
