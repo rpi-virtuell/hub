@@ -12,9 +12,9 @@
   /* Textfarben je Bereich: mindestens 4,5:1 auf paper, card und eigenem Tint */
   --x-hub:#203A8F;--x-finden:#00605C;--x-erstellen:#8A4C00;--x-koop:#7A1A3E;--x-ver:#5A3590;
   /* Farbnavigation (ADR-0017): eine Farbe je Inhaltsart, Werte aus dem Erscheinungsbild des Instituts; x = Text auf hellem Grund, t = Tint */
-  --n-ich:#2A3B8E;--n-material:#85992C;--n-termine:#DAB000;--n-menschen:#AF4112;--n-gespraeche:#B549F0;--n-news:#0072AA;
-  --nx-material:#4E5B13;--nx-termine:#6B5600;--nx-menschen:#8F330B;--nx-gespraeche:#7A1FB5;--nx-news:#005A87;
-  --nt-material:#EEF1DD;--nt-termine:#FAF1CC;--nt-menschen:#F7E3DA;--nt-gespraeche:#F1E0FC;--nt-news:#DCEEF7;
+  --n-ich:#2A3B8E;--n-material:#85992C;--n-termine:#DAB000;--n-menschen:#AF4112;--n-gespraeche:#B549F0;--n-news:#F1693E;
+  --nx-material:#4E5B13;--nx-termine:#6B5600;--nx-menschen:#8F330B;--nx-gespraeche:#7A1FB5;--nx-news:#A63A14;
+  --nt-material:#EEF1DD;--nt-termine:#FAF1CC;--nt-menschen:#F7E3DA;--nt-gespraeche:#F1E0FC;--nt-news:#FDE6DD;
   --t-hub:#E6EAF5;--t-finden:#DDF1F0;--t-erstellen:#FEEFD9;--t-koop:#FAE1EA;--t-ver:#EEE7F7;--t-profil:#E6EAF5;
   --ink:#1D1D1B;--muted:#5F5E5A;--line:#E7E4DC;--paper:#FBFAF7;--card:#FFFFFF;
   /* Lizenzpillen (Fläche plus Textfarbe, 4,5:1 auf Fläche, paper und card) */
@@ -178,14 +178,18 @@ button:focus-visible,[tabindex]:focus-visible,a:focus-visible,.btn:focus-visible
 .partners>p{color:var(--muted);margin:0 0 26px;max-width:62ch}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px}
 .partners h3{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:24px;margin:34px 0 14px}
-.pcard{position:relative;display:block;height:132px;perspective:900px;text-decoration:none;color:inherit;cursor:pointer;outline:0}
+.pcard{position:relative;display:block;height:158px;perspective:900px;text-decoration:none;color:inherit;cursor:pointer;outline:0}
 .pin{position:absolute;inset:0;transition:transform .55s cubic-bezier(.3,.9,.4,1);transform-style:preserve-3d}
 .pcard:hover .pin,.pcard:focus-visible .pin,.pcard.flip .pin{transform:rotateY(180deg)}
 .pface{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;border:1px solid var(--line);background:var(--card);padding:16px;display:flex;gap:14px;align-items:center}
 .pback{transform:rotateY(180deg);flex-direction:column;align-items:stretch;justify-content:space-between;gap:4px;padding:12px 16px 10px;background:var(--bk);border-color:transparent;color:var(--bt)}
 .pback p{margin:0;font-size:13.5px;line-height:1.38}
 .pback em{align-self:flex-end;font-style:normal;font-size:13px;font-weight:600;opacity:.9}
-.pcard .cc{flex:0 0 auto;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:18px}
+.pcard .cc{flex:0 0 auto;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:18px;background:#E9ECF2;color:#1B2440;box-shadow:inset 0 0 0 2px #C9CED6}
+/* Ein Ort trägt keine Inhaltsfarbe. Was er ist, steht in Worten; was er beiträgt, zeigen die Punkte in den Farben der Inhaltsarten (ADR-0017) */
+.pcard .bringt{display:flex;gap:5px;margin-top:7px}
+.pcard .bringt i{width:13px;height:13px;border-radius:50%;background:var(--c)}
+.pcard .art{display:block;margin-top:3px;font-size:11.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#1B2440}
 .pcard .cc-logo{position:relative;overflow:hidden}
 .pcard .cc-logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
 .pcard b{display:block;font-size:17px;line-height:1.2;hyphens:auto;overflow-wrap:anywhere}
@@ -746,6 +750,8 @@ relihub-steuerkonsole[hidden]{display:none}
 .cy-in{position:absolute;inset:0;transition:transform .6s cubic-bezier(.3,.9,.4,1);transform-style:preserve-3d}
 .cy-card:hover .cy-in,.cy-card:focus-within .cy-in,.cy-card.flip .cy-in{transform:rotateY(180deg)}
 .cy-f{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;background:var(--card);border:1px solid var(--line);padding:20px 20px 18px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.cy-f:not(.cy-back){transform:rotateY(0deg)}
+.cy-f *,.cy-av::before,.cy-av::after{backface-visibility:hidden;-webkit-backface-visibility:hidden}   /* Logo und Kreise haben eigene Ebenen und schienen sonst gespiegelt durch die Rückseite */
 .cy-back{transform:rotateY(180deg);background:var(--t-koop);border-color:transparent;align-items:stretch;text-align:left;color:#4A1530}
 .cy-av{position:relative;width:104px;height:86px;margin:2px 0 10px;flex:0 0 auto}
 .cy-av::before,.cy-av::after{content:"";position:absolute;top:4px;width:58px;height:58px;border-radius:50%;background:var(--av);opacity:.2}
@@ -769,7 +775,7 @@ relihub-steuerkonsole[hidden]{display:none}
 .cy-back .cy-follow.on{background:#fff}
 .cy-back small{font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--x-koop)}
 .cy-back h3{justify-content:flex-start;margin:2px 0 8px}
-.cy-back p{margin:0 0 6px;font-size:15px;line-height:1.45;color:#4A1530}
+.cy-back p{margin:0 0 6px;font-size:15px;line-height:1.45;color:#4A1530;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}   /* lange Texte schoben die Knöpfe aus der Karte */
 .cy-back .meta{font-size:13.5px;color:#7A1A3E}
 .cy-back .cy-rel{align-self:flex-start}
 .cy-back .open{align-self:stretch;background:var(--c-hub)}
@@ -1312,7 +1318,7 @@ body.in-entw .view.on{padding-top:28px}
 .fl-kopf button{margin-left:auto;font:inherit;border:0;background:none;color:#fff;cursor:pointer;min-width:36px;min-height:36px}
 .fl-log{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
 .fl-log p{margin:0;padding:8px 12px;border-radius:14px;max-width:88%;line-height:1.35}
-.fl-log .f{align-self:flex-start;background:var(--nt-news)}
+.fl-log .f{align-self:flex-start;background:var(--t-hub)}
 .fl-log .i{align-self:flex-end;background:var(--n-ich);color:#fff}
 .fl-log a{font-weight:600;color:var(--n-ich)}
 .fl-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 8px}
@@ -1963,7 +1969,7 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
     <form class="fl-form" id="flForm"><input id="flEin" type="text" autocomplete="off" maxlength="200" placeholder="Frag Flowi …" aria-label="Frage an Flowi"><button type="submit">Senden</button></form>
   </div>
   <button type="button" class="fl-knopf" id="flKnopf" aria-expanded="false" aria-controls="flFeld" aria-label="Flowi fragen">
-    <svg viewBox="-50 -50 100 100" aria-hidden="true"><circle cx="0" cy="-24" r="20" fill="#85992C"/><circle cx="23" cy="-7" r="20" fill="#DAB000"/><circle cx="14" cy="19" r="20" fill="#0072AA"/><circle cx="-14" cy="19" r="20" fill="#B549F0"/><circle cx="-23" cy="-7" r="20" fill="#AF4112"/><circle r="19" fill="#fff"/><circle cx="-6" cy="-3" r="2.6" fill="#1B2440"/><circle cx="6" cy="-3" r="2.6" fill="#1B2440"/><path d="M-7 5 Q0 12 7 5" fill="none" stroke="#1B2440" stroke-width="2.4" stroke-linecap="round"/></svg>
+    <svg viewBox="-50 -50 100 100" aria-hidden="true"><circle cx="0" cy="-24" r="20" fill="#85992C"/><circle cx="23" cy="-7" r="20" fill="#DAB000"/><circle cx="14" cy="19" r="20" fill="#F1693E"/><circle cx="-14" cy="19" r="20" fill="#B549F0"/><circle cx="-23" cy="-7" r="20" fill="#AF4112"/><circle r="19" fill="#fff"/><circle cx="-6" cy="-3" r="2.6" fill="#1B2440"/><circle cx="6" cy="-3" r="2.6" fill="#1B2440"/><path d="M-7 5 Q0 12 7 5" fill="none" stroke="#1B2440" stroke-width="2.4" stroke-linecap="round"/></svg>
   </button>
 </div>
 <div class="ef-overlay" id="efOverlay" hidden></div>
@@ -2087,7 +2093,7 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
   const FORM_ORDER = ['suchen', 'teilen', 'anlegen', 'bearbeiten'];
   // Farbe einer Knospe, wenn sie zu einem anderen Ding gehört als ihr Blatt: „Materialien“ am Blatt „ich“ trägt die Farbe der Materialien
   // Communities gehören zu den Menschen und tragen deren Farbe; Violett steht für Artikel. Blau heißt: Das mache ich mit meinen eigenen Dingen.
-  const FARBE = { ich: ['#2A3B8E', '#FFFFFF'], menschen: ['#AF4112', '#FFFFFF'], communities: ['#AF4112', '#FFFFFF'], material: ['#85992C', '#1B2400'], termine: ['#DAB000', '#2B1A00'], news: ['#0072AA', '#FFFFFF'], gespraeche: ['#B549F0', '#1B0A2A'] };   // Werte aus dem Erscheinungsbild des Instituts (ADR-0017)
+  const FARBE = { ich: ['#2A3B8E', '#FFFFFF'], menschen: ['#AF4112', '#FFFFFF'], communities: ['#AF4112', '#FFFFFF'], material: ['#85992C', '#1B2400'], termine: ['#DAB000', '#2B1A00'], news: ['#F1693E', '#2B1000'], gespraeche: ['#B549F0', '#1B0A2A'] };   // Werte aus dem Erscheinungsbild des Instituts (ADR-0017)
   // Belegung nach ADR-0015: ich, Menschen, Materialien, Termine, Artikel. Die Knospen sind die Wege zu dem, was im Datenraum liegt:
   // finden, teilen, erstellen, bearbeiten. label: Verb plus Ding; kurz: nur das Verb, für enge Schirme; ding: Name des Dings in der Sicht vom Tun her.
   // Blatt „ich“: aufgeklappt steht „mein(e)“ auf dem Blatt, das Profil in der Mitte, daneben Materialien und Termine, außen Personen und Communities.
@@ -3687,11 +3693,21 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   const TINK = { finden:X.finden, erstellen:X.erstellen, kooperieren:X.kooperieren, hub:X.hub };
   const PARTNER_MIT_SCHLUESSEL = ['reliGlobal', 'Konfi-Arbeit bundesweit', 'Friedensarbeit EKD', 'edufeed'];   // Einträge von PARTNERS mit eigenem Schlüssel (Community-Konto, Schlüsselliste)
   // Eintrag: [Name, Unterzeile, Farbe, Kürzel, Ziel, Rückseite, Marke, Logo]. Ziel: Ansicht im Hub (#…), fremde Seite (https://…, nur verlinkt) oder null (führt zu den Communities). Ein Logo kommt nur mit Erlaubnis des Trägers in die Liste. Logos laufen über den Bildproxy von edufeed, damit die fremde Seite keine Besucher des Hubs sieht. Die Werte sind feste Einträge dieser Liste, deshalb ohne esc (das hier noch nicht bereitsteht); die Bildadresse trägt ihre &amp; selbst
+  // Was ein Ort ist (auch mehreres zugleich) und was er beiträgt. Vorläufige Einschätzung aus den Selbstbeschreibungen, von den Orten zu bestätigen.
+  const ORT_INFO = {
+    'rpi-virtuell Materialpool': [['Ort'], ['material']], 'rpi-virtuell': [['Ort'], ['material', 'termine', 'news']],
+    'relilab': [['Community', 'Labor'], ['termine', 'material', 'menschen']], 'relidesk': [['Werkzeug'], ['material']],
+    'relimentar': [['Community'], ['material', 'termine']], 'narrt': [['Community'], ['termine', 'material', 'menschen']],
+    'reliGlobal': [['Community'], ['material', 'termine']], 'Konfi-Arbeit bundesweit': [['Community'], ['termine', 'material']],
+    'Friedensarbeit EKD': [['Community'], ['news', 'termine']], 'Kirche mit Kindern': [['Ort'], ['material']], 'InkRV': [['Ort'], ['material']],
+    'Comenius-Institut': [['Institut'], ['news']], 'edufeed': [['Infrastruktur'], []], 'OER-Community': [['Projekt'], ['news', 'termine', 'menschen']]
+  };
+  const DING_WORT = { material: 'Material', termine: 'Termine', news: 'News', menschen: 'Menschen', gespraeche: 'Gespräche' };
   const partnerLogo = url => `https://edufeed.org/api/image?url=${encodeURIComponent(url)}&amp;w=160&amp;h=160&amp;fit=contain&amp;fmt=webp`;
   document.getElementById('pgrid').innerHTML = PARTNERS.map(([n, d, k, ab, href, back, tag, logo]) => {
     const extern = /^https:\/\//.test(href || ''), partner = (!href || extern) && !PARTNER_MIT_SCHLUESSEL.includes(n), marke = partner ? 'Partner' + (tag ? ' · ' + tag : '') : tag;   // Partner nur ohne eigenen Schlüssel; Einträge mit Schlüssel sind Communities. Ohne Seite im Hub und ohne eigene Adresse führen beide zu den Communities
-    return `<a class="pcard${partner ? ' partner' : ''}" href="${href || '#communities'}"${extern ? ' target="_blank" rel="noopener"' : ''} style="--bk:${TINT[k]};--bt:${TINK[k]}" aria-label="${n}: ${back}"><span class="pin">`
-    + `<span class="pface"><span class="cc${logo ? ' cc-logo' : ''}" style="background:${C[k]};color:${T[k]}">${ab}${logo ? `<img src="${partnerLogo(logo)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span><span><b>${n}</b><small>${d}</small>${marke ? `<span class="tag">${marke}</span>` : ''}</span></span>`
+    return `<a class="pcard${partner ? ' partner' : ''}" href="${href || '#communities'}"${extern ? ' target="_blank" rel="noopener"' : ''} style="--bk:#EEF0F5;--bt:#1B2440" aria-label="${n}, ${ORT_INFO[n][0].join(' und ')}: ${back}"><span class="pin">`
+    + `<span class="pface"><span class="cc${logo ? ' cc-logo' : ''}">${ab}${logo ? `<img src="${partnerLogo(logo)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span><span><span class="art">${ORT_INFO[n][0].join(' · ')}</span><b>${n}</b><small>${d}</small>${ORT_INFO[n][1].length ? `<span class="bringt" title="Trägt bei: ${ORT_INFO[n][1].map(x => DING_WORT[x]).join(', ')}">${ORT_INFO[n][1].map(x => `<i style="--c:var(--n-${x})"></i>`).join('')}</span>` : ''}${marke ? `<span class="tag">${marke}</span>` : ''}</span></span>`
     + `<span class="pface pback"><p>${back}</p><em>${extern ? 'Zur Seite ›' : href ? 'Ansehen ›' : 'Zu den Communities ›'}</em></span></span></a>`;
   }).join('');
   // Auf Touch-Geräten: erstes Antippen dreht die Karte, zweites öffnet sie
@@ -6961,7 +6977,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   document.addEventListener('click', e => { const b = e.target.closest('[data-tun]'); if (b) standardAktion({ action: b.dataset.tun, label: b.textContent, url: '#' }, 'hub'); });
 
   // ---------- Blüten am linken Rand ----------
-  const ORT_ART = { materialpool: 'Ort', 'rpi-virtuell': 'Ort', relilab: 'Community', relidesk: 'Werkzeug', oercommunity: 'Projekt' };
+  const ORT_ART = { materialpool: 'Ort', 'rpi-virtuell': 'Ort', relilab: 'Community · Labor', relidesk: 'Werkzeug', oercommunity: 'Projekt' };
   const sbEl = document.getElementById('sb'), sbFeld = document.getElementById('sbFeld'), sbGriff = document.getElementById('sbGriff');
   function sbOrt() { const v = CUR.split('?')[0]; return v === 'relilab' ? 'relilab' : v === 'community' && crId === 'religlobal' ? 'religlobal' : ''; }
   function sbRender() {
