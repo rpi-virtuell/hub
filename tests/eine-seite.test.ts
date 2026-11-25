@@ -30,7 +30,7 @@ Deno.test('Umschalter über der Blume: ein Schalter, keine zwei Knöpfe', () => 
 
 Deno.test('Von den Dingen her direkt zum Ding, vom Tun her ausdifferenziert; grau ohne Anmeldung; fünftes Blatt Gespräche', () => {
   const d = (s.match(/registerBelegung\('eins-dinge-' \+ wer, \[[\s\S]*?\n    \]\);/) || [''])[0], t = (s.match(/registerBelegung\('eins-tun-' \+ wer, \[[\s\S]*?\n    \]\);/) || [''])[0];
-  assertEquals([...d.matchAll(/blatt\('e-[a-z]+', '([^']+)', '([a-z]+)', \{ (aktion|subs)/g)].map((m) => [m[1], m[2], m[3]]), [['Material', 'material', 'aktion'], ['Termine', 'termine', 'aktion'], ['News', 'news', 'aktion'], ['Gespräche', 'gespraeche', 'aktion'], ['Menschen', 'menschen', 'subs']], 'von den Dingen her führt ein Blatt nicht direkt zum Ding');
+  assertEquals([...d.matchAll(/blatt\('e-[a-z]+', '([^']+)', '([a-z]+)', \{ (aktion|subs)/g)].map((m) => [m[1], m[2], m[3]]), [['Material', 'material', 'aktion'], ['Termine', 'termine', 'aktion'], ['News', 'news', 'aktion'], ['Aktivitäten', 'gespraeche', 'aktion'], ['Menschen', 'menschen', 'subs']], 'von den Dingen her führt ein Blatt nicht direkt zum Ding');
   assertEquals([...t.matchAll(/(?:tun|blatt)\('t-[a-z]+', '([a-z]+)'/g)].map((m) => m[1]), ['finden', 'teilen', 'erstellen', 'mitreden', 'bearbeiten']);
   assert(/\[false, true\]\.forEach\(an => \{/.test(s) && /!an && NUR_ANGEMELDET\.includes\(id\) \? \{ stand: 'anmelden' \} : null/.test(s), 'ohne Anmeldung sind die Erweiterungen nicht ausgegraut');
   assert(/anmelden: \{ fill: '#C9CED6', text: '#2B2F36' \}/.test(c) && /anmelden: 'anmelden' \}/.test(c), 'graue Knospe sagt nicht, dass die Anmeldung fehlt');
@@ -84,12 +84,22 @@ Deno.test('Anmelden ohne Fachwörter; Wege vom Tun her als Blau-Treppe; Randblü
   assert(/function aktionVon\(action, label\) \{ let url = 'https:\/\/relihub\.example\/'; try \{ url = RelihubSteuerkonsole\.resolve\(action, 'hub-start'\)/.test(s) && !/url: '#' \}/.test(s), 'Randblüte ohne gültige Adresse');
 });
 
-Deno.test('Gespräche sind ein Feed: Beiträge zuerst, Zusagen nur auf Wunsch, eigener Feed nach Anmeldung', () => {
-  assert(/<h1>Gespräche<\/h1>/.test(s) && /<section aria-label="Feed"><h2>Feed<\/h2>\$\{gespr\}<\/section>/.test(s) && !/<h2>Protokoll<\/h2>/.test(s) && !/<h1>Mitmachen<\/h1>/.test(s), 'Ansicht heißt noch Mitmachen oder Protokoll');
-  assert(/pkMitLeisem \? alle : alle\.filter\(e => e\.ev\.kind !== 31925 && e\.ev\.kind !== 7\)/.test(s), 'Zusagen und Reaktionen stehen ungefragt im Feed');
-  assert(/new Set\(tagWerte\(ichDaten\.kontakte, 'p'\)\)/.test(s) && /!pkNurFolge \|\| folge\.has\(e\.ev\.pubkey\)/.test(s), 'Feed lässt sich nicht auf Gefolgte eingrenzen');
-  assert(/w\.dataset\.pkwer === 'folge' && !LOGGED\) \{ anDialogAuf\(\);/.test(s), 'eigener Feed ohne Anmeldung');
+Deno.test('Aktivitäten: ein Name, eine Liste; Zusagen nur auf Wunsch, Gefolgte nach Anmeldung', () => {
+  assert(/<h1>Aktivitäten<\/h1>/.test(s) && /<section class="pk-eins" aria-label="Aktivitäten">\$\{gespr\}\$\{prot\}<\/section>/.test(s), 'Ansicht ist nicht eine Liste unter einem Namen');
+  assert(!/<h2>Protokoll<\/h2>|<h2>Feed<\/h2>|Was sonst passiert|<h1>Mitmachen<\/h1>|<h1>Gespräche<\/h1>/.test(s), 'alte Namen oder Zwischenüberschriften stehen noch');
+  assert(/blatt\('e-gespraeche', 'Aktivitäten', 'gespraeche'/.test(s) && /b\('gespraeche\.oeffentlich', 'Aktivitäten', 'gespraeche'\)/.test(s), 'Blatt und Randblüte heißen anders als die Seite');
+  assert(/const rest = liste\.filter\(e => e\.ev\.kind !== 1111 && e\.ev\.kind !== 1\);/.test(s), 'Kommentare stehen doppelt');
+  assert(/pkMitLeisem \? alle : alle\.filter\(e => e\.ev\.kind !== 31925 && e\.ev\.kind !== 7\)/.test(s), 'Zusagen und Reaktionen stehen ungefragt in der Liste');
+  assert(/new Set\(tagWerte\(ichDaten\.kontakte, 'p'\)\)/.test(s) && /!pkNurFolge \|\| folge\.has\(e\.ev\.pubkey\)/.test(s) && /w\.dataset\.pkwer === 'folge' && !LOGGED\) \{ anDialogAuf\(\);/.test(s), 'Eingrenzen auf Gefolgte fehlt oder geht ohne Anmeldung');
   assert(!/Schreiben mit Schlüssel in der edufeed-App/.test(s) && /const kopf = view\.querySelector\(':scope > header'\); if \(kopf\) kopf\.after\(z\)/.test(s), 'Fachwort im Vorspann oder Knopfzeile über dem Kopf');
+});
+
+Deno.test('News: längere Beiträge als Kacheln mit Bild und Auszug, lesbar im Hub; Aktivitäten sind etwas anderes', () => {
+  assert(/<div class="view" id="v-news"/.test(html) && /'news\.finden': 'news',/.test(s) && /if \(v === 'news'\) nwOpen\(qs\);/.test(s), 'News führen nicht auf eine eigene Ansicht');
+  assert(/class="nw-karte"/.test(s) && /class="nw-bild"/.test(s) && /tagWert\(ev, 'summary'\)/.test(s) && /\.nw-raster\{display:grid/.test(html), 'Kachel ohne Bild, Auszug oder Raster');
+  assert(/ocDaten\.beitraege/.test(s) && /e\.ev\.kind === 30023/.test(s) && /tagWerte\(ev, 'l'\)\.includes\('seite'\)\) return;/.test(s), 'Quellen: nur längere Beiträge, keine Seiten');
+  assert(/'#news\?b=' \+ encodeURIComponent\(ev\.pubkey \+ ':' \+ tagWert\(ev, 'd'\)\)/.test(s) && /mdSeite\(x\.ev\.content\)/.test(s), 'Beitrag öffnet sich nicht im Hub');
+  assert(/news: \['news', 'News', \[\['news\.veroeffentlichen', 'Beitrag schreiben'\]\]\]/.test(s), 'Tun auf der Seite fehlt');
 });
 
 Deno.test('reliGLOBAL als zweites Beispiel neben relilab', () => {
