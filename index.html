@@ -822,6 +822,30 @@ relihub-steuerkonsole[hidden]{display:none}
 .ei-vorb{display:inline-block;margin-left:6px;padding:2px 10px;border-radius:999px;background:var(--oz-hell);color:var(--oz-text);font-size:13px;font-weight:600}
 @media (max-width:640px){.ei-vorschau{flex-direction:column;align-items:stretch}.ei-start{flex-direction:column;align-items:flex-start}}
 .pk-spalten{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:26px;align-items:start}
+.pk-eins{max-width:820px}
+/* News: längere Beiträge als Kacheln mit Bild und Auszug */
+.nw-wrap{max-width:1180px;margin:0 auto;padding:6px clamp(34px,4vw,40px) 70px}
+.nw-wrap h1{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:46px;line-height:1;margin:10px 0 8px}
+.nw-sub{margin:0 0 22px;max-width:720px;font-size:17px;color:#3D3D3A}
+.nw-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:20px}
+.nw-karte{display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:var(--card);border:1px solid var(--line);border-top:5px solid var(--n-news);text-decoration:none;color:var(--ink)}
+.nw-karte:hover{box-shadow:0 8px 26px rgba(20,24,40,.14)}
+.nw-karte:focus-visible{outline:3px solid #1B2440;outline-offset:3px}
+.nw-bild{position:relative;aspect-ratio:16/9;background:var(--nt-news);display:grid;place-items:center;color:var(--nx-news);font:600 42px/1 "Barlow Condensed",sans-serif}
+.nw-bild img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.nw-text{display:flex;flex-direction:column;gap:8px;padding:16px 18px 18px;flex:1}
+.nw-meta{font-size:13px;font-weight:600;color:var(--nx-news)}
+.nw-karte h2{margin:0;font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:25px;line-height:1.12}
+.nw-karte p{margin:0;font-size:15.5px;line-height:1.45;color:#3D3D3A;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.nw-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
+.nw-tags span{font-size:12.5px;font-weight:600;border-radius:999px;padding:2px 9px;background:var(--nt-news);color:var(--nx-news)}
+.nw-mehr{font-weight:600;color:var(--nx-news)}
+.nw-lesen{max-width:760px;font-size:17.5px;line-height:1.6}
+.nw-lesen h1{line-height:1.08;margin:6px 0 16px}
+.nw-lesen img{max-width:100%;height:auto;border-radius:14px}
+.nw-kopfbild{display:block;width:100%;max-height:420px;object-fit:cover;margin:0 0 18px}
+.nw-lesen a{color:var(--nx-news);font-weight:600}
+@media (max-width:640px){.nw-wrap h1{font-size:38px}}
 .pk-filter{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
 .pk-filter button{font:inherit;font-size:14.5px;font-weight:600;min-height:38px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--n-gespraeche);background:#fff;color:var(--nx-gespraeche);cursor:pointer}
 .pk-filter button[aria-pressed="true"]{background:var(--n-gespraeche);color:#1B0A2A}
@@ -1541,7 +1565,7 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
 </div>
 
 <!-- ===================== Ansicht: Mitmachen (Aktivitätsprotokoll, ADR-0009) ===================== -->
-<div class="view" id="v-mitmachen" data-stand="nachbau:Feed verbinden">
+<div class="view" id="v-mitmachen" data-stand="nachbau:Aktivitäten verbinden">
   <header class="hub-top">
     <a class="brand" href="#start"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg>ReliHub</a>
     <span class="sp"></span>
@@ -1551,6 +1575,18 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
   <main class="pk-wrap" id="pkRoot"></main>
   <footer class="hub-foot"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> ReliHub · ein Vorhaben von FOERBICO · Prototyp</footer>
   <relihub-steuerkonsole id="pkFlower" floating size="58" popover-size="210" context="hub-communities"></relihub-steuerkonsole>
+</div>
+
+<!-- ===================== Ansicht: News (längere Beiträge als Kacheln, ADR-0017) ===================== -->
+<div class="view" id="v-news" data-stand="nachbau:Beiträge laden">
+  <header class="hub-top">
+    <a class="brand" href="#start"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg>ReliHub</a>
+    <span class="sp"></span>
+    <nav><a href="#oekosystem">Ökosystem</a><a href="#mitmachen">Aktivitäten</a><a class="btn btn-profil" href="#profil">Mein Profil</a></nav>
+  </header>
+  <p class="stand" aria-live="polite"></p>
+  <main class="nw-wrap" id="nwRoot"></main>
+  <footer class="hub-foot"><svg class="mark" viewBox="-205 -205 410 410" width="22" height="22" aria-hidden="true"></svg> ReliHub · ein Vorhaben von FOERBICO · Prototyp</footer>
 </div>
 
 <!-- ===================== Ansicht: Eigene Instanz (Zuschnitt, ADR-0009) ===================== -->
@@ -3721,7 +3757,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     'Friedensarbeit EKD': [['Community'], ['news', 'termine']], 'Kirche mit Kindern': [['Ort'], ['material']], 'InkRV': [['Ort'], ['material']],
     'Comenius-Institut': [['Institut'], ['news']], 'edufeed': [['Infrastruktur'], []], 'OER-Community': [['Projekt'], ['news', 'termine', 'menschen']]
   };
-  const DING_WORT = { material: 'Material', termine: 'Termine', news: 'News', menschen: 'Menschen', gespraeche: 'Gespräche' };
+  const DING_WORT = { material: 'Material', termine: 'Termine', news: 'News', menschen: 'Menschen', gespraeche: 'Aktivitäten' };
   const partnerLogo = url => `https://edufeed.org/api/image?url=${encodeURIComponent(url)}&amp;w=160&amp;h=160&amp;fit=contain&amp;fmt=webp`;
   document.getElementById('pgrid').innerHTML = PARTNERS.map(([n, d, k, ab, href, back, tag, logo]) => {
     const extern = /^https:\/\//.test(href || ''), partner = (!href || extern) && !PARTNER_MIT_SCHLUESSEL.includes(n), marke = partner ? 'Partner' + (tag ? ' · ' + tag : '') : tag;   // Partner nur ohne eigenen Schlüssel; Einträge mit Schlüssel sind Communities. Ohne Seite im Hub und ohne eigene Adresse führen beide zu den Communities
@@ -5257,29 +5293,31 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const opts = CO_SCHLUESSEL.map(k => [k.hex, esc(k.n)]).concat(g ? [...g.ents.values()].filter(e => e.typ === 'community' && !CO_SCHLUESSEL.some(k => k.hex === e.pk)).map(e => [e.pk, bzName(e)]) : []);
     const wahl = fest ? `<p class="pk-wahl">Zuschnitt: ${esc((CO_SCHLUESSEL.find(k => k.hex === pkC) || { n: fest }).n)}</p>` : `<label class="pk-wahl">Community <select data-pkc><option value="">Alle</option>${opts.map(([h, n]) => `<option value="${esc(h)}"${h === pkC ? ' selected' : ''}>${n}</option>`).join('')}</select></label>`;
     let prot, gespr;
-    if (!pkGeladen) { prot = ''; gespr = '<p class="pk-leer">Der Feed wird geladen …</p>'; }
+    if (!pkGeladen) { prot = ''; gespr = '<p class="pk-leer">Die Aktivitäten werden geladen …</p>'; }
     else {
-      prot = liste.length ? `<ul class="pk-liste">${liste.slice(0, 80).map(e => `<li class="pk-zeile${pkMarke.has(e.id) && Date.now() - pkMarke.get(e.id) < 180000 ? ' neu' : ''}"><span class="pk-zeit">${esc(pkZeit(e.zeit))}</span><span class="pk-satz">${e.html}</span></li>`).join('')}</ul>`
-        : `<p class="pk-leer">${antwort ? 'Noch nichts zu dieser Auswahl.' : 'Die Verbindung antwortet gerade nicht (Relays antworten gerade nicht).'}</p>`;
+      const rest = liste.filter(e => e.ev.kind !== 1111 && e.ev.kind !== 1);   // Kommentare und kurze Beiträge stehen schon als Karten darüber
+      prot = rest.length ? `<ul class="pk-liste">${rest.slice(0, 80).map(e => `<li class="pk-zeile${pkMarke.has(e.id) && Date.now() - pkMarke.get(e.id) < 180000 ? ' neu' : ''}"><span class="pk-zeit">${esc(pkZeit(e.zeit))}</span><span class="pk-satz">${e.html}</span></li>`).join('')}</ul>`
+        : '';
       const gruppen = new Map();
       kom.forEach(e => { if (!gruppen.has(e.bezug[0])) gruppen.set(e.bezug[0], []); gruppen.get(e.bezug[0]).push(e); });
       const gk = [...gruppen].filter(([id]) => g && g.ents.get(id) && g.ents.get(id).ev).map(([id, es]) => `<div class="pk-gruppe">${eintragKarte({ ev: g.ents.get(id).ev, adr: id })}<ul>${es.map(e => `<li class="pk-kommentar"><b>${pkAutor(e.ev.pubkey)}</b> <span class="pk-zeit">${esc(pkZeit(e.zeit))}</span><p>${esc(String(e.ev.content || '').trim().slice(0, 1000))}</p></li>`).join('')}</ul></div>`).join('');
       const bk = beitr.map(e => `<li class="pk-kommentar">${e.bezug[0] && g && g.ents.get(e.bezug[0]) ? `<span class="pk-in">${bzName(g.ents.get(e.bezug[0]))}</span> ` : ''}<b>${pkAutor(e.ev.pubkey)}</b> <span class="pk-zeit">${esc(pkZeit(e.zeit))}</span><p>${esc(String(e.ev.content || '').trim().slice(0, 600))}</p></li>`).join('');
-      gespr = (gk || bk) ? gk + (bk ? `<div class="pk-gruppe"><h3>Kurze Beiträge in Communities</h3><ul>${bk}</ul></div>` : '')
-        : `<p class="pk-leer">${pkNurFolge ? 'Noch kein Gespräch von Menschen, denen du folgst.' : 'Noch kein Gespräch zu Materialien, Terminen oder Beiträgen.'} Kommentieren kannst du zurzeit in der <a href="https://edufeed.org" target="_blank" rel="noopener">edufeed-App</a>.</p>`;
+      gespr = gk + (bk ? `<div class="pk-gruppe"><ul>${bk}</ul></div>` : '');
+      if (!gespr && !prot) gespr = `<p class="pk-leer">${!antwort ? 'Die Verbindung antwortet gerade nicht (Relays antworten gerade nicht).' : pkNurFolge ? 'Noch keine Aktivität von Menschen, denen du folgst.' : 'Noch keine Aktivität zu dieser Auswahl. Noch kein Gespräch zu Materialien, Terminen oder Beiträgen.'}</p>`;
     }
     const chip = (attr, an, text, grau) => `<button type="button" ${attr} aria-pressed="${an}"${grau ? ' class="grau"' : ''}>${text}</button>`;
-    const filter = `<div class="pk-filter" role="group" aria-label="Feed eingrenzen">${chip('data-pkwer="alle"', !pkNurFolge, 'Alle')}${chip('data-pkwer="folge"', pkNurFolge, folge ? 'Von Menschen, denen ich folge' : 'Von Menschen, denen ich folge · anmelden', !folge)}`
+    const filter = `<div class="pk-filter" role="group" aria-label="Aktivitäten eingrenzen">${chip('data-pkwer="alle"', !pkNurFolge, 'Alle')}${chip('data-pkwer="folge"', pkNurFolge, folge ? 'Von Menschen, denen ich folge' : 'Von Menschen, denen ich folge · anmelden', !folge)}`
       + `${chip('data-pkleise', pkMitLeisem, pkMitLeisem ? 'Zusagen und Reaktionen ausblenden' : `Auch Zusagen und Reaktionen zeigen${leise ? ' (' + leise + ')' : ''}`)}</div>`;
-    root.innerHTML = `<h1>Gespräche</h1><p class="pk-sub">Was gerade besprochen und geteilt wird: Beiträge, Kommentare und Materialtipps aus den Communities. Lesen geht ohne Anmeldung.</p>${wahl}${filter}`
-      + `<div class="pk-spalten"><section aria-label="Feed"><h2>Feed</h2>${gespr}</section><section aria-label="Was sonst passiert"><h2>Was sonst passiert</h2>${prot}</section></div>`;
+    // Ein Name, eine Liste: „Aktivitäten“ heißt das Blatt, die Randblüte und die Seite; keine Zwischenüberschriften
+    root.innerHTML = `<h1>Aktivitäten</h1><p class="pk-sub">Was gerade geteilt und besprochen wird: Material, Termine, Beiträge und Kommentare aus den Communities. Lesen geht ohne Anmeldung.</p>${wahl}${filter}`
+      + `<section class="pk-eins" aria-label="Aktivitäten">${gespr}${prot}</section>`;
     const v = root.closest('.view');
-    if (v && pkGeladen) datenstand(v.id, antwort ? 'live' : 'nachbau', antwort ? `${liste.length} Einträge · ${kom.length} Kommentare · Protokoll verbunden mit ${r} von 2 Relays${r ? '' : ' · keine Live-Verbindung'}` : 'Relays nicht erreichbar');
+    if (v && pkGeladen) datenstand(v.id, antwort ? 'live' : 'nachbau', antwort ? `${liste.length} Einträge · ${kom.length} Kommentare · verbunden mit ${r} von 2 Relays${r ? '' : ' · keine Live-Verbindung'}` : 'Relays nicht erreichbar');
     if (!pkHoerer.has(root)) {
       pkHoerer.add(root);
       root.addEventListener('click', e => {
         const w = e.target.closest('[data-pkwer]'), l = e.target.closest('[data-pkleise]'); if (!w && !l) return;
-        if (w && w.dataset.pkwer === 'folge' && !LOGGED) { anDialogAuf(); anMeldung('Für deinen eigenen Feed melde dich bitte an.'); return; }
+        if (w && w.dataset.pkwer === 'folge' && !LOGGED) { anDialogAuf(); anMeldung('Für die Aktivitäten der Menschen, denen du folgst, melde dich bitte an.'); return; }
         if (w) pkNurFolge = w.dataset.pkwer === 'folge'; else pkMitLeisem = !pkMitLeisem;
         pkRender(root);
         const n = root.querySelector(w ? '[data-pkwer][aria-pressed="true"]' : '[data-pkleise]'); if (n) n.focus();
@@ -6138,7 +6176,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 
   // ---------- Kontexte der Steuerkonsole: dieselbe Steuerkonsole, je nach Seite andere Aktionen ----------
   let LOGGED = false;   // abgeleitet aus ICH.hex (ichSetzen im Block „Anmeldung“)
-  const VIEW_OF = { 'material.finden': 'materialpool', 'ich.profil': 'profil', 'ich.communities': 'profil?zu=comm', 'ich.termine': 'profil?zu=events', 'ich.materialien': 'profil', 'ich.menschen': 'kooperieren/personen', 'material.bearbeiten': 'finden/sammlung', 'material.erstellen': 'relidesk?tab=schreibtisch', 'termine.finden': 'finden/fortbildungen', 'termine.teilen': 'finden/fortbildungen', 'menschen.personen': 'kooperieren/personen', 'news.finden': 'mitmachen', 'news.teilen': 'communities', 'termine.bearbeiten': 'profil?zu=events', 'news.bearbeiten': 'profil?zu=artikel' };
+  const VIEW_OF = { 'material.finden': 'materialpool', 'ich.profil': 'profil', 'ich.communities': 'profil?zu=comm', 'ich.termine': 'profil?zu=events', 'ich.materialien': 'profil', 'ich.menschen': 'kooperieren/personen', 'material.bearbeiten': 'finden/sammlung', 'material.erstellen': 'relidesk?tab=schreibtisch', 'termine.finden': 'finden/fortbildungen', 'termine.teilen': 'finden/fortbildungen', 'menschen.personen': 'kooperieren/personen', 'news.finden': 'news', 'news.teilen': 'communities', 'termine.bearbeiten': 'profil?zu=events', 'news.bearbeiten': 'profil?zu=artikel' };
   function navTo(view, url) { const q = new URL(url).search; go(view + (q ? (view.includes('?') ? '&' + q.slice(1) : q) : '')); }
   function info(d) {
     if (!['menschen', 'communities', 'material', 'termine', 'sehen', 'zeigen', 'erarbeiten', 'kontakt'].includes(d.action)) return false;
@@ -6180,7 +6218,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (brauchtAnmeldung(d)) return false;   // ausgegraute Knospen: erst anmelden
     if (d.action === 'gespraeche.chat') { toast('<b>Chat aus den edufeed-Räumen</b> ist gewollt und noch nicht gebaut.'); return false; }
     if (d.action === 'gespraeche.oeffentlich') { go('mitmachen'); return false; }
-    if (d.action === 'gespraeche.communities') { go('mitmachen'); toast('Hier stehen später nur die Gespräche aus deinen Communities. Das hier ist ein Ausblick.'); return false; }
+    if (d.action === 'gespraeche.communities') { go('mitmachen'); toast('Hier stehen später nur die Aktivitäten aus deinen Communities. Das hier ist ein Ausblick.'); return false; }
     if (d.action === 'gespraeche.eigenes') { go('profil'); toast('Hier stehen später Kommentare, Reaktionen, Antworten, Erwähnungen und Zusagen zu deinen Dingen. Das hier ist ein Ausblick.'); return false; }
     if (d.action === 'menschen.communities') { go(HUB_C ? 'community' : 'communities'); return false; }   // mit Zuschnitt in den Raum der Community (ohne c gilt HUB_C)
     if (d.action === 'termine.erstellen') { openEvent(ctx); return false; }
@@ -6856,10 +6894,10 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const [viewRaw, qs] = raw.split('?');
     const [view, sub] = viewRaw.split('/');
     const finden = view === 'finden' && sub ? (['sammlung', 'fortbildungen'].includes(sub) ? sub : null) : view === 'kooperieren' && sub ? (sub === 'personen' ? sub : null) : undefined;   // finden/<sub>, kooperieren/<sub> → Ansicht v-<sub>
-    const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell', 'person', 'oekosystem', 'mitmachen', 'eigene-instanz'].includes(view) ? view : 'start');
+    const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell', 'person', 'oekosystem', 'mitmachen', 'news', 'eigene-instanz'].includes(view) ? view : 'start');
     if (finden === null) toast('Diese Seite gibt es nicht.');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
-    document.title = { start: 'ReliHub', profil: 'ReliHub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'Fortbildungen', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'ReliHub · Communities', oekosystem: 'ReliHub · Ökosystem', mitmachen: 'ReliHub · Gespräche', 'eigene-instanz': 'ReliHub · Eigene Instanz', community: 'ReliHub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des ReliHub' }[v];
+    document.title = { start: 'ReliHub', profil: 'ReliHub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'Fortbildungen', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'ReliHub · Communities', oekosystem: 'ReliHub · Ökosystem', mitmachen: 'ReliHub · Aktivitäten', news: 'ReliHub · News', 'eigene-instanz': 'ReliHub · Eigene Instanz', community: 'ReliHub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des ReliHub' }[v];
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || '', pp.get('zu') === 'katalog' ? 'katalog' : pp.get('tab')); }
     leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v === 'fortbildungen' ? 'rpi-virtuell' : v === 'eigene-instanz' ? 'zuschnitt' : v);
     RelihubSteuerkonsole.setOrt(leisteEl.getAttribute('current'));   // der Stiel markiert denselben Ort wie die Leiste
@@ -6868,6 +6906,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (v === 'communities') { document.getElementById('cyProf').textContent = LOGGED ? 'Mein Profil' : 'Anmelden'; cyFocus(new URLSearchParams(qs || '').get('c')); cyOpen(); }
     if (v === 'oekosystem') ozOpen(qs);
     if (v === 'mitmachen') pkOpen(qs);
+    if (v === 'news') nwOpen(qs);
     if (v === 'eigene-instanz') eiOpen(qs);
     if (v === 'oercommunity') ocOpen(sub);
     if (v === 'relilab') rlShow(qs);
@@ -6907,7 +6946,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       blatt('e-material', 'Material', 'material', { aktion: 'material.finden' }),
       blatt('e-termine', 'Termine', 'termine', { aktion: 'termine.finden' }),
       blatt('e-news', 'News', 'news', { aktion: 'news.finden' }),
-      blatt('e-gespraeche', 'Gespräche', 'gespraeche', { aktion: 'gespraeche.oeffentlich' }),
+      blatt('e-gespraeche', 'Aktivitäten', 'gespraeche', { aktion: 'gespraeche.oeffentlich' }),
       blatt('e-menschen', 'Menschen', 'menschen', { subs: [sub(an, 'menschen.personen', 'Personen'), sub(an, 'menschen.communities', 'Communities')] })
     ]);
     // Vom Tun her: die vier Wege des bisherigen Stands, dazu mitreden
@@ -6955,10 +6994,10 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     'e-material': 'Material: Unterrichtsideen, Entwürfe und Medien aus allen Instituten und Communities.', 'e-termine': 'Termine: Fortbildungen und Treffen, meist online.',
     'e-news': 'News: Artikel und Neuigkeiten aus dem Ökosystem.', 'e-menschen': 'Menschen: Personen und Communities.',
     't-finden': 'Finden: Material, Termine, News, Personen und Communities.',
-    'e-gespraeche': 'Gespräche: Kommentare, Reaktionen, Antworten und Zusagen, öffentlich oder aus deinen Communities.', 't-mitreden': 'Mitreden: Kommentare, Reaktionen, Antworten und Zusagen, öffentlich oder aus deinen Communities.',
-    'gespraeche.oeffentlich': 'Der Feed: Beiträge, Kommentare und Materialtipps aus den Communities.', 'gespraeche.communities': 'Gespräche aus deinen Communities.', 'gespraeche.eigenes': 'Kommentare, Reaktionen, Antworten, Erwähnungen und Zusagen zu deinen Dingen.', 'gespraeche.chat': 'Chat aus den edufeed-Räumen: gewollt und noch nicht gebaut.',
+    'e-gespraeche': 'Aktivitäten: was gerade geteilt und besprochen wird.', 't-mitreden': 'Mitreden: Kommentare, Reaktionen, Antworten und Zusagen, öffentlich oder aus deinen Communities.',
+    'gespraeche.oeffentlich': 'Aktivitäten: was gerade geteilt und besprochen wird, aus allen Communities.', 'gespraeche.communities': 'Aktivitäten aus deinen Communities.', 'gespraeche.eigenes': 'Kommentare, Reaktionen, Antworten, Erwähnungen und Zusagen zu deinen Dingen.', 'gespraeche.chat': 'Chat aus den edufeed-Räumen: gewollt und noch nicht gebaut.',
     't-teilen': 'Teilen: Gib weiter, was du hast.', 't-erstellen': 'Erstellen: Material, Termin oder Beitrag neu anlegen.', 't-bearbeiten': 'Bearbeiten: deine eigenen Dinge und dein Profil.',
-    'material.erstellen': 'Erstelle Material auf deinem Schreibtisch.', 'material.bearbeiten': 'Sammle Material in deinen Listen.', 'news.finden': 'Lies, was im Ökosystem gerade passiert.', 'news.veroeffentlichen': 'Schreib einen Beitrag.', 'ich': 'Die Mitte führt zur Anmeldung oder zu deinem ReliHub.'
+    'material.erstellen': 'Erstelle Material auf deinem Schreibtisch.', 'material.bearbeiten': 'Sammle Material in deinen Listen.', 'news.finden': 'Längere Beiträge aus den Instituten und Communities.', 'news.veroeffentlichen': 'Schreib einen Beitrag.', 'ich': 'Die Mitte führt zur Anmeldung oder zu deinem ReliHub.'
   };
   Object.keys(BLUMEN).forEach(k => {
     const b = BLUMEN[k].blaetter, dinge = [...new Set(b.map(x => x.ding))];
@@ -7002,7 +7041,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   const TUN = {
     materialpool: ['material', 'Material', [['material.teilen', 'veröffentlichen'], ['material.erstellen', 'erstellen'], ['material.bearbeiten', 'sammeln']]],
     fortbildungen: ['termine', 'Termine', [['termine.erstellen', 'veröffentlichen']]],
-    mitmachen: ['gespraeche', 'Gespräche', [['news.veroeffentlichen', 'Beitrag schreiben']]]
+    news: ['news', 'News', [['news.veroeffentlichen', 'Beitrag schreiben']]],
+    mitmachen: ['gespraeche', 'Aktivitäten', [['news.veroeffentlichen', 'Beitrag schreiben']]]
   };
   function tunZeile(v) {
     document.querySelectorAll('.tun-zeile').forEach(n => n.remove());
@@ -7014,6 +7054,50 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   }
   document.addEventListener('click', e => { const b = e.target.closest('[data-tun]'); if (b) standardAktion(aktionVon(b.dataset.tun, b.textContent), 'hub'); });
 
+  // ---------- News: längere Beiträge (kind 30023) als Kacheln mit Beitragsbild, Auszug und Schlagworten ----------
+  // Quellen: die Beiträge der OER-Community (eingebettet, dann live) und längere Beiträge anderer aus dem laufenden Strom der Aktivitäten.
+  function nwListe() {
+    const je = new Map(), auf = (ev, fremd) => {
+      const t = tagWert(ev, 'title'), d = tagWert(ev, 'd'); if (!t || !d || tagWerte(ev, 'l').includes('seite')) return;
+      const k = ev.pubkey + ':' + d, alt = je.get(k); if (alt && alt.ev.created_at >= ev.created_at) return;
+      je.set(k, { ev, t, zeit: +tagWert(ev, 'published_at') || ev.created_at, fremd });
+    };
+    OC_RAW.forEach(ev => { if (ev.kind === 30023) auf(ev, false); });
+    ((ocDaten && ocDaten.beitraege) || []).forEach(ev => auf(ev, false));
+    pkListe.forEach(e => { if (e.ev && e.ev.kind === 30023) auf(e.ev, e.ev.pubkey !== FO_HEX); });
+    return [...je.values()].sort((a, b) => b.zeit - a.zeit);
+  }
+  let nwB = '';   // gewählter Beitrag (pubkey:d) oder leer für die Kacheln
+  function nwRender() {
+    const root = document.getElementById('nwRoot'), liste = nwListe();
+    const datum0 = z => new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(z * 1000));
+    if (nwB) {
+      const x = liste.find(y => y.ev.pubkey + ':' + tagWert(y.ev, 'd') === nwB);
+      if (!x) { root.innerHTML = `<p><a class="nw-mehr" href="#news">‹ Alle News</a></p><p class="pk-leer">${pkGeladen ? 'Diesen Beitrag gibt es nicht.' : 'Der Beitrag wird geladen …'}</p>`; return; }
+      const bild = sichereUrl(tagWert(x.ev, 'image')), npub = bech32('npub', x.ev.pubkey.match(/../g).map(h => parseInt(h, 16)));
+      root.innerHTML = `<p><a class="nw-mehr" href="#news">‹ Alle News</a></p><article class="nw-lesen"><p class="nw-meta">${x.fremd ? `<a href="#person?p=${npub}">${pkAutor(x.ev.pubkey) || 'Zur Person'}</a>` : 'OER-Community'} · ${datum0(x.zeit)}</p><h1>${esc(x.t)}</h1>`
+        + (bild ? `<img class="nw-kopfbild" src="${esc(bild)}" alt="" onerror="this.remove()">` : '') + mdSeite(x.ev.content)
+        + (x.fremd ? '' : `<p><a class="nw-mehr" href="${esc(beitragUrl(x.ev))}" target="_blank" rel="noopener">Im Original bei oer.community ›</a></p>`) + `</article>`;
+      datenstand('v-news', 'live', 'Beitrag'); return;
+    }
+    const datum = z => new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(z * 1000));
+    const karte = x => {
+      const ev = x.ev, bild = sichereUrl(x.fremd ? tagWert(ev, 'image') : beitragBild(ev)), auszug = tagWert(ev, 'summary') || String(ev.content || '').replace(/[#>*_`\[\]()!]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 240);
+      const href = '#news?b=' + encodeURIComponent(ev.pubkey + ':' + tagWert(ev, 'd'));   // der Beitrag öffnet sich im Hub
+      return `<a class="nw-karte" href="${esc(href)}"><span class="nw-bild">${esc(ozIni(x.t))}${bild ? `<img src="${esc(bild)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`
+        + `<span class="nw-text"><span class="nw-meta">${x.fremd ? (pkAutor(ev.pubkey) || 'Aus dem Netz') : 'OER-Community'} · ${datum(x.zeit)}</span><h2>${esc(x.t)}</h2><p>${esc(auszug)}</p>`
+        + `<span class="nw-tags">${tagWerte(ev, 't').slice(0, 4).map(t => `<span>${esc(t)}</span>`).join('')}</span><span class="nw-mehr">Weiterlesen ›</span></span></a>`;
+    };
+    root.innerHTML = `<h1>News</h1><p class="nw-sub">Längere Beiträge aus den Instituten und Communities: Berichte, Einblicke und Hintergründe.</p>`
+      + (liste.length ? `<div class="nw-raster">${liste.slice(0, 30).map(karte).join('')}</div>` : '<p class="pk-leer">Noch keine Beiträge.</p>');
+    datenstand('v-news', pkGeladen || ocDaten ? 'live' : 'stand', pkGeladen || ocDaten ? `${liste.length} Beiträge` : OC_STAND);
+  }
+  function nwOpen(qs) {
+    nwB = new URLSearchParams(qs || '').get('b') || '';
+    nwRender();
+    const neu = () => { if (document.getElementById('v-news').classList.contains('on')) nwRender(); };
+    ocLaden().then(neu, () => {}); pkAnstossen(); [6000, 22000].forEach(ms => setTimeout(neu, ms));   // der Strom der Aktivitäten bringt weitere Beiträge nach
+  }
   // ---------- Blüten am linken Rand ----------
   const ORT_ART = { materialpool: 'Ort', 'rpi-virtuell': 'Ort', relilab: 'Community · Labor', relidesk: 'Werkzeug', oercommunity: 'Projekt' };
   const sbEl = document.getElementById('sb'), sbFeld = document.getElementById('sbFeld'), sbGriff = document.getElementById('sbGriff');
@@ -7022,7 +7106,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const v = CUR.split('?')[0].split('/').pop(), ort = sbOrt();
     const b = (akt, wort, ding, kl) => `<button type="button" class="sb-blatt${kl ? ' ' + kl : ''}${!LOGGED && NUR_ANGEMELDET.includes(akt) ? ' grau' : ''}" data-sb="${akt}" style="--c:${D_FARBE[ding][0]};--t:${D_FARBE[ding][1]}">${esc(wort)}${!LOGGED && NUR_ANGEMELDET.includes(akt) ? ' · anmelden' : ''}</button>`;
     const dinge = ort ? BLUMEN[ort].blaetter.map(x => b(x.aktion, x.wort, x.ding)).join('')
-      : b('material.finden', 'Material', 'material') + b('termine.finden', 'Termine', 'termine') + b('news.finden', 'News', 'news') + b('gespraeche.oeffentlich', 'Gespräche', 'gespraeche')
+      : b('material.finden', 'Material', 'material') + b('termine.finden', 'Termine', 'termine') + b('news.finden', 'News', 'news') + b('gespraeche.oeffentlich', 'Aktivitäten', 'gespraeche')
         + b('menschen.personen', 'Menschen', 'menschen') + b('menschen.personen', 'Personen', 'menschen', 'sub') + b('menschen.communities', 'Communities', 'menschen', 'sub');
     const orte = LEISTE.filter(x => x.id !== 'start').map(x => `<a class="sb-blatt ort" href="${x.href}" style="--c:${x.color}"${x.id === v ? ' aria-current="page"' : ''}>${esc(x.label)} <small>${ORT_ART[x.id] || 'Ort'}</small></a>`).join('')
       + `<a class="sb-blatt ort" href="#community?c=religlobal" style="--c:${D_FARBE.menschen[0]}"${ort === 'religlobal' ? ' aria-current="page"' : ''}>reliGLOBAL <small>Community</small></a><a class="sb-blatt ort" href="#partner" style="--c:#8A909C">Alle Orte</a>`;
@@ -7052,7 +7136,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     [/anmeld|konto|profil|registr|login/i, 'Finden und Lesen geht ohne Anmeldung. Zum Veröffentlichen, Erstellen, Sammeln und Mitreden brauchst du ein Profil. Die Mitte der Blume führt zur Anmeldung.'],
     [/veröffentlich|teilen|hochladen|eintragen/i, 'Eigenes teilst du nach der Anmeldung. Ob es im Pool einer Community erscheint, entscheidet ihre Redaktion.'],
     [/communit|gruppe|relilab|religlobal|mitmachen/i, 'Communities arbeiten an gemeinsamen Themen. <a href="#communities">Alle Communities ›</a> · <a href="#relilab">relilab ›</a> · <a href="#community?c=religlobal">reliGLOBAL ›</a>'],
-    [/gespräch|chat|kommentar|nachricht/i, 'Öffentliche Gespräche findest du unter Gespräche. Der Chat aus den Räumen kommt später dazu. <a href="#mitmachen">Zu den Gesprächen ›</a>'],
+    [/gespräch|chat|kommentar|nachricht|aktivit|feed/i, 'Was gerade geteilt und besprochen wird, steht unter Aktivitäten. Der Chat aus den Räumen kommt später dazu. <a href="#mitmachen">Zu den Aktivitäten ›</a>'],
+    [/news|artikel|beitrag|bericht|blog/i, 'Längere Beiträge mit Bild und Auszug stehen unter News. <a href="#news">Zu den News ›</a>'],
     [/offen|oer|lizenz|kosten|gratis/i, 'Offenes Material darfst du an deine Lerngruppe anpassen und weitergeben. Der ReliHub ist kostenlos.'],
     [/relihub|was ist|wer seid|hilfe|wie geht/i, 'Der ReliHub verbindet Material, Termine, News und Menschen aus den religionspädagogischen Instituten und Communities. Die Blume ist dein Wegweiser: von den Dingen her oder vom Tun her.']
   ];

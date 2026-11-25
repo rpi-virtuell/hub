@@ -161,7 +161,7 @@ Deno.test('Mitmachen: Ansicht, Abfrage, Zustände, Protokoll im Ökosystem', () 
   const l = fn('pkLaden');
   assert(/hubFetch\('mitmachen', \[\{ kinds: \[1111\], '#K': \['30142', '30023', '31922', '31923'\], limit: 100 \}, \{ kinds: \[1\], '#h': CO_SCHLUESSEL\.map/.test(l), 'zwei Filter, feste Mengen');
   const r = fn('pkRender');
-  assert(/Noch kein Gespräch/.test(r) && /antworten gerade nicht|Relays nicht erreichbar/.test(r) && /keine Live-Verbindung/.test(r) && /Protokoll verbunden mit/.test(r), 'Zustände');
+  assert(/Noch kein Gespräch/.test(r) && /antworten gerade nicht|Relays nicht erreichbar/.test(r) && /keine Live-Verbindung/.test(r) && /· verbunden mit/.test(r), 'Zustände');
   assert(/hubAbonnieren\('protokoll', \[\{ kinds: PK_KINDS/.test(s) && /id="ozProtokoll"/.test(html), 'Subscription und Streifen');
   assert(!/mdSeite\(/.test(r) && !/mdSeite\(/.test(fn('pkEintrag')), 'Kommentare nie als Markdown');
 });
