@@ -75,6 +75,15 @@ Deno.test('Orte tragen keine Inhaltsfarbe: Art in Worten, Beiträge als Punkte; 
   assert(/\.cy-f \*,\.cy-av::before,\.cy-av::after\{backface-visibility:hidden/.test(html), 'Logo scheint durch die gedrehte Karte');
 });
 
+Deno.test('Anmelden ohne Fachwörter; Wege vom Tun her als Blau-Treppe; Randblüten führen zur Seite', () => {
+  const d = (html.match(/<dialog class="an-dialog" id="anmelden"[\s\S]*?<\/dialog>/) || [''])[0], vor = d.split('<details')[0];
+  assert(!/Nostr|npub|NIP-07|nos2x|Alby|Schlüssel/.test(vor), 'Fachwörter stehen vor dem Aufklappen');
+  assert(/Ich habe schon ein Konto/.test(vor) && /Ich bin neu hier/.test(vor) && /Konto anlegen/.test(vor) && /data-an-schluessel/.test(vor), 'zwei Wege fehlen');
+  assert(/<summary>Wie funktioniert das genau\?<\/summary>/.test(d) && /id="anNpub"/.test(d.split('<details')[1] || ''), 'Einzelheiten und Nur-Ansehen sind nicht mehr erreichbar');
+  assert(/color: '#1F2F7A'/.test(c) && /color: '#2F74C0'/.test(c) && /color: '#63AEDD'/.test(c) && /color: '#B5D3EE'/.test(c) && /const FORM_T = \{ anlegen: '#10233A', bearbeiten: '#10233A' \}/.test(s), 'Wege sind nicht gestaffelt');
+  assert(/function aktionVon\(action, label\) \{ let url = 'https:\/\/relihub\.example\/'; try \{ url = RelihubSteuerkonsole\.resolve\(action, 'hub-start'\)/.test(s) && !/url: '#' \}/.test(s), 'Randblüte ohne gültige Adresse');
+});
+
 Deno.test('reliGLOBAL als zweites Beispiel neben relilab', () => {
   const b = (s.match(/religlobal: \{ name: 'reliGLOBAL', blaetter: \[[\s\S]*?\] \}/) || [''])[0];
   assertEquals([...b.matchAll(/ding: '([a-z]+)'/g)].map((m) => m[1]), ['menschen', 'material', 'material', 'termine', 'termine']);

@@ -45,6 +45,9 @@ Die Punkte 5, 8 und 10 sind damit geändert, Punkt 13 ergänzt.
 
 - **Orte tragen keine Inhaltsfarbe.** Farben gehören den Inhaltsarten. Ein Ort ist selten nur eines: relilab ist Community und Labor und bringt Termine, Material und Menschen. Deshalb steht auf der Kachel in Worten, was der Ort ist, auch mehreres. Darunter zeigen Punkte in den Farben der Inhaltsarten, was er beiträgt. Der Kreis mit dem Kürzel ist neutral. Die Zuordnung ist vorläufig und von den Orten zu bestätigen.
 
+- **Wege als Blau-Treppe.** Vom Tun her tragen die vier Wege Blau in klaren Stufen von dunkel nach hell: finden, teilen, erstellen, bearbeiten. Blau bleibt die Farbe des Tuns, die Inhaltsfarben bleiben den Dingen vorbehalten.
+- **Anmelden ohne Fachwörter.** Der Dialog nennt zwei Wege: „Ich habe schon ein Konto“ und „Ich bin neu hier“. Schlüssel, Erweiterung und das Ansehen mit öffentlichem Schlüssel stehen aufklappbar unter „Wie funktioniert das genau?“. Der Ablauf dahinter ist unverändert und bleibt die eigentliche Hürde: Wer neu ist, braucht weiter ein Konto bei edufeed und eine Erweiterung im Browser.
+
 ## Technik
 - Vier Belegungen der Steuerkonsole: `eins-dinge-gast`, `eins-dinge-ich`, `eins-tun-gast`, `eins-tun-ich`. Welche gilt, folgt aus Sicht und Anmeldung.
 - Neues Attribut `mitte-knopf`: Die Mitte ist klickbar, auch ohne Unterzeile.

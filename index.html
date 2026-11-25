@@ -1326,6 +1326,12 @@ body.in-entw .view.on{padding-top:28px}
 .fl-form{display:flex;gap:6px;padding:10px;border-top:1px solid var(--line)}
 .fl-form input{flex:1;min-width:0;font:inherit;padding:9px 12px;border:1.5px solid var(--line);border-radius:999px}
 .fl-form button{font:inherit;font-weight:600;padding:8px 14px;border:0;border-radius:999px;background:var(--n-ich);color:#fff;cursor:pointer}
+.an-wege{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.an-wege div{display:flex;flex-direction:column;gap:8px;padding:14px;border:1px solid var(--line);border-radius:14px}
+.an-wege a.an-btn{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;text-decoration:none}
+.an-mehr{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;font-size:14.5px}
+.an-mehr summary{cursor:pointer;font-weight:600;color:var(--x-hub)}
+@media (max-width:520px){.an-wege{grid-template-columns:1fr}}
 .oz-zu{display:none}
 body.oz-pop{overflow:hidden}
 body.oz-pop #v-start{display:block}
@@ -1986,16 +1992,22 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
 <dialog class="an-dialog" id="anmelden" aria-labelledby="anTitel">
   <form method="dialog" class="an-zu"><button type="submit" aria-label="Schließen">✕</button></form>
   <h2 id="anTitel">Anmelden</h2>
-  <p>Mit deinem Nostr-Schlüssel kannst du Personen folgen, Communities beitreten, Terminen zusagen, „Gefällt mir“ sagen und Sammlungen speichern.</p>
-  <p>Der Schlüssel bleibt in deiner Browser-Erweiterung (NIP-07, zum Beispiel nos2x oder Alby). Diese Seite fragt nie nach deinem privaten Schlüssel, speichert keinen Schlüssel und sendet nur, wenn du auf den Knopf klickst, der es sagt.</p>
-  <p><button type="button" class="an-btn" data-an-schluessel>Mit Schlüssel anmelden</button></p>
+  <p>Mit einem Konto kannst du Personen folgen, Communities beitreten, Terminen zusagen, Material sammeln und Eigenes veröffentlichen. Finden und Lesen geht immer ohne.</p>
+  <div class="an-wege">
+    <div><b>Ich habe schon ein Konto</b><button type="button" class="an-btn" data-an-schluessel>Anmelden</button></div>
+    <div><b>Ich bin neu hier</b><a class="an-btn zweit" href="https://edufeed.org" target="_blank" rel="noopener">Konto anlegen ›</a></div>
+  </div>
   <p class="an-fehler" id="anFehler" role="alert" hidden></p>
-  <form class="an-ansehen" data-an-ansehen>
-    <label for="anNpub">Nur ansehen mit deinem öffentlichen Schlüssel (npub)</label>
-    <div><input id="anNpub" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="npub1…"><button type="submit" class="an-btn zweit">Ansehen</button></div>
-    <p class="an-klein">So siehst du dein Profil und deine Communities; die Knöpfe zum Mitmachen bleiben aus.</p>
-  </form>
-  <p class="an-klein">Noch keinen Schlüssel? <a href="https://edufeed.org" target="_blank" rel="noopener">Konto bei edufeed anlegen ›</a></p>
+  <p class="an-klein">Das Konto legst du einmal bei edufeed an. Es gilt für alle Orte im ReliHub. Dein Konto gehört dir: Wir fragen nie nach einem Passwort und speichern keines.</p>
+  <details class="an-mehr">
+    <summary>Wie funktioniert das genau?</summary>
+    <p>Dein Konto ist ein Nostr-Schlüssel. Er bleibt in einer kleinen Erweiterung deines Browsers (NIP-07, zum Beispiel nos2x oder Alby). Diese Seite fragt nie nach deinem privaten Schlüssel, speichert keinen Schlüssel und sendet nur, wenn du auf den Knopf klickst, der es sagt.</p>
+    <form class="an-ansehen" data-an-ansehen>
+      <label for="anNpub">Nur ansehen mit deinem öffentlichen Schlüssel (npub)</label>
+      <div><input id="anNpub" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="npub1…"><button type="submit" class="an-btn zweit">Ansehen</button></div>
+      <p class="an-klein">So siehst du dein Profil und deine Communities; die Knöpfe zum Mitmachen bleiben aus.</p>
+    </form>
+  </details>
 </dialog>
 
 <script>
@@ -2085,10 +2097,10 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
   const GRAU_WORT = { spaeter: 'später', offen: 'bald', anmelden: 'anmelden' };   // sichtbar an Knospe und Knopf: die Graustufe allein erklärt sich nicht
   // Die vier Wege (ADR-0015): finden, teilen, erstellen, bearbeiten. Kennungen weichen bei zweien vom Wort ab, weil „finden“ und „erstellen“ schon Farbnamen der Anwendung sind.
   const FORMEN = {
-    suchen: { label: 'finden', blatt: 'finden', color: '#3558A8', d: 'M-12 0 Q0 -11 12 0 Q0 11 -12 0 Z M-3 0 A3 3 0 1 0 3 0 A3 3 0 1 0 -3 0' },
-    teilen: { label: 'teilen', blatt: 'teilen', color: '#2F74B5', d: 'M0 7 V-10 M-7 -3 L0 -10 L7 -3 M-10 11 H10' },
-    anlegen: { label: 'erstellen', blatt: 'erstellen', color: '#4B57A6', d: 'M0 -10 V10 M-10 0 H10' },
-    bearbeiten: { label: 'bearbeiten', blatt: 'bearbeiten', color: '#27628F', d: 'M-10 10 L-7 2 L4 -9 L9 -4 L-2 7 Z' }
+    suchen: { label: 'finden', blatt: 'finden', color: '#1F2F7A', d: 'M-12 0 Q0 -11 12 0 Q0 11 -12 0 Z M-3 0 A3 3 0 1 0 3 0 A3 3 0 1 0 -3 0' },
+    teilen: { label: 'teilen', blatt: 'teilen', color: '#2F74C0', d: 'M0 7 V-10 M-7 -3 L0 -10 L7 -3 M-10 11 H10' },
+    anlegen: { label: 'erstellen', blatt: 'erstellen', color: '#63AEDD', d: 'M0 -10 V10 M-10 0 H10' },
+    bearbeiten: { label: 'bearbeiten', blatt: 'bearbeiten', color: '#B5D3EE', d: 'M-10 10 L-7 2 L4 -9 L9 -4 L-2 7 Z' }
   };
   const FORM_ORDER = ['suchen', 'teilen', 'anlegen', 'bearbeiten'];
   // Farbe einer Knospe, wenn sie zu einem anderen Ding gehört als ihr Blatt: „Materialien“ am Blatt „ich“ trägt die Farbe der Materialien
@@ -6533,9 +6545,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   /** Anmelden über die Browser-Erweiterung (NIP-07): öffentlicher Schlüssel von getPublicKey, signiert wird später je Klick */
   function anmelden() {
     const n = window.nostr;
-    if (!n || typeof n.getPublicKey !== 'function') { anMeldung('Keine Nostr-Erweiterung gefunden (zum Beispiel nos2x oder Alby). Alternativ: nur ansehen mit npub.'); return Promise.resolve(); }
+    if (!n || typeof n.getPublicKey !== 'function') { anMeldung('In diesem Browser ist noch kein Konto eingerichtet. Wenn du neu bist, lege zuerst ein Konto an. Einzelheiten stehen unter „Wie funktioniert das genau?“.'); return Promise.resolve(); }
     return Promise.resolve().then(() => n.getPublicKey()).then(hex => {
-      if (!istHex64(hex)) { anMeldung('Die Erweiterung hat keinen gültigen Schlüssel geliefert.'); return; }
+      if (!istHex64(hex)) { anMeldung('Die Anmeldung hat nicht geklappt: Das Konto im Browser hat nicht geantwortet wie erwartet.'); return; }
       anFertig(hex, typeof n.signEvent === 'function');
     }, () => anMeldung('Anmeldung abgebrochen.'));
   }
@@ -6857,7 +6869,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   const blatt = (id, label, ding, mehr) => Object.assign({ id, label, color: D_FARBE[ding][0], text: D_FARBE[ding][1] }, mehr);
   // Jede Inhaltsart hat eine Farbe und behält sie in beiden Sichten: Material grün, Termine orange-gelb, News violett, Menschen pink. Blau ist das Tun und das Eigene.
   const FORM_C = {}; RelihubSteuerkonsole.formen.forEach(f => { FORM_C[f.id] = f.color; });
-  const tun = (id, label, form, subs, mehr) => Object.assign({ id, label, color: FORM_C[form], text: '#FFFFFF', subs }, mehr);
+  const FORM_T = { anlegen: '#10233A', bearbeiten: '#10233A' };   // die beiden hellen Stufen tragen dunkle Schrift
+  const tun = (id, label, form, subs, mehr) => Object.assign({ id, label, color: FORM_C[form], text: FORM_T[form] || '#FFFFFF', subs }, mehr);
   // Ohne Anmeldung trägt die Blume dieselben Knospen. Was erst angemeldet geht, ist ausgegraut und trägt das Wort „anmelden“.
   const sub = (an, id, label, mehr) => Object.assign({ id, label }, mehr, !an && NUR_ANGEMELDET.includes(id) ? { stand: 'anmelden' } : null);
   // Fünftes Blatt: Gespräche. Öffentlich für alle; angemeldet aus den eigenen Communities und zu den eigenen Dingen
@@ -6960,6 +6973,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   startBlume.addEventListener('relihub-activate', e => { if (V_SATZ[e.detail.action]) { vHinweis.textContent = V_SATZ[e.detail.action]; vInfo.style.setProperty('--hc', blattFarbe(e.detail.action)); vorZeigen(e.detail.action); } });
   // Die Vorschau bleibt stehen, wenn der Zeiger die Blume verlässt: Man soll die Kreise erreichen und anklicken können
 
+  /** Aktion wie aus der Blume: mit der aufgelösten Adresse, die navTo braucht */
+  function aktionVon(action, label) { let url = 'https://relihub.example/'; try { url = RelihubSteuerkonsole.resolve(action, 'hub-start') || url; } catch (e) {} return { action, label, url, stand: null }; }
   // ---------- Tun auf der Seite des Dings ----------
   const TUN = {
     materialpool: ['material', 'Material', [['material.teilen', 'veröffentlichen'], ['material.erstellen', 'erstellen'], ['material.bearbeiten', 'sammeln']]],
@@ -6974,7 +6989,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     z.innerHTML = `<b>${t[1]}:</b>` + t[2].map(x => `<button type="button" data-tun="${x[0]}"${LOGGED ? '' : ' class="grau"'}>${x[1]}${LOGGED ? '' : ' <small>· anmelden</small>'}</button>`).join('');
     view.prepend(z);
   }
-  document.addEventListener('click', e => { const b = e.target.closest('[data-tun]'); if (b) standardAktion({ action: b.dataset.tun, label: b.textContent, url: '#' }, 'hub'); });
+  document.addEventListener('click', e => { const b = e.target.closest('[data-tun]'); if (b) standardAktion(aktionVon(b.dataset.tun, b.textContent), 'hub'); });
 
   // ---------- Blüten am linken Rand ----------
   const ORT_ART = { materialpool: 'Ort', 'rpi-virtuell': 'Ort', relilab: 'Community · Labor', relidesk: 'Werkzeug', oercommunity: 'Projekt' };
@@ -6997,7 +7012,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   sbGriff.addEventListener('click', () => { const auf = !sbEl.classList.contains('auf'); sbEl.classList.toggle('auf', auf); sbGriff.setAttribute('aria-expanded', String(auf)); });
   sbFeld.addEventListener('click', e => {
     const k = e.target.closest('[data-sb]');
-    if (k) { const d = { action: k.dataset.sb, label: k.textContent, url: '#' }, ort = sbOrt(); if (ort === 'relilab') rlAktion(d); else if (ort === 'religlobal') rgAktion(d); else standardAktion(d, 'hub'); }
+    if (k) { const d = aktionVon(k.dataset.sb, k.textContent), ort = sbOrt(); if (ort === 'relilab') rlAktion(d); else if (ort === 'religlobal') rgAktion(d); else standardAktion(d, 'hub'); }
     if (k || e.target.closest('a')) sbZu();
   });
   document.addEventListener('click', e => { if (sbEl.classList.contains('auf') && !sbEl.contains(e.target)) sbZu(); });
