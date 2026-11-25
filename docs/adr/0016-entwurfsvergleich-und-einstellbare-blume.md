@@ -35,6 +35,7 @@ Der Prototyp zeigte zuletzt drei Navigationen zugleich: die Blätter der Blume, 
    - hinter jedem Blatt steht eine Inhaltsart des gemeinsamen Datenraums.
 10. **Beispiel relilab.** In Version 3 zeigt der Abschnitt im relilab die Einstellung als Tabelle mit Ding, Wortlaut und Ziel. Zwei Spielarten lassen sich umschalten: fünf Verben oder geteilte Blätter mit einer Hälfte für rein und einer für raus. Zwei weitere Beispiele zeigen, wie derselbe Platz anders heißen kann, etwa „Neuerscheinungen finden“ oder „Gruppenstunde vorbereiten“.
 11. **Der Ort bleibt stehen.** In Version 3 öffnet „Material teilen“ im relilab das Formular über der Seite, und „Material finden“ zeigt zuerst die Materialien des relilab.
+12. **Die Redaktion entscheidet.** Anmelden allein genügt nicht. Ob ein geteiltes Material im Pool einer Community erscheint, entscheidet ihre Redaktion. Wer nicht zur Community gehört, teilt in den Materialpool von rpi-virtuell. Die Tabelle im relilab sagt das bei „Material teilen“ und „Termin eintragen“.
 
 ## Technik
 - Die Steuerkonsole kennt weitere Belegungen: `RelihubSteuerkonsole.registerBelegung(name, liste)`, gewählt über das Attribut `belegung`. Die Blätter verteilen sich gleichmäßig, drei bis fünf sind erprobt. Ein Blatt ohne Knospen trägt `aktion` und führt direkt dorthin.
@@ -46,6 +47,7 @@ Der Prototyp zeigte zuletzt drei Navigationen zugleich: die Blätter der Blume, 
 - Der Vergleich macht die Seite größer. Nach der Entscheidung werden die nicht gewählten Versionen und die Reiterzeile entfernt.
 - Die Kennungen der Aktionen bleiben gleich. Alle Versionen nutzen dieselben Ziele wie bisher.
 - Wo eine Community ihre Einstellung später pflegt und wer sie ändern darf, ist offen.
+- Wie die Aufnahme in eine Community nach der Anmeldung abläuft, ist offen. Bisher geschieht sie in Treffen und per Mail.
 
 ## Offen
 - Die dritte Spielart, eine Blume, die nach dem Anmelden Blätter dazubekommt, ist beschrieben, aber nicht gebaut.

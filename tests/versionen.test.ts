@@ -55,6 +55,7 @@ Deno.test('Einstellbare Blume: Community wählt Blätter, Wortlaut und Ziel; Far
   assert(/color: D_FARBE\[ding\]\[0\]/.test(s), 'Farbe kommt nicht vom Ding');
   assert(/'ort-' \+ k \+ '-geteilt'/.test(s) && /rkArt === 'geteilt' \? 'scheibe' : 'knospen'/.test(s), 'Spielart mit geteilten Blättern fehlt');
   assert(/<div class="rl-konfig" id="rlKonfig" hidden><\/div>/.test(html) && /<th>Ding<\/th><th>Wortlaut<\/th><th>Ziel<\/th>/.test(s), 'Einstellung wird im relilab nicht gezeigt');
+  assert(/entscheidet ihre Redaktion/.test(s) && /Wer nicht dazugehört, teilt in den Materialpool von rpi-virtuell/.test(s) && !/die Community ist vorbelegt/.test(s), 'Hinweis zur Redaktion der Community fehlt');
   assert(/if \(d\.action === 'material\.teilen'\) \{ if \(CUR\.split\('\?'\)\[0\] !== 'relilab'\) go\('relilab'\); openChooser\('relilab'\); return false; \}/.test(s), 'Formular verlässt den Ort');
 });
 
