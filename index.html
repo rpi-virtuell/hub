@@ -1276,7 +1276,10 @@ body[data-v="light"] #rlHubText{display:none}
   .vl{position:static;width:auto;flex-direction:row;align-items:center;padding:6px 8px;border-right:0;border-bottom:1px solid var(--line);overflow-x:auto;white-space:nowrap}
   .vl h2{display:none}.vl a,.vl button{flex:none}.vl .vl-marke{margin:0;font-size:19px}
   .v-drei{grid-template-columns:1fr}
-  .vz-notiz{flex-basis:100%}
+  /* schmale Schirme: Die Reiterzeile bleibt eine einzige Zeile und wandert nicht mit, damit sie nicht vom Inhalt ablenkt */
+  .vz{position:static;padding:4px 8px}
+  .vz-marke,.vz-notiz{display:none}
+  .vz button{min-height:28px;padding:3px 10px;font-size:12px}
 }
 </style>
 </head>
@@ -6838,8 +6841,10 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     document.querySelectorAll('relihub-steuerkonsole').forEach(k => {
       if (k.closest('.ei-vorschau')) return;
       const schwebt = k.hasAttribute('floating'), imLab = k.id === 'rlBlume' || k.id === 'rlFlower';
-      setze(k, 'belegung', VERSION === 'light' && imLab ? 'ort-relilab-fuenf' : beleg);
-      setze(k, 'beschriftet', beleg && !schwebt ? '' : null);
+      // relilab ist nur in der Version Light das Beispiel; in den anderen Versionen bleibt seine Blume, wie sie war
+      const b = imLab ? (VERSION === 'light' ? 'ort-relilab-fuenf' : null) : beleg;
+      setze(k, 'belegung', b);
+      setze(k, 'beschriftet', b && !schwebt ? '' : null);
       if (schwebt) { setze(k, 'stiel', VERSION === 'light' || VERSION === 'suche' ? 'off' : null); }
     });
     setze(startBlume, 'stiel', VERSION === 'heute' || VERSION === 'reinraus' ? '' : null);
@@ -6852,7 +6857,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     mitteStand();
     rlKonfigRender();
   }
-  document.getElementById('vz').addEventListener('click', e => { const b = e.target.closest('button[data-v]'); if (b) versionSetzen(b.dataset.v, true); });
+  // Ein Reiter führt immer auf die Startseite: Der Vergleich beginnt in jeder Version am selben Ort
+  document.getElementById('vz').addEventListener('click', e => { const b = e.target.closest('button[data-v]'); if (!b) return; versionSetzen(b.dataset.v, true); if (CUR.split('?')[0] !== 'start') go('start'); else window.scrollTo(0, 0); });
   versionSetzen(new URLSearchParams(location.search).get('v') || speicher('relihub-version'));
   sichtSetzen(speicher('relihub-sicht'));
   themenRender();   // gespeicherte Themen der Startseite

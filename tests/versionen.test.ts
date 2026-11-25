@@ -10,6 +10,8 @@ Deno.test('Reiterzeile: fünf Versionen mit eigener Adresse', () => {
   assert(/const VERSIONEN = \{\s*heute:[\s\S]*?reinraus:[\s\S]*?light:[\s\S]*?suche:[\s\S]*?links:/.test(s), 'Beschreibung je Version fehlt');
   assert(/new URLSearchParams\(location\.search\)\.get\('v'\) \|\| speicher\('relihub-version'\)/.test(s), 'Version kommt nicht aus der Adresse oder dem Speicher');
   assert(/VERSION = VERSIONEN\[v\] \? v : 'heute'/.test(s), 'unbekannte Version fällt nicht auf den Stand heute zurück');
+  assert(/versionSetzen\(b\.dataset\.v, true\); if \(CUR\.split\('\?'\)\[0\] !== 'start'\) go\('start'\);/.test(s), 'Reiter führt nicht auf die Startseite');
+  assert(/const b = imLab \? \(VERSION === 'light' \? 'ort-relilab-fuenf' : null\) : beleg;/.test(s), 'relilab ändert sich auch außerhalb der Version Light');
 });
 
 Deno.test('Steuerkonsole: weitere Belegungen, direkte Blätter, dauerhafte Beschriftung', () => {
