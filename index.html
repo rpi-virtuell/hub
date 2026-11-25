@@ -1117,6 +1117,11 @@ relihub-steuerkonsole[hidden]{display:none}
 .rl-krit li{background:#F4E6FA;color:#5B1C73;border-radius:999px;padding:4px 13px;font-size:14px;font-weight:600}
 .rl-satz{max-width:70ch;margin:0 0 22px;color:#3A3F47}
 .rl-filterhinweis{display:flex;gap:10px;align-items:flex-start;margin:10px 22px 0;padding:10px 14px;border-radius:10px;background:#EAF4F1;color:#1F4A45;font-size:14.5px;line-height:1.45}
+.rx-sub{display:flex;flex-wrap:wrap;gap:6px;margin:12px 22px 0}
+.rx-sub[hidden]{display:none}
+.rx-sub a{font-size:13.5px;font-weight:500;text-decoration:none;color:#5B2D90;background:#FBF7FF;border:1px solid #E1D3F0;border-radius:999px;padding:5px 13px}
+.rx-sub a.home{background:transparent;border-color:transparent;color:#8A2BB8;font-weight:700}
+.rx-sub a.on{background:#7B3AC9;border-color:#7B3AC9;color:#fff}
 .rl-filterhinweis::before{content:'';flex:none;width:12px;height:12px;margin-top:4px;border-radius:50%;border:3px solid #1F6F68}
 .rl-hubband{display:flex;flex-direction:column;align-items:center;margin:0 0 28px;padding:22px 20px 96px;border:1px solid #E1D8FA;border-radius:14px;background:#FAF8FF}
 .rl-hubband>div{align-self:stretch;max-width:70ch;margin:0 0 100px}
@@ -1749,6 +1754,7 @@ body[data-v="light"] #rlHubText{display:none}
   </header>
   <p class="stand" aria-live="polite"></p>
   <p class="rl-filterhinweis" id="rlFilterHinweis" hidden></p>
+  <nav class="rx-sub" id="rxSub" aria-label="relilab-Unterseiten" hidden></nav>
 
   <div data-rlsec="home" class="on">
   <div class="rl-lab">
@@ -2233,7 +2239,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 `;
 
   class RelihubSteuerkonsoleElement extends HTMLElement {
-    static get observedAttributes() { return ['size', 'variant', 'context', 'base-url', 'target', 'compact', 'floating', 'popover-size', 'popover-align', 'belegung', 'beschriftet', 'mitte-unter', 'sicht', 'mitte', 'stiel']; }
+    static get observedAttributes() { return ['size', 'variant', 'context', 'base-url', 'target', 'compact', 'floating', 'popover-size', 'popover-align', 'belegung', 'beschriftet', 'ohne-mitte', 'mitte-unter', 'sicht', 'mitte', 'stiel']; }
     constructor() {
       super();
       this.attachShadow({ mode: 'open' });
@@ -2355,6 +2361,7 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       const mitte = el('g', { class: 'mitte', 'pointer-events': 'none', 'aria-hidden': 'true' }, svg);
       const mText = ort ? ort.label : 'Ich möchte', mBreit = Math.max(96, Math.min(220, mText.length * 12.5 + 34));
       if (ort) mitte.setAttribute('data-ort', ort.label);
+      if (this.hasAttribute('ohne-mitte')) mitte.setAttribute('display', 'none');
       // Mit mitte-unter wird die Mitte zum Knopf für „ich“: Unter dem Ort steht klein, wohin der Klick führt (anmelden oder mein Profil)
       const unter = this.getAttribute('mitte-unter'), mFarbe = ort && ort.color ? '#FFFFFF' : '#1B2440';
       el('rect', { x: -mBreit / 2, y: unter ? -24 : -19, width: mBreit, height: unter ? 54 : 38, rx: unter ? 22 : 19, fill: ort && ort.color ? ort.color : '#FFFFFF', 'fill-opacity': ort && ort.color ? 1 : 0.94 }, mitte);
@@ -5515,11 +5522,16 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     go('relilab?room=' + id);
   });
   function g_rlFlip(c) { document.querySelectorAll('#rlCommGrid .cy-card.flip').forEach(x => x.classList.remove('flip')); c.classList.add('flip'); }
+  const RX_SUB = [['termine', 'Termine', '#relilab?tab=termine&von=konsole'], ['material', 'Material', '#relilab?zu=materialien&von=konsole'], ['news', 'News', '#relilab?room=relilab&rtab=art&von=konsole'], ['personen', 'Personen', '#relilab?zu=menschen&von=konsole'], ['communities', 'Communities', '#relilab?tab=communities&von=konsole']];
   function rlShow(qs) {
     const p = new URLSearchParams(qs || ''), room = p.get('room'), sec = room ? 'room' : ['communities', 'termine', 'mitmachen'].includes(p.get('tab')) ? p.get('tab') : 'home';
     document.querySelectorAll('#v-relilab [data-rlsec]').forEach(n => n.classList.toggle('on', n.dataset.rlsec === sec));
     // Hinweiszeile (ADR-0014): sagt in einem Satz, dass dieser Bereich aus dem gemeinsamen Datenraum kommt und auf relilab gefiltert ist
-    const fh = document.getElementById('rlFilterHinweis'), was = sec === 'communities' ? 'Communities' : sec === 'termine' ? 'Termine' : sec === 'home' && p.get('zu') === 'menschen' ? 'Menschen' : sec === 'home' && p.get('zu') === 'materialien' ? 'Materialien' : '';
+    const zuP = p.get('zu'), wk = sec === 'communities' ? 'communities' : sec === 'termine' ? 'termine' : sec === 'home' && zuP === 'menschen' ? 'personen' : sec === 'home' && zuP === 'materialien' ? 'material' : sec === 'room' && p.get('von') === 'konsole' ? 'news' : '';
+    const fh = document.getElementById('rlFilterHinweis'), was = ({ communities: 'Communities', termine: 'Termine', personen: 'Menschen', material: 'Materialien', news: VERSION === 'reinraus' ? 'News' : 'Artikel' })[wk] || '';
+    // Unternavigation der gefilterten Ansichten wie im Entwurf aus dem Maintainer-Kreis (nur Version 2)
+    const rx = document.getElementById('rxSub'); rx.hidden = !(VERSION === 'reinraus' && wk);
+    rx.innerHTML = rx.hidden ? '' : '<a href="#relilab" class="home">‹ relilab</a>' + RX_SUB.map(([k, l, h]) => `<a href="${esc(h)}"${k === wk ? ' class="on" aria-current="page"' : ''}>${l}</a>`).join('');
     fh.hidden = !was;
     if (was) fh.innerHTML = `<span>Über die <b>Steuerkonsole des ReliHub</b> (${was}): Hier im relilab siehst du nur die ${was}, die zu relilab gehören. Sie kommen aus demselben Datenraum wie im ReliHub, gefiltert auf <b>relilab</b>.</span>`;
     if (sec === 'room') crOpen(room, p.get('rtab'), 'rlCrRoot'); else if (sec === 'communities') rlCommRender();
@@ -6120,12 +6132,13 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     handler: d => {
       if (!d.action.includes('.') && d.action !== 'ich' && VERSION !== 'heute') return false;
       if (brauchtAnmeldung(d)) return false;
-      if (VERSION === 'light') {   // der Ort bleibt stehen: Das Formular legt sich über relilab, die Suche zeigt zuerst das Eigene
+      if (VERSION === 'light' || VERSION === 'reinraus') {   // der Ort bleibt stehen: Das Formular legt sich über relilab, jede Knospe „finden“ zeigt nur, was zu relilab gehört
         if (d.action === 'material.teilen') { if (CUR.split('?')[0] !== 'relilab') go('relilab'); openChooser('relilab'); return false; }
-        if (d.action === 'material.finden') { go('relilab?zu=materialien'); return false; }
+        if (d.action === 'material.finden') { go('relilab?zu=materialien&von=konsole'); return false; }
+        if (d.action === 'news.finden') { go('relilab?room=relilab&rtab=art&von=konsole'); return false; }
       }
-      if (d.action === 'menschen.communities') { go('relilab?tab=communities'); return false; }
-      if (d.action === 'menschen.personen') { go('relilab?zu=menschen'); return false; }
+      if (d.action === 'menschen.communities') { go('relilab?tab=communities&von=konsole'); return false; }
+      if (d.action === 'menschen.personen') { go('relilab?zu=menschen&von=konsole'); return false; }
       if (d.action === 'termine.finden') { go('relilab?tab=termine&von=konsole'); return false; }
       return standardAktion(d, 'relilab');
     }
@@ -6729,21 +6742,22 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   // ---------- Entwurfsvergleich (ADR-0016): fünf Fassungen der Navigation, umschaltbar über die Reiterzeile oder ?v= ----------
   const VERSIONEN = {
     heute: 'Blume mit Umschalter, Stiel und Leiste. So steht der Entwurf bisher.',
-    reinraus: 'Oben ich, ringsum vier Dinge mit je zwei Wegen: finden und veröffentlichen. Der Stiel trägt die Orte, die Leiste entfällt.',
+    reinraus: 'Entwurf aus dem Maintainer-Kreis: oben ReliHub, ringsum Material, Termine, News, Menschen mit je zwei Knospen. Der Stiel trägt die Orte. Im relilab führt jede Knospe auf eine gefilterte Ansicht.',
     light: 'Fünf Blätter mit Verb, ein Klick führt direkt hin. Die Mitte führt zur Anmeldung, die Blume sitzt unten rechts. Im relilab ist die Blume einstellbar.',
     suche: 'Die Suche ist der Einstieg und führt ins Ökosystem. Die Orte liegen unten als Blütenreihe.',
     links: 'Gegenprobe ohne Blume als Steuerung: Die Navigation steht links als Liste.'
   };
   const D_FARBE = RelihubSteuerkonsole.farben, D_NAME = { menschen: 'Menschen', material: 'Material', termine: 'Termine', news: 'Artikel' };
   const blatt = (id, label, ding, mehr) => Object.assign({ id, label, color: D_FARBE[ding][0], text: D_FARBE[ding][1] }, mehr);
-  // Version 2, rein und raus, nach dem Entwurf aus dem Maintainer-Kreis: oben „ich“ mit Profil und vernetzter Suche,
-  // dann Materialien, Termine, Artikel mit je finden und veröffentlichen, zuletzt Menschen mit Personen und Communities
+  // Version 2, rein und raus, streng nach dem Entwurf aus dem Maintainer-Kreis: oben ReliHub mit „mein Profil“ und „vernetzte Suche“,
+  // dann Material, Termine, News mit je finden und veröffentlichen, zuletzt Menschen mit Personen und Communities.
+  // Farben wie im Entwurf: News in Pink, Menschen in Violett (umgekehrt zu ADR-0015). Keine Schrift in der Mitte, keine dauerhafte Beschriftung.
   RelihubSteuerkonsole.registerBelegung('reinraus', [
-    blatt('rr-ich', 'ich', 'ich', { subs: [{ id: 'ich.profil', label: 'mein Profil' }, { id: 'ich.suche', label: 'vernetzte Suche' }] }),
-    blatt('rr-material', 'Materialien', 'material', { subs: [{ id: 'material.finden', label: 'finden' }, { id: 'material.teilen', label: 'veröffentlichen' }] }),
+    blatt('rr-ich', 'ReliHub', 'ich', { subs: [{ id: 'ich.profil', label: 'mein Profil' }, { id: 'ich.suche', label: 'vernetzte Suche' }] }),
+    blatt('rr-material', 'Material', 'material', { subs: [{ id: 'material.finden', label: 'finden' }, { id: 'material.teilen', label: 'veröffentlichen' }] }),
     blatt('rr-termine', 'Termine', 'termine', { subs: [{ id: 'termine.finden', label: 'finden' }, { id: 'termine.erstellen', label: 'veröffentlichen' }] }),
-    blatt('rr-news', 'Artikel', 'news', { subs: [{ id: 'news.finden', label: 'finden' }, { id: 'news.veroeffentlichen', label: 'veröffentlichen' }] }),
-    blatt('rr-menschen', 'Menschen', 'menschen', { subs: [{ id: 'menschen.personen', label: 'Personen' }, { id: 'menschen.communities', label: 'Communities' }] })
+    blatt('rr-news', 'News', 'menschen', { subs: [{ id: 'news.finden', label: 'finden' }, { id: 'news.veroeffentlichen', label: 'veröffentlichen' }] }),
+    blatt('rr-menschen', 'Menschen', 'news', { subs: [{ id: 'menschen.personen', label: 'Personen' }, { id: 'menschen.communities', label: 'Communities' }] })
   ]);
   // Version 3, Light: eine Stufe, fünf Blätter mit Verb. Dieselbe Form trägt die einstellbare Blume einer Community (BLUMEN).
   // Fest sind Farbe und Platz je Ding; die Community wählt Blätter, Wortlaut und Ziel.
@@ -6778,9 +6792,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     'menschen.personen': 'Sieh, wer hier mitarbeitet, und nimm Kontakt auf.', 'menschen.communities': 'Finde Communities, die an deinen Themen arbeiten.',
     'material.finden': 'Suche Material aus allen Instituten und Communities.', 'material.teilen': 'Gib eigenes Material weiter. Es erscheint überall, wo es gebraucht wird.',
     'termine.erstellen': 'Trag einen Termin einmal ein. Er erscheint in jedem Kalender, der dazu passt.', 'termine.finden': 'Finde Fortbildungen und Treffen, meist online.',
-    'rr-ich': 'Ich: mein Profil und die vernetzte Suche über alles.', 'ich.profil': 'Dein Profil: was du teilst und wo du dabei bist.', 'ich.suche': 'Die vernetzte Suche zeigt, wie Menschen, Communities, Materialien und Termine zusammenhängen.',
-    'rr-menschen': 'Menschen: Personen und Communities finden.', 'rr-material': 'Materialien: finden oder veröffentlichen.',
-    'rr-termine': 'Termine: finden oder veröffentlichen.', 'rr-news': 'Artikel: lesen oder selbst veröffentlichen.'
+    'rr-ich': 'ReliHub: mein Profil und die vernetzte Suche über alles.', 'ich.profil': 'Dein Profil: was du teilst und wo du dabei bist.', 'ich.suche': 'Die vernetzte Suche zeigt, wie Menschen, Communities, Materialien und Termine zusammenhängen.',
+    'rr-menschen': 'Menschen: Personen und Communities finden.', 'rr-material': 'Material: finden oder veröffentlichen.',
+    'rr-termine': 'Termine: finden oder veröffentlichen.', 'rr-news': 'News: finden oder selbst veröffentlichen.'
   };
   Object.keys(BLUMEN).forEach(k => {
     const b = BLUMEN[k].blaetter, dinge = [...new Set(b.map(x => x.ding))];
@@ -6793,9 +6807,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     }));
   });
   const V_START = {
-    reinraus: 'Oben stehst du. Ringsum vier Dinge, je zwei Wege: finden und veröffentlichen.',
+    reinraus: 'Fahre über ein Blatt: oben ReliHub, ringsum Material, Termine, News und Menschen.',
     light: 'Diese Blume ist dein Wegweiser im ReliHub. Du findest sie auf jeder Seite unten rechts wieder. Die Mitte führt zur Anmeldung.',
-    suche: 'Oder geh direkt über die Blume: oben du, ringsum vier Dinge mit je zwei Wegen.'
+    suche: 'Oder geh direkt über die Blume: oben ReliHub, ringsum vier Dinge mit je zwei Wegen.'
   };
   const vHinweis = document.getElementById('vHinweis'), startBlume = document.getElementById('startFlower');
   startBlume.addEventListener('relihub-activate', e => { if (VERSION !== 'heute' && V_SATZ[e.detail.action]) vHinweis.textContent = V_SATZ[e.detail.action]; });
@@ -6848,9 +6862,10 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       if (k.closest('.ei-vorschau')) return;
       const schwebt = k.hasAttribute('floating'), imLab = k.id === 'rlBlume' || k.id === 'rlFlower';
       // relilab ist nur in der Version Light das Beispiel; in den anderen Versionen bleibt seine Blume, wie sie war
-      const b = imLab ? (VERSION === 'light' ? 'ort-relilab-fuenf' : null) : beleg;
+      const b = imLab ? (VERSION === 'light' ? 'ort-relilab-fuenf' : VERSION === 'reinraus' ? 'reinraus' : null) : beleg;
       setze(k, 'belegung', b);
-      setze(k, 'beschriftet', b && !schwebt ? '' : null);
+      setze(k, 'beschriftet', b && !schwebt && VERSION !== 'reinraus' ? '' : null);
+      setze(k, 'ohne-mitte', b === 'reinraus' ? '' : null);   // im Entwurf steht ReliHub auf dem oberen Blatt, die Mitte bleibt leer
       if (schwebt) { setze(k, 'stiel', VERSION === 'light' || VERSION === 'suche' ? 'off' : null); }
     });
     setze(startBlume, 'stiel', VERSION === 'heute' || VERSION === 'reinraus' ? '' : null);
