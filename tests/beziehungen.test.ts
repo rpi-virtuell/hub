@@ -103,7 +103,7 @@ Deno.test('Ökosystem als Blume: Kelch, fünf Blätter, ähnlich Verbundene, Akt
   assertEquals(ae(kanten, ents, 'c:x', 'community'), [['c:y', 2]]);
   assertEquals(ae(kanten, ents, 'm:1', 'material'), []);
   const l = fn('ozListe');
-  assert(/art: 'start'/.test(l) && /art: 'nachbar'/.test(l) && /ozAehnlich\(/.test(l) && (l.match(/ozSichtbar/g) || []).length >= 4 && /direkt verbunden/.test(l), 'drei Arten, jede mit Sichtbarkeitsregel');
+  assert(/'start' : 'treffer'/.test(l) && /art: 'nachbar'/.test(l) && /ozAehnlich\(/.test(l) && (l.match(/ozSichtbar/g) || []).length >= 4 && /direkt verbunden/.test(l), 'drei Arten, jede mit Sichtbarkeitsregel');
   const k = fn('ozKelch');
   assert(/akKnopf\('folgen'/.test(k) && /akKnopf\('beitreten'/.test(k) && /akKnopf\('zusagen'/.test(k) && /akKnopf\('vielleicht'/.test(k) && /akKnopf\('gefaellt'/.test(k) && /esc\(href\)/.test(k) && /rel="noopener"/.test(k), 'Aktionen und Link im Kelch');
   assert(/prefers-reduced-motion/.test(fn('ozFliegen')) && /ozWeg\.length > 7/.test(fn('ozWegMerken')) && /'\?wahl=' \+ encodeURIComponent\(ozWahl\)/.test(fn('ozRoute')), 'Bewegung abschaltbar, Weg begrenzt, Route');

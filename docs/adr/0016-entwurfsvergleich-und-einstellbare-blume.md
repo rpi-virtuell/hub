@@ -1,7 +1,7 @@
 # ADR-0016: Entwurfsvergleich in fünf Versionen und einstellbare Blume
 
 ## Status
-Entwurf · 24.11.2026 · Entscheidungsgrundlage für das Treffen mit der UX-Beratung am 25.11.2026; nach der Entscheidung bleibt eine Version, die übrigen werden entfernt
+Entwurf · 24.11.2026 · der Entwurfsvergleich ist seit dem 25.11.2026 durch ADR-0017 abgelöst; die einstellbare Blume einer Community (Punkte 9 bis 12) gilt weiter
 
 ## Kontext
 Der Prototyp zeigte zuletzt drei Navigationen zugleich: die Blätter der Blume, den Stiel mit den Orten und die Leiste unten links. Im Projektteam wurde das als zu viel erlebt. Aus der Besprechung des Stands kamen diese Befunde:
