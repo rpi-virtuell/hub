@@ -47,10 +47,17 @@ Deno.test('Tun auf der Seite des Dings: Knöpfe im Materialpool, im Kalender und
 });
 
 Deno.test('Farbnavigation: eine Farbe je Inhaltsart aus dem Erscheinungsbild des Instituts', () => {
-  assert(/--n-ich:#2A3B8E;--n-material:#85992C;--n-termine:#DAB000;--n-menschen:#AF4112;--n-gespraeche:#DA8D00;--n-news:#7F89BB;/.test(html), 'Farbwerte fehlen');
-  assert(/material: \['#85992C', '#1B2400'\], termine: \['#DAB000', '#2B1A00'\], news: \['#7F89BB', '#141A33'\], gespraeche: \['#DA8D00', '#2B1A00'\]/.test(c), 'Blume trägt die Farben nicht');
+  assert(/--n-ich:#2A3B8E;--n-material:#85992C;--n-termine:#DAB000;--n-menschen:#AF4112;--n-gespraeche:#B549F0;--n-news:#0072AA;/.test(html), 'Farbwerte fehlen');
+  assert(/material: \['#85992C', '#1B2400'\], termine: \['#DAB000', '#2B1A00'\], news: \['#0072AA', '#FFFFFF'\], gespraeche: \['#B549F0', '#1B0A2A'\]/.test(c), 'Blume trägt die Farben nicht');
   assert(/\[data-typ="material"\]\{--tc:var\(--n-material\)/.test(html) && /\[data-typ="event"\]\{--tc:var\(--n-termine\)/.test(html) && /\[data-typ="person"\]\{--tc:var\(--n-menschen\)/.test(html), 'Ökosystem trägt andere Farben als die Blume');
-  assert(/vHinweis\.style\.setProperty\('--hc', blattFarbe\(e\.detail\.action\)\)/.test(s) && /@media \(min-width:1100px\)\{\.v-hinweis\{position:absolute;left:calc\(50% \+ 268px\)/.test(html), 'Erläuterung steht nicht neben dem Blatt in dessen Farbe');
+  assert(/vInfo\.style\.setProperty\('--hc', blattFarbe\(e\.detail\.action\)\)/.test(s) && /@media \(min-width:1100px\)\{\.v-info\{position:absolute;left:calc\(50% \+ 268px\)/.test(html), 'Erläuterung steht nicht neben dem Blatt in dessen Farbe');
+});
+
+Deno.test('Vorschau um die Erläuterung: echte Einträge als Kreise mit Ring in der Farbe des Dings', () => {
+  assert(/const VOR_TYP = \{ material: 'material', termine: 'event', menschen: 'person', communities: 'community' \};/.test(s) && /stVorschau\(VOR_TYP\[k\], 24\)/.test(s) && /gesehen\.has\(n\)/.test(s) && /stLaden\(\);/.test(s), 'Vorschau nutzt nicht die echten Einträge des Gefüges');
+  assert(/OC_RAW\.filter\(e => e\.kind === 30023/.test(s), 'News ohne Vorschau');
+  assert(/\.vk-ring\{[^}]*border-radius:50%[^}]*background:linear-gradient\([^;]*var\(--hc\)/.test(html) && /onerror="this\.remove\(\)"/.test(s), 'Kreis ohne Ring in der Farbe des Dings oder ohne Rückfall bei fehlendem Bild');
+  assert(/<div class="vk-reihe" id="vVor"><\/div>/.test(html), 'Platz für die Vorschau fehlt');
 });
 
 Deno.test('Blüten am linken Rand ersetzen Leiste und kleine Blume', () => {
