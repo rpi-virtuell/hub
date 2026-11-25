@@ -48,6 +48,8 @@ Die Punkte 5, 8 und 10 sind damit geändert, Punkt 13 ergänzt.
 - **Wege als Blau-Treppe.** Vom Tun her tragen die vier Wege Blau in klaren Stufen von dunkel nach hell: finden, teilen, erstellen, bearbeiten. Blau bleibt die Farbe des Tuns, die Inhaltsfarben bleiben den Dingen vorbehalten.
 - **Anmelden ohne Fachwörter.** Der Dialog nennt zwei Wege: „Ich habe schon ein Konto“ und „Ich bin neu hier“. Schlüssel, Erweiterung und das Ansehen mit öffentlichem Schlüssel stehen aufklappbar unter „Wie funktioniert das genau?“. Der Ablauf dahinter ist unverändert und bleibt die eigentliche Hürde: Wer neu ist, braucht weiter ein Konto bei edufeed und eine Erweiterung im Browser.
 
+- **Gespräche sind ein Feed.** Die Ansicht hinter dem Blatt heißt „Gespräche“ und zeigt zuerst den Feed: Beiträge, Kommentare und Materialtipps aus den Communities. Wer wo zusagt und wer worauf reagiert, steht nicht mehr ungefragt darin, es lässt sich zuschalten. Angemeldet lässt sich der Feed auf die Menschen eingrenzen, denen man folgt. Das Wort „Protokoll“ entfällt. Offen: der Feed nach eigenen Themen und aus den eigenen Communities in einem Schritt.
+
 ## Technik
 - Vier Belegungen der Steuerkonsole: `eins-dinge-gast`, `eins-dinge-ich`, `eins-tun-gast`, `eins-tun-ich`. Welche gilt, folgt aus Sicht und Anmeldung.
 - Neues Attribut `mitte-knopf`: Die Mitte ist klickbar, auch ohne Unterzeile.
