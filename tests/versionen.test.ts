@@ -17,8 +17,8 @@ Deno.test('Steuerkonsole: weitere Belegungen, direkte Blätter, dauerhafte Besch
   assert(/const a = \(-90 \+ 360 \/ n \* i\) \* Math\.PI \/ 180/.test(c), 'Blätter verteilen sich nicht gleichmäßig');
   assert(/'data-action': f\.aktion \|\| f\.id/.test(c), 'Blatt ohne Knospen führt nicht direkt zur Aktion');
   assert(/if \(this\.hasAttribute\('beschriftet'\)\) this\.funcs\.forEach\(f => this\.wort\(base, f\.label/.test(c), 'Wort steht nicht dauerhaft auf dem Blatt');
-  assert(/'belegung', 'beschriftet', 'oben', 'sicht', 'mitte', 'stiel'\]/.test(c), 'neue Attribute werden nicht beobachtet');
-  assert(/:host\(\[floating\]\[oben\]\)\{top:/.test(c), 'schwebende Blume lässt sich nicht nach oben setzen');
+  assert(/'belegung', 'beschriftet', 'mitte-unter', 'sicht', 'mitte', 'stiel'\]/.test(c), 'neue Attribute werden nicht beobachtet');
+  assert(/const unter = this\.getAttribute\('mitte-unter'\)/.test(c) && /mitte\.addEventListener\('click', e => \{ e\.stopPropagation\(\); this\.fire\('ich'\); \}\)/.test(c), 'Mitte wird nicht zum Knopf für ich');
 });
 
 Deno.test('Version 2, rein und raus: vier Dinge, je zwei Wege', () => {
@@ -31,13 +31,15 @@ Deno.test('Version 2, rein und raus: vier Dinge, je zwei Wege', () => {
   assert(/body\[data-v="reinraus"\] #leiste,body\[data-v="links"\] #leiste\{display:none\}/.test(html), 'Leiste bleibt in Version 2 stehen');
 });
 
-Deno.test('Version 3, Light: fünf Blätter mit Verb, direkt, Hilfe unten rechts', () => {
+Deno.test('Version 3, Light: fünf Blätter mit Verb, direkt, Mitte zur Anmeldung, Blume unten rechts', () => {
   const hub = (s.match(/hub: \{ name: 'ReliHub', blaetter: \[[\s\S]*?\] \}/) || [''])[0];
   assertEquals([...hub.matchAll(/wort: '([^']+)'/g)].map((m) => m[1]), ['Kontakt aufnehmen', 'Material finden', 'Material teilen', 'Termin eintragen', 'Termine finden']);
-  assert(/if \(VERSION !== 'heute'\) return d\.action\.includes\('\.'\) \? standardAktion\(d, 'hub'\) : false;/.test(s), 'Klick führt nicht direkt hin');
+  assert(/if \(VERSION !== 'heute'\) return d\.action\.includes\('\.'\) \|\| d\.action === 'ich' \? standardAktion\(d, 'hub'\) : false;/.test(s), 'Klick führt nicht direkt hin');
   assert(/body:not\(\[data-v="heute"\]\) #stSicht,body:not\(\[data-v="heute"\]\) #explain\{display:none\}/.test(html), 'Umschalter und Erklärkarte bleiben stehen');
-  assert(/setze\(k, 'oben', VERSION === 'light' \? '' : null\)/.test(s), 'schwebende Blume sitzt nicht oben');
-  assert(/<button type="button" class="v-hilfe" id="hilfeKnopf" aria-expanded="false" aria-controls="hilfeFeld"/.test(html) && /body\[data-v="light"\] \.v-hilfe\{display:grid\}/.test(html), 'Hilfeknopf fehlt');
+  assert(!/hilfeKnopf|\[oben\]/.test(html), 'Hilfeknopf oder Blume oben sind noch da: Die Blume sitzt unten rechts');
+  assert(/const w = VERSION === 'light' \? \(LOGGED \? 'mein Profil' : 'anmelden'\) : null;/.test(s) && /kopfzeilen\(\); mitteStand\(\);/.test(s), 'Mitte zeigt den Stand der Anmeldung nicht');
+  assert(/if \(d\.action === 'ich'\) \{ if \(VERSION === 'light' && !LOGGED\) anDialogAuf\(\); else go\(LOGGED \? 'profil' : 'start'\); return false; \}/.test(s), 'Mitte führt nicht zur Anmeldung oder zum Profil');
+  assert(/const NUR_ANGEMELDET = \['material\.teilen', 'termine\.erstellen', 'news\.veroeffentlichen'\];/.test(s) && /if \(VERSION !== 'light' \|\| LOGGED \|\| !NUR_ANGEMELDET\.includes\(d\.action\)\) return false;/.test(s), 'Teilen und Eintragen gehen ohne Anmeldung');
 });
 
 Deno.test('Einstellbare Blume: Community wählt Blätter, Wortlaut und Ziel; Farbe und Platz bleiben', () => {

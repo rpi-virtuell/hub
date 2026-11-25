@@ -11,7 +11,8 @@ Der Prototyp zeigte zuletzt drei Navigationen zugleich: die Blätter der Blume, 
 - Wer auf ein Blatt klickt, erwartet die Seite dazu und keine Erklärkarte.
 - Finden und veröffentlichen je Inhaltsart ist sofort verständlich.
 - Die Suche wird der häufigste Einstieg sein. Das Ökosystem gilt als stärkste Idee, aber nicht als erste Seite für Neue.
-- Unten rechts erwartet man Hilfe und Gespräch, keine Steuerkonsole.
+- Wo die kleine Blume sitzt, war strittig: Die einen erwarten unten rechts Hilfe und Gespräch, die anderen dort den Zugang zum Mitgestalten. Nach Rückmeldung aus dem Projektteam bleibt sie unten rechts.
+- Formulare ohne Anmeldung laden zu Spam ein und können eine Community vermüllen.
 - In einer Community soll die Blume schlank sein. Was sie zeigt und wie die Blätter heißen, soll die Community bestimmen.
 - Die Startseite sagt nicht, was man hier findet, was man tun kann und warum.
 - Der Ort muss stehen bleiben: Ein Formular legt sich über die Seite der Community.
@@ -22,7 +23,7 @@ Der Prototyp zeigte zuletzt drei Navigationen zugleich: die Blätter der Blume, 
 1. **Reiterzeile.** Oben auf jeder Seite steht eine schmale Zeile „Entwurfsvergleich“ mit fünf Reitern und einem Satz, was die gewählte Version ausmacht. Jede Version hat eine eigene Adresse (`?v=reinraus`, `?v=light`, `?v=suche`, `?v=links`), die Wahl bleibt im Browser gespeichert.
 2. **Version 1, Stand heute.** Unverändert: Blume mit Umschalter, Stiel und Leiste (ADR-0013 bis ADR-0015).
 3. **Version 2, rein und raus.** Vier Blätter: Menschen, Materialien, Termine, Artikel. Je Blatt zwei Knospen, finden und veröffentlichen; bei Menschen sind es Personen und Communities. Kein Umschalter, keine Leiste, keine Sonderfarbe. Der Stiel trägt die Orte. Profil und vernetzte Suche stehen als Links unter der Blume.
-4. **Version 3, Light.** Eine Stufe, fünf Blätter mit Verb und Ding: Kontakt aufnehmen, Material finden, Material teilen, Termin eintragen, Termine finden. Ein Klick führt direkt hin. Die schwebende Blume sitzt oben rechts, unten rechts steht ein Hilfeknopf. Die Leiste bleibt für die Orte.
+4. **Version 3, Light.** Eine Stufe, fünf Blätter mit Verb und Ding: Kontakt aufnehmen, Material finden, Material teilen, Termin eintragen, Termine finden. Ein Klick führt direkt hin. Die schwebende Blume sitzt unten rechts. Die Mitte ist ein Knopf: Unter dem Ort steht klein „anmelden“, nach der Anmeldung „mein Profil“. Finden geht ohne Anmeldung, Teilen und Eintragen fragen zuerst danach. Das Menü der Community oben bleibt ihr eigenes und dient dem Informieren. Die Leiste bleibt für die Orte.
 5. **Version 4, Suche zuerst.** Das Suchfeld ist der Einstieg und führt ins Ökosystem. Die Orte liegen unten als Blütenreihe: ineinandergreifende Blätter in der Farbe des Orts, der aktuelle liegt obenauf. Stiel und schwarze Leiste entfallen.
 6. **Version 5, Leiste links.** Die Gegenprobe: Navigation als Liste am linken Rand, die Blume ist nur Zeichen.
 7. **Drei Sätze auf der Startseite.** In den Versionen 3 bis 5 stehen unter der Überschrift drei kurze Antworten: Was du hier findest, was du hier tun kannst, warum.
@@ -37,7 +38,7 @@ Der Prototyp zeigte zuletzt drei Navigationen zugleich: die Blätter der Blume, 
 
 ## Technik
 - Die Steuerkonsole kennt weitere Belegungen: `RelihubSteuerkonsole.registerBelegung(name, liste)`, gewählt über das Attribut `belegung`. Die Blätter verteilen sich gleichmäßig, drei bis fünf sind erprobt. Ein Blatt ohne Knospen trägt `aktion` und führt direkt dorthin.
-- Das Attribut `beschriftet` schreibt das Wort dauerhaft auf jedes Blatt. Das Attribut `oben` setzt die schwebende Blume an den oberen Rand.
+- Das Attribut `beschriftet` schreibt das Wort dauerhaft auf jedes Blatt. Das Attribut `mitte-unter` macht die Mitte zum Knopf für „ich“ und schreibt klein darunter, wohin er führt.
 - Die Leiste kennt `form="blueten"` und je Eintrag eine Farbe.
 - Die Einstellung einer Community ist ein kleiner Datensatz: je Blatt Ding, Wortlaut und Ziel. Im Prototyp steht er in der Seite.
 
@@ -49,6 +50,6 @@ Der Prototyp zeigte zuletzt drei Navigationen zugleich: die Blätter der Blume, 
 ## Offen
 - Die dritte Spielart, eine Blume, die nach dem Anmelden Blätter dazubekommt, ist beschrieben, aber nicht gebaut.
 - In der geteilten Spielart liegt die Mitte nah an der oberen Hälfte.
-- Die schwebende Blume oben rechts kann auf einzelnen Seiten Kopfzeilen berühren.
+- Nach der Anmeldung öffnet sich das Formular nicht von selbst, der Klick auf das Blatt ist noch einmal nötig.
 - Version 5 hat auf schmalen Schirmen nur einen waagrechten Streifen.
-- Ob Hilfe unten rechts später ein Gespräch oder ein Assistent wird, ist nicht entschieden.
+- Wo Hilfe, Gespräch oder ein Assistent ihren Platz bekommen, ist nicht entschieden. Der Hilfeknopf des ersten Entwurfs ist wieder entfernt.

@@ -1233,7 +1233,7 @@ a.kat-card:hover{border-color:var(--c-koop)}
 .vz button[aria-pressed="true"]{background:#fff;color:#1D1D1B;border-color:#fff}
 .vz button:focus-visible{outline:3px solid #FFA500;outline-offset:1px}
 .vz-notiz{flex:1 1 280px;color:#E6E8EC}
-.v-drei,.v-hinweis,.v-hilfe,.v-hilfefeld,.vl{display:none}
+.v-drei,.v-hinweis,.vl{display:none}
 body:not([data-v="heute"]) #stSicht,body:not([data-v="heute"]) #explain{display:none}
 body[data-v="reinraus"] .flower-wrap{padding:112px 0 366px}
 body[data-v="light"] .flower-wrap,body[data-v="suche"] .flower-wrap{padding:84px 0 104px}
@@ -1249,14 +1249,6 @@ body[data-v="suche"] .st-themen input{padding:15px 20px;font-size:19px}
 body[data-v="suche"] .st-themen .st-chips{display:none}
 body[data-v="reinraus"] #leiste,body[data-v="links"] #leiste{display:none}
 body[data-v="links"] relihub-steuerkonsole[floating],body[data-v="links"] .flower-wrap{display:none}
-body[data-v="light"] .v-hilfe{display:grid}
-.v-hilfe{position:fixed;right:22px;bottom:22px;z-index:9999;width:54px;height:54px;border-radius:50%;place-items:center;border:0;background:#1D1D1B;color:#fff;font:700 24px/1 Barlow,sans-serif;cursor:pointer;box-shadow:0 8px 26px rgba(15,23,42,.24)}
-.v-hilfe:focus-visible{outline:3px solid #FFA500;outline-offset:3px}
-body[data-v="light"] .v-hilfefeld:not([hidden]){display:block}
-.v-hilfefeld{position:fixed;right:22px;bottom:88px;z-index:9999;width:min(320px,calc(100vw - 44px));background:#fff;color:#1D1D1B;border:1px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:0 18px 50px rgba(15,23,42,.22);font-size:15px}
-.v-hilfefeld h2{margin:0 0 6px;font-size:18px}
-.v-hilfefeld p{margin:0 0 8px}
-.v-hilfefeld .klein{font-size:13px;color:#4B515A;margin:0}
 body[data-v="links"]{padding-left:216px}
 body[data-v="links"] .vl{display:flex}
 .vl{position:fixed;left:0;top:0;bottom:0;width:216px;box-sizing:border-box;z-index:7000;flex-direction:column;gap:2px;padding:14px 10px 16px;background:#fff;border-right:1px solid var(--line);overflow-y:auto;font-size:15px}
@@ -1923,13 +1915,6 @@ body[data-v="light"] #rlHubText{display:none}
 </div>
 
 <relihub-leiste id="leiste" label="Orte"></relihub-leiste>
-<button type="button" class="v-hilfe" id="hilfeKnopf" aria-expanded="false" aria-controls="hilfeFeld" aria-label="Hilfe und Kontakt">?</button>
-<div class="v-hilfefeld" id="hilfeFeld" hidden>
-  <h2>Hilfe</h2>
-  <p>Die Blume oben rechts ist dein Wegweiser: Sie führt zu Material, Terminen und Menschen. Du findest sie auf jeder Seite.</p>
-  <p><a href="#kooperieren/personen">Kontakt aufnehmen</a> · <a href="#partner">Alle Orte ansehen</a></p>
-  <p class="klein">Hier könnte später ein Gespräch mit einer Ansprechperson oder ein Assistent stehen.</p>
-</div>
 <div class="ef-overlay" id="efOverlay" hidden></div>
 <div class="leiste-cfg" id="leisteCfg" hidden role="dialog" aria-label="Leiste anpassen">
   <h2>Leiste anpassen</h2>
@@ -2239,17 +2224,12 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
 :host([floating][open]) .popover{transform:none}
 @media (max-width:560px){:host([floating]) .popover{position:fixed;top:auto;bottom:96px;left:50%;right:auto!important;transform:translate(-50%,10px) scale(.96)}
   :host([floating][open]) .popover{transform:translate(-50%,0)}}
-:host([floating][oben]){top:var(--relihub-float-top,96px);bottom:auto}
-:host([floating][oben]) .popover{bottom:auto;top:calc(100% + 16px);transform-origin:top right;transform:translateY(-10px) scale(.96)}
-:host([floating][oben][open]) .popover{transform:none}
-@media (max-width:560px){:host([floating][oben]) .popover{top:150px;bottom:auto;transform:translate(-50%,-10px) scale(.96)}
-  :host([floating][oben][open]) .popover{transform:translate(-50%,0)}}
 @media (prefers-reduced-motion:reduce){.pop,.bud,.popover,.st-blatt{transition:none}}
 .cap{position:absolute;top:14px;left:0;right:0;text-align:center;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#5F5E5A}
 `;
 
   class RelihubSteuerkonsoleElement extends HTMLElement {
-    static get observedAttributes() { return ['size', 'variant', 'context', 'base-url', 'target', 'compact', 'floating', 'popover-size', 'popover-align', 'belegung', 'beschriftet', 'oben', 'sicht', 'mitte', 'stiel']; }
+    static get observedAttributes() { return ['size', 'variant', 'context', 'base-url', 'target', 'compact', 'floating', 'popover-size', 'popover-align', 'belegung', 'beschriftet', 'mitte-unter', 'sicht', 'mitte', 'stiel']; }
     constructor() {
       super();
       this.attachShadow({ mode: 'open' });
@@ -2371,8 +2351,15 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
       const mitte = el('g', { class: 'mitte', 'pointer-events': 'none', 'aria-hidden': 'true' }, svg);
       const mText = ort ? ort.label : 'Ich möchte', mBreit = Math.max(96, Math.min(220, mText.length * 12.5 + 34));
       if (ort) mitte.setAttribute('data-ort', ort.label);
-      el('rect', { x: -mBreit / 2, y: -19, width: mBreit, height: 38, rx: 19, fill: ort && ort.color ? ort.color : '#FFFFFF', 'fill-opacity': ort && ort.color ? 1 : 0.94 }, mitte);
-      this.text(mitte, mText, 0, 1, 23, ort && ort.color ? '#FFFFFF' : '#1B2440', 'lbl');
+      // Mit mitte-unter wird die Mitte zum Knopf für „ich“: Unter dem Ort steht klein, wohin der Klick führt (anmelden oder mein Profil)
+      const unter = this.getAttribute('mitte-unter'), mFarbe = ort && ort.color ? '#FFFFFF' : '#1B2440';
+      el('rect', { x: -mBreit / 2, y: unter ? -24 : -19, width: mBreit, height: unter ? 54 : 38, rx: unter ? 22 : 19, fill: ort && ort.color ? ort.color : '#FFFFFF', 'fill-opacity': ort && ort.color ? 1 : 0.94 }, mitte);
+      this.text(mitte, mText, 0, unter ? -7 : 1, 23, mFarbe, 'lbl');
+      if (unter) {
+        const u = this.text(mitte, unter, 0, 15, 15, mFarbe, 'lbl'); u.setAttribute('text-decoration', 'underline');
+        mitte.setAttribute('pointer-events', 'auto'); mitte.removeAttribute('aria-hidden'); mitte.style.cursor = 'pointer';
+        mitte.addEventListener('click', e => { e.stopPropagation(); this.fire('ich'); });
+      }
 
       // Zugängliche Links (für Tastatur und Screenreader) – steuern dieselbe Grafik
       const nav = document.createElement('nav');
@@ -2388,6 +2375,14 @@ svg{display:block;width:100%;height:100%;overflow:visible;touch-action:manipulat
           nav.appendChild(a);
         });
       });
+      if (unter) {
+        const a = document.createElement('a');
+        a.href = resolve('ich', this.ctx, this).url; a.textContent = unter === 'anmelden' ? 'Anmelden' : 'Mein Profil';
+        a.addEventListener('focus', () => { this.cancelClose(); this.openPop(); });
+        a.addEventListener('blur', () => this.closePop(300));
+        a.addEventListener('click', e => { e.preventDefault(); this.fire('ich'); });
+        nav.insertBefore(a, nav.firstChild);
+      }
       root.appendChild(nav);
       this.stielHalter = holder; this.stielEinheit = (this.compact ? (parseInt(this.getAttribute('popover-size'), 10) || 200) : size) / (2 * VB);
       this.stielBauen();
@@ -6010,12 +6005,27 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   function later(d) { toast(`<b>${d.label}</b> führt später hierhin:<br><code>${d.url}</code>`); }
 
   // Gemeinsame Kette aller Kontexte: Knospe → Aktion (Editor, Ansicht), sonst Hinweis oder „führt später hierhin“
+  // Version Light: Finden geht ohne Anmeldung, Teilen und Eintragen fragen zuerst danach (Schutz vor Spam in den Communities)
+  const NUR_ANGEMELDET = ['material.teilen', 'termine.erstellen', 'news.veroeffentlichen'];
+  function brauchtAnmeldung(d) {
+    if (VERSION !== 'light' || LOGGED || !NUR_ANGEMELDET.includes(d.action)) return false;
+    anDialogAuf(); anMeldung('Zum Teilen und Eintragen melde dich bitte an. Finden geht ohne Anmeldung.'); return true;
+  }
+  /** Mitte der Blume in der Version Light: zeigt klein „anmelden“ oder „mein Profil“ und ist dann klickbar */
+  function mitteStand() {
+    document.querySelectorAll('relihub-steuerkonsole').forEach(k => {
+      if (k.closest('.ei-vorschau')) return;
+      const w = VERSION === 'light' ? (LOGGED ? 'mein Profil' : 'anmelden') : null;
+      if (w === null) k.removeAttribute('mitte-unter'); else if (k.getAttribute('mitte-unter') !== w) k.setAttribute('mitte-unter', w);
+    });
+  }
   function standardAktion(d, ctx) {
     if (d.action === 'menschen.communities') { go(HUB_C ? 'community' : 'communities'); return false; }   // mit Zuschnitt in den Raum der Community (ohne c gilt HUB_C)
     if (d.action === 'termine.erstellen') { openEvent(ctx); return false; }
     if (d.action === 'news.veroeffentlichen') { openBlog(ctx); return false; }
     if (d.action === 'material.teilen') { go('materialpool'); openChooser('materialpool'); return false; }
-    if (d.action === 'ich') { go(LOGGED ? 'profil' : 'start'); return false; }
+    if (brauchtAnmeldung(d)) return false;
+    if (d.action === 'ich') { if (VERSION === 'light' && !LOGGED) anDialogAuf(); else go(LOGGED ? 'profil' : 'start'); return false; }
     if (d.action.startsWith('ich.') && d.action !== 'ich.profil' && !LOGGED) { anmelden(); return false; }
     if (d.stand === 'offen') { toast(`<b>${EX[d.action] ? EX[d.action].t : d.label}</b> ${GRAU_TEXT.offen}.`); return false; }
     if (VIEW_OF[d.action]) { navTo(VIEW_OF[d.action], d.url); if (d.stand) toast(`<b>${d.label}</b> ${GRAU_TEXT[d.stand]}. Das hier ist ein Ausblick.`); return false; }
@@ -6031,7 +6041,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     onActivate: d => { if (exPinned && d.source === 'pointer') return; if (VERSION !== 'heute') return; explain(d.action); },
     handler: d => {
       exPinned = true;
-      if (VERSION !== 'heute') return d.action.includes('.') ? standardAktion(d, 'hub') : false;   // die anderen Versionen führen ohne Erklärkarte direkt hin
+      if (VERSION !== 'heute') return d.action.includes('.') || d.action === 'ich' ? standardAktion(d, 'hub') : false;   // die anderen Versionen führen ohne Erklärkarte direkt hin
       if (MODUS === 'direkt' && d.action.includes('.')) return standardAktion(d, 'hub');
       if (kleinerSchirm()) { exEl.classList.add('sheet'); explain(d.action); } else { explain(d.action); exEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
       return false;
@@ -6041,7 +6051,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   RelihubSteuerkonsole.registerContext('hub-start-float', {
     mitte: { label: 'ReliHub' },
     handler: d => {
-      if (VERSION !== 'heute') return d.action.includes('.') ? standardAktion(d, 'hub') : false;
+      if (VERSION !== 'heute') return d.action.includes('.') || d.action === 'ich' ? standardAktion(d, 'hub') : false;
       if (MODUS === 'direkt') return standardAktion(d, 'hub');
       explain(d.action);
       if (kleinerSchirm()) exEl.classList.add('sheet'); else exEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -6103,7 +6113,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     mitte: { label: 'relilab', kurz: 'rl', color: '#6D3BE0' },   // erstes Beispiel für „Mitte plus vier“ (ADR-0013)
     actions: { 'material.finden': { params: { thema: 'Digitalität' } } },
     handler: d => {
-      if (!d.action.includes('.') && VERSION !== 'heute') return false;
+      if (!d.action.includes('.') && d.action !== 'ich' && VERSION !== 'heute') return false;
+      if (brauchtAnmeldung(d)) return false;
       if (VERSION === 'light') {   // der Ort bleibt stehen: Das Formular legt sich über relilab, die Suche zeigt zuerst das Eigene
         if (d.action === 'material.teilen') { if (CUR.split('?')[0] !== 'relilab') go('relilab'); openChooser('relilab'); return false; }
         if (d.action === 'material.finden') { go('relilab?zu=materialien'); return false; }
@@ -6347,7 +6358,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     ICH.hex = istHex64(hex) ? hex : null; ICH.kann = !!(ICH.hex && kann); LOGGED = !!ICH.hex;
     ichDaten = null; ichInhalte = null; ichLauf++;
     try { if (ICH.hex) sessionStorage.setItem('relihub-ich', JSON.stringify({ hex: ICH.hex, kann: ICH.kann })); else sessionStorage.removeItem('relihub-ich'); } catch (e) {}
-    kopfzeilen();
+    kopfzeilen(); mitteStand();
     if (ICH.hex) ichLaden();
   }
   /** Profil, Mitgliedsliste (kind 30000, d=communities) und Folgeliste (kind 3) der angemeldeten Person in einer Abfrage je Relay */
@@ -6714,7 +6725,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   const VERSIONEN = {
     heute: 'Blume mit Umschalter, Stiel und Leiste. So steht der Entwurf bisher.',
     reinraus: 'Vier Dinge, je zwei Wege: finden und veröffentlichen. Der Stiel trägt die Orte, die Leiste entfällt.',
-    light: 'Fünf Blätter mit Verb, ein Klick führt direkt hin. Die Blume sitzt oben, unten rechts steht die Hilfe. Im relilab ist die Blume einstellbar.',
+    light: 'Fünf Blätter mit Verb, ein Klick führt direkt hin. Die Mitte führt zur Anmeldung, die Blume sitzt unten rechts. Im relilab ist die Blume einstellbar.',
     suche: 'Die Suche ist der Einstieg und führt ins Ökosystem. Die Orte liegen unten als Blütenreihe.',
     links: 'Gegenprobe ohne Blume als Steuerung: Die Navigation steht links als Liste.'
   };
@@ -6755,7 +6766,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       { ding: 'termine', wort: 'Freizeit eintragen', kurz: 'eintragen', aktion: 'termine.erstellen' },
       { ding: 'termine', wort: 'Termine finden', kurz: 'finden', aktion: 'termine.finden' }] }
   };
-  const ZIEL_TEXT = { 'menschen.personen': 'Ansprechpersonen der Community', 'material.finden': 'Liste, zuerst nur die eigene Community', 'material.teilen': 'Formular, die Community ist vorbelegt', 'termine.erstellen': 'Formular, die Community ist vorbelegt', 'termine.finden': 'Liste, zuerst nur die eigene Community' };
+  const ZIEL_TEXT = { 'menschen.personen': 'Ansprechpersonen der Community', 'material.finden': 'Liste, zuerst nur die eigene Community', 'material.teilen': 'Formular nach Anmeldung, die Community ist vorbelegt', 'termine.erstellen': 'Formular nach Anmeldung, die Community ist vorbelegt', 'termine.finden': 'Liste, zuerst nur die eigene Community' };
   const V_SATZ = {
     'menschen.personen': 'Sieh, wer hier mitarbeitet, und nimm Kontakt auf.', 'menschen.communities': 'Finde Communities, die an deinen Themen arbeiten.',
     'material.finden': 'Suche Material aus allen Instituten und Communities.', 'material.teilen': 'Gib eigenes Material weiter. Es erscheint überall, wo es gebraucht wird.',
@@ -6775,7 +6786,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   });
   const V_START = {
     reinraus: 'Vier Dinge, je zwei Wege: finden und veröffentlichen. <a href="#profil">Mein Profil</a> · <a href="#oekosystem">Vernetzte Suche</a>',
-    light: 'Diese Blume ist dein Wegweiser im ReliHub. Du findest sie auf jeder Seite wieder. Fahre über ein Blatt oder tippe es an.',
+    light: 'Diese Blume ist dein Wegweiser im ReliHub. Du findest sie auf jeder Seite unten rechts wieder. Die Mitte führt zur Anmeldung.',
     suche: 'Oder geh direkt über die Blume: vier Dinge, je zwei Wege.'
   };
   const vHinweis = document.getElementById('vHinweis'), startBlume = document.getElementById('startFlower');
@@ -6816,9 +6827,6 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     rlKonfigRender();
     const neu = document.querySelector(`#rlKonfig [${b.dataset.rkBsp ? 'data-rk-bsp' : 'data-rk-art'}][aria-pressed="true"]`); if (neu) neu.focus();
   });
-  const hilfeKnopf = document.getElementById('hilfeKnopf'), hilfeFeld = document.getElementById('hilfeFeld');
-  hilfeKnopf.addEventListener('click', () => { hilfeFeld.hidden = !hilfeFeld.hidden; hilfeKnopf.setAttribute('aria-expanded', String(!hilfeFeld.hidden)); });
-  hilfeFeld.addEventListener('click', e => { if (e.target.closest('a')) { hilfeFeld.hidden = true; hilfeKnopf.setAttribute('aria-expanded', 'false'); } });
   function versionSetzen(v, merken) {
     VERSION = VERSIONEN[v] ? v : 'heute';
     document.body.dataset.v = VERSION;
@@ -6832,7 +6840,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       const schwebt = k.hasAttribute('floating'), imLab = k.id === 'rlBlume' || k.id === 'rlFlower';
       setze(k, 'belegung', VERSION === 'light' && imLab ? 'ort-relilab-fuenf' : beleg);
       setze(k, 'beschriftet', beleg && !schwebt ? '' : null);
-      if (schwebt) { setze(k, 'oben', VERSION === 'light' ? '' : null); setze(k, 'stiel', VERSION === 'light' || VERSION === 'suche' ? 'off' : null); }
+      if (schwebt) { setze(k, 'stiel', VERSION === 'light' || VERSION === 'suche' ? 'off' : null); }
     });
     setze(startBlume, 'stiel', VERSION === 'heute' || VERSION === 'reinraus' ? '' : null);
     setze(leisteEl, 'form', VERSION === 'suche' ? 'blueten' : null);
@@ -6841,7 +6849,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     knopf.textContent = VERSION === 'suche' ? 'Suchen' : 'Zeigen';
     stFeld.placeholder = VERSION === 'suche' ? 'Frieden, Konfi, Schöpfung …' : '#Frieden #Konfi #Schöpfung';
     vHinweis.innerHTML = V_START[VERSION] || '';
-    hilfeFeld.hidden = true; hilfeKnopf.setAttribute('aria-expanded', 'false');
+    mitteStand();
     rlKonfigRender();
   }
   document.getElementById('vz').addEventListener('click', e => { const b = e.target.closest('button[data-v]'); if (b) versionSetzen(b.dataset.v, true); });
