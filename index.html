@@ -837,6 +837,16 @@ relihub-steuerkonsole[hidden]{display:none}
 #v-fortbildungen .ka-tools button{color:#2B1A00}
 #v-fortbildungen .ka-act button{border-color:var(--n-termine)}
 #v-fortbildungen .ka-in h1{color:var(--nx-termine)}
+/* Community-Raum: keine zweite linke Leiste. Die Blüten am Rand tragen die Wege des Raums in den Worten der Community (ADR-0017) */
+.cr .cr-side{display:none}
+.cr{grid-template-columns:minmax(0,1fr)!important}
+/* relilab: keine Blume mehr in der Mitte der Seite. Was die Community braucht, steht in den Blüten am Rand */
+#rlBlume,.rl-hubband{display:none!important}
+/* relilab-Seite: Abschnitte untereinander, Einträge je Abschnitt im Raster */
+.rl-trias{grid-template-columns:minmax(0,1fr)!important;gap:34px!important}
+.rl-reihe{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;margin:0 0 10px}
+.rl-reihe>*{margin:0!important}
+.cr-mat{margin:0 0 26px}
 /* Material: alles Material des Ökosystems */
 .mt-wrap{max-width:1180px;margin:0 auto;padding:6px clamp(34px,4vw,40px) 70px}
 .mt-wrap h1{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:46px;line-height:1;margin:10px 0 8px}
@@ -5632,7 +5642,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (crTab === 'katalog') return `<div class="cr-cols one"><section class="kat" id="katRoot" aria-live="polite"></section></div>`;
     const D0 = crData(c), D = { act: [], ev: [], ...D0 }, mem = crMember[c.id], lock = (what) => `<div class="cr-lock"><b>${what} nur für Mitglieder</b>Tritt der Community bei, um ${what === 'Kalender' ? 'alle Termine zu sehen und eigene anzulegen' : 'die Einstellungen zu verwalten'}.<div style="margin-top:14px"><button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button></div></div>`;
     const evList = D.ev.map(([d, t]) => `<button type="button" class="cr-ev" data-todo="Termin „${t}“"><small>${d}</small><b>${t}</b></button>`).join('');
-    if (crTab === 'home') return `<div class="cr-cols"><section><h2 class="cr-h">Kürzliche Aktivität</h2>${D.act.map(i => crItem(i, c)).join('')}</section><aside><h2 class="cr-h"><span>Kommende Veranstaltungen ›</span></h2>${evList}</aside></div>`;
+    if (crTab === 'home') return `<section class="cr-mat"><h2 class="cr-h">Materialien</h2><div id="crMat"></div></section><div class="cr-cols"><section><h2 class="cr-h">Kürzliche Aktivität</h2>${D.act.map(i => crItem(i, c)).join('')}</section><aside><h2 class="cr-h"><span>Kommende Veranstaltungen ›</span></h2>${evList}</aside></div>`;
     if (crTab === 'art' || crTab === 'lern') {
       const ty = crTab === 'art' ? 'Artikel' : 'Lerninhalt', list = D.act.filter(i => i.type === ty);
       const btn = crTab === 'art' ? `<button type="button" class="cr-pill" data-cract="blog">+ Artikel schreiben</button>` : `<button type="button" class="cr-pill" data-cract="learn">+ Lerninhalt teilen</button>`;
@@ -5650,6 +5660,19 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     }
     return `<div class="cr-cols one"><section><h2 class="cr-h">Einstellungen</h2>${mem ? ['Benachrichtigungen bei neuen Terminen', 'Benachrichtigungen bei neuen Artikeln', 'Wöchentliche Zusammenfassung per E-Mail'].map((t, i) => `<div class="cr-set"><label>${t}<input type="checkbox" ${i < 2 ? 'checked' : ''}></label></div>`).join('') + '<button type="button" class="cr-pill ghost" data-cract="leave">Community verlassen</button>' : lock('Einstellungen')}</section></div>`;
   }
+  /** Materialien der Community auf ihrer Übersicht: was ihr Konto veröffentlicht hat oder was mit ihr geteilt ist, als Karten wie im Materialfeed */
+  let crMatLauf = 0;
+  function crMaterial(hx) {
+    const lauf = ++crMatLauf, ziel = () => crRootEl && crRootEl.querySelector('#crMat');
+    const zeigen = () => {
+      const z = ziel(); if (!z || lauf !== crMatLauf) return;
+      const g = ozGefuege, k = 'c:' + hx;
+      const ms = !g || !hx ? [] : [...g.ents.values()].filter(e => e.typ === 'material' && e.ev && e.ev.kind === 30142 && (e.pk === hx || (g.kanten.get(e.id) || new Set()).has(k))).map(e => mpMaterial(e.ev)).sort((a, b) => b.datum - a.datum);
+      z.innerHTML = ms.length ? `<div class="mt-raster">${ms.slice(0, 6).map(mtKarte).join('')}</div>${ms.length > 6 ? `<p class="mt-ort"><a href="#community?c=${esc(crId)}&zu=katalog">Alle ${ms.length} Materialien ›</a></p>` : ''}` : `<p class="pk-leer">${ozLive ? 'Noch kein Material von dieser Community im Netz.' : 'Material wird geladen …'}</p>`;
+    };
+    zeigen();
+    ozQuellenLaden().then(r => { if (r[4].antwort && !ozLive) ozBauen(); zeigen(); }, () => {});
+  }
   function crRender() {
     const c = CY.find(x => x.id === crId); if (!c) return;
     const mem = crMember[c.id], fol = cyFollow.has(c.id), req = crReq[c.id], hx = (CO_SCHLUESSEL.find(k => k.id === c.id) || {}).hex || ([...CY_HEX].find(x => x[1] === c.id) || [])[0] || '';   // Schlüssel der Community für „Beitreten“
@@ -5664,6 +5687,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
           <div class="cr-act">${hx ? akKnopf('beitreten', hx, 'Beitreten') : mem ? '<span class="cr-badge">✓ Mitglied</span>' : req ? '<span class="cr-badge">Anfrage gesendet</span>' : '<button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button>'}${mem ? '' : '<a data-cract="code">Einladungscode einlösen</a><div class="cr-code" id="crCode" hidden><input placeholder="Code eingeben" aria-label="Einladungscode"><button type="button" class="cr-pill" data-cract="redeem">Einlösen</button></div>'}</div></div>
         ${crMain(c)}
       </main>`;
+    if (crTab === 'home') crMaterial(hx);
     if (crTab === 'katalog') katRender(c);
     else { katLauf++; if (crRootEl.id === 'crRoot') datenstand('v-community', 'nachbau', 'Beispielinhalte'); }
   }
@@ -5831,15 +5855,24 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const mat = antwort ? daten.materialien.slice(0, 6) : [], men = antwort ? daten.menschen : [];
     const termine = antwort ? daten.termine : RT_EV.filter(t => t.s >= jetzt).slice(0, 6);
     const fZeit = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-    tr.innerHTML = `<section id="rlMaterialien" aria-label="Materialien"><h2>Materialien</h2><p class="rl-hint">Neu im Katalog des relilab.</p>`
-      + (mat.length ? mat.map(eintragKarte).join('') : leer(antwort ? 'Noch nichts im Katalog.' : stumm))
-      + `<a class="rl-mehr" href="${esc('#community?c=relilab&zu=katalog')}">Alle im Katalog ›</a></section>`
-      + `<section id="rlMenschen" aria-label="Menschen"><h2>Menschen</h2><p class="rl-hint">Wer hier steht, hat im Labor veröffentlicht oder geteilt.</p>`
-      + (men.length ? men.slice(0, 8).map(pr => `<a class="pe-card rl-person" href="${esc('#person?p=' + pr.npub)}">${peAv(pr)}<div><b>${pr.name}</b>${pr.about ? `<p>${pr.about}</p>` : ''}</div></a>`).join('') : leer(antwort ? 'Noch niemand mit Profil.' : stumm))
+    // Reihenfolge der Seite (ADR-0017): Termine, Communities, Personen, Material, News
+    const reihe = (inhalt, sonst) => inhalt ? `<div class="rl-reihe">${inhalt}</div>` : sonst;
+    const comms = CY.filter(c => c.rl), news = nwListe().filter(x => /relilab/i.test(x.t + ' ' + tagWerte(x.ev, 't').join(' '))).slice(0, 3);
+    tr.innerHTML = `<section id="rlMitmachen" aria-label="Termine"><h2>Termine</h2><p class="rl-hint">Die nächsten Labortermine.</p>`
+      + reihe(termine.map(t => `<a class="rl-termin" href="${esc(sichereUrl(t.u))}"><b>${esc(t.t || t.id)}</b><span>${esc(fZeit.format(new Date(t.s * 1000)))}</span></a>`).join(''), leer(!daten || antwort ? 'Keine bevorstehenden Termine.' : stumm))
+      + `<a class="rl-mehr" href="${esc('#relilab?tab=termine&von=konsole')}">Alle Labortermine ›</a></section>`
+      + `<section id="rlCommunities" aria-label="Communities"><h2>Communities</h2><p class="rl-hint">Gruppen, die im relilab an einem Thema arbeiten.</p>`
+      + reihe(comms.map(c => `<a class="pe-card rl-person" href="${esc('#relilab?room=' + c.id)}">${cyAv(c)}<div><b>${c.n}</b>${c.bio ? `<p>${esc(c.bio)}</p>` : ''}</div></a>`).join(''), leer('Noch keine Communities.'))
+      + `<a class="rl-mehr" href="${esc('#relilab?tab=communities&von=konsole')}">Alle Communities im relilab ›</a></section>`
+      + `<section id="rlMenschen" aria-label="Personen"><h2>Personen</h2><p class="rl-hint">Wer hier steht, hat im Labor veröffentlicht oder geteilt.</p>`
+      + reihe(men.slice(0, 8).map(pr => `<a class="pe-card rl-person" href="${esc('#person?p=' + pr.npub)}">${peAv(pr)}<div><b>${pr.name}</b>${pr.about ? `<p>${pr.about}</p>` : ''}</div></a>`).join(''), leer(antwort ? 'Noch niemand mit Profil.' : stumm))
       + `</section>`
-      + `<section id="rlMitmachen" aria-label="Nächste Termine"><h2>Nächste Termine</h2><p class="rl-hint">Die nächsten Labortermine.</p>`
-      + (termine.length ? termine.map(t => `<a class="rl-termin" href="${esc(sichereUrl(t.u))}"><b>${esc(t.t || t.id)}</b><span>${esc(fZeit.format(new Date(t.s * 1000)))}</span></a>`).join('') : leer(!daten || antwort ? 'Keine bevorstehenden Termine.' : stumm))
-      + `<a class="rl-mehr" href="${esc('#finden/fortbildungen?logik=labor')}">Alle Labortermine ›</a><br><a class="rl-mehr" href="${esc('#relilab?tab=mitmachen')}">Sehen, was im relilab gerade passiert ›</a></section>`;
+      + `<section id="rlMaterialien" aria-label="Material"><h2>Material</h2><p class="rl-hint">Neu im Katalog des relilab.</p>`
+      + reihe(mat.map(e => e.ev && e.ev.kind === 30142 ? mtKarte(mpMaterial(e.ev)) : eintragKarte(e)).join(''), leer(antwort ? 'Noch nichts im Katalog.' : stumm))
+      + `<a class="rl-mehr" href="${esc('#community?c=relilab&zu=katalog')}">Alle im Katalog ›</a></section>`
+      + `<section id="rlNews" aria-label="News"><h2>News</h2><p class="rl-hint">Längere Beiträge aus dem relilab.</p>`
+      + reihe(news.map(x => `<a class="rl-termin" href="${esc('#news?b=' + encodeURIComponent(x.ev.pubkey + ':' + tagWert(x.ev, 'd')))}"><b>${esc(x.t)}</b><span>${esc(new Date(x.zeit * 1000).toLocaleDateString('de-DE'))}</span></a>`).join(''), leer('Noch keine Beiträge aus dem relilab im Netz.'))
+      + `<a class="rl-mehr" href="${esc('#relilab?room=relilab&rtab=art&von=konsole')}">Artikel im relilab ›</a><br><a class="rl-mehr" href="${esc('#relilab?tab=mitmachen')}">Sehen, was im relilab gerade passiert ›</a></section>`;
     if (document.querySelector('#v-relilab [data-rlsec="home"]').classList.contains('on')) {
       if (antwort) datenstand('v-relilab', 'live', `${daten.materialien.length} Materialien · ${daten.menschen.length} Menschen · ${daten.termineZahl} Labortermine`);
       else datenstand('v-relilab', 'stand', RT_STAND);
@@ -6427,15 +6460,21 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       if (d.action === 'termine.finden') { go('relilab?tab=termine&von=konsole'); return false; }
       return standardAktion(d, 'relilab');
   }
-  // Zweites Beispiel: reliGLOBAL. Der Ort bleibt stehen, jede Knospe zeigt nur, was zu reliGLOBAL gehört
+  // Blüten im Raum einer Community (zweites Beispiel: reliGLOBAL): Der Ort bleibt stehen, jede Blüte führt in den Raum, die Raumleiste entfällt
   function rgAktion(d) {
     if (brauchtAnmeldung(d)) return false;
-    if (d.action === 'material.finden') { go('community?c=religlobal&zu=katalog'); return false; }
-    if (d.action === 'termine.finden') { go('community?c=religlobal&tab=kal'); return false; }
-    if (d.action === 'menschen.personen') { go('community?c=religlobal&tab=mem'); return false; }
-    if (d.action === 'material.teilen') { openChooser('reliGlobal'); return false; }
-    if (d.action === 'termine.erstellen') { openEvent('reliGlobal'); return false; }
-    return standardAktion(d, 'reliGlobal');
+    const c = crId, name = (CY.find(x => x.id === c) || {}).n || c, zu = t => { go('community?c=' + c + (t === 'katalog' ? '&zu=katalog' : t === 'home' ? '' : '&tab=' + t)); return false; };
+    if (d.action === 'raum.home') return zu('home');
+    if (d.action === 'material.finden') return zu('katalog');
+    if (d.action === 'termine.finden') return zu('kal');
+    if (d.action === 'menschen.personen') return zu('mem');
+    if (d.action === 'news.finden') return zu('art');
+    if (d.action === 'gespraeche.oeffentlich') return zu('chat');
+    if (d.action === 'raum.lern') return zu('lern');
+    if (d.action === 'raum.set') return zu('set');
+    if (d.action === 'material.teilen') { openChooser(name); return false; }
+    if (d.action === 'termine.erstellen') { openEvent(name); return false; }
+    return standardAktion(d, name);
   }
 
   RelihubSteuerkonsole.registerContext('relidesk', {
@@ -7076,6 +7115,12 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   // Einstellbare Blume einer Community (ADR-0016): eine Stufe, fünf Blätter mit Verb.
   // Fest sind Farbe und Platz je Ding; die Community wählt Blätter, Wortlaut und Ziel.
   const BLUMEN = {
+    frieden: { name: 'Friedensarbeit', blaetter: [
+      { ding: 'menschen', wort: 'Kontakt aufnehmen', aktion: 'menschen.personen' },
+      { ding: 'material', wort: 'Material zur Friedensbildung finden', kurz: 'finden', aktion: 'material.finden' },
+      { ding: 'material', wort: 'Material teilen', kurz: 'teilen', aktion: 'material.teilen' },
+      { ding: 'termine', wort: 'Aktion eintragen', kurz: 'eintragen', aktion: 'termine.erstellen' },
+      { ding: 'termine', wort: 'Aktionen und Termine finden', kurz: 'finden', aktion: 'termine.finden' }] },
     religlobal: { name: 'reliGLOBAL', blaetter: [
       { ding: 'menschen', wort: 'Kontakt aufnehmen', aktion: 'menschen.personen' },
       { ding: 'material', wort: 'Material zum Globalen Lernen finden', kurz: 'finden', aktion: 'material.finden' },
@@ -7259,17 +7304,25 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   // ---------- Blüten am linken Rand ----------
   const ORT_ART = { materialpool: 'Ort', 'rpi-virtuell': 'Ort', relilab: 'Community · Labor', relidesk: 'Werkzeug', oercommunity: 'Projekt' };
   const sbEl = document.getElementById('sb'), sbFeld = document.getElementById('sbFeld'), sbGriff = document.getElementById('sbGriff');
-  function sbOrt() { const v = CUR.split('?')[0]; return v === 'relilab' ? 'relilab' : v === 'community' && crId === 'religlobal' ? 'religlobal' : ''; }
+  function sbOrt() { const v = CUR.split('?')[0]; return v === 'relilab' ? 'relilab' : v === 'community' ? 'raum' : ''; }
+  // Wörter einer Community für ihre Blüten: eigene, wenn sie welche eingestellt hat, sonst die allgemeinen
+  const BLUETEN_STANDARD = [
+    { ding: 'menschen', wort: 'Kontakt aufnehmen', aktion: 'menschen.personen' }, { ding: 'material', wort: 'Material finden', aktion: 'material.finden' }, { ding: 'material', wort: 'Material teilen', aktion: 'material.teilen' },
+    { ding: 'termine', wort: 'Termin eintragen', aktion: 'termine.erstellen' }, { ding: 'termine', wort: 'Termine finden', aktion: 'termine.finden' }];
+  const raumName = () => BLUMEN[crId] ? BLUMEN[crId].name : ((CY.find(c => c.id === crId) || {}).n || 'dieser Community').replace(/\u00ad/g, '');
   function sbRender() {
     const v = CUR.split('?')[0].split('/').pop(), ort = sbOrt();
     const b = (akt, wort, ding, kl) => `<button type="button" class="sb-blatt${kl ? ' ' + kl : ''}${!LOGGED && NUR_ANGEMELDET.includes(akt) ? ' grau' : ''}" data-sb="${akt}" style="--c:${D_FARBE[ding][0]};--t:${D_FARBE[ding][1]}">${esc(wort)}${!LOGGED && NUR_ANGEMELDET.includes(akt) ? ' · anmelden' : ''}</button>`;
-    const dinge = ort ? BLUMEN[ort].blaetter.map(x => b(x.aktion, x.wort, x.ding)).join('')
+    const bl = ort === 'raum' ? (BLUMEN[crId] ? BLUMEN[crId].blaetter : BLUETEN_STANDARD) : ort === 'relilab' ? BLUMEN[rkBsp].blaetter : null;
+    const dinge = ort === 'raum' ? b('raum.home', 'Übersicht', 'ich') + bl.map(x => b(x.aktion, x.wort, x.ding)).join('') + b('news.finden', 'News lesen', 'news') + b('gespraeche.oeffentlich', 'Mitreden', 'gespraeche') + b('raum.lern', 'Lernbausteine', 'material', 'sub') + b('raum.set', 'Einstellungen', 'ich', 'sub')
+      : ort === 'relilab' ? bl.map(x => b(x.aktion, x.wort, x.ding)).join('') + b('news.finden', 'News lesen', 'news') + b('menschen.communities', 'Communities im relilab', 'menschen', 'sub')
+      : ort ? ''
       : b('material.finden', 'Material', 'material') + b('termine.finden', 'Termine', 'termine') + b('news.finden', 'News', 'news') + b('gespraeche.oeffentlich', 'Aktivitäten', 'gespraeche')
         + b('menschen.personen', 'Menschen', 'menschen') + b('menschen.personen', 'Personen', 'menschen', 'sub') + b('menschen.communities', 'Communities', 'menschen', 'sub');
     const orte = LEISTE.filter(x => x.id !== 'start').map(x => `<a class="sb-blatt ort" href="${x.href}" style="--c:${x.color}"${x.id === v ? ' aria-current="page"' : ''}>${esc(x.label)} <small>${ORT_ART[x.id] || 'Ort'}</small></a>`).join('')
-      + `<a class="sb-blatt ort" href="#community?c=religlobal" style="--c:${D_FARBE.menschen[0]}"${ort === 'religlobal' ? ' aria-current="page"' : ''}>reliGLOBAL <small>Community</small></a><a class="sb-blatt ort" href="#partner" style="--c:#8A909C">Alle Orte</a>`;
+      + [['religlobal', 'reliGLOBAL'], ['konfi', 'Konfi-Arbeit'], ['frieden', 'Friedensarbeit']].map(([id, n]) => `<a class="sb-blatt ort" href="#community?c=${id}" style="--c:${D_FARBE.menschen[0]}"${ort === 'raum' && crId === id ? ' aria-current="page"' : ''}>${n} <small>Community</small></a>`).join('') + `<a class="sb-blatt ort" href="#partner" style="--c:#8A909C">Alle Orte</a>`;
     sbFeld.innerHTML = `<a class="sb-blatt" href="#start" style="--c:${D_FARBE.ich[0]}"${v === 'start' ? ' aria-current="page"' : ''}>ReliHub · Start</a>`
-      + `<h2>${ort ? 'Hier bei ' + esc(BLUMEN[ort].name) : 'Im ReliHub'}</h2>${dinge}`
+      + `<h2>${ort === 'raum' ? 'Hier bei ' + esc(raumName()) : ort === 'relilab' ? 'Hier bei ' + esc(BLUMEN[rkBsp].name) : 'Im ReliHub'}</h2>${dinge}`
       + `<button type="button" class="sb-blatt" data-sb="ich" style="--c:${D_FARBE.ich[0]}">${LOGGED ? 'Mein ReliHub' : 'Anmelden'}</button>`
       + `<h2>Orte im Ökosystem</h2>${orte}`;
   }
@@ -7277,7 +7330,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   sbGriff.addEventListener('click', () => { const auf = !sbEl.classList.contains('auf'); sbEl.classList.toggle('auf', auf); sbGriff.setAttribute('aria-expanded', String(auf)); });
   sbFeld.addEventListener('click', e => {
     const k = e.target.closest('[data-sb]');
-    if (k) { const d = aktionVon(k.dataset.sb, k.textContent), ort = sbOrt(); if (ort === 'relilab') rlAktion(d); else if (ort === 'religlobal') rgAktion(d); else standardAktion(d, 'hub'); }
+    if (k) { const d = aktionVon(k.dataset.sb, k.textContent), ort = sbOrt(); if (ort === 'relilab') rlAktion(d); else if (ort === 'raum') rgAktion(d); else standardAktion(d, 'hub'); }
     if (k || e.target.closest('a')) sbZu();
   });
   document.addEventListener('click', e => { if (sbEl.classList.contains('auf') && !sbEl.contains(e.target)) sbZu(); });
@@ -7285,7 +7338,8 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
 
   // ---------- In Entwicklung: Ansichten ohne eigene Entwicklung ----------
   const IN_ENTW = ['materialpool', 'sammlung', 'relidesk', 'rpi-virtuell', 'eigene-instanz'];
-  function entwStand(v) { document.body.classList.toggle('in-entw', IN_ENTW.includes(v) || (v === 'community' && crId !== 'religlobal') || (v === 'profil' && !LOGGED)); }
+  const RAUM_BLAUPAUSE = ['religlobal', 'konfi', 'frieden'];   // Räume nach der Blaupause: eigene Wörter in den Blüten, echte Materialien, kein Hinweis „In Entwicklung“
+  function entwStand(v) { document.body.classList.toggle('in-entw', IN_ENTW.includes(v) || (v === 'community' && !RAUM_BLAUPAUSE.includes(crId)) || (v === 'profil' && !LOGGED)); }
 
   // ---------- Flowi: Chat-Blume unten rechts. Entwurf: feste Antworten nach Stichwort, noch kein Sprachmodell, nichts wird gesendet ----------
   const FLOWI = [
@@ -7321,20 +7375,20 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   // Einstellbare Blume am Beispiel relilab
   let rkBsp = 'relilab', rkArt = 'fuenf';
   function rlKonfigRender() {
-    const an = true, box = document.getElementById('rlKonfig'), k = document.getElementById('rlBlume'), b = BLUMEN[rkBsp];
+    const an = false, box = document.getElementById('rlKonfig')   /* der Kasten ist von der Seite genommen: Die Blüten am Rand zeigen die Wörter selbst */, k = document.getElementById('rlBlume'), b = BLUMEN[rkBsp];
     box.hidden = !an;
     k.setAttribute('variant', an && rkArt === 'geteilt' ? 'scheibe' : 'knospen');
     if (an && rkBsp !== 'relilab') k.setAttribute('mitte', b.name); else k.removeAttribute('mitte');
     if (!an) { box.innerHTML = ''; return; }
     k.setAttribute('belegung', 'ort-' + rkBsp + '-' + rkArt);
     const wahl = (attr, wert, akt, text) => `<button type="button" ${attr}="${wert}" aria-pressed="${wert === akt}">${text}</button>`;
-    box.innerHTML = `<p class="rl-hubmarke">Einstellbare Blume · Entwurf</p><h2>Die Blume von ${esc(b.name)}</h2>`
-      + `<p>Die Community stellt ihre Blume selbst ein: welche Blätter sie zeigt, wie sie heißen und wohin sie führen. Fest bleiben Farbe und Platz je Ding, höchstens fünf Blätter und eine Stufe. So bleibt die Blume überall wiedererkennbar.</p>`
+    box.innerHTML = `<p class="rl-hubmarke">Einstellbare Blüten · Entwurf</p><h2>Die Blüten von ${esc(b.name)}</h2>`
+      + `<p>Die Community stellt ihre Blüten selbst ein: welche sie zeigt, wie sie heißen und wohin sie führen. Du findest sie am linken Rand. Fest bleiben die Farbe je Ding und höchstens fünf Blüten. So bleibt die Leiste überall wiedererkennbar.</p>`
       + `<div class="rk-wahl"><span>Beispiel</span>${wahl('data-rk-bsp', 'relilab', rkBsp, 'relilab')}${wahl('data-rk-bsp', 'religlobal', rkBsp, 'reliGLOBAL')}${wahl('data-rk-bsp', 'wissenschaft', rkBsp, 'Wissenschaft')}${wahl('data-rk-bsp', 'konfi', rkBsp, 'Konfi-Arbeit')}</div>`
-      + `<div class="rk-wahl"><span>Spielart</span>${wahl('data-rk-art', 'fuenf', rkArt, 'Fünf Verben')}${wahl('data-rk-art', 'geteilt', rkArt, 'Geteilte Blätter')}</div>`
       + `<table><thead><tr><th>Ding</th><th>Wortlaut</th><th>Ziel</th></tr></thead><tbody>${b.blaetter.map(x => `<tr><td><span class="pk" style="--c:${D_FARBE[x.ding][0]}"></span>${D_NAME[x.ding]}</td><td>${esc(x.wort)}</td><td>${ZIEL_TEXT[x.aktion]}</td></tr>`).join('')}</tbody></table>`
       + `<p class="rl-hint">Anmelden allein genügt nicht: Die Community nimmt auf, wer bei ihr veröffentlicht. Wer nicht dazugehört, teilt in den Materialpool von rpi-virtuell. Das Material ist dann im gemeinsamen Datenraum zu finden, aber nicht im Pool von ${esc(b.name)}.</p>`
-      + (rkBsp === 'relilab' ? '' : '<p class="rl-hint">Dieses Beispiel zeigt nur den Wortlaut. Die Klicks führen hier weiter ins relilab.</p>');
+      + (rkBsp === 'relilab' ? '' : '<p class="rl-hint">Dieses Beispiel zeigt nur den Wortlaut, auch in den Blüten am Rand. Die Klicks führen hier weiter ins relilab.</p>');
+    try { sbRender(); } catch (e) {}   // die Blüten am Rand zeigen die Wörter des gewählten Beispiels
   }
   document.getElementById('rlKonfig').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;

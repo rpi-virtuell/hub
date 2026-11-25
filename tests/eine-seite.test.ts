@@ -64,7 +64,7 @@ Deno.test('Blüten am linken Rand ersetzen Leiste und kleine Blume', () => {
   assert(/<nav class="sb" id="sb" aria-label="ReliHub-Navigation">/.test(html) && /#leiste,relihub-steuerkonsole\[floating\]\{display:none!important\}/.test(html), 'Blüten fehlen oder Leiste und kleine Blume stehen noch');
   assertEquals((html.match(/<button type="button" class="sb-griff"[\s\S]*?<\/button>/) || [''])[0].match(/<i /g)!.length, 6);
   assert(/const ORT_ART = \{ materialpool: 'Ort', 'rpi-virtuell': 'Ort', relilab: 'Community · Labor', relidesk: 'Werkzeug', oercommunity: 'Projekt' \};/.test(s), 'Ort, Community, Werkzeug und Projekt sind nicht unterschieden');
-  assert(/if \(ort === 'relilab'\) rlAktion\(d\); else if \(ort === 'religlobal'\) rgAktion\(d\); else standardAktion\(d, 'hub'\);/.test(s), 'in einer Community führen die Blüten nicht an ihren Ort');
+  assert(/if \(ort === 'relilab'\) rlAktion\(d\); else if \(ort === 'raum'\) rgAktion\(d\); else standardAktion\(d, 'hub'\);/.test(s), 'in einer Community führen die Blüten nicht an ihren Ort');
   assert(/ReliHub · Start<\/a>/.test(s) && /e\.key === 'Escape' && sbEl\.classList\.contains\('auf'\)/.test(s), 'Weg zum Start oder Schließen fehlt');
 });
 
@@ -152,7 +152,12 @@ Deno.test('reliGLOBAL als zweites Beispiel neben relilab', () => {
   const b = (s.match(/religlobal: \{ name: 'reliGLOBAL', blaetter: \[[\s\S]*?\] \}/) || [''])[0];
   assertEquals([...b.matchAll(/ding: '([a-z]+)'/g)].map((m) => m[1]), ['menschen', 'material', 'material', 'termine', 'termine']);
   assert(/Werkstätten finden/.test(b) && /wahl\('data-rk-bsp', 'religlobal', rkBsp, 'reliGLOBAL'\)/.test(s), 'Beispiel fehlt in der Auswahl');
-  for (const z of ["go('community?c=religlobal&zu=katalog')", "go('community?c=religlobal&tab=kal')", "go('community?c=religlobal&tab=mem')"]) assert(s.includes(z), 'Ziel fehlt: ' + z);
+  const rg = (s.match(/function rgAktion\(d\) \{[\s\S]*?\n  \}/) || [''])[0];
+  for (const z of ["if (d.action === 'material.finden') return zu('katalog');", "if (d.action === 'termine.finden') return zu('kal');", "if (d.action === 'menschen.personen') return zu('mem');", "if (d.action === 'news.finden') return zu('art');", "if (d.action === 'gespraeche.oeffentlich') return zu('chat');"]) assert(rg.includes(z), 'Ziel fehlt: ' + z);
+  assert(/\.cr \.cr-side\{display:none\}/.test(html) && /b\('raum\.home', 'Übersicht', 'ich'\)/.test(s) && /BLUMEN\[crId\] \? BLUMEN\[crId\]\.blaetter : BLUETEN_STANDARD/.test(s), 'Raum hat noch eine zweite linke Leiste oder die Blüten tragen seine Wege nicht');
+  assert(/#rlBlume,\.rl-hubband\{display:none!important\}/.test(html) && /const an = false, box = document\.getElementById\('rlKonfig'\)/.test(s) && /BLUMEN\[rkBsp\]\.blaetter/.test(s), 'relilab zeigt noch Blume oder Kasten in der Mitte');
+  assert(/const RAUM_BLAUPAUSE = \['religlobal', 'konfi', 'frieden'\];/.test(s) && /frieden: \{ name: 'Friedensarbeit', blaetter: \[/.test(s) && /!RAUM_BLAUPAUSE\.includes\(crId\)/.test(s), 'Blaupause gilt nicht für Friedensarbeit und Konfi');
+  assert(/<section class="cr-mat"><h2 class="cr-h">Materialien<\/h2><div id="crMat"><\/div><\/section>/.test(s) && /e\.pk === hx \|\| \(g\.kanten\.get\(e\.id\) \|\| new Set\(\)\)\.has\(k\)/.test(s) && /ms\.slice\(0, 6\)\.map\(mtKarte\)/.test(s), 'Raum zeigt keine echten Materialien');
 });
 
 Deno.test('In Entwicklung liegt über Ansichten ohne eigene Entwicklung; Flowi sitzt unten rechts', () => {
