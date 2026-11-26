@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Wuchsformen der Blume</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: oben das Pult der Skizze, darunter die Seite einer Community als Gast; das Element sitzt fest unten links, Flowi unten rechts */
+:root{
+  --grund:#F6F4EE; --karte:#FFFFFF; --tinte:#1C2333; --leise:#5C6475; --linie:#DAD6CB; --pult:#1C2333; --pult-tinte:#F3F1EA; --pult-leise:#B5BACB;
+  --d-material:#85992C; --t-material:#1B2400;
+  --d-termine:#DAB000; --t-termine:#2B2200;
+  --d-news:#F1693E; --t-news:#2B1000;
+  --d-gespraeche:#B549F0; --t-gespraeche:#FFFFFF;
+  --d-menschen:#AF4112; --t-menschen:#FFFFFF;
+  --hub:#2A3B8E; --ort:#2E7B4F; --ort-tinte:#FFFFFF; --gast:#1F6F6B; --gast-tinte:#FFFFFF; --platz:#E6E2D7; --flowi:#FFE27A; --flowi-blatt:#F7B8D2; --schatten:rgba(20,26,40,.22);
+  --text:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif; --titel:"Barlow Condensed","Barlow",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --grund:#14171F; --karte:#1E222D; --tinte:#ECEAE3; --leise:#A4AABA; --linie:#343A4A; --pult:#0C0E14; --pult-tinte:#ECEAE3; --pult-leise:#9299AC;
+  --platz:#2C3140; --schatten:rgba(0,0,0,.55); --hub:#7C8FE8; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --grund:#14171F; --karte:#1E222D; --tinte:#ECEAE3; --leise:#A4AABA; --linie:#343A4A; --pult:#0C0E14; --pult-tinte:#ECEAE3; --pult-leise:#9299AC;
+  --platz:#2C3140; --schatten:rgba(0,0,0,.55); --hub:#7C8FE8; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--grund);color:var(--tinte);font:400 17px/1.5 var(--text);margin:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--hub);outline-offset:2px}
+.innen{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* Pult der Skizze */
+.pult{background:var(--pult);color:var(--pult-tinte)}
+.pult .innen{padding-block:14px 16px;display:flex;flex-direction:column;gap:12px}
+.pult h1{font:700 26px/1.1 var(--titel);margin:0;letter-spacing:.01em}
+.pult p{margin:0;color:var(--pult-leise);font-size:15px}
+.reihe{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center}
+.gruppe{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;min-width:0}
+.gruppe>span{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--pult-leise);margin-right:2px}
+.seg{display:inline-flex;border:1px solid var(--pult-leise);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--pult-tinte);padding:7px 16px;cursor:pointer;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--pult-tinte);color:var(--pult)}
+.haken{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:999px;border:1px solid var(--pult-leise);font-size:15px;cursor:pointer}
+.haken i{width:14px;height:14px;border-radius:50%;background:var(--c)}
+.haken input{accent-color:var(--pult-tinte)}
+.pult select{background:var(--pult);color:var(--pult-tinte);border:1px solid var(--pult-leise);border-radius:999px;padding:6px 12px}
+.farbe{width:28px;height:28px;border-radius:50%;border:2px solid var(--pult);box-shadow:0 0 0 1px var(--pult-leise);background:var(--c);cursor:pointer;padding:0}
+.farbe[aria-pressed="true"]{box-shadow:0 0 0 3px var(--pult-tinte)}
+
+/* Die Seite der Community (Gast) */
+.gast-kopf{border-bottom:4px solid var(--gast)}
+.gast-kopf .innen{padding-block:16px;display:flex;flex-wrap:wrap;gap:8px 22px;align-items:baseline}
+.gast-kopf b{font:700 24px/1.1 Georgia,"Times New Roman",serif;color:var(--gast)}
+.gast-kopf span{color:var(--leise);font-size:15px}
+.gast>.innen{padding-block:26px 160px;padding-left:max(64px,env(safe-area-inset-left,0px));min-height:640px;display:grid;gap:22px}
+.stufe-marke{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--leise);margin:0 0 4px}
+.gast h2{font:700 clamp(30px,5vw,44px)/1.05 var(--titel);margin:0 0 10px;text-wrap:balance}
+.gast p{margin:0 0 10px;max-width:62ch}
+.probier{display:inline-block;margin-top:4px;padding:8px 14px;border-radius:12px;background:var(--karte);border:1px dashed var(--linie);font-weight:600}
+.pruef{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:14px;margin:0;padding:0;list-style:none}
+.pruef li{background:var(--karte);border:1px solid var(--linie);border-radius:16px;padding:14px 16px;min-width:0}
+.pruef b{display:block;font:700 20px/1.15 var(--titel);margin-bottom:4px}
+.pruef span{color:var(--leise);font-size:15.5px}
+.ausgabe{background:var(--karte);border:1px solid var(--linie);border-top:6px solid var(--c,var(--gast));border-radius:18px;padding:18px 20px}
+.ausgabe h3{font:700 26px/1.1 var(--titel);margin:0 0 6px}
+.ausgabe .wo{color:var(--leise);font-size:15px;margin:0 0 14px}
+.platz{display:grid;gap:10px;margin:0 0 6px}
+.platz div{height:54px;border-radius:12px;background:var(--platz);display:flex;align-items:center;padding:0 14px;color:var(--leise);font-size:14px}
+.hinweis{background:var(--platz);border-radius:12px;padding:10px 14px;margin:0 0 14px;font-weight:500}
+.feld{display:grid;gap:4px;margin:0 0 12px}
+.feld label{font-size:14px;font-weight:600}
+.feld input[type=text]{border:1px solid var(--linie);background:var(--grund);border-radius:10px;padding:9px 12px;width:100%}
+.schalter{display:flex;align-items:center;gap:8px;margin:0 0 14px}
+.knopf{border:0;border-radius:999px;background:var(--gast);color:var(--gast-tinte);font-weight:700;padding:10px 20px;cursor:pointer}
+.status{color:var(--leise);font-size:15px;margin:10px 0 0}
+
+/* Das Element am linken Rand: Die Blume schaut halb herein und rollt beim Klick ganz heraus. Aus dem Rand springen die Wege der Seite als Streifen; darunter wachsen die Orte als Ranken. */
+.wuchs{position:fixed;z-index:50;left:env(safe-area-inset-left,0px);top:clamp(96px,19vh,180px);width:0;height:0}
+.knospe{position:absolute;left:0;top:0;width:96px;height:96px;border:0;border-radius:50%;background:transparent;padding:0;cursor:pointer;transform:translateX(-52%);transition:transform .7s cubic-bezier(.3,.8,.3,1);z-index:3}
+.knospe:hover{transform:translateX(-44%)}
+.knospe svg{width:96px;height:96px;display:block;filter:drop-shadow(0 4px 10px var(--schatten));transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.wuchs.auf .knospe,.wuchs.zeigt .knospe{transform:translateX(8px)}
+.wuchs.auf .knospe svg,.wuchs.zeigt .knospe svg{transform:rotate(216deg)}
+.spalte{position:absolute;left:0;top:108px;width:max-content;max-width:100vw;display:flex;flex-direction:column;align-items:flex-start;max-height:calc(100vh - clamp(96px,19vh,180px) - 124px);overflow-y:auto;overflow-x:hidden;padding:2px 0 12px;scrollbar-width:none}
+.wege{display:grid;grid-template-columns:max-content;grid-template-rows:0fr;transition:grid-template-rows .35s}
+.wuchs.auf .wege{grid-template-rows:1fr}
+.wege>div{min-height:0;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:0 14px 0 0}
+.wuchs.auf .wege>div{padding-bottom:12px}
+.weg{display:flex;align-items:stretch;flex:none;height:40px;border-radius:0 999px 999px 0;background:var(--c);color:var(--t);overflow:hidden;white-space:nowrap;box-shadow:0 3px 10px var(--schatten);transform:translateX(-108%);opacity:0;transition:transform .25s,opacity .2s}
+.wuchs.auf .weg{transform:none;opacity:1;transition:transform .5s cubic-bezier(.2,1.35,.4,1) calc(var(--v)*1s),opacity .2s calc(var(--v)*1s)}
+.weg b{display:flex;align-items:center;padding:0 12px 0 14px;font-weight:700;font-size:16px;min-width:96px}
+.weg button{border:0;border-left:2px solid var(--c);background:var(--karte);color:var(--tinte);font-weight:700;font-size:15px;padding:0 14px;cursor:pointer;margin:3px 0}
+.weg button:last-child{border-radius:0 999px 999px 0;margin-right:3px;padding-right:16px}
+.weg button:hover,.weg button:focus-visible{background:color-mix(in srgb,var(--c) 26%,var(--karte))}
+.wortlaut{position:absolute;left:116px;top:30px;width:max-content;max-width:min(300px,calc(100vw - 132px));background:var(--tinte);color:var(--grund);border-radius:12px;padding:7px 12px;font-size:15px;font-weight:600;z-index:4}
+.zettel{position:absolute;left:116px;top:0;width:min(300px,calc(100vw - 132px));background:var(--karte);border:1px solid var(--linie);border-radius:16px;padding:14px 16px;box-shadow:0 8px 28px var(--schatten);z-index:4}
+.zettel b{display:block;font:700 21px/1.15 var(--titel);margin-bottom:4px}
+.zettel p{margin:0 0 8px;font-size:15.5px}
+.zettel .teilt{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.zettel .teilt span{font-size:13px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--c);color:var(--t)}
+.zettel a{font-weight:700;color:var(--hub)}
+/* Ranken: alle Orte des Ökosystems. In Ruhe schauen nur Stummel aus dem Rand, beim Überfahren oder Antippen wachsen sie heraus */
+.ranken{display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:4px 14px 0 0}
+.ort{display:flex;align-items:center;gap:8px;flex:none;height:22px;padding:0 14px 0 12px;border:0;border-radius:0 999px 999px 0;background:var(--ort);color:transparent;text-decoration:none;font:600 15px/1 var(--text);white-space:nowrap;cursor:pointer;box-shadow:0 2px 8px var(--schatten);
+  transform:translateX(calc(-100% + var(--stummel)*1px));transition:transform .35s cubic-bezier(.4,0,.6,1) calc(var(--z)*1s),height .25s,color .2s}
+.ort i{width:9px;height:9px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px var(--ort-tinte)}
+.ranken.auf .ort{color:var(--ort-tinte);transform:none;height:30px;transition:transform .5s cubic-bezier(.2,1.35,.4,1) calc(var(--v)*1s),height .25s,color .2s}
+.ort.hier{background:var(--tinte);color:var(--grund)}
+.ranken:not(.auf) .ort.hier{color:transparent}
+.ort:hover{filter:brightness(1.12)}
+/* Mitnehmen: Der gewählte Ort lädt in einen Rahmen unter dem Element. Blume, Wege, Ranken und Flowi bleiben stehen. */
+.rahmen{position:fixed;inset:0;width:100%;height:100%;border:0;background:#fff;z-index:30}
+.ortszeile{position:fixed;z-index:46;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 14px;max-width:calc(100vw - 180px);background:var(--tinte);color:var(--grund);border-radius:999px;padding:8px 18px;font-size:15px;box-shadow:0 6px 22px var(--schatten)}
+.ortszeile b{font-weight:700}
+.ortszeile a,.ortszeile button{color:inherit;font:inherit;font-weight:600;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:translate(-50%,-50%);width:min(540px,calc(100vw - 32px));max-height:80vh;overflow:auto;box-shadow:0 18px 60px var(--schatten)}
+.ausgabe .zu{float:right;border:0;background:var(--platz);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:17px;margin:0 0 6px 10px}
+
+/* Flowi unten rechts, wie im Hub: Blume in den fünf Farben mit Gesicht. Die Marke KI sagt, dass hier eine Maschine spricht */
+.flowi{position:fixed;z-index:45;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.flowi button{display:block;width:64px;height:64px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;position:relative;filter:drop-shadow(0 4px 10px var(--schatten))}
+.flowi button svg{display:block;width:100%;height:100%}
+.flowi button em{position:absolute;right:-6px;top:-4px;font:700 12px/1 var(--text);font-style:normal;background:var(--tinte);color:var(--grund);border-radius:999px;padding:3px 7px}
+.flowi .blase{width:min(270px,calc(100vw - 32px));background:var(--karte);border:1px solid var(--linie);border-radius:20px 20px 6px 20px;padding:12px 14px;box-shadow:0 8px 28px var(--schatten);font-size:15.5px}
+.flowi .blase b{display:block;font:700 19px/1.15 var(--titel)}
+@media (prefers-reduced-motion: reduce){ .knospe,.knospe svg,.weg,.wege,.ort{transition:none!important} }
+</style>
+</head>
+<body>
+
+
+<section class="pult" aria-label="Pult der Skizze">
+  <div class="innen">
+    <div>
+      <h1>Wuchsformen der Blume</h1>
+      <p>Klickbare Skizze. Ein Element wächst mit der Seite einer Community: Knospe, Blüte, Ranke. Die Blume rollt aus dem Rand, die Orte wachsen als Ranken heraus und laden ihre Seite hier hinein. Am linken Rand wird bedient, unten rechts spricht Flowi als Maschine.</p>
+    </div>
+    <div class="reihe">
+      <div class="gruppe"><span>Wuchsform</span>
+        <div class="seg" role="group" aria-label="Wuchsform">
+          <button type="button" data-stufe="knospe" aria-pressed="false">Knospe</button>
+          <button type="button" data-stufe="bluete" aria-pressed="true">Blüte</button>
+          <button type="button" data-stufe="ranke" aria-pressed="false">Ranke</button>
+        </div>
+      </div>
+      <div class="gruppe"><span>Wörter</span>
+        <select id="woerter" aria-label="Wörter der Community">
+          <option value="allgemein">allgemein</option>
+          <option value="frieden">Friedensarbeit</option>
+          <option value="global">Globales Lernen</option>
+        </select>
+      </div>
+      <div class="gruppe"><span>Farbe der Seite</span>
+        <button type="button" class="farbe" data-farbe="#1F6F6B" style="--c:#1F6F6B" aria-pressed="true" aria-label="Petrol"></button>
+        <button type="button" class="farbe" data-farbe="#7A2E52" style="--c:#7A2E52" aria-pressed="false" aria-label="Beere"></button>
+        <button type="button" class="farbe" data-farbe="#2F5FA8" style="--c:#2F5FA8" aria-pressed="false" aria-label="Blau"></button>
+      </div>
+    </div>
+    <div class="gruppe" id="teilt"><span>Diese Seite teilt</span></div>
+  </div>
+</section>
+
+<div class="gast">
+  <header class="gast-kopf"><div class="innen"><b>Seite einer Community</b><span>ihr eigenes Design, ihre eigene Navigation, ihre eigenen Inhalte</span></div></header>
+  <div class="innen">
+    <section aria-live="polite">
+      <p class="stufe-marke" id="marke"></p>
+      <h2 id="titel"></h2>
+      <div id="text"></div>
+      <span class="probier" id="probier"></span>
+    </section>
+    <ul class="pruef" id="pruef"></ul>
+    <section class="ausgabe" id="ausgabe" hidden tabindex="-1"></section>
+  </div>
+</div>
+
+<iframe class="rahmen" id="rahmen" title="Seite eines Orts im Ökosystem" hidden></iframe>
+<div class="ortszeile" id="ortszeile" hidden></div>
+
+<div class="wuchs" id="wuchs">
+  <button type="button" class="knospe" id="knospe" aria-expanded="false" aria-label="Zeichen des ReliHub-Ökosystems">
+    <svg viewBox="-50 -50 100 100" aria-hidden="true">
+      <circle cx="0" cy="-22" r="22" fill="#85992C" fill-opacity=".82"/><circle cx="21" cy="-7" r="22" fill="#DAB000" fill-opacity=".82"/><circle cx="13" cy="18" r="22" fill="#F1693E" fill-opacity=".82"/>
+      <circle cx="-13" cy="18" r="22" fill="#B549F0" fill-opacity=".82"/><circle cx="-21" cy="-7" r="22" fill="#AF4112" fill-opacity=".82"/><circle cx="0" cy="0" r="11" id="mitte" fill="#1F6F6B" stroke="#fff" stroke-width="2.5"/>
+    </svg>
+  </button>
+  <div class="wortlaut" id="wortlaut" hidden></div>
+  <div class="zettel" id="zettel" hidden></div>
+  <div class="spalte">
+    <div class="wege"><div id="wege"></div></div>
+    <nav class="ranken" id="ranken" hidden aria-label="Orte im Ökosystem"></nav>
+  </div>
+</div>
+
+<div class="flowi">
+  <div class="blase" id="blase" hidden><b>Ich bin Flowi.</b>Ich bin eine Maschine und erkläre dir, was du hier siehst. Menschen und ihre Inhalte erreichst du über die Blume am linken Rand.</div>
+  <button type="button" id="flowi" aria-expanded="false" aria-label="Flowi, Fragen an die Maschine">
+    <svg viewBox="-50 -50 100 100" aria-hidden="true"><circle cx="0" cy="-24" r="20" fill="#85992C"/><circle cx="23" cy="-7" r="20" fill="#DAB000"/><circle cx="14" cy="19" r="20" fill="#F1693E"/><circle cx="-14" cy="19" r="20" fill="#B549F0"/><circle cx="-23" cy="-7" r="20" fill="#AF4112"/><circle r="19" fill="#fff"/><circle cx="-6" cy="-3" r="2.6" fill="#1B2440"/><circle cx="6" cy="-3" r="2.6" fill="#1B2440"/><path d="M-7 5 Q0 12 7 5" fill="none" stroke="#1B2440" stroke-width="2.4" stroke-linecap="round"/></svg>
+    <em>KI</em>
+  </button>
+</div>
+
+<script>
+(function () {
+  var DINGE = [
+    { id: 'material', name: 'Material', raus: ['finden', 'Material finden'], rein: ['teilen', 'Material teilen'] },
+    { id: 'termine', name: 'Termine', raus: ['finden', 'Termine finden'], rein: ['eintragen', 'Termin eintragen'] },
+    { id: 'news', name: 'News', raus: ['lesen', 'News lesen'], rein: ['schreiben', 'Beitrag schreiben'] },
+    { id: 'gespraeche', name: 'Aktivität', raus: ['ansehen', 'Aktivitäten ansehen'], rein: ['mitreden', 'Mitreden'] },
+    { id: 'menschen', name: 'Menschen', raus: ['finden', 'Personen finden'], rein: ['Kontakt', 'Kontakt aufnehmen'] }
+  ];
+  // Wörter einer Community: nur der Wortlaut ändert sich, Farbe und Platz je Inhaltsart bleiben
+  var WOERTER = {
+    allgemein: {},
+    frieden: { material: ['Material zur Friedensbildung finden', 'Material teilen'], termine: ['Aktionen und Termine finden', 'Aktion eintragen'] },
+    global: { material: ['Material zum Globalen Lernen finden', 'Material teilen'], termine: ['Werkstätten finden', 'Werkstatt eintragen'] }
+  };
+  var ORTE = [
+    { n: 'ReliHub', art: 'Überblick und Suche', u: 'https://hub.rpi-virtuell.net/', c: '#2A3B8E' },
+    { n: 'relilab', art: 'Labor', u: 'https://relilab.org/', c: '#B549F0' },
+    { n: 'reliGlobal', art: 'Community', u: 'https://religlobal.org/', c: '#AF4112' },
+    { n: 'Konfiarbeit EKD', art: 'Community', u: 'https://konfi-arbeit.de/', c: '#AF4112' },
+    { n: 'ALPIKA Grundschule', art: 'Community', u: 'https://alpika.de/blog/grundschulen/', c: '#AF4112' },
+    { n: 'Friedenspädagogik', art: 'Community', u: 'https://hub.rpi-virtuell.net/#community?c=frieden', c: '#AF4112' },
+    { n: 'rpi-virtuell', art: 'Materialpool und Kalender', u: 'https://rpi-virtuell.de', c: '#85992C' },
+    { n: 'OER-Community', art: 'Projektseite', u: 'https://oer.community/', c: '#F1693E' }
+  ];
+  var RAHMEN = true;   // Orte laden in einen Rahmen unter dem Element; wo das Einbetten nicht geht, öffnen sie sich in einem neuen Tab
+  var TEXTE = {
+    knospe: { marke: 'Stufe 2 · Zeichen', titel: 'Knospe: Die Seite zeigt, dass sie dazugehört',
+      text: ['Die Seite bleibt, wie sie ist. Am linken Rand schaut nur die Blume halb herein.', 'Sie sagt: Diese Seite teilt Inhalte im gemeinsamen Datenraum. Ein Klick rollt sie heraus und erklärt das Ökosystem.'],
+      probier: 'Probier es: Klick auf die Blume am linken Rand.',
+      pruef: ['Das Zeichen ist klein und trägt in der Mitte die Farbe der Seite.', 'Es braucht nur die Datenanbindung. Mehr muss die Community nicht tun.', 'Der Klick erklärt das Ökosystem. Niemand wird von der Seite weggezogen.'] },
+    bluete: { marke: 'Stufe 3 · Bedienung', titel: 'Blüte: Die Wege springen aus dem Rand',
+      text: ['Ein Klick, und die Blume rollt heraus. Aus dem Rand springt je Inhaltsart ein Streifen in ihrer Farbe.', 'An jedem Streifen hängen gleich die beiden Wege: einer holt etwas aus dem Datenraum, einer gibt etwas hinein. Die Formulare sind auf jeder Seite des Ökosystems dieselben.'],
+      probier: 'Probier es: ein Klick auf die Blume, dann direkt auf einen Weg.',
+      pruef: ['Die Wörter an den Wegen bestimmt die Community. Stell oben andere Wörter ein.', 'Es springen so viele Streifen heraus, wie die Seite teilt. Nimm oben Häkchen heraus.', 'Finden und Eintragen passieren auf dieser Seite, nicht in einer Zentrale.'] },
+    ranke: { marke: 'Stufe 4 · Nachbarn', titel: 'Ranke: Die Navigation geht mit zu den Nachbarn',
+      text: ['Unter der Blume schauen die Orte des Ökosystems als kurze Ranken aus dem Rand. Fährst du darüber oder tippst sie an, wachsen sie mit ihren Namen heraus.', 'Ein Klick auf einen Ort lädt seine Seite hier hinein. Blume, Wege und Ranken bleiben stehen: Du nimmst die Navigation mit, auch wenn du die Seite wechselst.'],
+      probier: 'Probier es: über die Ranken fahren und einen Ort wählen.',
+      pruef: ['Jeder Ort erscheint mit seiner eigenen Seite und seinem eigenen Design.', 'Die Ranken sind freiwillig. Eine Seite kann bei der Blüte bleiben.', 'Die Ranken führen zu Nachbarn. Der ReliHub ist darin ein Ort unter anderen.'] }
+  };
+  var PRUEF = ['Eigene Identität', 'Schrittweise hineinwachsen', 'Keine Zentrale'];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var stufe = 'bluete', aktiv = { material: true, termine: true, news: true, gespraeche: true, menschen: true }, auf = false, satz = 'allgemein';
+  var wuchs = $('wuchs'), knospe = $('knospe'), wege = $('wege'), zettel = $('zettel'), wortlaut = $('wortlaut'), ausgabe = $('ausgabe'), ranken = $('ranken'), rahmen = $('rahmen'), ortszeile = $('ortszeile');
+  var hier = '';   // Name des Orts, der gerade im Rahmen geladen ist
+  var besuche = {};
+  try { besuche = JSON.parse(localStorage.getItem('wuchs-besuche') || '{}') || {}; } catch (e) { besuche = {}; }
+
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function wort(d, richtung) { var w = (WOERTER[satz] || {})[d.id]; return w ? w[richtung === 'raus' ? 0 : 1] : d[richtung][1]; }
+  function liste() { return DINGE.filter(function (d) { return aktiv[d.id]; }); }
+
+  // Häkchen: was die Seite teilt
+  var teilt = $('teilt');
+  DINGE.forEach(function (d) {
+    var l = document.createElement('label'); l.className = 'haken'; l.style.setProperty('--c', 'var(--d-' + d.id + ')');
+    l.innerHTML = '<input type="checkbox" id="teilt-' + d.id + '"' + (aktiv[d.id] ? ' checked' : '') + '><i></i>' + esc(d.id === 'gespraeche' ? 'Aktivitäten' : d.name);
+    l.querySelector('input').addEventListener('change', function (e) { aktiv[d.id] = e.target.checked; zeichnen(); });
+    teilt.appendChild(l);
+  });
+
+  // Streifen und Ranken stehen nach dem Bauen im Rand; die Klasse „auf“ lässt die Streifen herausspringen
+  function zeichnen() {
+    var t = TEXTE[stufe];
+    $('marke').textContent = t.marke; $('titel').textContent = t.titel; $('probier').textContent = t.probier;
+    $('text').innerHTML = t.text.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
+    $('pruef').innerHTML = PRUEF.map(function (p, i) { return '<li><b>' + esc(p) + '</b><span>' + esc(t.pruef[i]) + '</span></li>'; }).join('');
+    document.querySelectorAll('[data-stufe]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.stufe === stufe)); });
+    var ds = liste(), bedienbar = stufe !== 'knospe';
+    if (!bedienbar) auf = false;
+    wege.innerHTML = ''; wortlaut.hidden = true;
+    if (bedienbar) {
+      zettel.hidden = true;
+      ds.forEach(function (d, i) {
+        var z = document.createElement('div'); z.className = 'weg'; z.style.setProperty('--v', (0.28 + i * 0.07).toFixed(2));
+        z.style.setProperty('--c', 'var(--d-' + d.id + ')'); z.style.setProperty('--t', 'var(--t-' + d.id + ')');
+        z.innerHTML = '<b>' + esc(d.id === 'gespraeche' ? 'Aktivitäten' : d.name) + '</b>';
+        ['raus', 'rein'].forEach(function (r) {
+          var b = document.createElement('button'); b.type = 'button'; b.textContent = d[r][0]; b.title = wort(d, r); b.setAttribute('aria-label', wort(d, r));
+          var zeig = function () { wortlaut.textContent = wort(d, r); wortlaut.hidden = false; };
+          b.addEventListener('mouseenter', zeig); b.addEventListener('focus', zeig); b.addEventListener('mouseleave', function () { wortlaut.hidden = true; });
+          b.addEventListener('click', function () { ausgeben(d, r); });
+          z.appendChild(b);
+        });
+        wege.appendChild(z);
+      });
+    }
+    ranken.hidden = stufe !== 'ranke'; if (stufe === 'ranke') rankenZeichnen();
+    zettelFuellen(); stellen();
+  }
+  function stellen() {
+    var bedienbar = stufe !== 'knospe';
+    wuchs.classList.toggle('auf', bedienbar && auf); wuchs.classList.toggle('zeigt', !bedienbar && !zettel.hidden);
+    if (bedienbar && auf && !liste().length) { wortlaut.textContent = 'Diese Seite teilt noch nichts. Setz oben ein Häkchen.'; wortlaut.hidden = false; } else if (!auf) wortlaut.hidden = true;
+    knospe.setAttribute('aria-expanded', String(bedienbar ? auf : !zettel.hidden));
+    knospe.setAttribute('aria-label', !bedienbar ? 'Zeichen des ReliHub-Ökosystems, erklärt sich bei Klick' : auf ? 'Schließen' : 'Wege dieser Seite öffnen');
+    wege.querySelectorAll('button').forEach(function (b) { b.tabIndex = auf ? 0 : -1; });
+  }
+  function zettelFuellen() {
+    var ds = liste();
+    zettel.innerHTML = '<b>Teil des ReliHub-Ökosystems</b><p>Diese Seite teilt Inhalte im gemeinsamen Datenraum für religionsbezogene Bildung.</p>'
+      + (ds.length ? '<div class="teilt">' + ds.map(function (d) { return '<span style="--c:var(--d-' + d.id + ');--t:var(--t-' + d.id + ')">' + esc(d.id === 'gespraeche' ? 'Aktivitäten' : d.name) + '</span>'; }).join('') + '</div>' : '<p>Noch ist nichts angebunden.</p>')
+      + '<a href="https://hub.rpi-virtuell.net/" target="_blank" rel="noopener">Was ist das Ökosystem? ›</a>';
+  }
+  function ausgeben(d, richtung) {
+    var titel = wort(d, richtung);
+    ausgabe.style.setProperty('--c', 'var(--d-' + d.id + ')');
+    if (richtung === 'raus') {
+      ausgabe.innerHTML = '<h3>' + esc(titel) + '</h3><p class="wo">' + (hier ? 'Erscheint über der Seite von ' + esc(hier) + ', in ihrem Design. ' : 'Erscheint hier, auf der Seite der Community und in ihrem Design. ') + 'Die Einträge kommen aus dem gemeinsamen Datenraum, gefiltert auf diese Community.</p>'
+        + '<div class="platz"><div>Platzhalter für einen Eintrag aus dem Datenraum</div><div>Platzhalter für einen Eintrag aus dem Datenraum</div><div>Platzhalter für einen Eintrag aus dem Datenraum</div></div>'
+        + '<p class="status">Jeder Eintrag nennt seine Quelle und führt dorthin.</p>';
+    } else {
+      ausgabe.innerHTML = '<h3>' + esc(titel) + '</h3><p class="wo">Dasselbe Formular auf jeder Seite des Ökosystems. Dahinter liegt die gemeinsam vereinbarte Datenstruktur.</p>'
+        + '<p class="hinweis">Zum Eintragen meldest du dich an. Ansehen und Finden gehen ohne Anmeldung.</p>'
+        + '<form id="formular"><div class="feld"><label for="f-titel">Titel</label><input type="text" id="f-titel" autocomplete="off"></div>'
+        + '<div class="feld"><label for="f-kurz">Kurzbeschreibung</label><input type="text" id="f-kurz" autocomplete="off"></div>'
+        + '<label class="schalter"><input type="checkbox" id="f-offen" checked> Öffentlich ausschreiben, auch bei den Nachbarn sichtbar</label>'
+        + '<button type="submit" class="knopf">Anmelden und eintragen</button><p class="status" id="f-status" role="status"></p></form>';
+      $('formular').addEventListener('submit', function (e) { e.preventDefault(); $('f-status').textContent = 'In der Skizze endet der Weg hier. Im Hub folgt jetzt die Anmeldung.'; });
+    }
+    ausgabe.insertAdjacentHTML('afterbegin', '<button type="button" class="zu" aria-label="Schließen">✕</button>');
+    ausgabe.querySelector('.zu').addEventListener('click', function () { ausgabe.hidden = true; });
+    ausgabe.hidden = false; if (!hier) ausgabe.scrollIntoView({ behavior: 'smooth', block: 'center' }); ausgabe.focus({ preventScroll: true });
+  }
+
+  knospe.addEventListener('click', function () {
+    if (stufe === 'knospe') { zettel.hidden = !zettel.hidden; stellen(); return; }
+    auf = !auf; stellen();
+  });
+  document.querySelectorAll('[data-stufe]').forEach(function (b) { b.addEventListener('click', function () { stufe = b.dataset.stufe; auf = false; zettel.hidden = true; ausgabe.hidden = true; ranken.classList.remove('auf'); zeichnen(); }); });
+  $('woerter').addEventListener('change', function (e) { satz = e.target.value; zeichnen(); });
+  document.querySelectorAll('[data-farbe]').forEach(function (b) { b.addEventListener('click', function () {
+    document.documentElement.style.setProperty('--gast', b.dataset.farbe); $('mitte').setAttribute('fill', b.dataset.farbe);
+    document.querySelectorAll('[data-farbe]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+  }); });
+  // Ranken: alle Orte; in Ruhe Stummel, beim Überfahren, Fokus oder ersten Antippen wachsen sie heraus. Besuchte Orte rücken nach oben.
+  function rankenZeichnen() {
+    var breiten = [18, 26, 20, 34, 40, 30, 36, 22, 28, 16, 38, 24, 32];
+    ranken.innerHTML = '';
+    ORTE.map(function (o, i) { return { o: o, i: i, b: besuche[o.n] || 0 }; }).sort(function (a, b) { return b.b - a.b || a.i - b.i; }).forEach(function (x, i) {
+      var a = document.createElement('a'); a.className = 'ort' + (x.o.n === hier ? ' hier' : ''); a.href = x.o.u; a.target = '_blank'; a.rel = 'noopener'; a.title = x.o.art; a.dataset.ort = x.o.n;
+      if (x.o.n === hier) a.setAttribute('aria-current', 'page');
+      a.style.setProperty('--stummel', breiten[i % breiten.length]); a.style.setProperty('--v', (i * 0.05).toFixed(2)); a.style.setProperty('--z', ((ORTE.length - i) * 0.03).toFixed(2)); a.style.setProperty('--c', x.o.c);
+      a.innerHTML = '<i></i>' + esc(x.o.n);
+      ranken.appendChild(a);
+    });
+  }
+  // Mitnehmen: Der Ort lädt in den Rahmen, das Element bleibt darüber stehen
+  function laden(o) {
+    hier = o ? o.n : ''; document.body.classList.toggle('im-rahmen', !!o); ausgabe.hidden = true;
+    rahmen.hidden = !o; ortszeile.hidden = !o;
+    if (o) {
+      rahmen.src = o.u;
+      ortszeile.innerHTML = '<span>Du bist bei <b>' + esc(o.n) + '</b></span><a href="' + esc(o.u) + '" target="_blank" rel="noopener">in neuem Tab öffnen</a><button type="button" id="zurSkizze">zurück zur Skizze</button>';
+      $('zurSkizze').addEventListener('click', function () { laden(null); });
+    } else { rahmen.removeAttribute('src'); ortszeile.innerHTML = ''; }
+    rankenZeichnen();
+  }
+  ranken.addEventListener('mouseenter', function () { ranken.classList.add('auf'); });
+  ranken.addEventListener('mouseleave', function () { ranken.classList.remove('auf'); });
+  ranken.addEventListener('focusin', function () { ranken.classList.add('auf'); });
+  ranken.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-ort]'); if (!a) return;
+    if (!ranken.classList.contains('auf')) { e.preventDefault(); ranken.classList.add('auf'); return; }   // erstes Antippen lässt die Ranken wachsen
+    besuche[a.dataset.ort] = (besuche[a.dataset.ort] || 0) + 1;
+    try { localStorage.setItem('wuchs-besuche', JSON.stringify(besuche)); } catch (er) {}
+    if (!RAHMEN) return;   // ohne Rahmen öffnet sich der Ort in einem neuen Tab
+    e.preventDefault(); laden(ORTE.filter(function (o) { return o.n === a.dataset.ort; })[0]);
+  });
+  document.addEventListener('click', function (e) { if (!e.target.closest('#ranken')) ranken.classList.remove('auf'); });
+
+  // Flowi
+  $('flowi').addEventListener('click', function () { var b = $('blase'); b.hidden = !b.hidden; $('flowi').setAttribute('aria-expanded', String(!b.hidden)); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (!ausgabe.hidden && hier) { ausgabe.hidden = true; return; }
+    if (!zettel.hidden) { zettel.hidden = true; stellen(); return; }
+    if (ranken.classList.contains('auf')) { ranken.classList.remove('auf'); return; }
+    if (auf) { auf = false; stellen(); }
+  });
+  zeichnen();
+})();
+</script>
+
+</body>
+</html>
