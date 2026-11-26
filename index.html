@@ -1377,22 +1377,45 @@ body.oz-pop .bl-pw[data-typ="suche"]{order:9}
 /* Ökosystem geht unter dem Suchschlitz auf, sobald getippt wird */
 /* Blüten am linken Rand: ragen ein Stück herein und blättern beim Überfahren auf; ersetzen Leiste und kleine Blume */
 #leiste,relihub-steuerkonsole[floating]{display:none!important}
-.sb{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:7200;font-size:15px}
-.sb-griff{display:flex;flex-direction:column;padding:0;border:0;background:none;cursor:pointer}
-.sb-griff i{display:block;width:20px;height:40px;margin:-5px 0;border-radius:0 40px 40px 0;background:var(--c);box-shadow:1px 0 3px rgba(0,0,0,.18)}
-.sb-griff:focus-visible{outline:3px solid var(--n-gespraeche);outline-offset:2px}
-.sb-feld{position:absolute;left:0;top:50%;width:268px;max-height:88vh;box-sizing:border-box;overflow-y:auto;padding:14px 14px 14px 0;background:var(--card);border:1px solid var(--line);border-left:0;border-radius:0 24px 24px 0;box-shadow:6px 8px 30px rgba(20,24,40,.22);transform:translate(-105%,-50%);visibility:hidden;transition:transform .2s,visibility .2s}
-.sb:hover .sb-feld,.sb:focus-within .sb-feld,.sb.auf .sb-feld{transform:translate(0,-50%);visibility:visible}
-@media (prefers-reduced-motion:reduce){.sb-feld{transition:none}}
-.sb-feld h2{font:700 11px/1.2 Barlow,sans-serif;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:14px 14px 4px}
-.sb-blatt{display:flex;align-items:center;gap:8px;width:fit-content;max-width:100%;box-sizing:border-box;min-height:40px;margin:4px 0;padding:7px 18px 7px 14px;border:0;border-radius:0 999px 999px 0;background:var(--c);color:var(--t,#fff);font:inherit;font-weight:600;text-decoration:none;text-align:left;cursor:pointer}
-.sb-blatt.sub{min-height:34px;margin-left:0;padding-left:26px;font-size:14px;background:color-mix(in srgb,var(--c) 24%,#fff);color:#1B2440}
-.sb-blatt.ort{background:#F1F3F7;color:#1B2440;font-weight:500}
-.sb-blatt.ort::before{content:"";flex:none;width:11px;height:11px;border-radius:50%;background:var(--c)}
-.sb-blatt.ort small{font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
-.sb-blatt[aria-current]{box-shadow:inset 0 0 0 3px #1B2440}
-.sb-blatt:focus-visible{outline:3px solid #1B2440;outline-offset:2px}
-.sb-blatt.grau{background:#C9CED6;color:#2B2F36}
+/* Navigation am linken Rand (ADR-0018): Die Blume schaut halb herein und rollt beim Klick heraus. Aus dem Rand springen die Wege als Streifen, darunter wachsen die Orte als Ranken. */
+.sb{position:fixed;left:0;top:clamp(96px,19vh,180px);z-index:7200;width:0;height:0;font-size:15px}
+.sb-blume{position:absolute;left:0;top:0;width:92px;height:92px;border:0;border-radius:50%;background:transparent;padding:0;cursor:pointer;transform:translateX(-52%);transition:transform .7s cubic-bezier(.3,.8,.3,1);z-index:3}
+.sb-blume:hover{transform:translateX(-44%)}
+.sb-blume svg{width:92px;height:92px;display:block;filter:drop-shadow(0 4px 10px rgba(20,24,40,.3));transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.sb.auf .sb-blume{transform:translateX(8px)}
+.sb.auf .sb-blume svg{transform:rotate(216deg)}
+.sb-blume:focus-visible{outline:3px solid var(--n-ich);outline-offset:2px}
+.sb-wort{position:absolute;left:112px;top:28px;width:max-content;max-width:min(300px,calc(100vw - 128px));background:#1B2440;color:#fff;border-radius:12px;padding:7px 12px;font-weight:600;z-index:4}
+.sb-spalte{position:absolute;left:0;top:104px;width:max-content;max-width:100vw;display:flex;flex-direction:column;align-items:flex-start;max-height:calc(100vh - clamp(96px,19vh,180px) - 120px);overflow-y:auto;overflow-x:hidden;padding:2px 0 12px;scrollbar-width:none}
+.sb-wege{display:grid;grid-template-columns:max-content;grid-template-rows:0fr;transition:grid-template-rows .35s}
+.sb.auf .sb-wege{grid-template-rows:1fr}
+.sb-wege>div{min-height:0;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:0 14px 0 0}
+.sb.auf .sb-wege>div{padding-bottom:12px}
+.sb-weg{display:flex;align-items:stretch;flex:none;height:40px;border-radius:0 999px 999px 0;background:var(--c);color:var(--t,#fff);overflow:hidden;white-space:nowrap;box-shadow:0 3px 10px rgba(20,24,40,.25);transform:translateX(-108%);opacity:0;transition:transform .25s,opacity .2s}
+.sb.auf .sb-weg{transform:none;opacity:1;transition:transform .5s cubic-bezier(.2,1.35,.4,1) calc(var(--v)*1s),opacity .2s calc(var(--v)*1s)}
+.sb-weg b{display:flex;align-items:center;padding:0 12px 0 14px;font-weight:700;font-size:16px;min-width:104px}
+.sb-weg button,.sb-weg a{display:flex;align-items:center;border:0;border-left:2px solid var(--c);background:var(--card);color:#1B2440;font:inherit;font-weight:700;padding:0 14px;cursor:pointer;margin:3px 0;text-decoration:none}
+.sb-weg>:last-child{border-radius:0 999px 999px 0;margin-right:3px;padding-right:16px}
+.sb-weg button:hover,.sb-weg button:focus-visible,.sb-weg a:hover{background:color-mix(in srgb,var(--c) 26%,#fff)}
+.sb-weg button.grau{color:#6A7180}
+.sb-weg.ein b{min-width:0}
+.sb-weg.ein{height:34px}
+.sb-ranken{display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:4px 14px 0 0}
+.sb-ort{display:flex;align-items:center;gap:8px;flex:none;height:22px;padding:0 14px 0 12px;border-radius:0 999px 999px 0;background:#2E7B4F;color:transparent;text-decoration:none;font-weight:600;white-space:nowrap;box-shadow:0 2px 8px rgba(20,24,40,.25);
+  transform:translateX(calc(-100% + var(--stummel)*1px));transition:transform .35s cubic-bezier(.4,0,.6,1) calc(var(--z)*1s),height .25s,color .2s}
+.sb-ort i{flex:none;width:9px;height:9px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px #fff}
+.sb-ranken.auf .sb-ort{color:#fff;transform:none;height:30px;transition:transform .5s cubic-bezier(.2,1.35,.4,1) calc(var(--v)*1s),height .25s,color .2s}
+.sb-ort[aria-current]{background:#1B2440}
+.sb-ort.alle{background:#5F6670}
+.sb-ort:hover{filter:brightness(1.12)}
+.sb-ort:focus-visible{outline:3px solid #1B2440;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.sb-blume,.sb-blume svg,.sb-weg,.sb-wege,.sb-ort{transition:none!important}}
+/* Ort im Rahmen: Die Seite einer Community lädt unter die Navigation, Blume, Wege, Ranken und Flowi bleiben stehen */
+#v-ort iframe{position:fixed;inset:0;width:100%;height:100%;border:0;background:#fff;z-index:20}
+.ort-zeile{position:fixed;z-index:7100;left:50%;bottom:14px;transform:translateX(-50%);display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px 16px;max-width:calc(100vw - 190px);margin:0;background:#1B2440;color:#fff;border-radius:999px;padding:8px 18px;font-size:15px;box-shadow:0 6px 22px rgba(20,24,40,.35)}
+.ort-zeile a{color:#fff;font-weight:600}
+.cr-feed{max-width:none;align-items:center;margin:0 0 20px}
+.cr-feed .cr-pill{text-decoration:none;margin-left:auto}
 /* Tun auf der Seite des Dings: Wer von den Dingen her kommt, findet hier, was er damit tun kann */
 .tun-zeile{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px clamp(34px,4vw,40px);background:var(--tb);border-bottom:3px solid var(--tc);font-size:15px}
 .tun-zeile b{margin-right:4px}
@@ -1453,7 +1476,10 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
 @media (max-width:820px){
   .v-drei{grid-template-columns:1fr}
   .st-sicht{font-size:14px;gap:6px;flex-wrap:nowrap;white-space:nowrap}
-  .sb-griff i{width:11px;height:30px;margin:-4px 0}
+  .sb-blume,.sb-blume svg{width:76px;height:76px}
+  .sb-spalte{top:88px}
+  .sb-weg b{min-width:92px}
+  .ort-zeile{left:12px;right:92px;transform:none;max-width:none;border-radius:16px;justify-content:flex-start;font-size:14px;padding:8px 14px}
   .tun-zeile{padding:6px 16px;font-size:14px}.tun-zeile button{min-height:34px;padding:4px 12px}
   .st-sicht>span:first-child{display:none}
 }
@@ -1691,6 +1717,12 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
 </div>
 
 <!-- ===================== Ansicht 7: Community-Raum ===================== -->
+<!-- ===================== Ansicht: Ort im Rahmen (ADR-0018) ===================== -->
+<div class="view" id="v-ort" data-stand="live:Seite des Orts">
+  <p class="stand" aria-live="polite" hidden></p>
+  <iframe id="ortRahmen" title="Seite eines Orts im Ökosystem" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
+  <p class="ort-zeile" id="ortZeile"></p>
+</div>
 <div class="view" id="v-community" data-stand="nachbau:Beispielinhalte">
   <header class="hub-top">
     <a class="brand" href="#start"><svg class="mark" viewBox="-205 -205 410 410" aria-hidden="true"></svg>ReliHub</a>
@@ -2093,8 +2125,11 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
 <relihub-leiste id="leiste" label="Orte"></relihub-leiste>
 <!-- Blüten am linken Rand (ADR-0017): Start, die Dinge und die Orte, auf jeder Seite -->
 <nav class="sb" id="sb" aria-label="ReliHub-Navigation">
-  <button type="button" class="sb-griff" id="sbGriff" aria-expanded="false" aria-controls="sbFeld" aria-label="Navigation aufblättern"><i style="--c:var(--n-ich)"></i><i style="--c:var(--n-material)"></i><i style="--c:var(--n-termine)"></i><i style="--c:var(--n-news)"></i><i style="--c:var(--n-gespraeche)"></i><i style="--c:var(--n-menschen)"></i></button>
-  <div class="sb-feld" id="sbFeld"></div>
+  <button type="button" class="sb-blume" id="sbGriff" aria-expanded="false" aria-controls="sbFeld" aria-label="Navigation öffnen">
+    <svg viewBox="-50 -50 100 100" aria-hidden="true"><circle cx="0" cy="-22" r="22" fill="#85992C" fill-opacity=".85"/><circle cx="21" cy="-7" r="22" fill="#DAB000" fill-opacity=".85"/><circle cx="13" cy="18" r="22" fill="#F1693E" fill-opacity=".85"/><circle cx="-13" cy="18" r="22" fill="#B549F0" fill-opacity=".85"/><circle cx="-21" cy="-7" r="22" fill="#AF4112" fill-opacity=".85"/><circle cx="0" cy="0" r="11" fill="#2A3B8E" stroke="#fff" stroke-width="2.5"/></svg>
+  </button>
+  <div class="sb-wort" id="sbWort" hidden></div>
+  <div class="sb-spalte" id="sbFeld"><div class="sb-wege"><div id="sbWege"></div></div><div class="sb-ranken" id="sbRanken"></div></div>
 </nav>
 <!-- In Entwicklung: über Ansichten ohne eigene Entwicklung -->
 <div class="entw" id="entw"><p class="entw-band" role="status">In Entwicklung · Diese Ansicht ist ein Nachbau mit Beispieldaten</p><div class="entw-wort" aria-hidden="true">IN ENTWICKLUNG</div></div>
@@ -5715,6 +5750,11 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       }
     }, () => { ['crBeitr', 'crTerm'].forEach(id => { const x = el(id); if (x && lauf === crFuellLauf) x.innerHTML = leer('Die Relays antworten gerade nicht.'); }); });
   }
+  /** Hinweis über dem Raum (ADR-0018): Die Ansicht im Hub ist ein Feed, zu Hause ist die Community auf ihrer eigenen Seite. Mit eigener Seite steht der Weg dorthin groß daneben. */
+  function crHinweis(c) {
+    const o = ortVon(c.id), n = esc(c.n);
+    return `<p class="mt-feed cr-feed"><b>Feed von ${n}</b><span>Hier läuft zusammen, was ${n} im Netz teilt: Material, Beiträge und Termine, ungefiltert und nach Zeit.${o && o.web ? ` Redaktionell betreut, eingeordnet, im eigenen Design und mit Ansprechpersonen findest du ${n} auf der eigenen Webseite.` : ''}</span>${o && o.web ? `<a class="cr-pill" href="#ort?o=${esc(o.id)}">Zur Webseite ›</a>` : ''}</p>`;
+  }
   function crRender() {
     const c = CY.find(x => x.id === crId); if (!c) return;
     const mem = crMember[c.id], fol = cyFollow.has(c.id), req = crReq[c.id], hx = crHex(c.id);   // Schlüssel der Community: für „Beitreten“ und für alle Inhalte
@@ -5727,7 +5767,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
         <div class="cr-top"><span class="ring" style="width:240px;height:240px;background:${c.col};right:-50px;top:-120px"></span><span class="ring" style="width:170px;height:170px;background:var(--c-koop);right:130px;bottom:-120px"></span><div class="cr-id"><div class="cr-name">${crAv(c, 64)}<h1>${c.n}</h1>${hx ? '' : `<button type="button" class="cr-fol${fol ? '' : ' off'}" data-cract="follow">${fol ? '✓ Folge ich' : '+ Folgen'}</button>`}</div>
           ${hx ? '<button type="button" class="cr-mem" data-crtab="mem"><span id="crZahl">Mitglieder</span> ›</button>' : ''}${c.inst ? `<div>${cyRel(c)}</div>` : ''}${nlLine(c)}</div>
           <div class="cr-act">${hx ? akKnopf('beitreten', hx, 'Beitreten') : mem ? '<span class="cr-badge">✓ Mitglied</span>' : req ? '<span class="cr-badge">Anfrage gesendet</span>' : '<button type="button" class="cr-pill" data-cract="join">Beitritt anfragen</button>'}${mem ? '' : '<a data-cract="code">Einladungscode einlösen</a><div class="cr-code" id="crCode" hidden><input placeholder="Code eingeben" aria-label="Einladungscode"><button type="button" class="cr-pill" data-cract="redeem">Einlösen</button></div>'}</div></div>
-        ${crMain(c, hx)}
+        ${crHinweis(c)}${crMain(c, hx)}
       </main>`;
     if (hx && crTab !== 'katalog') { crMaterial(hx); crFuellen(c, hx); }
     if (crTab === 'katalog') katRender(c);
@@ -7104,10 +7144,10 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const [viewRaw, qs] = raw.split('?');
     const [view, sub] = viewRaw.split('/');
     const finden = view === 'finden' && sub ? (['sammlung', 'fortbildungen'].includes(sub) ? sub : null) : view === 'kooperieren' && sub ? (sub === 'personen' ? sub : null) : undefined;   // finden/<sub>, kooperieren/<sub> → Ansicht v-<sub>
-    const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell', 'person', 'oekosystem', 'mitmachen', 'news', 'material', 'eigene-instanz'].includes(view) ? view : 'start');
+    const v = finden ? finden : (['start', 'profil', 'materialpool', 'relilab', 'relidesk', 'communities', 'community', 'oercommunity', 'rpi-virtuell', 'person', 'oekosystem', 'mitmachen', 'news', 'material', 'eigene-instanz', 'ort'].includes(view) ? view : 'start');
     if (finden === null) toast('Diese Seite gibt es nicht.');
     document.querySelectorAll('.view').forEach(n => n.classList.toggle('on', n.id === 'v-' + v));
-    document.title = { start: 'ReliHub', profil: 'ReliHub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'ReliHub · Termine', material: 'ReliHub · Material', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'ReliHub · Communities', oekosystem: 'ReliHub · Ökosystem', mitmachen: 'ReliHub · Aktivitäten', news: 'ReliHub · News', 'eigene-instanz': 'ReliHub · Eigene Instanz', community: 'ReliHub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des ReliHub' }[v];
+    document.title = { start: 'ReliHub', profil: 'ReliHub · Mein Profil', materialpool: 'Materialpool Religion', sammlung: 'Sammlung', fortbildungen: 'ReliHub · Termine', material: 'ReliHub · Material', personen: 'Personen', person: 'Profil', relilab: 'relilab', relidesk: 'relidesk', communities: 'ReliHub · Communities', oekosystem: 'ReliHub · Ökosystem', mitmachen: 'ReliHub · Aktivitäten', news: 'ReliHub · News', 'eigene-instanz': 'ReliHub · Eigene Instanz', ort: 'ReliHub · Ort im Ökosystem', community: 'ReliHub · Community-Raum', oercommunity: 'OER-Community · FOERBICO', 'rpi-virtuell': 'rpi-virtuell · Teil des ReliHub' }[v];
     if (v === 'community') { const pp = new URLSearchParams(qs || ''); crOpen(pp.get('c') || '', pp.get('zu') === 'katalog' ? 'katalog' : pp.get('tab')); }
     leisteEl.setAttribute('current', v === 'community' ? 'c-' + crId : v === 'fortbildungen' ? 'rpi-virtuell' : v === 'eigene-instanz' ? 'zuschnitt' : v);
     RelihubSteuerkonsole.setOrt(leisteEl.getAttribute('current'));   // der Stiel markiert denselben Ort wie die Leiste
@@ -7119,6 +7159,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     if (v === 'mitmachen') pkOpen(qs);
     if (v === 'news') nwOpen(qs);
     if (v === 'material') mtOpen(qs);
+    ortOpen(v === 'ort' ? qs : null);
     if (v === 'eigene-instanz') eiOpen(qs);
     if (v === 'oercommunity') ocOpen(sub);
     if (v === 'relilab') rlShow(qs);
@@ -7373,38 +7414,107 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   }
   // ---------- Blüten am linken Rand ----------
   const ORT_ART = { materialpool: 'Ort', 'rpi-virtuell': 'Ort', relilab: 'Community · Labor', relidesk: 'Werkzeug', oercommunity: 'Projekt' };
-  const sbEl = document.getElementById('sb'), sbFeld = document.getElementById('sbFeld'), sbGriff = document.getElementById('sbGriff');
+  // ---------- Navigation am linken Rand (ADR-0018): Blume, Wege als Streifen, Orte als Ranken ----------
+  const sbEl = document.getElementById('sb'), sbFeld = document.getElementById('sbFeld'), sbGriff = document.getElementById('sbGriff'), sbWege = document.getElementById('sbWege'), sbRanken = document.getElementById('sbRanken'), sbWortEl = document.getElementById('sbWort');
   function sbOrt() { const v = CUR.split('?')[0]; return v === 'relilab' ? 'relilab' : v === 'community' ? 'raum' : ''; }
-  // Wörter einer Community für ihre Blüten: eigene, wenn sie welche eingestellt hat, sonst die allgemeinen
-  const BLUETEN_STANDARD = [
-    { ding: 'menschen', wort: 'Kontakt aufnehmen', aktion: 'menschen.personen' }, { ding: 'material', wort: 'Material finden', aktion: 'material.finden' }, { ding: 'material', wort: 'Material teilen', aktion: 'material.teilen' },
-    { ding: 'termine', wort: 'Termin eintragen', aktion: 'termine.erstellen' }, { ding: 'termine', wort: 'Termine finden', aktion: 'termine.finden' }];
-  const raumName = () => BLUMEN[crId] ? BLUMEN[crId].name : ((CY.find(c => c.id === crId) || {}).n || 'dieser Community').replace(/\u00ad/g, '');
-  function sbRender() {
-    const v = CUR.split('?')[0].split('/').pop(), ort = sbOrt();
-    const b = (akt, wort, ding, kl) => `<button type="button" class="sb-blatt${kl ? ' ' + kl : ''}${!LOGGED && NUR_ANGEMELDET.includes(akt) ? ' grau' : ''}" data-sb="${akt}" style="--c:${D_FARBE[ding][0]};--t:${D_FARBE[ding][1]}">${esc(wort)}${!LOGGED && NUR_ANGEMELDET.includes(akt) ? ' · anmelden' : ''}</button>`;
-    const bl = ort === 'raum' ? (BLUMEN[crId] ? BLUMEN[crId].blaetter : BLUETEN_STANDARD) : ort === 'relilab' ? BLUMEN[rkBsp].blaetter : null;
-    const dinge = ort === 'raum' ? b('raum.home', 'Übersicht', 'ich') + bl.map(x => b(x.aktion, x.wort, x.ding)).join('') + b('news.finden', 'News lesen', 'news') + b('gespraeche.oeffentlich', 'Mitreden', 'gespraeche') + b('raum.lern', 'Lernbausteine', 'material', 'sub') + b('raum.set', 'Einstellungen', 'ich', 'sub')
-      : ort === 'relilab' ? bl.map(x => b(x.aktion, x.wort, x.ding)).join('') + b('news.finden', 'News lesen', 'news') + b('menschen.communities', 'Communities im relilab', 'menschen', 'sub')
-      : ort ? ''
-      : b('material.finden', 'Material', 'material') + b('termine.finden', 'Termine', 'termine') + b('news.finden', 'News', 'news') + b('gespraeche.oeffentlich', 'Aktivitäten', 'gespraeche')
-        + b('menschen.personen', 'Menschen', 'menschen') + b('menschen.personen', 'Personen', 'menschen', 'sub') + b('menschen.communities', 'Communities', 'menschen', 'sub');
-    const orte = LEISTE.filter(x => x.id !== 'start').map(x => `<a class="sb-blatt ort" href="${x.href}" style="--c:${x.color}"${x.id === v ? ' aria-current="page"' : ''}>${esc(x.label)} <small>${ORT_ART[x.id] || 'Ort'}</small></a>`).join('')
-      + [['religlobal', 'reliGLOBAL'], ['konfi', 'Konfi-Arbeit'], ['frieden', 'Friedensarbeit']].map(([id, n]) => `<a class="sb-blatt ort" href="#community?c=${id}" style="--c:${D_FARBE.menschen[0]}"${ort === 'raum' && crId === id ? ' aria-current="page"' : ''}>${n} <small>Community</small></a>`).join('') + `<a class="sb-blatt ort" href="#partner" style="--c:#8A909C">Alle Orte</a>`;
-    sbFeld.innerHTML = `<a class="sb-blatt" href="#start" style="--c:${D_FARBE.ich[0]}"${v === 'start' ? ' aria-current="page"' : ''}>ReliHub · Start</a>`
-      + `<h2>${ort === 'raum' ? 'Hier bei ' + esc(raumName()) : ort === 'relilab' ? 'Hier bei ' + esc(BLUMEN[rkBsp].name) : 'Im ReliHub'}</h2>${dinge}`
-      + `<button type="button" class="sb-blatt" data-sb="ich" style="--c:${D_FARBE.ich[0]}">${LOGGED ? 'Mein ReliHub' : 'Anmelden'}</button>`
-      + `<h2>Orte im Ökosystem</h2>${orte}`;
+  // Je Inhaltsart ein Streifen mit zwei Wegen: einer holt etwas heraus, einer gibt etwas hinein
+  const STREIFEN = [
+    { ding: 'material', name: 'Material', raus: ['finden', 'material.finden', 'Material finden'], rein: ['teilen', 'material.teilen', 'Material teilen'] },
+    { ding: 'termine', name: 'Termine', raus: ['finden', 'termine.finden', 'Termine finden'], rein: ['eintragen', 'termine.erstellen', 'Termin eintragen'] },
+    { ding: 'news', name: 'News', raus: ['lesen', 'news.finden', 'News lesen'], rein: ['schreiben', 'news.veroeffentlichen', 'Beitrag schreiben'] },
+    { ding: 'gespraeche', name: 'Aktivitäten', raus: ['ansehen', 'gespraeche.oeffentlich', 'Aktivitäten ansehen'], rein: ['mitreden', 'gespraeche.communities', 'Mitreden'] },
+    { ding: 'menschen', name: 'Menschen', raus: ['Personen', 'menschen.personen', 'Personen finden'], rein: ['Communities', 'menschen.communities', 'Communities ansehen'] }
+  ];
+  // Orte des Ökosystems. `web`: die eigene Seite, sie lädt im Rahmen. `hub`: was der Ort im Datenraum teilt, als Ansicht im Hub.
+  // `wege`: Jeder Ort legt selbst fest, wohin ein Weg führt: auf einen Navigationspunkt seiner eigenen Seite (https-Adresse) oder in den Datenraum (Route im Hub, auch mit eigenem Filter).
+  // Ohne Eintrag gilt der Datenraum: die Ansicht des Orts im Hub, sonst der ganze Hub. Im Prototyp steht die Tabelle hier; später legt sie jede Community unter ihrem Schlüssel ab.
+  const OEKO_ORTE = [
+    { id: 'relilab', n: 'relilab', web: 'https://relilab.org/', hub: 'relilab', c: '#6D3BE0', blume: 'relilab',
+      wege: { 'termine.finden': 'https://relilab.org/termine/', 'termine.erstellen': 'https://relilab.org/termin-einreichen/', 'material.finden': 'https://relilab.org/alle-material4you-beitraege/' } },
+    { id: 'religlobal', n: 'reliGlobal', web: 'https://religlobal.org/', hub: 'community?c=religlobal', c: '#AF4112', blume: 'religlobal',
+      wege: { 'termine.finden': 'https://religlobal.org/termine/', 'material.finden': 'https://religlobal.org/unit/', 'menschen.personen': 'https://religlobal.org/kontakt/' } },
+    { id: 'konfi', n: 'Konfiarbeit EKD', web: 'https://konfi-arbeit.de/', hub: 'community?c=konfi', c: '#AF4112', blume: 'konfi',
+      wege: { 'material.finden': 'https://konfi-arbeit.de/category/praxismaterial/', 'termine.finden': 'https://konfi-arbeit.de/category/veranstaltungen/', 'news.finden': 'https://konfi-arbeit.de/category/konfi-news/' } },
+    { id: 'alpika-gs', n: 'ALPIKA Grundschule', web: 'https://alpika.de/blog/grundschulen/', hub: 'community?c=alpika-gs', c: '#AF4112', wege: {} },
+    { id: 'frieden', n: 'Friedenspädagogik', web: '', hub: 'community?c=frieden', c: '#AF4112', blume: 'frieden', wege: {} },   // Community am Anfang: alle Wege führen in ihren Ausschnitt des Datenraums
+    { id: 'rpi-virtuell', n: 'rpi-virtuell', web: 'https://rpi-virtuell.de/', hub: 'rpi-virtuell', c: '#0072AA', wege: { 'material.finden': 'material', 'termine.finden': 'finden/fortbildungen', 'news.finden': 'news' } },   // der ganze Datenraum
+    { id: 'oercommunity', n: 'OER-Community', web: 'https://oer.community/', hub: 'oercommunity', c: '#B02A5B', wege: { 'material.finden': 'material', 'termine.finden': 'finden/fortbildungen', 'news.finden': 'community?c=oercommunity&tab=art' } },   // Datenraum, News mit eigenem Filter
+    { id: 'relidesk', n: 'relidesk', web: '', hub: 'relidesk', c: '#AD5F00', wege: {} }
+  ];
+  const ortVon = id => OEKO_ORTE.find(o => o.id === id) || null;
+  /** Wo die Navigation gerade steht: { art: 'hub' | 'ort' | 'relilab' | 'raum', o: Ort oder null }. Im Rahmen und in der Hub-Ansicht eines Orts gelten seine Wege und seine Wörter. */
+  function sbKontext() {
+    const [v, qs] = CUR.split('?');
+    if (v === 'ort') { const o = ortVon(new URLSearchParams(qs || '').get('o')); return o ? { art: 'ort', o } : { art: 'hub', o: null }; }
+    if (v === 'relilab') return { art: 'relilab', o: ortVon('relilab') };
+    if (v === 'community') return { art: 'raum', o: ortVon(crId) };
+    return { art: 'hub', o: null };
   }
-  const sbZu = () => { sbEl.classList.remove('auf'); sbGriff.setAttribute('aria-expanded', 'false'); if (document.activeElement && sbEl.contains(document.activeElement)) document.activeElement.blur(); };
-  sbGriff.addEventListener('click', () => { const auf = !sbEl.classList.contains('auf'); sbEl.classList.toggle('auf', auf); sbGriff.setAttribute('aria-expanded', String(auf)); });
-  sbFeld.addEventListener('click', e => {
-    const k = e.target.closest('[data-sb]');
-    if (k) { const d = aktionVon(k.dataset.sb, k.textContent), ort = sbOrt(); if (ort === 'relilab') rlAktion(d); else if (ort === 'raum') rgAktion(d); else standardAktion(d, 'hub'); }
-    if (k || e.target.closest('a')) sbZu();
+  const raumName = () => BLUMEN[crId] ? BLUMEN[crId].name : ((CY.find(c => c.id === crId) || {}).n || 'dieser Community').replace(/­/g, '');
+  let sbBesuche = {};
+  try { sbBesuche = JSON.parse(localStorage.getItem('relihub:orte-besuche') || '{}') || {}; } catch (e) { sbBesuche = {}; }
+  function sbRender() {
+    const v = CUR.split('?')[0].split('/').pop(), k = sbKontext(), bl = k.o && k.o.blume && BLUMEN[k.o.blume] ? BLUMEN[k.o.blume].blaetter : [];
+    const eigen = akt => bl.find(x => x.aktion === akt);   // Wörter der Community, wo sie welche eingestellt hat
+    let nr = 0; const vz = () => (0.22 + nr++ * 0.06).toFixed(2);
+    const knopf = (w) => {
+      const e = eigen(w[1]), ziel = k.o && k.o.wege[w[1]], grau = !LOGGED && !ziel && NUR_ANGEMELDET.includes(w[1]), voll = (e ? e.wort : w[2]) + (grau ? ' · nach Anmeldung' : '');
+      return `<button type="button"${grau ? ' class="grau"' : ''} data-sb="${w[1]}" data-wort="${esc(voll)}" title="${esc(voll)}" aria-label="${esc(voll)}">${esc(e && e.kurz ? e.kurz : w[0])}</button>`;
+    };
+    const ein = (inhalt, ding) => `<div class="sb-weg ein" style="--c:${D_FARBE[ding][0]};--t:${D_FARBE[ding][1]};--v:${vz()}">${inhalt}</div>`;
+    const kopf = k.o ? ein(`<b>bei ${esc(k.o.n)}</b>` + (k.art === 'ort' ? `<a href="#${esc(k.o.hub)}">im Datenraum</a>` : `<button type="button" data-sb="raum.home">Übersicht</button>` + (k.o.web ? `<a href="#ort?o=${k.o.id}">Webseite</a>` : '')), 'ich')
+      : k.art === 'raum' ? ein(`<b>bei ${esc(raumName())}</b><button type="button" data-sb="raum.home">Übersicht</button>`, 'ich') : '';
+    sbWege.innerHTML = (v === 'start' ? '' : ein(`<a href="#start"><span aria-hidden="true">‹ </span>ReliHub</a>`, 'ich')) + kopf
+      + STREIFEN.map(s => `<div class="sb-weg" style="--c:${D_FARBE[s.ding][0]};--t:${D_FARBE[s.ding][1]};--v:${vz()}"><b>${esc(s.name)}</b>${knopf(s.raus)}${knopf(s.rein)}</div>`).join('')
+      + ein(`<button type="button" data-sb="ich">${LOGGED ? 'Mein ReliHub' : 'Anmelden'}</button>`, 'ich');
+    // Ranken: alle Orte; besuchte rücken nach oben. In Ruhe schauen nur Stummel aus dem Rand.
+    const breiten = [18, 26, 20, 34, 40, 30, 36, 22, 28, 16, 38, 24, 32];
+    const orte = OEKO_ORTE.map((o, i) => ({ o, i, b: sbBesuche[o.id] || 0 })).sort((a, b) => b.b - a.b || a.i - b.i);
+    sbRanken.innerHTML = orte.map((x, i) => `<a class="sb-ort" href="#${x.o.web ? 'ort?o=' + x.o.id : x.o.hub}" data-ort="${x.o.id}" style="--c:${x.o.c};--stummel:${breiten[i % breiten.length]};--v:${(i * 0.05).toFixed(2)};--z:${((orte.length - i) * 0.03).toFixed(2)}"${k.o && k.o.id === x.o.id ? ' aria-current="page"' : ''}><i></i>${esc(x.o.n)}</a>`).join('')
+      + `<a class="sb-ort alle" href="#partner" style="--c:#fff;--stummel:14;--v:${(orte.length * 0.05).toFixed(2)};--z:0"><i></i>Alle Orte</a>`;
+    sbTab();
+  }
+  function sbTab() { const auf = sbEl.classList.contains('auf'); sbWege.querySelectorAll('button,a').forEach(b => { b.tabIndex = auf ? 0 : -1; }); }
+  const sbZu = () => { sbEl.classList.remove('auf'); sbRanken.classList.remove('auf'); sbWortEl.hidden = true; sbGriff.setAttribute('aria-expanded', 'false'); sbGriff.setAttribute('aria-label', 'Navigation öffnen'); sbTab(); };
+  sbGriff.addEventListener('click', () => { const auf = !sbEl.classList.contains('auf'); if (!auf) { sbZu(); return; } sbEl.classList.add('auf'); sbGriff.setAttribute('aria-expanded', 'true'); sbGriff.setAttribute('aria-label', 'Navigation schließen'); sbTab(); });
+  /** Ein Weg: erst gilt, was der Ort selbst festgelegt hat (eigene Seite im Rahmen oder Route im Hub), sonst sein Ausschnitt des Datenraums, sonst der ganze Hub */
+  function sbWeg(akt, label) {
+    const k = sbKontext(), ziel = k.o && k.o.wege[akt], d = aktionVon(akt, label);
+    if (akt === 'ich') return standardAktion(d, 'hub');
+    if (ziel) { go(/^https:\/\//.test(ziel) ? 'ort?o=' + k.o.id + '&w=' + akt : ziel); return false; }
+    if (k.art === 'relilab' || (k.art === 'ort' && k.o.id === 'relilab')) return akt === 'raum.home' ? (go('relilab'), false) : rlAktion(d);
+    if (k.art === 'raum') return rgAktion(d);
+    if (k.art === 'ort' && k.o.hub.startsWith('community?c=')) { crId = k.o.id; return rgAktion(d); }
+    return standardAktion(d, 'hub');
+  }
+  sbWege.addEventListener('click', e => {
+    const b = e.target.closest('[data-sb]');
+    if (b) sbWeg(b.dataset.sb, b.dataset.wort || b.textContent);
+    if (b || e.target.closest('a')) sbZu();
   });
-  document.addEventListener('click', e => { if (sbEl.classList.contains('auf') && !sbEl.contains(e.target)) sbZu(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && sbEl.classList.contains('auf')) { sbZu(); sbGriff.focus(); } });
+  const sbZeig = e => { const b = e.target.closest && e.target.closest('[data-wort]'); if (b) { sbWortEl.textContent = b.dataset.wort; sbWortEl.hidden = false; } else sbWortEl.hidden = true; };
+  sbWege.addEventListener('mouseover', sbZeig); sbWege.addEventListener('focusin', sbZeig); sbWege.addEventListener('mouseleave', () => { sbWortEl.hidden = true; });
+  sbRanken.addEventListener('mouseenter', () => sbRanken.classList.add('auf'));
+  sbRanken.addEventListener('mouseleave', () => sbRanken.classList.remove('auf'));
+  sbRanken.addEventListener('focusin', () => sbRanken.classList.add('auf'));
+  sbRanken.addEventListener('click', e => {
+    const a = e.target.closest('.sb-ort'); if (!a) return;
+    if (!sbRanken.classList.contains('auf')) { e.preventDefault(); sbRanken.classList.add('auf'); return; }   // erstes Antippen lässt die Ranken wachsen
+    if (a.dataset.ort) { sbBesuche[a.dataset.ort] = (sbBesuche[a.dataset.ort] || 0) + 1; try { localStorage.setItem('relihub:orte-besuche', JSON.stringify(sbBesuche)); } catch (er) {} }
+    sbZu();
+  });
+  document.addEventListener('click', e => { if (!sbEl.contains(e.target)) { if (sbEl.classList.contains('auf')) sbZu(); sbRanken.classList.remove('auf'); } });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && (sbEl.classList.contains('auf') || sbRanken.classList.contains('auf'))) { sbZu(); sbGriff.focus(); } });
+
+  // ---------- Ort im Rahmen (ADR-0018): Die eigene Seite eines Orts lädt unter die Navigation. Geladen werden nur Adressen aus der Tabelle OEKO_ORTE. ----------
+  function ortOpen(qs) {
+    const rahmen = document.getElementById('ortRahmen'), zeile = document.getElementById('ortZeile');
+    if (qs === null) { if (rahmen.getAttribute('src')) rahmen.removeAttribute('src'); return; }
+    const p = new URLSearchParams(qs || ''), o = ortVon(p.get('o')), w = o && o.wege[p.get('w')], ziel = w && /^https:\/\//.test(w) ? w : o && o.web;
+    if (!ziel) { go(o ? o.hub : 'partner'); return; }
+    if (rahmen.getAttribute('src') !== ziel) rahmen.setAttribute('src', ziel);
+    zeile.innerHTML = `<span>Du bist bei <b>${esc(o.n)}</b></span><a href="${esc(sichereUrl(ziel))}" target="_blank" rel="noopener">in neuem Tab öffnen</a><a href="#${esc(o.hub)}">Was ${esc(o.n)} im Datenraum teilt ›</a>`;
+  }
 
   // ---------- In Entwicklung: Ansichten ohne eigene Entwicklung ----------
   const IN_ENTW = ['materialpool', 'sammlung', 'relidesk', 'rpi-virtuell', 'eigene-instanz'];
