@@ -294,6 +294,7 @@ Deno.test('Ranken sind wählbar: Häkchen je Ort, gemerkt im Browser, Orte ohne 
   const r = fn('sbRender');
   assert(/\.filter\(x => !sbAus\.includes\(x\.o\.id\) \|\| \(k\.o && k\.o\.id === x\.o\.id\)\)/.test(r), 'Abgewähltes fehlt, der aktuelle Ort bleibt');
   assert(/x\.o\.tab \? esc\(sichereUrl\(x\.o\.web\)\)/.test(r) && /target="_blank" rel="noopener" aria-label="\$\{esc\(o\.n\)\}, öffnet in neuem Tab"/.test(r) && /noch ohne Inhalte im Datenraum/.test(r), 'Ranke ohne Schlüssel: neue Registerkarte, mit Hinweis');
+  assert(/\.sort\(\(a, b\) => !!a\.o\.ohne - !!b\.o\.ohne \|\| b\.b - a\.b \|\| a\.i - b\.i\)/.test(r), 'Orte ohne Schlüssel stehen immer unten');
   assert(/id="sbWahlGriff" aria-expanded="\$\{!sbWahl\.hidden\}" aria-controls="sbWahl"/.test(r), 'Griff zur Auswahl');
   const w = fn('sbWahlZeig');
   assert(/<fieldset><legend>Welche Orte sollen als Ranken erscheinen\?<\/legend>/.test(w) && /OEKO_ORTE\.map\(o => `<label><input type="checkbox"/.test(w) && /Rangfolge des Hubs/.test(w) && /bleibt in diesem Browser/.test(w), 'Liste mit Häkchen und Erklärung der Voreinstellung');

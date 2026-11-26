@@ -7489,7 +7489,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       + ein(`<button type="button" data-sb="ich">${LOGGED ? 'Mein ReliHub' : 'Anmelden'}</button>`, 'ich');
     // Ranken: alle Orte; besuchte rücken nach oben. In Ruhe schauen nur Stummel aus dem Rand.
     const breiten = [18, 26, 20, 34, 40, 30, 36, 22, 28, 16, 38, 24, 32];
-    const orte = OEKO_ORTE.map((o, i) => ({ o, i, b: sbBesuche[o.id] || 0 })).filter(x => !sbAus.includes(x.o.id) || (k.o && k.o.id === x.o.id)).sort((a, b) => b.b - a.b || a.i - b.i);
+    const orte = OEKO_ORTE.map((o, i) => ({ o, i, b: sbBesuche[o.id] || 0 })).filter(x => !sbAus.includes(x.o.id) || (k.o && k.o.id === x.o.id)).sort((a, b) => !!a.o.ohne - !!b.o.ohne || b.b - a.b || a.i - b.i);   // Orte ohne Schlüssel stehen immer unten, auch wenn sie besucht wurden
     const zusatz = o => (o.ohne ? ' title="noch ohne Inhalte im Datenraum"' : '') + (o.tab ? ` target="_blank" rel="noopener" aria-label="${esc(o.n)}, öffnet in neuem Tab"` : '');
     sbRanken.innerHTML = orte.map((x, i) => `<a class="sb-ort" href="${x.o.tab ? esc(sichereUrl(x.o.web)) : '#' + (x.o.web ? 'ort?o=' + x.o.id : x.o.hub)}"${zusatz(x.o)} data-ort="${x.o.id}" style="--c:${x.o.c};--stummel:${breiten[i % breiten.length]};--v:${(i * 0.05).toFixed(2)};--z:${((orte.length - i) * 0.03).toFixed(2)}"${k.o && k.o.id === x.o.id ? ' aria-current="page"' : ''}><i></i>${esc(x.o.n)}${x.o.tab ? '<span aria-hidden="true"> ↗</span>' : ''}</a>`).join('')
       + `<a class="sb-ort alle" href="#partner" style="--c:#fff;--stummel:14;--v:${(orte.length * 0.05).toFixed(2)};--z:0"><i></i>Alle Orte</a>`
