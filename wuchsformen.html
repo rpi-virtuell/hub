@@ -90,10 +90,10 @@ button,input,select{font:inherit;color:inherit}
 .wuchs.auf .wege{grid-template-rows:1fr}
 .wege>div{min-height:0;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:0 14px 0 0}
 .wuchs.auf .wege>div{padding-bottom:12px}
-.weg{display:flex;align-items:stretch;flex:none;height:40px;border-radius:0 999px 999px 0;background:var(--c);color:var(--t);overflow:hidden;white-space:nowrap;box-shadow:0 0 0 1.5px color-mix(in srgb,var(--c) 50%,#1B2440),0 3px 10px var(--schatten);transform:translateX(-108%);opacity:0;transition:transform .25s,opacity .2s}
+.weg{display:flex;align-items:stretch;flex:none;height:40px;border-radius:0 999px 999px 0;background:var(--c);color:var(--t);overflow:hidden;white-space:nowrap;box-shadow:0 3px 10px var(--schatten);transform:translateX(-108%);opacity:0;transition:transform .25s,opacity .2s}
 .wuchs.auf .weg{transform:none;opacity:1;transition:transform .5s cubic-bezier(.2,1.35,.4,1) calc(var(--v)*1s),opacity .2s calc(var(--v)*1s)}
-.weg b{display:flex;align-items:center;padding:0 12px 0 14px;font-weight:700;font-size:16px;min-width:96px}
-.weg button{border:0;border-left:2px solid var(--c);background:var(--karte);color:var(--tinte);font-weight:700;font-size:15px;padding:0 14px;cursor:pointer;margin:3px 0}
+.weg b{display:flex;align-items:center;padding:0 12px 0 14px;font-weight:600;font-size:16px;min-width:96px}
+.weg button{border:0;border-left:2px solid var(--c);background:var(--karte);color:var(--tinte);font-weight:500;font-size:15px;padding:0 14px;cursor:pointer;margin:3px 0}
 .weg button:last-child{border-radius:0 999px 999px 0;margin-right:3px;padding-right:16px}
 .weg button:hover,.weg button:focus-visible{background:color-mix(in srgb,var(--c) 26%,var(--karte))}
 .wortlaut{position:absolute;left:116px;top:30px;width:max-content;max-width:min(300px,calc(100vw - 132px));background:var(--tinte);color:var(--grund);border-radius:12px;padding:7px 12px;font-size:15px;font-weight:600;z-index:4}
@@ -109,7 +109,7 @@ button,input,select{font:inherit;color:inherit}
 .rad{display:none;position:absolute;left:0;top:48px;width:0;height:0;--cx:260px;--cy:200px;transform:translate(-4px,0) scale(.3) rotate(-220deg);transition:transform .9s cubic-bezier(.3,.8,.3,1);z-index:3}
 .wuchs.var-rad .rad{display:block}
 .wuchs.var-rad.auf .rad{transform:translate(var(--cx),var(--cy)) scale(1) rotate(0deg)}
-.rad-blatt{position:absolute;left:calc((var(--x) - var(--pr))*1px);top:calc((var(--y) - var(--pr))*1px);width:calc(var(--pr)*2px);height:calc(var(--pr)*2px);border-radius:50%;background:var(--c);color:var(--t);opacity:.92;display:grid;place-items:center;text-align:center;font:700 16px/1.1 var(--text);border:0;padding:0;cursor:pointer;box-shadow:0 0 0 1.5px color-mix(in srgb,var(--c) 50%,#1B2440),0 4px 14px var(--schatten);transition:opacity .2s,box-shadow .2s}
+.rad-blatt{position:absolute;left:calc((var(--x) - var(--pr))*1px);top:calc((var(--y) - var(--pr))*1px);width:calc(var(--pr)*2px);height:calc(var(--pr)*2px);border-radius:50%;background:var(--c);color:var(--t);opacity:.92;display:grid;place-items:center;text-align:center;font:700 16px/1.1 var(--text);border:0;padding:0;cursor:pointer;box-shadow:0 4px 14px var(--schatten);transition:opacity .2s,box-shadow .2s}
 .rad-blatt.vorn{opacity:1;z-index:1;box-shadow:0 0 0 3px var(--karte),0 6px 18px var(--schatten)}
 .rad-mitte{position:absolute;left:-27px;top:-27px;width:54px;height:54px;border-radius:50%;border:3px solid var(--karte);background:var(--gast);color:var(--gast-tinte);cursor:pointer;font-size:19px;line-height:1;z-index:2;padding:0}
 .rad-mitte::before{content:"";position:absolute;inset:-150px;border-radius:50%}

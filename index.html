@@ -1391,14 +1391,15 @@ body.oz-pop .bl-pw[data-typ="suche"]{order:9}
 .sb.auf .sb-wege{grid-template-rows:1fr}
 .sb-wege>div{min-height:0;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:0 14px 0 0}
 .sb.auf .sb-wege>div{padding-bottom:12px}
-/* Kontur: Gelb und Orange heben sich allein zu wenig vom Seitengrund ab (3:1 für Bedienelemente) */
-.sb-weg{display:flex;align-items:stretch;flex:none;height:40px;border-radius:0 999px 999px 0;background:var(--c);color:var(--t,#fff);overflow:hidden;white-space:nowrap;box-shadow:0 0 0 1.5px color-mix(in srgb,var(--c) 50%,#1B2440),0 3px 10px rgba(20,24,40,.25);transform:translateX(-108%);opacity:0;transition:transform .25s,opacity .2s}
+.sb-weg{display:flex;align-items:stretch;flex:none;height:40px;border-radius:0 999px 999px 0;background:var(--c);color:var(--t,#fff);overflow:hidden;white-space:nowrap;box-shadow:0 3px 10px rgba(20,24,40,.25);transform:translateX(-108%);opacity:0;transition:transform .25s,opacity .2s}
 .sb.auf .sb-weg{transform:none;opacity:1;transition:transform .5s cubic-bezier(.2,1.35,.4,1) calc(var(--v)*1s),opacity .2s calc(var(--v)*1s)}
-.sb-weg b{display:flex;align-items:center;padding:0 12px 0 14px;font-weight:700;font-size:16px;min-width:104px}
-.sb-weg button,.sb-weg a{display:flex;align-items:center;border:0;border-left:2px solid var(--c);background:var(--card);color:#1B2440;font:inherit;font-weight:700;padding:0 14px;cursor:pointer;margin:3px 0;text-decoration:none}
+.sb-weg b{display:flex;align-items:center;padding:0 12px 0 14px;font-weight:600;font-size:16px;min-width:104px}
+.sb-weg button,.sb-weg a{display:flex;align-items:center;border:0;border-left:2px solid var(--c);background:var(--card);color:#1B2440;font:inherit;font-weight:500;padding:0 14px;cursor:pointer;margin:3px 0;text-decoration:none}
 .sb-weg>:last-child{border-radius:0 999px 999px 0;margin-right:3px;padding-right:16px}
 .sb-weg button:hover,.sb-weg button:focus-visible,.sb-weg a:hover{background:color-mix(in srgb,var(--c) 26%,#fff)}
-.sb-weg button.grau{color:#6A7180}
+/* Erst nach Anmeldung: graue Fläche, graue Schrift (über 4,5 zu 1), bleibt bedienbar und führt zur Anmeldung */
+.sb-weg button.grau{background:#E4E6EA;color:#4F5560}
+.sb-weg button.grau:hover,.sb-weg button.grau:focus-visible{background:#D6D9DF}
 .sb-weg.ein b{min-width:0}
 .sb-weg.ein{height:34px}
 .sb-ranken{display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:4px 14px 0 0}
