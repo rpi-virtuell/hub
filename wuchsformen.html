@@ -108,7 +108,8 @@ button,input,select{font:inherit;color:inherit}
 .rad{display:none;position:absolute;left:0;top:48px;width:0;height:0;--cx:260px;--cy:200px;transform:translate(-4px,0) scale(.3) rotate(-220deg);transition:transform .9s cubic-bezier(.3,.8,.3,1);z-index:3}
 .wuchs.var-rad .rad{display:block}
 .wuchs.var-rad.auf .rad{transform:translate(var(--cx),var(--cy)) scale(1) rotate(0deg)}
-.rad-blatt{position:absolute;left:calc((var(--x) - var(--pr))*1px);top:calc((var(--y) - var(--pr))*1px);width:calc(var(--pr)*2px);height:calc(var(--pr)*2px);border-radius:50%;background:var(--c);color:var(--t);opacity:.92;display:grid;place-items:center;text-align:center;font-weight:700;font-size:16px;box-shadow:0 4px 14px var(--schatten)}
+.rad-blatt{position:absolute;left:calc((var(--x) - var(--pr))*1px);top:calc((var(--y) - var(--pr))*1px);width:calc(var(--pr)*2px);height:calc(var(--pr)*2px);border-radius:50%;background:var(--c);color:var(--t);opacity:.92;display:grid;place-items:center;text-align:center;font:700 16px/1.1 var(--text);border:0;padding:0;cursor:pointer;box-shadow:0 4px 14px var(--schatten);transition:opacity .2s,box-shadow .2s}
+.rad-blatt.vorn{opacity:1;z-index:1;box-shadow:0 0 0 3px var(--karte),0 6px 18px var(--schatten)}
 .rad-mitte{position:absolute;left:-27px;top:-27px;width:54px;height:54px;border-radius:50%;border:3px solid var(--karte);background:var(--gast);color:var(--gast-tinte);cursor:pointer;font-size:19px;line-height:1;z-index:2;padding:0}
 .rad-mitte::before{content:"";position:absolute;inset:-150px;border-radius:50%}
 .wuchs.auf .rad-mitte::before{content:none}
@@ -120,8 +121,9 @@ button,input,select{font:inherit;color:inherit}
 .rad.klein .rad-trieb{font-size:13px;gap:4px}
 .rad.klein .rad-trieb span{padding:3px 7px}
 .rad-trieb:hover span,.rad-trieb:focus-visible span{background:var(--c);color:var(--t)}
-.wuchs.auf .rad-trieb{transform:translate(-17px,-50%) scale(1);opacity:1;visibility:visible;transition:transform .4s cubic-bezier(.2,1.4,.4,1) calc(.7s + var(--v)*1s),opacity .2s calc(.7s + var(--v)*1s),visibility 0s}
-.wuchs.auf .rad-trieb.links{transform:translate(calc(-100% + 17px),-50%) scale(1)}
+/* Die Knospen eines Blatts erscheinen erst, wenn die Maus über dem Blatt steht, es den Fokus hat oder angetippt ist */
+.wuchs.auf .rad-trieb.zeig{transform:translate(-17px,-50%) scale(1);opacity:1;visibility:visible;transition:transform .35s cubic-bezier(.2,1.4,.4,1) calc(var(--v)*1s),opacity .2s calc(var(--v)*1s),visibility 0s}
+.wuchs.auf .rad-trieb.links.zeig{transform:translate(calc(-100% + 17px),-50%) scale(1)}
 .schleier{position:fixed;inset:0;z-index:49;background:color-mix(in srgb,var(--tinte) 30%,transparent)}
 @media (prefers-reduced-motion: reduce){ .rad,.rad-trieb{transition:none!important} }
 /* Ranken: alle Orte des Ökosystems. In Ruhe schauen nur Stummel aus dem Rand, beim Überfahren oder Antippen wachsen sie heraus */
@@ -333,7 +335,8 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
     knospe.setAttribute('aria-expanded', String(bedienbar ? auf : !zettel.hidden));
     knospe.setAttribute('aria-label', !bedienbar ? 'Zeichen des ReliHub-Ökosystems, erklärt sich bei Klick' : auf ? 'Schließen' : 'Wege dieser Seite öffnen');
     wege.querySelectorAll('button').forEach(function (b) { b.tabIndex = auf ? 0 : -1; });
-    rad.querySelectorAll('.rad-trieb').forEach(function (b) { b.tabIndex = auf ? 0 : -1; });
+    rad.querySelectorAll('.rad-blatt').forEach(function (b) { b.tabIndex = auf ? 0 : -1; });
+    if (!auf) radZeig(-1);
     var m = rad.querySelector('.rad-mitte'); if (m) { m.textContent = auf ? '✕' : ''; m.setAttribute('aria-expanded', String(auf)); m.setAttribute('aria-label', auf ? 'Rad schließen' : 'Rad öffnen'); }
     schleier.hidden = !(variante === 'rad' && bedienbar && auf);
   }
@@ -417,13 +420,13 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
     rad.innerHTML = ''; rad.classList.toggle('klein', klein);
     var pos = function (w, r) { var a = w * Math.PI / 180; return [Math.round(r * Math.sin(a)), Math.round(-r * Math.cos(a))]; };
     ds.forEach(function (d, i) {
-      var w = i * schritt, p = pos(w, PO), b = document.createElement('span'); b.className = 'rad-blatt';
+      var w = i * schritt, p = pos(w, PO), b = document.createElement('button'); b.type = 'button'; b.className = 'rad-blatt'; b.dataset.i = i; b.setAttribute('aria-label', d.name + ': Wege zeigen');
       b.style.setProperty('--x', p[0]); b.style.setProperty('--y', p[1]); b.style.setProperty('--pr', PR);
       b.style.setProperty('--c', 'var(--d-' + d.id + ')'); b.style.setProperty('--t', 'var(--t-' + d.id + ')');
       b.style.fontSize = klein ? '12px' : '16px'; b.textContent = d.name; rad.appendChild(b);
       [['raus', -spreiz], ['rein', spreiz]].forEach(function (x, k) {
         var q = pos(w + x[1], RB), t = document.createElement('button'); t.type = 'button'; t.className = 'rad-trieb' + (q[0] < -20 ? ' links' : '');
-        t.style.setProperty('--x', q[0]); t.style.setProperty('--y', q[1]); t.style.setProperty('--v', ((i * 2 + k) * 0.04).toFixed(2));
+        t.dataset.i = i; t.style.setProperty('--x', q[0]); t.style.setProperty('--y', q[1]); t.style.setProperty('--v', (k * 0.07).toFixed(2));
         t.style.setProperty('--c', 'var(--d-' + d.id + ')'); t.style.setProperty('--t', 'var(--t-' + d.id + ')');
         t.innerHTML = '<i aria-hidden="true">›</i><span>' + esc(d[x[0]][0]) + '</span>'; t.title = wort(d, x[0]); t.setAttribute('aria-label', wort(d, x[0]));
         t.addEventListener('click', function () { auf = false; stellen(); ausgeben(d, x[0]); });
@@ -434,6 +437,17 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
     m.addEventListener('click', function () { auf = !auf; stellen(); });
     rad.appendChild(m);
   }
+  // Knospen nur am Blatt unter der Maus: zeigen beim Überfahren, beim Fokus und beim Antippen; kurz warten, bevor sie wieder gehen, damit die Maus vom Blatt zur Knospe kommt
+  var radVorn = -1, radUhr = 0;
+  function radZeig(i) {
+    radVorn = i;
+    rad.querySelectorAll('.rad-trieb').forEach(function (t) { var an = +t.dataset.i === i; t.classList.toggle('zeig', an); t.tabIndex = an && auf ? 0 : -1; });
+    rad.querySelectorAll('.rad-blatt').forEach(function (b) { b.classList.toggle('vorn', +b.dataset.i === i); b.setAttribute('aria-expanded', String(+b.dataset.i === i)); });
+  }
+  rad.addEventListener('mouseover', function (e) { var n = e.target.closest('[data-i]'); if (!n || !auf) return; clearTimeout(radUhr); if (+n.dataset.i !== radVorn) radZeig(+n.dataset.i); });
+  rad.addEventListener('mouseout', function (e) { var zu = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('[data-i]') : null; if (zu) return; clearTimeout(radUhr); radUhr = setTimeout(function () { radZeig(-1); }, 450); });
+  rad.addEventListener('focusin', function (e) { var n = e.target.closest('[data-i]'); if (n && auf) { clearTimeout(radUhr); radZeig(+n.dataset.i); } });
+  rad.addEventListener('click', function (e) { var b = e.target.closest('.rad-blatt'); if (!b || !auf) return; clearTimeout(radUhr); radZeig(+b.dataset.i); });
   document.querySelectorAll('[data-var]').forEach(function (b) { b.addEventListener('click', function () {
     variante = b.dataset.var; auf = false; ausgabe.hidden = true;
     document.querySelectorAll('[data-var]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
