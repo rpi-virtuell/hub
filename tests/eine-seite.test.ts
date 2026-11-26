@@ -1,6 +1,6 @@
 // Eine Seite (ADR-0017): Suche oben, Umschalter über der Blume, vier Belegungen nach Sicht und Anmeldung, einstellbare Blume der Community (ADR-0016).
 import { assert, assertEquals } from 'jsr:@std/assert@1';
-import { appScript, consoleScript, html } from './helfer.ts';
+import { appScript, consoleScript, contrast, html } from './helfer.ts';
 const c = consoleScript(), s = appScript();
 const beleg = (name: string) => (s.match(new RegExp("registerBelegung\\('" + name + "', \\[[\\s\\S]*?\\n  \\]\\);")) || [''])[0];
 
@@ -266,4 +266,24 @@ Deno.test('ADR-0017 und README nennen die eine Seite', async () => {
   assert(/## Status\nEntwurf/.test(adr) && /Suchschlitz/.test(adr) && /Mein ReliHub/.test(adr), 'ADR-0017 unvollständig');
   assert(/ADR-0017/.test(alt), 'ADR-0016 verweist nicht auf die Nachfolge');
   assert(/\[0017\]\(0017-eine-seite-suche-umschalter-blume\.md\)/.test(readme) && /\[0016\]\(0016-entwurfsvergleich-und-einstellbare-blume\.md\)/.test(readme), 'README nennt ADR-0016 oder ADR-0017 nicht');
+});
+
+Deno.test('Barrierefreiheit der Blume am Rand: Kontraste, Kontur, Zielgröße, Ansage (WCAG 2.2 AA)', () => {
+  const farben = JSON.parse((c.match(/const FARBE = (\{[^\n]*?\});/) || ['', '{}'])[1].replace(/'/g, '"').replace(/(\w+):/g, '"$1":'));
+  const misch = (a: string, b: string) => '#' + [1, 3, 5].map((i) => Math.round((parseInt(a.slice(i, i + 2), 16) + parseInt(b.slice(i, i + 2), 16)) / 2).toString(16).padStart(2, '0')).join('');
+  const skizze = Deno.readTextFileSync(new URL('../wuchsformen.html', import.meta.url));
+  for (const d of ['material', 'termine', 'news', 'gespraeche', 'menschen']) {
+    assert(contrast(farben[d][0], farben[d][1]) >= 4.5, 'Schrift auf dem Streifen: ' + d);
+    assert(contrast(misch(farben[d][0], '#1B2440'), '#FBFAF7') >= 3, 'Kontur des Streifens gegen den Seitengrund: ' + d);
+    const m = skizze.match(new RegExp('--d-' + d + ':(#[0-9A-F]{6}); --t-' + d + ':(#[0-9A-F]{6})'));
+    assert(m && contrast(m[1], m[2]) >= 4.5, 'Schrift auf dem Streifen der Skizze: ' + d);
+  }
+  for (const f of ['#2E7B4F', '#5F6670', '#1B2440']) assert(contrast('#FFFFFF', f) >= 4.5, 'Schrift auf der Ranke ' + f);
+  for (const [datei, weg, ort] of [[html, '.sb-weg', '.sb-ort'], [skizze, '.weg', '.ort']]) {
+    assert(datei.includes(weg + '{display:flex;align-items:stretch;flex:none;height:40px;') && new RegExp('\\' + weg + '\\{[^}]*box-shadow:0 0 0 1\\.5px color-mix\\(in srgb,var\\(--c\\) 50%,#1B2440\\)').test(datei), 'Kontur am Streifen');
+    assert(datei.includes(ort + '{display:flex;align-items:center;gap:8px;flex:none;height:24px;'), 'Stummel mindestens 24 Pixel hoch');
+    assert(new RegExp('@media \\(pointer:coarse\\)\\{[^{]*\\' + ort + '\\{height:36px\\}').test(datei), 'mehr Fläche für den Finger');
+  }
+  assert(/<p class="ort-zeile" id="ortZeile" role="status">/.test(html) && /id="ortszeile" role="status"/.test(skizze), 'Wechsel des Orts wird angesagt');
+  assert(/rahmen\.title = 'Seite von ' \+ o\.n;/.test(s) && /Date\.now\(\) - sbKlick < 1500\) \{ sbKlick = 0; rahmen\.focus\(/.test(s) && /zeile\.dataset\.ziel === ziel\) return;/.test(s), 'Rahmen trägt den Namen des Orts, Fokus folgt, keine doppelte Ansage');
 });

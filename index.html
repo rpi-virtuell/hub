@@ -1391,7 +1391,8 @@ body.oz-pop .bl-pw[data-typ="suche"]{order:9}
 .sb.auf .sb-wege{grid-template-rows:1fr}
 .sb-wege>div{min-height:0;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:0 14px 0 0}
 .sb.auf .sb-wege>div{padding-bottom:12px}
-.sb-weg{display:flex;align-items:stretch;flex:none;height:40px;border-radius:0 999px 999px 0;background:var(--c);color:var(--t,#fff);overflow:hidden;white-space:nowrap;box-shadow:0 3px 10px rgba(20,24,40,.25);transform:translateX(-108%);opacity:0;transition:transform .25s,opacity .2s}
+/* Kontur: Gelb und Orange heben sich allein zu wenig vom Seitengrund ab (3:1 für Bedienelemente) */
+.sb-weg{display:flex;align-items:stretch;flex:none;height:40px;border-radius:0 999px 999px 0;background:var(--c);color:var(--t,#fff);overflow:hidden;white-space:nowrap;box-shadow:0 0 0 1.5px color-mix(in srgb,var(--c) 50%,#1B2440),0 3px 10px rgba(20,24,40,.25);transform:translateX(-108%);opacity:0;transition:transform .25s,opacity .2s}
 .sb.auf .sb-weg{transform:none;opacity:1;transition:transform .5s cubic-bezier(.2,1.35,.4,1) calc(var(--v)*1s),opacity .2s calc(var(--v)*1s)}
 .sb-weg b{display:flex;align-items:center;padding:0 12px 0 14px;font-weight:700;font-size:16px;min-width:104px}
 .sb-weg button,.sb-weg a{display:flex;align-items:center;border:0;border-left:2px solid var(--c);background:var(--card);color:#1B2440;font:inherit;font-weight:700;padding:0 14px;cursor:pointer;margin:3px 0;text-decoration:none}
@@ -1401,7 +1402,7 @@ body.oz-pop .bl-pw[data-typ="suche"]{order:9}
 .sb-weg.ein b{min-width:0}
 .sb-weg.ein{height:34px}
 .sb-ranken{display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:4px 14px 0 0}
-.sb-ort{display:flex;align-items:center;gap:8px;flex:none;height:22px;padding:0 14px 0 12px;border-radius:0 999px 999px 0;background:#2E7B4F;color:transparent;text-decoration:none;font-weight:600;white-space:nowrap;box-shadow:0 2px 8px rgba(20,24,40,.25);
+.sb-ort{display:flex;align-items:center;gap:8px;flex:none;height:24px;padding:0 14px 0 12px;border-radius:0 999px 999px 0;background:#2E7B4F;color:transparent;text-decoration:none;font-weight:600;white-space:nowrap;box-shadow:0 2px 8px rgba(20,24,40,.25);
   transform:translateX(calc(-100% + var(--stummel)*1px));transition:transform .35s cubic-bezier(.4,0,.6,1) calc(var(--z)*1s),height .25s,color .2s}
 .sb-ort i{flex:none;width:9px;height:9px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px #fff}
 .sb-ranken.auf .sb-ort{color:#fff;transform:none;height:30px;transition:transform .5s cubic-bezier(.2,1.35,.4,1) calc(var(--v)*1s),height .25s,color .2s}
@@ -1409,6 +1410,7 @@ body.oz-pop .bl-pw[data-typ="suche"]{order:9}
 .sb-ort.alle{background:#5F6670}
 .sb-ort:hover{filter:brightness(1.12)}
 .sb-ort:focus-visible{outline:3px solid #1B2440;outline-offset:2px}
+@media (pointer:coarse){.sb-ranken.auf .sb-ort{height:36px}}   /* mehr Fläche für den Finger */
 @media (prefers-reduced-motion:reduce){.sb-blume,.sb-blume svg,.sb-weg,.sb-wege,.sb-ort{transition:none!important}}
 /* Ort im Rahmen: Die Seite einer Community lädt unter die Navigation, Blume, Wege, Ranken und Flowi bleiben stehen */
 #v-ort iframe{position:fixed;inset:0;width:100%;height:100%;border:0;background:#fff;z-index:20}
@@ -1721,7 +1723,7 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
 <div class="view" id="v-ort" data-stand="live:Seite des Orts">
   <p class="stand" aria-live="polite" hidden></p>
   <iframe id="ortRahmen" title="Seite eines Orts im Ökosystem" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
-  <p class="ort-zeile" id="ortZeile"></p>
+  <p class="ort-zeile" id="ortZeile" role="status"></p>
 </div>
 <div class="view" id="v-community" data-stand="nachbau:Beispielinhalte">
   <header class="hub-top">
@@ -7507,12 +7509,19 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && (sbEl.classList.contains('auf') || sbRanken.classList.contains('auf'))) { sbZu(); sbGriff.focus(); } });
 
   // ---------- Ort im Rahmen (ADR-0018): Die eigene Seite eines Orts lädt unter die Navigation. Geladen werden nur Adressen aus der Tabelle OEKO_ORTE. ----------
+  let sbKlick = 0;   // die Navigation zeichnet sich beim Wechsel neu, deshalb merkt sie sich den Klick statt des Fokus
+  sbEl.addEventListener('click', () => { sbKlick = Date.now(); }, true);
   function ortOpen(qs) {
     const rahmen = document.getElementById('ortRahmen'), zeile = document.getElementById('ortZeile');
     if (qs === null) { if (rahmen.getAttribute('src')) rahmen.removeAttribute('src'); return; }
     const p = new URLSearchParams(qs || ''), o = ortVon(p.get('o')), w = o && o.wege[p.get('w')], ziel = w && /^https:\/\//.test(w) ? w : o && o.web;
     if (!ziel) { go(o ? o.hub : 'partner'); return; }
     if (rahmen.getAttribute('src') !== ziel) rahmen.setAttribute('src', ziel);
+    rahmen.title = 'Seite von ' + o.n;
+    // Wer über die Navigation kam, landet mit dem Fokus in der geladenen Seite. Die Zeile sagt den Wechsel an, aber nur wenn sich das Ziel ändert.
+    if (Date.now() - sbKlick < 1500) { sbKlick = 0; rahmen.focus({ preventScroll: true }); }
+    if (zeile.dataset.ziel === ziel) return;
+    zeile.dataset.ziel = ziel;
     zeile.innerHTML = `<span>Du bist bei <b>${esc(o.n)}</b></span><a href="${esc(sichereUrl(ziel))}" target="_blank" rel="noopener">in neuem Tab öffnen</a><a href="#${esc(o.hub)}">Was ${esc(o.n)} im Datenraum teilt ›</a>`;
   }
 
