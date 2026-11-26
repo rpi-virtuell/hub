@@ -62,10 +62,11 @@ Deno.test('Vorschau um die Erläuterung: echte Einträge als Kreise mit Ring in 
 
 Deno.test('Blüten am linken Rand ersetzen Leiste und kleine Blume', () => {
   assert(/<nav class="sb" id="sb" aria-label="ReliHub-Navigation">/.test(html) && /#leiste,relihub-steuerkonsole\[floating\]\{display:none!important\}/.test(html), 'Blüten fehlen oder Leiste und kleine Blume stehen noch');
-  assertEquals((html.match(/<button type="button" class="sb-griff"[\s\S]*?<\/button>/) || [''])[0].match(/<i /g)!.length, 6);
+  assertEquals((html.match(/<button type="button" class="sb-blume" id="sbGriff"[\s\S]*?<\/button>/) || [''])[0].match(/<circle /g)!.length, 6);
   assert(/const ORT_ART = \{ materialpool: 'Ort', 'rpi-virtuell': 'Ort', relilab: 'Community · Labor', relidesk: 'Werkzeug', oercommunity: 'Projekt' \};/.test(s), 'Ort, Community, Werkzeug und Projekt sind nicht unterschieden');
-  assert(/if \(ort === 'relilab'\) rlAktion\(d\); else if \(ort === 'raum'\) rgAktion\(d\); else standardAktion\(d, 'hub'\);/.test(s), 'in einer Community führen die Blüten nicht an ihren Ort');
-  assert(/ReliHub · Start<\/a>/.test(s) && /e\.key === 'Escape' && sbEl\.classList\.contains\('auf'\)/.test(s), 'Weg zum Start oder Schließen fehlt');
+  const weg = (s.match(/function sbWeg\(akt, label\) \{[\s\S]*?\n  \}/) || [''])[0];
+  assert(/rlAktion\(d\)/.test(weg) && /rgAktion\(d\)/.test(weg) && /standardAktion\(d, 'hub'\)/.test(weg), 'in einer Community führen die Wege nicht an ihren Ort');
+  assert(/<a href="#start"><span aria-hidden="true">‹ <\/span>ReliHub<\/a>/.test(s) && /e\.key === 'Escape' && \(sbEl\.classList\.contains\('auf'\)/.test(s), 'Weg zum Start oder Schließen fehlt');
 });
 
 Deno.test('Orte tragen keine Inhaltsfarbe: Art in Worten, Beiträge als Punkte; Wendekarten ohne durchscheinendes Logo', () => {
@@ -87,7 +88,7 @@ Deno.test('Anmelden ohne Fachwörter; Wege vom Tun her als Blau-Treppe; Randblü
 Deno.test('Aktivitäten: ein Name, eine Liste; Zusagen nur auf Wunsch, Gefolgte nach Anmeldung', () => {
   assert(/<h1>Aktivitäten<\/h1>/.test(s) && /<section class="pk-eins" aria-label="Aktivitäten">\$\{gespr\}\$\{prot\}<\/section>/.test(s), 'Ansicht ist nicht eine Liste unter einem Namen');
   assert(!/<h2>Protokoll<\/h2>|<h2>Feed<\/h2>|Was sonst passiert|<h1>Mitmachen<\/h1>|<h1>Gespräche<\/h1>/.test(s), 'alte Namen oder Zwischenüberschriften stehen noch');
-  assert(/blatt\('e-gespraeche', 'Aktivitäten', 'gespraeche'/.test(s) && /b\('gespraeche\.oeffentlich', 'Aktivitäten', 'gespraeche'\)/.test(s), 'Blatt und Randblüte heißen anders als die Seite');
+  assert(/blatt\('e-gespraeche', 'Aktivitäten', 'gespraeche'/.test(s) && /\{ ding: 'gespraeche', name: 'Aktivitäten', raus: \['ansehen', 'gespraeche\.oeffentlich'/.test(s), 'Blatt und Streifen heißen anders als die Seite');
   assert(/const rest = liste\.filter\(e => e\.ev\.kind !== 1111 && e\.ev\.kind !== 1\);/.test(s), 'Kommentare stehen doppelt');
   assert(/pkMitLeisem \? alle : alle\.filter\(e => e\.ev\.kind !== 31925 && e\.ev\.kind !== 7\)/.test(s), 'Zusagen und Reaktionen stehen ungefragt in der Liste');
   assert(/new Set\(tagWerte\(ichDaten\.kontakte, 'p'\)\)/.test(s) && /!pkNurFolge \|\| folge\.has\(e\.ev\.pubkey\)/.test(s) && /w\.dataset\.pkwer === 'folge' && !LOGGED\) \{ anDialogAuf\(\);/.test(s), 'Eingrenzen auf Gefolgte fehlt oder geht ohne Anmeldung');
@@ -154,8 +155,8 @@ Deno.test('reliGLOBAL als zweites Beispiel neben relilab', () => {
   assert(/Werkstätten finden/.test(b) && /wahl\('data-rk-bsp', 'religlobal', rkBsp, 'reliGLOBAL'\)/.test(s), 'Beispiel fehlt in der Auswahl');
   const rg = (s.match(/function rgAktion\(d\) \{[\s\S]*?\n  \}/) || [''])[0];
   for (const z of ["if (d.action === 'material.finden') return zu('katalog');", "if (d.action === 'termine.finden') return zu('kal');", "if (d.action === 'menschen.personen') return zu('mem');", "if (d.action === 'news.finden') return zu('art');", "if (d.action === 'gespraeche.oeffentlich') return zu('chat');"]) assert(rg.includes(z), 'Ziel fehlt: ' + z);
-  assert(/\.cr \.cr-side\{display:none\}/.test(html) && /b\('raum\.home', 'Übersicht', 'ich'\)/.test(s) && /BLUMEN\[crId\] \? BLUMEN\[crId\]\.blaetter : BLUETEN_STANDARD/.test(s), 'Raum hat noch eine zweite linke Leiste oder die Blüten tragen seine Wege nicht');
-  assert(/#rlBlume,\.rl-hubband\{display:none!important\}/.test(html) && /const an = false, box = document\.getElementById\('rlKonfig'\)/.test(s) && /BLUMEN\[rkBsp\]\.blaetter/.test(s), 'relilab zeigt noch Blume oder Kasten in der Mitte');
+  assert(/\.cr \.cr-side\{display:none\}/.test(html) && /data-sb="raum\.home">Übersicht<\/button>/.test(s) && /BLUMEN\[k\.o\.blume\]\.blaetter/.test(s), 'Raum hat noch eine zweite linke Leiste oder die Wege tragen seine Wörter nicht');
+  assert(/#rlBlume,\.rl-hubband\{display:none!important\}/.test(html) && /const an = false, box = document\.getElementById\('rlKonfig'\)/.test(s), 'relilab zeigt noch Blume oder Kasten in der Mitte');
   assert(/frieden: \{ name: 'Friedensarbeit', blaetter: \[/.test(s) && !/RAUM_BLAUPAUSE/.test(s) && !/v === 'community' &&/.test((s.match(/function entwStand\(v\) \{.*/) || [''])[0]), 'Räume tragen noch den Hinweis In Entwicklung');
   assert(/<section class="cr-mat"><h2 class="cr-h">Materialien<\/h2><div id="crMat"><\/div><\/section>/.test(s) && /e\.pk === hx \|\| \(g\.kanten\.get\(e\.id\) \|\| new Set\(\)\)\.has\(k\)/.test(s) && /ms\.slice\(0, 6\)/.test(s) && /sicht\.map\(mtKarte\)/.test(s), 'Raum zeigt keine echten Materialien');
 });
@@ -176,6 +177,30 @@ Deno.test('Räume und relilab zeigen nur, was unter echten Schlüsseln im Netz s
   const rl = [...s.matchAll(/\{ id: '([a-z-]+)', n: [^\n]*\n/g)].filter((x) => / rl: 1[, ]/.test(x[0])).map((x) => x[1]);
   assertEquals(rl.sort(), ['alpika-gs', 'relilab', 'relilab-impuls']);
   assert(/npub1lde034983zllh2nhe48lt60q6p3a6lsxn0g90uemhg0906jsnzesh5vz8y'\), 'relilab-impuls'\]/.test(s), 'Schlüssel von relilab-impuls');
+});
+Deno.test('Blume am Rand: Wege als Streifen, Orte als Ranken, Orte im Rahmen (ADR-0018)', () => {
+  const fn = (n: string) => (s.match(new RegExp('function ' + n + '\\([^)]*\\) \\{[\\s\\S]*?\\n  \\}')) || [''])[0];
+  const st = (s.match(/const STREIFEN = \[[\s\S]*?\n  \];/) || [''])[0];
+  assertEquals([...st.matchAll(/ding: '([a-z]+)'/g)].map((m) => m[1]), ['material', 'termine', 'news', 'gespraeche', 'menschen']);
+  for (const a of ['material.finden', 'material.teilen', 'termine.finden', 'termine.erstellen', 'news.finden', 'news.veroeffentlichen', 'menschen.personen', 'menschen.communities']) assert(st.includes("'" + a + "'"), 'Weg fehlt: ' + a);
+  const r = fn('sbRender');
+  assert(/STREIFEN\.map\(/.test(r) && /class="sb-ort"/.test(r) && /x\.o\.web \? 'ort\?o=' \+ x\.o\.id : x\.o\.hub/.test(r) && /href="#partner"/.test(r), 'Streifen, Ranken und der Weg zu allen Orten');
+  assert(/sbBesuche\[o\.id\]/.test(r) && /NUR_ANGEMELDET\.includes\(w\[1\]\)/.test(r), 'besuchte Orte zuerst, Wege mit Anmeldung gekennzeichnet');
+  // Jeder Ort legt seine Wege selbst fest: eigene Seite, Datenraum oder eigener Ausschnitt
+  const orte = (s.match(/const OEKO_ORTE = \[[\s\S]*?\n  \];/) || [''])[0];
+  assert(/'termine\.finden': 'https:\/\/relilab\.org\/termine\/'/.test(orte) && /'termine\.finden': 'https:\/\/religlobal\.org\/termine\/'/.test(orte), 'Wege auf die eigene Seite');
+  assert(/id: 'rpi-virtuell'[^\n]*'termine\.finden': 'finden\/fortbildungen'/.test(orte) && /id: 'oercommunity'[^\n]*'news\.finden': 'community\?c=oercommunity&tab=art'/.test(orte) && /id: 'frieden', n: 'Friedenspädagogik', web: ''[^\n]*wege: \{\}/.test(orte), 'Wege in den Datenraum, mit eigenem Ausschnitt oder ohne Eintrag');
+  const w = fn('sbWeg');
+  assert(/const k = sbKontext\(\), ziel = k\.o && k\.o\.wege\[akt\]/.test(w) && /\/\^https:\\\/\\\/\/\.test\(ziel\) \? 'ort\?o=' \+ k\.o\.id \+ '&w=' \+ akt : ziel/.test(w), 'erst gilt, was der Ort festgelegt hat');
+  // Rahmen: nur Adressen aus der Tabelle, kein Wechsel der Hub-Adresse durch die eingebettete Seite
+  const o = fn('ortOpen');
+  assert(/ortVon\(p\.get\('o'\)\)/.test(o) && /o\.wege\[p\.get\('w'\)\]/.test(o) && !/p\.get\('u'\)|p\.get\('url'\)/.test(o) && /rahmen\.removeAttribute\('src'\)/.test(o), 'Rahmen lädt nur Adressen aus der Tabelle und leert sich beim Verlassen');
+  const rahmen = (html.match(/<iframe id="ortRahmen"[^>]*>/) || [''])[0];
+  assert(/sandbox="[^"]*"/.test(rahmen) && !/allow-top-navigation/.test(rahmen) && /referrerpolicy="no-referrer"/.test(rahmen), 'Rahmen darf die Adresse des Hubs nicht wechseln');
+  assert(/'eigene-instanz', 'ort'\]\.includes\(view\)/.test(s) && /ortOpen\(v === 'ort' \? qs : null\);/.test(s), 'Route ort');
+  // Räume im Hub sind ein Feed mit Verweis auf die eigene Seite
+  const h = fn('crHinweis');
+  assert(/Feed von \$\{n\}/.test(h) && /auf der eigenen Webseite/.test(h) && /href="#ort\?o=\$\{esc\(o\.id\)\}">Zur Webseite ›/.test(h) && /\$\{crHinweis\(c\)\}\$\{crMain\(c, hx\)\}/.test(s), 'Hinweis und Weg zur Webseite über dem Raum');
 });
 Deno.test('Lizenzpille nennt den Urheber', () => {
   assert(/urheber: \[\.\.\.new Set\(tagWerte\(ev, 'creator:name'\)/.test(s), 'Urheber aus creator:name');
