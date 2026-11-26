@@ -103,8 +103,9 @@ button,input,select{font:inherit;color:inherit}
 .zettel .teilt{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .zettel .teilt span{font-size:13px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--c);color:var(--t)}
 .zettel a{font-weight:700;color:var(--hub)}
-/* Variante „Rad mit Knospen“: Das Rad rollt aus dem Rand, wird groß und trägt an jedem Blatt zwei Knospen. Ohne Streifen und Ranken. */
-.wuchs.var-rad .knospe,.wuchs.var-rad .spalte{display:none}
+/* Variante „Rad mit Knospen“: Das Rad rollt aus dem Rand, wird groß und trägt an jedem Blatt zwei Knospen. Es ersetzt die Streifen; die Ranken zu den Orten bleiben. */
+.wuchs.var-rad .knospe,.wuchs.var-rad .wege{display:none}
+.wuchs.var-rad.auf .rad.klein~.spalte{visibility:hidden}
 .rad{display:none;position:absolute;left:0;top:48px;width:0;height:0;--cx:260px;--cy:200px;transform:translate(-4px,0) scale(.3) rotate(-220deg);transition:transform .9s cubic-bezier(.3,.8,.3,1);z-index:3}
 .wuchs.var-rad .rad{display:block}
 .wuchs.var-rad.auf .rad{transform:translate(var(--cx),var(--cy)) scale(1) rotate(0deg)}
@@ -392,6 +393,7 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
   // Mitnehmen: Der Ort lädt in den Rahmen, das Element bleibt darüber stehen
   function laden(o) {
     hier = o ? o.n : ''; document.body.classList.toggle('im-rahmen', !!o); ausgabe.hidden = true;
+    if (variante === 'rad' && auf) { auf = false; stellen(); }   // das Rad gibt den Blick auf die geladene Seite frei
     rahmen.hidden = !o; ortszeile.hidden = !o;
     if (o) {
       rahmen.src = o.u;
@@ -416,7 +418,7 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
   // Variante „Rad mit Knospen“: Blätter rings um die Mitte, an jedem zwei Knospen für Raus und Rein. Winkel 0 zeigt nach oben, gezählt im Uhrzeigersinn.
   function radZeichnen(ds) {
     var klein = window.innerWidth < 600, RB = klein ? 84 : 158, PO = klein ? 38 : 66, PR = klein ? 40 : 60, n = ds.length, schritt = n ? 360 / n : 0, spreiz = Math.min(20, schritt * 0.21);
-    rad.style.setProperty('--cx', klein ? 'calc(50vw - 4px)' : '270px'); rad.style.setProperty('--cy', (RB + (klein ? 36 : 44)) + 'px');
+    rad.style.setProperty('--cx', klein ? 'calc(50vw - 4px)' : '310px'); rad.style.setProperty('--cy', (RB + (klein ? 36 : 44)) + 'px');
     rad.innerHTML = ''; rad.classList.toggle('klein', klein);
     var pos = function (w, r) { var a = w * Math.PI / 180; return [Math.round(r * Math.sin(a)), Math.round(-r * Math.cos(a))]; };
     ds.forEach(function (d, i) {
@@ -451,8 +453,6 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
   document.querySelectorAll('[data-var]').forEach(function (b) { b.addEventListener('click', function () {
     variante = b.dataset.var; auf = false; ausgabe.hidden = true;
     document.querySelectorAll('[data-var]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
-    if (variante === 'rad' && stufe === 'ranke') stufe = 'bluete';   // das Rad kommt ohne Ranken aus
-    var r = document.querySelector('[data-stufe="ranke"]'); r.disabled = variante === 'rad'; r.title = variante === 'rad' ? 'Das Rad kommt ohne Ranken aus' : '';
     zeichnen();
   }); });
   schleier.addEventListener('click', function () { auf = false; stellen(); });
