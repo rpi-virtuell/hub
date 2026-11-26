@@ -26,6 +26,7 @@
   --grund:#14171F; --karte:#1E222D; --tinte:#ECEAE3; --leise:#A4AABA; --linie:#343A4A; --pult:#0C0E14; --pult-tinte:#ECEAE3; --pult-leise:#9299AC;
   --platz:#2C3140; --schatten:rgba(0,0,0,.55); --hub:#7C8FE8; color-scheme:dark }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--grund);color:var(--tinte);font:400 17px/1.5 var(--text);margin:0}
 button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--hub);outline-offset:2px}
@@ -42,6 +43,7 @@ button,input,select{font:inherit;color:inherit}
 .seg{display:inline-flex;border:1px solid var(--pult-leise);border-radius:999px;overflow:hidden}
 .seg button{border:0;background:transparent;color:var(--pult-tinte);padding:7px 16px;cursor:pointer;font-weight:600}
 .seg button[aria-pressed="true"]{background:var(--pult-tinte);color:var(--pult)}
+.seg button:disabled{opacity:.4;cursor:default}
 .haken{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:999px;border:1px solid var(--pult-leise);font-size:15px;cursor:pointer}
 .haken i{width:14px;height:14px;border-radius:50%;background:var(--c)}
 .haken input{accent-color:var(--pult-tinte)}
@@ -101,6 +103,27 @@ button,input,select{font:inherit;color:inherit}
 .zettel .teilt{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .zettel .teilt span{font-size:13px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--c);color:var(--t)}
 .zettel a{font-weight:700;color:var(--hub)}
+/* Variante „Rad mit Knospen“: Das Rad rollt aus dem Rand, wird groß und trägt an jedem Blatt zwei Knospen. Ohne Streifen und Ranken. */
+.wuchs.var-rad .knospe,.wuchs.var-rad .spalte{display:none}
+.rad{display:none;position:absolute;left:0;top:48px;width:0;height:0;--cx:260px;--cy:200px;transform:translate(-4px,0) scale(.3) rotate(-220deg);transition:transform .9s cubic-bezier(.3,.8,.3,1);z-index:3}
+.wuchs.var-rad .rad{display:block}
+.wuchs.var-rad.auf .rad{transform:translate(var(--cx),var(--cy)) scale(1) rotate(0deg)}
+.rad-blatt{position:absolute;left:calc((var(--x) - var(--pr))*1px);top:calc((var(--y) - var(--pr))*1px);width:calc(var(--pr)*2px);height:calc(var(--pr)*2px);border-radius:50%;background:var(--c);color:var(--t);opacity:.92;display:grid;place-items:center;text-align:center;font-weight:700;font-size:16px;box-shadow:0 4px 14px var(--schatten)}
+.rad-mitte{position:absolute;left:-27px;top:-27px;width:54px;height:54px;border-radius:50%;border:3px solid var(--karte);background:var(--gast);color:var(--gast-tinte);cursor:pointer;font-size:19px;line-height:1;z-index:2;padding:0}
+.rad-mitte::before{content:"";position:absolute;inset:-150px;border-radius:50%}
+.wuchs.auf .rad-mitte::before{content:none}
+.rad-trieb{position:absolute;left:calc(var(--x)*1px);top:calc(var(--y)*1px);display:flex;align-items:center;gap:6px;border:0;background:none;padding:0;cursor:pointer;font:700 15px/1.1 var(--text);color:var(--tinte);white-space:nowrap;z-index:3;
+  transform:translate(-17px,-50%) scale(0);transform-origin:17px 50%;opacity:0;visibility:hidden;transition:transform .15s,opacity .15s,visibility 0s .15s}
+.rad-trieb.links{flex-direction:row-reverse;transform:translate(calc(-100% + 17px),-50%) scale(0);transform-origin:calc(100% - 17px) 50%}
+.rad-trieb i{flex:none;width:34px;height:34px;border-radius:50%;background:var(--c);color:var(--t);display:grid;place-items:center;font-style:normal;font-size:20px;box-shadow:0 0 0 3px var(--karte),0 3px 10px var(--schatten)}
+.rad-trieb span{background:var(--karte);border-radius:10px;padding:4px 9px;box-shadow:0 2px 8px var(--schatten)}
+.rad.klein .rad-trieb{font-size:13px;gap:4px}
+.rad.klein .rad-trieb span{padding:3px 7px}
+.rad-trieb:hover span,.rad-trieb:focus-visible span{background:var(--c);color:var(--t)}
+.wuchs.auf .rad-trieb{transform:translate(-17px,-50%) scale(1);opacity:1;visibility:visible;transition:transform .4s cubic-bezier(.2,1.4,.4,1) calc(.7s + var(--v)*1s),opacity .2s calc(.7s + var(--v)*1s),visibility 0s}
+.wuchs.auf .rad-trieb.links{transform:translate(calc(-100% + 17px),-50%) scale(1)}
+.schleier{position:fixed;inset:0;z-index:49;background:color-mix(in srgb,var(--tinte) 30%,transparent)}
+@media (prefers-reduced-motion: reduce){ .rad,.rad-trieb{transition:none!important} }
 /* Ranken: alle Orte des Ökosystems. In Ruhe schauen nur Stummel aus dem Rand, beim Überfahren oder Antippen wachsen sie heraus */
 .ranken{display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:4px 14px 0 0}
 .ort{display:flex;align-items:center;gap:8px;flex:none;height:22px;padding:0 14px 0 12px;border:0;border-radius:0 999px 999px 0;background:var(--ort);color:transparent;text-decoration:none;font:600 15px/1 var(--text);white-space:nowrap;cursor:pointer;box-shadow:0 2px 8px var(--schatten);
@@ -145,6 +168,12 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
           <button type="button" data-stufe="ranke" aria-pressed="false">Ranke</button>
         </div>
       </div>
+      <div class="gruppe"><span>Variante</span>
+        <div class="seg" role="group" aria-label="Variante der Bedienung">
+          <button type="button" data-var="streifen" aria-pressed="true">Streifen und Ranken</button>
+          <button type="button" data-var="rad" aria-pressed="false">Rad mit Knospen</button>
+        </div>
+      </div>
       <div class="gruppe"><span>Wörter</span>
         <select id="woerter" aria-label="Wörter der Community">
           <option value="allgemein">allgemein</option>
@@ -179,6 +208,7 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
 <iframe class="rahmen" id="rahmen" title="Seite eines Orts im Ökosystem" hidden></iframe>
 <div class="ortszeile" id="ortszeile" hidden></div>
 
+<div class="schleier" id="schleier" hidden></div>
 <div class="wuchs" id="wuchs">
   <button type="button" class="knospe" id="knospe" aria-expanded="false" aria-label="Zeichen des ReliHub-Ökosystems">
     <svg viewBox="-50 -50 100 100" aria-hidden="true">
@@ -188,6 +218,7 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
   </button>
   <div class="wortlaut" id="wortlaut" hidden></div>
   <div class="zettel" id="zettel" hidden></div>
+  <div class="rad" id="rad"></div>
   <div class="spalte">
     <div class="wege"><div id="wege"></div></div>
     <nav class="ranken" id="ranken" hidden aria-label="Orte im Ökosystem"></nav>
@@ -247,6 +278,7 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
   var $ = function (id) { return document.getElementById(id); };
   var stufe = 'bluete', aktiv = { material: true, termine: true, news: true, gespraeche: true, menschen: true }, auf = false, satz = 'allgemein';
   var wuchs = $('wuchs'), knospe = $('knospe'), wege = $('wege'), zettel = $('zettel'), wortlaut = $('wortlaut'), ausgabe = $('ausgabe'), ranken = $('ranken'), rahmen = $('rahmen'), ortszeile = $('ortszeile');
+  var variante = 'streifen', rad = $('rad'), schleier = $('schleier');   // zweite Variante der Bedienung: Rad mit Knospen statt Streifen und Ranken
   var hier = '';   // Name des Orts, der gerade im Rahmen geladen ist
   var besuche = {};
   try { besuche = JSON.parse(localStorage.getItem('wuchs-besuche') || '{}') || {}; } catch (e) { besuche = {}; }
@@ -291,6 +323,7 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
       });
     }
     ranken.hidden = stufe !== 'ranke'; if (stufe === 'ranke') rankenZeichnen();
+    wuchs.classList.toggle('var-rad', variante === 'rad' && bedienbar); radZeichnen(bedienbar ? ds : []);
     zettelFuellen(); stellen();
   }
   function stellen() {
@@ -300,6 +333,9 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
     knospe.setAttribute('aria-expanded', String(bedienbar ? auf : !zettel.hidden));
     knospe.setAttribute('aria-label', !bedienbar ? 'Zeichen des ReliHub-Ökosystems, erklärt sich bei Klick' : auf ? 'Schließen' : 'Wege dieser Seite öffnen');
     wege.querySelectorAll('button').forEach(function (b) { b.tabIndex = auf ? 0 : -1; });
+    rad.querySelectorAll('.rad-trieb').forEach(function (b) { b.tabIndex = auf ? 0 : -1; });
+    var m = rad.querySelector('.rad-mitte'); if (m) { m.textContent = auf ? '✕' : ''; m.setAttribute('aria-expanded', String(auf)); m.setAttribute('aria-label', auf ? 'Rad schließen' : 'Rad öffnen'); }
+    schleier.hidden = !(variante === 'rad' && bedienbar && auf);
   }
   function zettelFuellen() {
     var ds = liste();
@@ -373,6 +409,40 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
     e.preventDefault(); laden(ORTE.filter(function (o) { return o.n === a.dataset.ort; })[0]);
   });
   document.addEventListener('click', function (e) { if (!e.target.closest('#ranken')) ranken.classList.remove('auf'); });
+
+  // Variante „Rad mit Knospen“: Blätter rings um die Mitte, an jedem zwei Knospen für Raus und Rein. Winkel 0 zeigt nach oben, gezählt im Uhrzeigersinn.
+  function radZeichnen(ds) {
+    var klein = window.innerWidth < 600, RB = klein ? 84 : 158, PO = klein ? 38 : 66, PR = klein ? 40 : 60, n = ds.length, schritt = n ? 360 / n : 0, spreiz = Math.min(20, schritt * 0.21);
+    rad.style.setProperty('--cx', klein ? 'calc(50vw - 4px)' : '270px'); rad.style.setProperty('--cy', (RB + (klein ? 36 : 44)) + 'px');
+    rad.innerHTML = ''; rad.classList.toggle('klein', klein);
+    var pos = function (w, r) { var a = w * Math.PI / 180; return [Math.round(r * Math.sin(a)), Math.round(-r * Math.cos(a))]; };
+    ds.forEach(function (d, i) {
+      var w = i * schritt, p = pos(w, PO), b = document.createElement('span'); b.className = 'rad-blatt';
+      b.style.setProperty('--x', p[0]); b.style.setProperty('--y', p[1]); b.style.setProperty('--pr', PR);
+      b.style.setProperty('--c', 'var(--d-' + d.id + ')'); b.style.setProperty('--t', 'var(--t-' + d.id + ')');
+      b.style.fontSize = klein ? '12px' : '16px'; b.textContent = d.name; rad.appendChild(b);
+      [['raus', -spreiz], ['rein', spreiz]].forEach(function (x, k) {
+        var q = pos(w + x[1], RB), t = document.createElement('button'); t.type = 'button'; t.className = 'rad-trieb' + (q[0] < -20 ? ' links' : '');
+        t.style.setProperty('--x', q[0]); t.style.setProperty('--y', q[1]); t.style.setProperty('--v', ((i * 2 + k) * 0.04).toFixed(2));
+        t.style.setProperty('--c', 'var(--d-' + d.id + ')'); t.style.setProperty('--t', 'var(--t-' + d.id + ')');
+        t.innerHTML = '<i aria-hidden="true">›</i><span>' + esc(d[x[0]][0]) + '</span>'; t.title = wort(d, x[0]); t.setAttribute('aria-label', wort(d, x[0]));
+        t.addEventListener('click', function () { auf = false; stellen(); ausgeben(d, x[0]); });
+        rad.appendChild(t);
+      });
+    });
+    var m = document.createElement('button'); m.type = 'button'; m.className = 'rad-mitte';
+    m.addEventListener('click', function () { auf = !auf; stellen(); });
+    rad.appendChild(m);
+  }
+  document.querySelectorAll('[data-var]').forEach(function (b) { b.addEventListener('click', function () {
+    variante = b.dataset.var; auf = false; ausgabe.hidden = true;
+    document.querySelectorAll('[data-var]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    if (variante === 'rad' && stufe === 'ranke') stufe = 'bluete';   // das Rad kommt ohne Ranken aus
+    var r = document.querySelector('[data-stufe="ranke"]'); r.disabled = variante === 'rad'; r.title = variante === 'rad' ? 'Das Rad kommt ohne Ranken aus' : '';
+    zeichnen();
+  }); });
+  schleier.addEventListener('click', function () { auf = false; stellen(); });
+  window.addEventListener('resize', function () { if (variante === 'rad') radZeichnen(stufe === 'knospe' ? [] : liste()); stellen(); });
 
   // Flowi
   $('flowi').addEventListener('click', function () { var b = $('blase'); b.hidden = !b.hidden; $('flowi').setAttribute('aria-expanded', String(!b.hidden)); });
