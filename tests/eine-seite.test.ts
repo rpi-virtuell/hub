@@ -286,3 +286,19 @@ Deno.test('Barrierefreiheit der Blume am Rand: Kontraste, Kontur, Zielgröße, A
   assert(/<p class="ort-zeile" id="ortZeile" role="status">/.test(html) && /id="ortszeile" role="status"/.test(skizze), 'Wechsel des Orts wird angesagt');
   assert(/rahmen\.title = 'Seite von ' \+ o\.n;/.test(s) && /Date\.now\(\) - sbKlick < 1500\) \{ sbKlick = 0; rahmen\.focus\(/.test(s) && /zeile\.dataset\.ziel === ziel\) return;/.test(s), 'Rahmen trägt den Namen des Orts, Fokus folgt, keine doppelte Ansage');
 });
+
+Deno.test('Ranken sind wählbar: Häkchen je Ort, gemerkt im Browser, Orte ohne Schlüssel führen auf ihre Webseite', () => {
+  const fn = (n: string) => (s.match(new RegExp('function ' + n + '\\([^)]*\\) \\{[\\s\\S]*?\\n  \\}')) || [''])[0];
+  const orte = (s.match(/const OEKO_ORTE = \[[\s\S]*?\n  \];/) || [''])[0];
+  for (const id of ['narrt', 'relimentar']) assert(new RegExp("id: '" + id + "'[^\\n]*web: 'https://[^']+'[^\\n]*hub: 'partner'[^\\n]*ohne: true, tab: true").test(orte), 'Ort ohne Schlüssel: ' + id);
+  const r = fn('sbRender');
+  assert(/\.filter\(x => !sbAus\.includes\(x\.o\.id\) \|\| \(k\.o && k\.o\.id === x\.o\.id\)\)/.test(r), 'Abgewähltes fehlt, der aktuelle Ort bleibt');
+  assert(/x\.o\.tab \? esc\(sichereUrl\(x\.o\.web\)\)/.test(r) && /target="_blank" rel="noopener" aria-label="\$\{esc\(o\.n\)\}, öffnet in neuem Tab"/.test(r) && /noch ohne Inhalte im Datenraum/.test(r), 'Ranke ohne Schlüssel: neue Registerkarte, mit Hinweis');
+  assert(/\.sort\(\(a, b\) => !!a\.o\.ohne - !!b\.o\.ohne \|\| b\.b - a\.b \|\| a\.i - b\.i\)/.test(r), 'Orte ohne Schlüssel stehen immer unten');
+  assert(/id="sbWahlGriff" aria-expanded="\$\{!sbWahl\.hidden\}" aria-controls="sbWahl"/.test(r), 'Griff zur Auswahl');
+  const w = fn('sbWahlZeig');
+  assert(/<fieldset><legend>Welche Orte sollen als Ranken erscheinen\?<\/legend>/.test(w) && /OEKO_ORTE\.map\(o => `<label><input type="checkbox"/.test(w) && /Rangfolge des Hubs/.test(w) && /bleibt in diesem Browser/.test(w), 'Liste mit Häkchen und Erklärung der Voreinstellung');
+  assert(/localStorage\.getItem\('relihub:orte-aus'\)/.test(s) && /localStorage\.setItem\('relihub:orte-aus', JSON\.stringify\(sbAus\)\)/.test(s), 'Auswahl im Browser gemerkt');
+  assert(/if \(!ziel \|\| o\.tab\) \{ go\(/.test(fn('ortOpen')), 'was das Einbetten verbietet, lädt nie in den Rahmen');
+  assert(/<div class="sb-wahl" id="sbWahl" hidden><\/div>/.test(html) && /\.sb-spalte\{[^}]*overflow-y:auto/.test(html), 'Auswahl im Markup, Spalte scrollt');
+});

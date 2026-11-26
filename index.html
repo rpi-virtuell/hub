@@ -1409,6 +1409,17 @@ body.oz-pop .bl-pw[data-typ="suche"]{order:9}
 .sb-ranken.auf .sb-ort{color:#fff;transform:none;height:30px;transition:transform .5s cubic-bezier(.2,1.35,.4,1) calc(var(--v)*1s),height .25s,color .2s}
 .sb-ort[aria-current]{background:#1B2440}
 .sb-ort.alle{background:#5F6670}
+button.sb-ort{border:0;font:inherit;font-weight:600;cursor:pointer}
+/* Auswahl der Ranken: Häkchen je Ort, gemerkt im Browser */
+.sb-wahl{margin:8px 14px 4px 8px;width:min(280px,calc(100vw - 30px));background:var(--card);color:#1B2440;border-radius:14px;padding:12px 14px;box-shadow:0 6px 22px rgba(20,24,40,.3);font-size:15px;white-space:normal}
+.sb-wahl fieldset{border:0;margin:0;padding:0}
+.sb-wahl legend{font-weight:600;padding:0;margin-bottom:6px}
+.sb-wahl label{display:flex;gap:9px;align-items:flex-start;min-height:32px;padding:5px 0;cursor:pointer}
+.sb-wahl input{flex:none;width:18px;height:18px;margin:2px 0 0;accent-color:#2E7B4F}
+.sb-wahl small{display:block;color:#5F6670;font-size:13px;line-height:1.3}
+.sb-wahl p{margin:8px 0 10px;color:#5F6670;font-size:13px;line-height:1.35}
+.sb-wahl button{border:0;border-radius:999px;background:#1B2440;color:#fff;font:inherit;font-weight:600;padding:7px 18px;cursor:pointer}
+.sb-wahl :focus-visible{outline:3px solid #1B2440;outline-offset:2px}
 .sb-ort:hover{filter:brightness(1.12)}
 .sb-ort:focus-visible{outline:3px solid #1B2440;outline-offset:2px}
 @media (pointer:coarse){.sb-ranken.auf .sb-ort{height:36px}}   /* mehr Fläche für den Finger */
@@ -2132,7 +2143,7 @@ body.oz-pop .oz-zu{display:flex;position:sticky;top:0;z-index:5;flex-wrap:wrap;j
     <svg viewBox="-50 -50 100 100" aria-hidden="true"><circle cx="0" cy="-22" r="22" fill="#85992C" fill-opacity=".85"/><circle cx="21" cy="-7" r="22" fill="#DAB000" fill-opacity=".85"/><circle cx="13" cy="18" r="22" fill="#F1693E" fill-opacity=".85"/><circle cx="-13" cy="18" r="22" fill="#B549F0" fill-opacity=".85"/><circle cx="-21" cy="-7" r="22" fill="#AF4112" fill-opacity=".85"/><circle cx="0" cy="0" r="11" fill="#2A3B8E" stroke="#fff" stroke-width="2.5"/></svg>
   </button>
   <div class="sb-wort" id="sbWort" hidden></div>
-  <div class="sb-spalte" id="sbFeld"><div class="sb-wege"><div id="sbWege"></div></div><div class="sb-ranken" id="sbRanken"></div></div>
+  <div class="sb-spalte" id="sbFeld"><div class="sb-wege"><div id="sbWege"></div></div><div class="sb-ranken" id="sbRanken"></div><div class="sb-wahl" id="sbWahl" hidden></div></div>
 </nav>
 <!-- In Entwicklung: über Ansichten ohne eigene Entwicklung -->
 <div class="entw" id="entw"><p class="entw-band" role="status">In Entwicklung · Diese Ansicht ist ein Nachbau mit Beispieldaten</p><div class="entw-wort" aria-hidden="true">IN ENTWICKLUNG</div></div>
@@ -7418,7 +7429,7 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   // ---------- Blüten am linken Rand ----------
   const ORT_ART = { materialpool: 'Ort', 'rpi-virtuell': 'Ort', relilab: 'Community · Labor', relidesk: 'Werkzeug', oercommunity: 'Projekt' };
   // ---------- Navigation am linken Rand (ADR-0018): Blume, Wege als Streifen, Orte als Ranken ----------
-  const sbEl = document.getElementById('sb'), sbFeld = document.getElementById('sbFeld'), sbGriff = document.getElementById('sbGriff'), sbWege = document.getElementById('sbWege'), sbRanken = document.getElementById('sbRanken'), sbWortEl = document.getElementById('sbWort');
+  const sbEl = document.getElementById('sb'), sbFeld = document.getElementById('sbFeld'), sbGriff = document.getElementById('sbGriff'), sbWege = document.getElementById('sbWege'), sbRanken = document.getElementById('sbRanken'), sbWahl = document.getElementById('sbWahl'), sbWortEl = document.getElementById('sbWort');
   function sbOrt() { const v = CUR.split('?')[0]; return v === 'relilab' ? 'relilab' : v === 'community' ? 'raum' : ''; }
   // Je Inhaltsart ein Streifen mit zwei Wegen: einer holt etwas heraus, einer gibt etwas hinein
   const STREIFEN = [
@@ -7442,7 +7453,10 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     { id: 'frieden', n: 'Friedenspädagogik', web: '', hub: 'community?c=frieden', c: '#AF4112', blume: 'frieden', wege: {} },   // Community am Anfang: alle Wege führen in ihren Ausschnitt des Datenraums
     { id: 'rpi-virtuell', n: 'rpi-virtuell', web: 'https://rpi-virtuell.de/', hub: 'rpi-virtuell', c: '#0072AA', wege: { 'material.finden': 'material', 'termine.finden': 'finden/fortbildungen', 'news.finden': 'news' } },   // der ganze Datenraum
     { id: 'oercommunity', n: 'OER-Community', web: 'https://oer.community/', hub: 'oercommunity', c: '#B02A5B', wege: { 'material.finden': 'material', 'termine.finden': 'finden/fortbildungen', 'news.finden': 'community?c=oercommunity&tab=art' } },   // Datenraum, News mit eigenem Filter
-    { id: 'relidesk', n: 'relidesk', web: '', hub: 'relidesk', c: '#AD5F00', wege: {} }
+    { id: 'relidesk', n: 'relidesk', web: '', hub: 'relidesk', c: '#AD5F00', wege: {} },
+    // Noch ohne Schlüssel im Datenraum (`ohne`): Die Ranke führt nur auf die eigene Webseite. `tab`: Die Seite verbietet das Einbetten und öffnet in neuem Tab.
+    { id: 'narrt', n: 'narrt', web: 'https://narrt.de/', hub: 'partner', c: '#AF4112', ohne: true, tab: true, wege: {} },
+    { id: 'relimentar', n: 'relimentar', web: 'https://relimentar.de/', hub: 'partner', c: '#AF4112', ohne: true, tab: true, wege: {} }
   ];
   const ortVon = id => OEKO_ORTE.find(o => o.id === id) || null;
   /** Wo die Navigation gerade steht: { art: 'hub' | 'ort' | 'relilab' | 'raum', o: Ort oder null }. Im Rahmen und in der Hub-Ansicht eines Orts gelten seine Wege und seine Wörter. */
@@ -7456,6 +7470,9 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   const raumName = () => BLUMEN[crId] ? BLUMEN[crId].name : ((CY.find(c => c.id === crId) || {}).n || 'dieser Community').replace(/­/g, '');
   let sbBesuche = {};
   try { sbBesuche = JSON.parse(localStorage.getItem('relihub:orte-besuche') || '{}') || {}; } catch (e) { sbBesuche = {}; }
+  // Auswahl der Ranken: Gemerkt wird nur, was abgewählt ist, im Browser. Neue Orte erscheinen so von selbst.
+  let sbAus = [];
+  try { const a = JSON.parse(localStorage.getItem('relihub:orte-aus') || '[]'); sbAus = Array.isArray(a) ? a.filter(x => typeof x === 'string') : []; } catch (e) { sbAus = []; }
   function sbRender() {
     const v = CUR.split('?')[0].split('/').pop(), k = sbKontext(), bl = k.o && k.o.blume && BLUMEN[k.o.blume] ? BLUMEN[k.o.blume].blaetter : [];
     const eigen = akt => bl.find(x => x.aktion === akt);   // Wörter der Community, wo sie welche eingestellt hat
@@ -7465,20 +7482,32 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
       return `<button type="button"${grau ? ' class="grau"' : ''} data-sb="${w[1]}" data-wort="${esc(voll)}" title="${esc(voll)}" aria-label="${esc(voll)}">${esc(e && e.kurz ? e.kurz : w[0])}</button>`;
     };
     const ein = (inhalt, ding) => `<div class="sb-weg ein" style="--c:${D_FARBE[ding][0]};--t:${D_FARBE[ding][1]};--v:${vz()}">${inhalt}</div>`;
-    const kopf = k.o ? ein(`<b>bei ${esc(k.o.n)}</b>` + (k.art === 'ort' ? `<a href="#${esc(k.o.hub)}">im Datenraum</a>` : `<button type="button" data-sb="raum.home">Übersicht</button>` + (k.o.web ? `<a href="#ort?o=${k.o.id}">Webseite</a>` : '')), 'ich')
+    const kopf = k.o ? ein(`<b>bei ${esc(k.o.n)}</b>` + (k.art === 'ort' ? `<a href="#${esc(k.o.hub)}">${k.o.ohne ? 'Alle Orte' : 'im Datenraum'}</a>` : `<button type="button" data-sb="raum.home">Übersicht</button>` + (k.o.web ? `<a href="#ort?o=${k.o.id}">Webseite</a>` : '')), 'ich')
       : k.art === 'raum' ? ein(`<b>bei ${esc(raumName())}</b><button type="button" data-sb="raum.home">Übersicht</button>`, 'ich') : '';
     sbWege.innerHTML = (v === 'start' ? '' : ein(`<a href="#start"><span aria-hidden="true">‹ </span>ReliHub</a>`, 'ich')) + kopf
       + STREIFEN.map(s => `<div class="sb-weg" style="--c:${D_FARBE[s.ding][0]};--t:${D_FARBE[s.ding][1]};--v:${vz()}"><b>${esc(s.name)}</b>${knopf(s.raus)}${knopf(s.rein)}</div>`).join('')
       + ein(`<button type="button" data-sb="ich">${LOGGED ? 'Mein ReliHub' : 'Anmelden'}</button>`, 'ich');
     // Ranken: alle Orte; besuchte rücken nach oben. In Ruhe schauen nur Stummel aus dem Rand.
     const breiten = [18, 26, 20, 34, 40, 30, 36, 22, 28, 16, 38, 24, 32];
-    const orte = OEKO_ORTE.map((o, i) => ({ o, i, b: sbBesuche[o.id] || 0 })).sort((a, b) => b.b - a.b || a.i - b.i);
-    sbRanken.innerHTML = orte.map((x, i) => `<a class="sb-ort" href="#${x.o.web ? 'ort?o=' + x.o.id : x.o.hub}" data-ort="${x.o.id}" style="--c:${x.o.c};--stummel:${breiten[i % breiten.length]};--v:${(i * 0.05).toFixed(2)};--z:${((orte.length - i) * 0.03).toFixed(2)}"${k.o && k.o.id === x.o.id ? ' aria-current="page"' : ''}><i></i>${esc(x.o.n)}</a>`).join('')
-      + `<a class="sb-ort alle" href="#partner" style="--c:#fff;--stummel:14;--v:${(orte.length * 0.05).toFixed(2)};--z:0"><i></i>Alle Orte</a>`;
+    const orte = OEKO_ORTE.map((o, i) => ({ o, i, b: sbBesuche[o.id] || 0 })).filter(x => !sbAus.includes(x.o.id) || (k.o && k.o.id === x.o.id)).sort((a, b) => !!a.o.ohne - !!b.o.ohne || b.b - a.b || a.i - b.i);   // Orte ohne Schlüssel stehen immer unten, auch wenn sie besucht wurden
+    const zusatz = o => (o.ohne ? ' title="noch ohne Inhalte im Datenraum"' : '') + (o.tab ? ` target="_blank" rel="noopener" aria-label="${esc(o.n)}, öffnet in neuem Tab"` : '');
+    sbRanken.innerHTML = orte.map((x, i) => `<a class="sb-ort" href="${x.o.tab ? esc(sichereUrl(x.o.web)) : '#' + (x.o.web ? 'ort?o=' + x.o.id : x.o.hub)}"${zusatz(x.o)} data-ort="${x.o.id}" style="--c:${x.o.c};--stummel:${breiten[i % breiten.length]};--v:${(i * 0.05).toFixed(2)};--z:${((orte.length - i) * 0.03).toFixed(2)}"${k.o && k.o.id === x.o.id ? ' aria-current="page"' : ''}><i></i>${esc(x.o.n)}${x.o.tab ? '<span aria-hidden="true"> ↗</span>' : ''}</a>`).join('')
+      + `<a class="sb-ort alle" href="#partner" style="--c:#fff;--stummel:14;--v:${(orte.length * 0.05).toFixed(2)};--z:0"><i></i>Alle Orte</a>`
+      + `<button type="button" class="sb-ort alle wahl" id="sbWahlGriff" aria-expanded="${!sbWahl.hidden}" aria-controls="sbWahl" style="--c:#fff;--stummel:10;--v:${((orte.length + 1) * 0.05).toFixed(2)};--z:0"><i></i>Orte auswählen</button>`;
     sbTab();
   }
+  /** Auswahl der Ranken: ein Häkchen je Ort. Die Voreinstellung zeigt alle; die Reihenfolge ist die Rangfolge des Hubs, Besuchtes rückt nach oben. */
+  function sbWahlZeig(auf) {
+    sbWahl.hidden = !auf;
+    const g = document.getElementById('sbWahlGriff'); if (g) g.setAttribute('aria-expanded', String(auf));
+    if (!auf) return;
+    sbWahl.innerHTML = `<fieldset><legend>Welche Orte sollen als Ranken erscheinen?</legend>`
+      + OEKO_ORTE.map(o => `<label><input type="checkbox" value="${o.id}"${sbAus.includes(o.id) ? '' : ' checked'}><span>${esc(o.n)}${o.ohne ? '<small>noch ohne Inhalte im Datenraum, führt auf die eigene Webseite</small>' : ''}</span></label>`).join('')
+      + `</fieldset><p>Voreingestellt sind alle Orte in der Rangfolge des Hubs. Was du besuchst, rückt nach oben. Deine Auswahl bleibt in diesem Browser. Weitere Orte stehen unter „Alle Orte“.</p><button type="button" id="sbWahlZu">Fertig</button>`;
+    sbWahl.querySelector('input').focus(); sbWahl.scrollIntoView({ block: 'nearest' });
+  }
   function sbTab() { const auf = sbEl.classList.contains('auf'); sbWege.querySelectorAll('button,a').forEach(b => { b.tabIndex = auf ? 0 : -1; }); }
-  const sbZu = () => { sbEl.classList.remove('auf'); sbRanken.classList.remove('auf'); sbWortEl.hidden = true; sbGriff.setAttribute('aria-expanded', 'false'); sbGriff.setAttribute('aria-label', 'Navigation öffnen'); sbTab(); };
+  const sbZu = () => { sbEl.classList.remove('auf'); sbRanken.classList.remove('auf'); sbWahlZeig(false); sbWortEl.hidden = true; sbGriff.setAttribute('aria-expanded', 'false'); sbGriff.setAttribute('aria-label', 'Navigation öffnen'); sbTab(); };
   sbGriff.addEventListener('click', () => { const auf = !sbEl.classList.contains('auf'); if (!auf) { sbZu(); return; } sbEl.classList.add('auf'); sbGriff.setAttribute('aria-expanded', 'true'); sbGriff.setAttribute('aria-label', 'Navigation schließen'); sbTab(); });
   /** Ein Weg: erst gilt, was der Ort selbst festgelegt hat (eigene Seite im Rahmen oder Route im Hub), sonst sein Ausschnitt des Datenraums, sonst der ganze Hub */
   function sbWeg(akt, label) {
@@ -7503,9 +7532,17 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
   sbRanken.addEventListener('click', e => {
     const a = e.target.closest('.sb-ort'); if (!a) return;
     if (!sbRanken.classList.contains('auf')) { e.preventDefault(); sbRanken.classList.add('auf'); return; }   // erstes Antippen lässt die Ranken wachsen
+    if (a.id === 'sbWahlGriff') { sbWahlZeig(sbWahl.hidden); return; }
     if (a.dataset.ort) { sbBesuche[a.dataset.ort] = (sbBesuche[a.dataset.ort] || 0) + 1; try { localStorage.setItem('relihub:orte-besuche', JSON.stringify(sbBesuche)); } catch (er) {} }
     sbZu();
   });
+  sbWahl.addEventListener('change', e => {
+    const id = e.target.value; if (!ortVon(id)) return;
+    sbAus = e.target.checked ? sbAus.filter(x => x !== id) : sbAus.concat(id);
+    try { localStorage.setItem('relihub:orte-aus', JSON.stringify(sbAus)); } catch (er) {}
+    sbRanken.classList.add('auf'); sbRender();
+  });
+  sbWahl.addEventListener('click', e => { if (e.target.id === 'sbWahlZu') { sbWahlZeig(false); const g = document.getElementById('sbWahlGriff'); if (g) g.focus(); } });
   document.addEventListener('click', e => { if (!sbEl.contains(e.target)) { if (sbEl.classList.contains('auf')) sbZu(); sbRanken.classList.remove('auf'); } });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && (sbEl.classList.contains('auf') || sbRanken.classList.contains('auf'))) { sbZu(); sbGriff.focus(); } });
 
@@ -7516,14 +7553,14 @@ button.x:focus-visible{outline:3px solid currentColor;outline-offset:1px}
     const rahmen = document.getElementById('ortRahmen'), zeile = document.getElementById('ortZeile');
     if (qs === null) { if (rahmen.getAttribute('src')) rahmen.removeAttribute('src'); return; }
     const p = new URLSearchParams(qs || ''), o = ortVon(p.get('o')), w = o && o.wege[p.get('w')], ziel = w && /^https:\/\//.test(w) ? w : o && o.web;
-    if (!ziel) { go(o ? o.hub : 'partner'); return; }
+    if (!ziel || o.tab) { go(o ? o.hub : 'partner'); return; }   // was das Einbetten verbietet, lädt nie in den Rahmen
     if (rahmen.getAttribute('src') !== ziel) rahmen.setAttribute('src', ziel);
     rahmen.title = 'Seite von ' + o.n;
     // Wer über die Navigation kam, landet mit dem Fokus in der geladenen Seite. Die Zeile sagt den Wechsel an, aber nur wenn sich das Ziel ändert.
     if (Date.now() - sbKlick < 1500) { sbKlick = 0; rahmen.focus({ preventScroll: true }); }
     if (zeile.dataset.ziel === ziel) return;
     zeile.dataset.ziel = ziel;
-    zeile.innerHTML = `<span>Du bist bei <b>${esc(o.n)}</b></span><a href="${esc(sichereUrl(ziel))}" target="_blank" rel="noopener">in neuem Tab öffnen</a><a href="#${esc(o.hub)}">Was ${esc(o.n)} im Datenraum teilt ›</a>`;
+    zeile.innerHTML = `<span>Du bist bei <b>${esc(o.n)}</b></span><a href="${esc(sichereUrl(ziel))}" target="_blank" rel="noopener">in neuem Tab öffnen</a>` + (o.ohne ? '<span>noch ohne Inhalte im Datenraum</span>' : `<a href="#${esc(o.hub)}">Was ${esc(o.n)} im Datenraum teilt ›</a>`);
   }
 
   // ---------- In Entwicklung: Ansichten ohne eigene Entwicklung ----------
