@@ -42,3 +42,7 @@ Dazu gehört ein Stufenmodell, das jeder Ort in seinem Tempo geht: Daten teilen,
 - Die Ziele der Wege sind aus den Navigationen der Seiten abgelesen und nicht mit den Communities abgestimmt.
 - Das Zeichen als kleinste Stufe und das Element zum Einbinden auf fremden Seiten sind in der Skizze gezeigt, aber nicht gebaut.
 - Ob die Blume in der Mitte der Startseite bleibt oder die Bedienung am Rand vorführt.
+
+## Fortschreibung: Barrierefreiheit (26.11.2026)
+
+Ziel ist WCAG 2.2 Stufe AA. Schrift auf Streifen und Ranken hält 4,5 zu 1. Die Streifen bleiben ohne Kontur: Gelb und Orange heben sich zwar nicht mit 3 zu 1 vom Seitengrund ab, die Schaltflächen sind aber über ihre Schrift erkennbar, das genügt der Stufe AA. Wege, die erst nach Anmeldung gehen, tragen eine graue Fläche mit grauer Schrift. Die Stummel der Ranken sind 24 Pixel hoch, ausgefahren auf Geräten mit Fingerbedienung 36 Pixel. Lädt ein Ort in den Rahmen, trägt der Rahmen dessen Namen, die Ortszeile sagt den Wechsel an, und der Fokus folgt in die geladene Seite, wenn der Wechsel aus der Navigation kam. Ein Test rechnet die Kontraste nach. Offen bleiben ein Durchlauf mit Screenreader und die Prüfung bei 200 und 400 Prozent Zoom.

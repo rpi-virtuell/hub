@@ -14,7 +14,7 @@
   --d-material:#85992C; --t-material:#1B2400;
   --d-termine:#DAB000; --t-termine:#2B2200;
   --d-news:#F1693E; --t-news:#2B1000;
-  --d-gespraeche:#B549F0; --t-gespraeche:#FFFFFF;
+  --d-gespraeche:#B549F0; --t-gespraeche:#1B0A2A;
   --d-menschen:#AF4112; --t-menschen:#FFFFFF;
   --hub:#2A3B8E; --ort:#2E7B4F; --ort-tinte:#FFFFFF; --gast:#1F6F6B; --gast-tinte:#FFFFFF; --platz:#E6E2D7; --flowi:#FFE27A; --flowi-blatt:#F7B8D2; --schatten:rgba(20,26,40,.22);
   --text:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif; --titel:"Barlow Condensed","Barlow",system-ui,sans-serif;
@@ -92,8 +92,8 @@ button,input,select{font:inherit;color:inherit}
 .wuchs.auf .wege>div{padding-bottom:12px}
 .weg{display:flex;align-items:stretch;flex:none;height:40px;border-radius:0 999px 999px 0;background:var(--c);color:var(--t);overflow:hidden;white-space:nowrap;box-shadow:0 3px 10px var(--schatten);transform:translateX(-108%);opacity:0;transition:transform .25s,opacity .2s}
 .wuchs.auf .weg{transform:none;opacity:1;transition:transform .5s cubic-bezier(.2,1.35,.4,1) calc(var(--v)*1s),opacity .2s calc(var(--v)*1s)}
-.weg b{display:flex;align-items:center;padding:0 12px 0 14px;font-weight:700;font-size:16px;min-width:96px}
-.weg button{border:0;border-left:2px solid var(--c);background:var(--karte);color:var(--tinte);font-weight:700;font-size:15px;padding:0 14px;cursor:pointer;margin:3px 0}
+.weg b{display:flex;align-items:center;padding:0 12px 0 14px;font-weight:600;font-size:16px;min-width:96px}
+.weg button{border:0;border-left:2px solid var(--c);background:var(--karte);color:var(--tinte);font-weight:500;font-size:15px;padding:0 14px;cursor:pointer;margin:3px 0}
 .weg button:last-child{border-radius:0 999px 999px 0;margin-right:3px;padding-right:16px}
 .weg button:hover,.weg button:focus-visible{background:color-mix(in srgb,var(--c) 26%,var(--karte))}
 .wortlaut{position:absolute;left:116px;top:30px;width:max-content;max-width:min(300px,calc(100vw - 132px));background:var(--tinte);color:var(--grund);border-radius:12px;padding:7px 12px;font-size:15px;font-weight:600;z-index:4}
@@ -129,10 +129,11 @@ button,input,select{font:inherit;color:inherit}
 @media (prefers-reduced-motion: reduce){ .rad,.rad-trieb{transition:none!important} }
 /* Ranken: alle Orte des Ökosystems. In Ruhe schauen nur Stummel aus dem Rand, beim Überfahren oder Antippen wachsen sie heraus */
 .ranken{display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:4px 14px 0 0}
-.ort{display:flex;align-items:center;gap:8px;flex:none;height:22px;padding:0 14px 0 12px;border:0;border-radius:0 999px 999px 0;background:var(--ort);color:transparent;text-decoration:none;font:600 15px/1 var(--text);white-space:nowrap;cursor:pointer;box-shadow:0 2px 8px var(--schatten);
+.ort{display:flex;align-items:center;gap:8px;flex:none;height:24px;padding:0 14px 0 12px;border:0;border-radius:0 999px 999px 0;background:var(--ort);color:transparent;text-decoration:none;font:600 15px/1 var(--text);white-space:nowrap;cursor:pointer;box-shadow:0 2px 8px var(--schatten);
   transform:translateX(calc(-100% + var(--stummel)*1px));transition:transform .35s cubic-bezier(.4,0,.6,1) calc(var(--z)*1s),height .25s,color .2s}
 .ort i{width:9px;height:9px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px var(--ort-tinte)}
 .ranken.auf .ort{color:var(--ort-tinte);transform:none;height:30px;transition:transform .5s cubic-bezier(.2,1.35,.4,1) calc(var(--v)*1s),height .25s,color .2s}
+@media (pointer:coarse){.ranken.auf .ort{height:36px}}
 .ort.hier{background:var(--tinte);color:var(--grund)}
 .ranken:not(.auf) .ort.hier{color:transparent}
 .ort:hover{filter:brightness(1.12)}
@@ -209,7 +210,7 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
 </div>
 
 <iframe class="rahmen" id="rahmen" title="Seite eines Orts im Ökosystem" hidden></iframe>
-<div class="ortszeile" id="ortszeile" hidden></div>
+<div class="ortszeile" id="ortszeile" role="status" hidden></div>
 
 <div class="schleier" id="schleier" hidden></div>
 <div class="wuchs" id="wuchs">
@@ -396,7 +397,8 @@ body.im-rahmen .ausgabe{position:fixed;z-index:48;left:50%;top:50%;transform:tra
     if (variante === 'rad' && auf) { auf = false; stellen(); }   // das Rad gibt den Blick auf die geladene Seite frei
     rahmen.hidden = !o; ortszeile.hidden = !o;
     if (o) {
-      rahmen.src = o.u;
+      rahmen.src = o.u; rahmen.title = 'Seite von ' + o.n;
+      if (ranken.contains(document.activeElement)) rahmen.focus({ preventScroll: true });
       ortszeile.innerHTML = '<span>Du bist bei <b>' + esc(o.n) + '</b></span><a href="' + esc(o.u) + '" target="_blank" rel="noopener">in neuem Tab öffnen</a><button type="button" id="zurSkizze">zurück zur Skizze</button>';
       $('zurSkizze').addEventListener('click', function () { laden(null); });
     } else { rahmen.removeAttribute('src'); ortszeile.innerHTML = ''; }

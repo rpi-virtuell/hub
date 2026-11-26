@@ -1,6 +1,6 @@
 // Eine Seite (ADR-0017): Suche oben, Umschalter über der Blume, vier Belegungen nach Sicht und Anmeldung, einstellbare Blume der Community (ADR-0016).
 import { assert, assertEquals } from 'jsr:@std/assert@1';
-import { appScript, consoleScript, html } from './helfer.ts';
+import { appScript, consoleScript, contrast, html } from './helfer.ts';
 const c = consoleScript(), s = appScript();
 const beleg = (name: string) => (s.match(new RegExp("registerBelegung\\('" + name + "', \\[[\\s\\S]*?\\n  \\]\\);")) || [''])[0];
 
@@ -266,4 +266,23 @@ Deno.test('ADR-0017 und README nennen die eine Seite', async () => {
   assert(/## Status\nEntwurf/.test(adr) && /Suchschlitz/.test(adr) && /Mein ReliHub/.test(adr), 'ADR-0017 unvollständig');
   assert(/ADR-0017/.test(alt), 'ADR-0016 verweist nicht auf die Nachfolge');
   assert(/\[0017\]\(0017-eine-seite-suche-umschalter-blume\.md\)/.test(readme) && /\[0016\]\(0016-entwurfsvergleich-und-einstellbare-blume\.md\)/.test(readme), 'README nennt ADR-0016 oder ADR-0017 nicht');
+});
+
+Deno.test('Barrierefreiheit der Blume am Rand: Kontraste, Kontur, Zielgröße, Ansage (WCAG 2.2 AA)', () => {
+  const farben = JSON.parse((c.match(/const FARBE = (\{[^\n]*?\});/) || ['', '{}'])[1].replace(/'/g, '"').replace(/(\w+):/g, '"$1":'));
+  const skizze = Deno.readTextFileSync(new URL('../wuchsformen.html', import.meta.url));
+  for (const d of ['material', 'termine', 'news', 'gespraeche', 'menschen']) {
+    assert(contrast(farben[d][0], farben[d][1]) >= 4.5, 'Schrift auf dem Streifen: ' + d);
+    const m = skizze.match(new RegExp('--d-' + d + ':(#[0-9A-F]{6}); --t-' + d + ':(#[0-9A-F]{6})'));
+    assert(m && contrast(m[1], m[2]) >= 4.5, 'Schrift auf dem Streifen der Skizze: ' + d);
+  }
+  for (const f of ['#2E7B4F', '#5F6670', '#1B2440']) assert(contrast('#FFFFFF', f) >= 4.5, 'Schrift auf der Ranke ' + f);
+  for (const [datei, weg, ort] of [[html, '.sb-weg', '.sb-ort'], [skizze, '.weg', '.ort']]) {
+    assert(datei.includes(weg + '{display:flex;align-items:stretch;flex:none;height:40px;') && !/1\.5px color-mix/.test(datei), 'Streifen ohne Kontur');
+    assert(datei.includes(ort + '{display:flex;align-items:center;gap:8px;flex:none;height:24px;'), 'Stummel mindestens 24 Pixel hoch');
+    assert(new RegExp('@media \\(pointer:coarse\\)\\{[^{]*\\' + ort + '\\{height:36px\\}').test(datei), 'mehr Fläche für den Finger');
+  }
+  assert(/\.sb-weg button\.grau\{background:#E4E6EA;color:#4F5560\}/.test(html) && contrast('#4F5560', '#E4E6EA') >= 4.5 && contrast('#4F5560', '#D6D9DF') >= 4.5, 'Wege nach Anmeldung sind sichtbar grau und lesbar');
+  assert(/<p class="ort-zeile" id="ortZeile" role="status">/.test(html) && /id="ortszeile" role="status"/.test(skizze), 'Wechsel des Orts wird angesagt');
+  assert(/rahmen\.title = 'Seite von ' \+ o\.n;/.test(s) && /Date\.now\(\) - sbKlick < 1500\) \{ sbKlick = 0; rahmen\.focus\(/.test(s) && /zeile\.dataset\.ziel === ziel\) return;/.test(s), 'Rahmen trägt den Namen des Orts, Fokus folgt, keine doppelte Ansage');
 });
